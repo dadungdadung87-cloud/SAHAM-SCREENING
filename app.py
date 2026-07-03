@@ -43,24 +43,16 @@ st.markdown("Analisis Tren, Momentum, dan Volume secara Real-Time.")
 st.markdown("---")
 
 # ==========================================
-# 2. DAFTAR SAHAM
+# 2. DAFTAR SAHAM (DARI FILE Teks)
 # ==========================================
-daftar_saham = [
-    'BUMI', 'BNBR', 'BRMS', 'DEWA', 'PADI', 'TPIA', 'BIPI', 'DSSA', 'CUAN', 'BRPT', 
-    'BBRI', 'BUVA', 'BULL', 'COCO', 'YELO', 'EPAC', 'MBMA', 'BBRM', 'BMRI', 'LPKR', 
-    'BKSL', 'KIOS', 'BBCA', 'KOTA', 'TLKM', 'CSMI', 'MINA', 'ELTY', 'INET', 'BUKA', 
-    'MAPI', 'ENRG', 'TOOL', 'RGAS', 'PSAB', 'ESSA', 'PEGE', 'DEWI', 'HOKI', 'IRSX', 
-    'RAJA', 'ANTM', 'UVCR', 'MDIA', 'BBNI', 'VKTR', 'RBMS', 'SGER', 'CDIA', 'OMED', 
-    'BEEF', 'MBTO', 'AMMN', 'BBKP', 'BMTR', 'KOKA', 'ERAA', 'BTEK', 'MTEL', 'SMIL', 
-    'MSKY', 'AYLS', 'DMAS', 'MARK', 'ESIP', 'KPIG', 'PNLF', 'EMTK', 'ENZO', 'GOTO', 
-    'PTRO', 'KIJA', 'BREN', 'SCMA', 'PACK', 'LEAD', 'NCKL', 'AYAM', 'ASPR', 'WMPP', 
-    'TOWR', 'MDKA', 'ASII', 'LCKM', 'KLBF', 'JGLE', 'PPRE', 'GIAA', 'AMRT', 'FUJI', 
-    'SUPA', 'PWON', 'BWPT', 'PGAS', 'MEDC', 'KOCI', 'HOPE', 'BAIK', 'WIRG', 'CYBR', 
-    'MMIX', 'SRSN', 'BSDE', 'MSIN', 'RATU', 'RSCH', 'HUMI', 'CMNT', 'SMLE', 'NICL', 
-    'BBTN', 'VTNY', 'SLIS', 'PYFA', 'ACES', 'IBOS', 'BAPA', 'INDO', 'NTBK', 'TINS', 
-    'GPRA', 'PMUI', 'DGWG', 'FOLK', 'BCIP', 'ARCI', 'DEFI', 'PADA', 'INCO', 'HMSP', 
-    'FUTR', 'GULA'
-]
+try:
+    # Membaca daftar saham langsung dari file saham.txt
+    with open("saham.txt", "r") as file:
+        daftar_saham = [baris.strip().upper() for baris in file if baris.strip()]
+    st.caption(f"📁 Berhasil memuat **{len(daftar_saham)}** saham dari file eksternal.")
+except FileNotFoundError:
+    st.error("File 'saham.txt' tidak ditemukan! Pastikan Anda sudah membuat file tersebut.")
+    daftar_saham = [] # Kosongkan daftar jika file tidak ada
 
 # ==========================================
 # 3. MESIN KALKULASI ALGORITMA (VERSI TURBO - MULTITHREADING)
