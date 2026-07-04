@@ -68,7 +68,7 @@ def proses_screener_turbo(saham_list):
         
         # 2. BULK DOWNLOAD (Menarik semua data sekaligus)
         # Parameter threads=True membuat proses download berjalan paralel
-        data_mentah = yf.download(tickers_str, period="2mo", interval="1d", group_by='ticker', threads=True, progress=False)
+        data_mentah = yf.download(tickers_str, period="1mo", interval="1d", group_by='ticker', threads=True, progress=False)
         
         progress_bar = st.progress(0)
         
