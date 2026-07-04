@@ -3,6 +3,7 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 import requests # <--- TAMBAHKAN INI
+import os
 
 # ==========================================
 # 1. PENGATURAN UI/UX
@@ -41,6 +42,52 @@ st.markdown("""
 st.title("⚡ AlgoTrade Screener - IHSG")
 st.markdown("Analisis Tren, Momentum, dan Volume secara Real-Time.")
 st.markdown("---")
+
+# ==========================================
+# FITUR TAMBAHAN: SIDEBAR WATCHLIST PRIBADI
+# ==========================================
+FILE_WATCHLIST = "watchlist_pribadi.txt"
+
+def baca_watchlist():
+    if not os.path.exists(FILE_WATCHLIST):
+        with open(FILE_WATCHLIST, "w") as f:
+            pass
+        return []
+    with open(FILE_WATCHLIST, "r") as f:
+        return [baris.strip().upper() for baris in f if baris.strip()]
+
+def simpan_watchlist(daftar_saham):
+    with open(FILE_WATCHLIST, "w") as f:
+        for saham in set(daftar_saham): 
+            f.write(saham + "\n")
+
+# Membangun antarmuka di Sidebar
+st.sidebar.markdown("### 📌 Watchlist Anda")
+watchlist_saat_ini = baca_watchlist()
+
+saham_baru = st.sidebar.text_input("Tambah Saham (Cth: BBCA):").upper()
+if st.sidebar.button("➕ Tambah"):
+    if saham_baru and saham_baru not in watchlist_saat_ini:
+        watchlist_saat_ini.append(saham_baru)
+        simpan_watchlist(watchlist_saat_ini)
+        st.sidebar.success(f"Masuk daftar!")
+        st.rerun()
+
+st.sidebar.markdown("---")
+
+if watchlist_saat_ini:
+    st.sidebar.write("Saham Tersimpan:")
+    for saham in watchlist_saat_ini:
+        col1, col2 = st.sidebar.columns([3, 1])
+        with col1:
+            st.sidebar.write(f"**{saham}**")
+        with col2:
+            if st.sidebar.button("❌", key=f"hapus_{saham}", help="Hapus dari watchlist"):
+                watchlist_saat_ini.remove(saham)
+                simpan_watchlist(watchlist_saat_ini)
+                st.rerun()
+else:
+    st.sidebar.info("Belum ada saham.")
 
 # ==========================================
 # 2. DAFTAR SAHAM (DARI FILE Teks)
@@ -260,6 +307,32 @@ if not df_hasil.empty:
             hide_index=True,
             height=750 
         )
+
+    # ==========================================
+    # FITUR BARU: SIMPAN CEPAT KE WATCHLIST
+    # (Letakkan ini tepat di bawah kode st.dataframe)
+    # ==========================================
+    st.markdown("---")
+    st.markdown("#### ⭐ Simpan Cepat ke Watchlist")
+    
+    # Dropdown mengambil data dari df_filtered (saham yang lolos filter saja)
+    pilihan_saham = st.selectbox(
+        "Pilih saham dari tabel di atas untuk dipantau:", 
+        ["- Pilih Saham -"] + list(df_filtered["Ticker"])
+    )
+    
+    if st.button("Simpan ke Watchlist 📌"):
+        if pilihan_saham != "- Pilih Saham -":
+            # Memanggil mesin watchlist yang sudah kita buat di Sidebar tadi
+            watchlist_sekarang = baca_watchlist()
+            
+            if pilihan_saham not in watchlist_sekarang:
+                watchlist_sekarang.append(pilihan_saham)
+                simpan_watchlist(watchlist_sekarang)
+                st.success(f"Berhasil! {pilihan_saham} sudah ditambahkan ke menu Sidebar.")
+            else:
+                st.warning(f"{pilihan_saham} sudah ada di Watchlist Anda.")
+
         st.caption(f"Menampilkan urutan {(indeks_awal + 1)} - {min(indeks_akhir, len(df_filtered))} dari total {len(df_filtered)} saham yang lolos filter.")
     else:
         st.warning("Tidak ada saham yang memenuhi kriteria filter Anda saat ini.")
