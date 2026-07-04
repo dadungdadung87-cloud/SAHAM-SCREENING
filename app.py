@@ -68,7 +68,7 @@ def proses_screener_turbo(saham_list):
         
         # 2. BULK DOWNLOAD (Menarik semua data sekaligus)
         # Parameter threads=True membuat proses download berjalan paralel
-        data_mentah = yf.download(tickers_str, period="1mo", interval="1d", group_by='ticker', threads=True, progress=False)
+        data_mentah = yf.download(tickers_str, period="2mo", interval="1d", group_by='ticker', threads=True, progress=False)
         
         progress_bar = st.progress(0)
         
@@ -157,6 +157,11 @@ if not df_hasil.empty:
     met3.markdown(f"<div class='metric-container'><h3>📈 Fase Uptrend</h3><h2 style='color: #60a5fa;'>{total_uptrend} Saham</h2></div>", unsafe_allow_html=True)
     
     st.markdown("### 🎛️ Panel Filter Lengkap")
+    
+    # Tombol untuk menarik data paling baru dari market
+if st.button("🔄 Perbarui Data Market Sekarang"):
+    st.cache_data.clear() # Menghapus ingatan lama
+    st.rerun() # Memuat ulang web secara instan
 
     # FITUR BARU: Kolom Pencarian Saham
     search_ticker = st.text_input("🔍 Cari Kode Saham Spesifik (Contoh: BBCA, BMRI)", "")
