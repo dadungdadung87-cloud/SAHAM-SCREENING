@@ -158,6 +158,9 @@ if not df_hasil.empty:
     
     st.markdown("### 🎛️ Panel Filter Lengkap")
     
+    # FITUR BARU: Kolom Pencarian Saham
+    search_ticker = st.text_input("🔍 Cari Kode Saham Spesifik (Contoh: BBCA, BMRI)", "")
+    
     # Baris 1: Filter Indikator Dasar
     col1, col2, col3, col4 = st.columns(4)
     with col1:
@@ -182,6 +185,11 @@ if not df_hasil.empty:
     # MESIN PENYARINGAN (FILTERING)
     df_filtered = df_hasil.copy()
     
+    # Menyaring berdasarkan Pencarian Ticker (FITUR BARU)
+    if search_ticker:
+        # Menjadikan teks input selalu huruf besar agar cocok dengan data
+        df_filtered = df_filtered[df_filtered["Ticker"].str.contains(search_ticker.upper(), na=False)]
+        
     # Menyaring berdasarkan Indikator
     if filter_vol != "Semua":
         df_filtered = df_filtered[df_filtered["Vol Breakout"] == filter_vol]
