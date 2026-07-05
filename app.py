@@ -336,3 +336,26 @@ if not df_hasil.empty:
         st.caption(f"Menampilkan urutan {(indeks_awal + 1)} - {min(indeks_akhir, len(df_filtered))} dari total {len(df_filtered)} saham yang lolos filter.")
     else:
         st.warning("Tidak ada saham yang memenuhi kriteria filter Anda saat ini.")
+
+    # ==========================================
+    # 5. TABEL KHUSUS WATCHLIST (DATA LENGKAP)
+    # ==========================================
+    st.markdown("---")
+    st.markdown("### 🌟 Data Lengkap Watchlist Pribadi Anda")
+
+    # Mengambil daftar nama saham dari file txt
+    watchlist_terbaru = baca_watchlist()
+
+    # Jika watchlist ada isinya (tidak kosong)
+    if len(watchlist_terbaru) > 0:
+        # Menyaring master data (df_hasil) HANYA untuk saham yang ada di watchlist
+        df_watchlist = df_hasil[df_hasil['Ticker'].isin(watchlist_terbaru)]
+        
+        # Menampilkan tabel khusus watchlist
+        st.dataframe(
+            df_watchlist,
+            use_container_width=True,
+            hide_index=True
+        )
+    else:
+        st.info("📌 Watchlist Anda masih kosong. Silakan tambahkan saham melalui panel di atas atau dari menu samping (Sidebar).")
