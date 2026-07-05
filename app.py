@@ -2,7 +2,7 @@ import streamlit as st
 import yfinance as yf
 import pandas as pd
 import numpy as np
-import requests # <--- TAMBAHKAN INI
+import requests
 import os
 
 # ==========================================
@@ -70,7 +70,7 @@ if st.sidebar.button("➕ Tambah"):
     if saham_baru and saham_baru not in watchlist_saat_ini:
         watchlist_saat_ini.append(saham_baru)
         simpan_watchlist(watchlist_saat_ini)
-        st.sidebar.success(f"Masuk daftar!")
+        st.sidebar.success("Masuk daftar!")
         st.rerun()
 
 st.sidebar.markdown("---")
@@ -93,38 +93,31 @@ else:
 # 2. DAFTAR SAHAM (DARI FILE Teks)
 # ==========================================
 try:
-    # Membaca daftar saham langsung dari file saham.txt
     with open("saham.txt", "r") as file:
         daftar_saham = [baris.strip().upper() for baris in file if baris.strip()]
     st.caption(f"📁 Berhasil memuat **{len(daftar_saham)}** saham dari file eksternal.")
 except FileNotFoundError:
     st.error("File 'saham.txt' tidak ditemukan! Pastikan Anda sudah membuat file tersebut.")
-    daftar_saham = [] # Kosongkan daftar jika file tidak ada
+    daftar_saham = [] 
 
 # ==========================================
-# 3. MESIN KALKULASI ALGORITMA (VERSI TURBO - MULTITHREADING)
+# 3. MESIN KALKULASI ALGORITMA (VERSI TURBO)
 # ==========================================
 @st.cache_data(ttl=300) 
 def proses_screener_turbo(saham_list):
     hasil = []
     
     with st.spinner('Menerapkan Bulk Download untuk 500+ saham secara serentak...'):
-        # 1. Menyiapkan daftar lengkap kode saham dengan .JK
         tickers_jk = [f"{t}.JK" for t in saham_list]
         tickers_str = " ".join(tickers_jk)
         
-        # 2. BULK DOWNLOAD (Menarik semua data sekaligus)
-        # Parameter threads=True membuat proses download berjalan paralel
         data_mentah = yf.download(tickers_str, period="2mo", interval="1d", group_by='ticker', threads=True, progress=False)
         
         progress_bar = st.progress(0)
         
-        # 3. Mengolah data mentah yang sudah ditarik secara massal
         for i, ticker in enumerate(saham_list):
             try:
                 t_jk = f"{ticker}.JK"
-                
-                # Mengisolasi data untuk 1 saham spesifik, buang data yang kosong
                 if t_jk in data_mentah:
                     df_saham = data_mentah[t_jk].dropna(subset=['Close', 'Volume'])
                     
@@ -157,7 +150,7 @@ def proses_screener_turbo(saham_list):
                         if rsi > 50: score += 1
                         if momentum == "Positif": score += 1
                         if ma_signal == "Uptrend": score += 1
-                        
+
                         rekomendasi = "BELI" if score == 4 else "WAIT & SEE"
                         nilai_transaksi = close_today * vol_today
                         likuiditas = "> 1 Miliar" if nilai_transaksi > 1000000000 else "< 1 Miliar"
@@ -178,7 +171,6 @@ def proses_screener_turbo(saham_list):
             except Exception:
                 pass
                 
-            # Update progress bar agar visualisasi tetap responsif
             progress_bar.progress((i + 1) / len(saham_list))
             
         progress_bar.empty() 
@@ -187,11 +179,10 @@ def proses_screener_turbo(saham_list):
     if not hasil: return pd.DataFrame(columns=kolom)
     return pd.DataFrame(hasil)
 
-# Mengeksekusi mesin turbo
 df_hasil = proses_screener_turbo(daftar_saham)
 
 # ==========================================
-# 4. DASHBOARD RINGKASAN & FILTER (UI BARU)
+# 4. DASHBOARD RINGKASAN & FILTER 
 # ==========================================
 if not df_hasil.empty:
     total_dianalisis = len(df_hasil)
@@ -204,82 +195,48 @@ if not df_hasil.empty:
     met3.markdown(f"<div class='metric-container'><h3>📈 Fase Uptrend</h3><h2 style='color: #60a5fa;'>{total_uptrend} Saham</h2></div>", unsafe_allow_html=True)
     
     st.markdown("### 🎛️ Panel Filter Lengkap")
-
-    # FITUR BARU: Kolom Pencarian Saham
     search_ticker = st.text_input("🔍 Cari Kode Saham Spesifik (Contoh: BBCA, BMRI)", "")
     
-    # Baris 1: Filter Indikator Dasar
     col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        filter_vol = st.selectbox("🔊 1. Volume", ["Semua", "Tembus MA20", "Normal"])
-    with col2:
-        filter_rsi = st.selectbox("📊 2. RSI (14D)", ["Semua", "> 50 (Bullish)", "<= 50 (Bearish)"])
-    with col3:
-        filter_trend = st.selectbox("📈 3. Tren (MA20)", ["Semua", "Uptrend", "Downtrend"])
-    with col4:
-        filter_momentum = st.selectbox("⚡ 4. Momentum", ["Semua", "Positif", "Negatif"])
+    with col1: filter_vol = st.selectbox("🔊 1. Volume", ["Semua", "Tembus MA20", "Normal"])
+    with col2: filter_rsi = st.selectbox("📊 2. RSI (14D)", ["Semua", "> 50 (Bullish)", "<= 50 (Bearish)"])
+    with col3: filter_trend = st.selectbox("📈 3. Tren (MA20)", ["Semua", "Uptrend", "Downtrend"])
+    with col4: filter_momentum = st.selectbox("⚡ 4. Momentum", ["Semua", "Positif", "Negatif"])
 
-    # Baris 2: Filter Hasil Penilaian & Keamanan
-    st.write("") # Spasi kecil agar rapi
+    st.write("") 
     col5, col6, col7 = st.columns(3)
-    with col5:
-        filter_score = st.selectbox("⭐ Total Score", ["Semua", 4, 3, 2, 1, 0])
-    with col6:
-        filter_rekomendasi = st.selectbox("🎯 Rekomendasi", ["Semua", "BELI", "WAIT & SEE"])
-    with col7:
-        filter_likuiditas = st.selectbox("💧 Likuiditas", ["Semua", "> 1 Miliar", "< 1 Miliar"])
+    with col5: filter_score = st.selectbox("⭐ Total Score", ["Semua", 4, 3, 2, 1, 0])
+    with col6: filter_rekomendasi = st.selectbox("🎯 Rekomendasi", ["Semua", "BELI", "WAIT & SEE"])
+    with col7: filter_likuiditas = st.selectbox("💧 Likuiditas", ["Semua", "> 1 Miliar", "< 1 Miliar"])
 
-    # MESIN PENYARINGAN (FILTERING)
     df_filtered = df_hasil.copy()
-    
-    # Menyaring berdasarkan Pencarian Ticker (FITUR BARU)
-    if search_ticker:
-        # Menjadikan teks input selalu huruf besar agar cocok dengan data
-        df_filtered = df_filtered[df_filtered["Ticker"].str.contains(search_ticker.upper(), na=False)]
-        
-    # Menyaring berdasarkan Indikator
-    if filter_vol != "Semua":
-        df_filtered = df_filtered[df_filtered["Vol Breakout"] == filter_vol]
-    if filter_rsi == "> 50 (Bullish)":
-        df_filtered = df_filtered[df_filtered["RSI (14D)"] > 50]
-    elif filter_rsi == "<= 50 (Bearish)":
-        df_filtered = df_filtered[df_filtered["RSI (14D)"] <= 50]
-    if filter_trend != "Semua":
-        df_filtered = df_filtered[df_filtered["MA Signal"] == filter_trend]
-    if filter_momentum != "Semua":
-        df_filtered = df_filtered[df_filtered["Momentum"] == filter_momentum]
-        
-    # Menyaring berdasarkan Penilaian Akhir
-    if filter_score != "Semua":
-        df_filtered = df_filtered[df_filtered["Total Score"] == filter_score]
-    if filter_rekomendasi != "Semua":
-        df_filtered = df_filtered[df_filtered["Rekomendasi"] == filter_rekomendasi]
-    if filter_likuiditas != "Semua":
-        df_filtered = df_filtered[df_filtered["Likuiditas"] == filter_likuiditas]
+    if search_ticker: df_filtered = df_filtered[df_filtered["Ticker"].str.contains(search_ticker.upper(), na=False)]
+    if filter_vol != "Semua": df_filtered = df_filtered[df_filtered["Vol Breakout"] == filter_vol]
+    if filter_rsi == "> 50 (Bullish)": df_filtered = df_filtered[df_filtered["RSI (14D)"] > 50]
+    elif filter_rsi == "<= 50 (Bearish)": df_filtered = df_filtered[df_filtered["RSI (14D)"] <= 50]
+    if filter_trend != "Semua": df_filtered = df_filtered[df_filtered["MA Signal"] == filter_trend]
+    if filter_momentum != "Semua": df_filtered = df_filtered[df_filtered["Momentum"] == filter_momentum]
+    if filter_score != "Semua": df_filtered = df_filtered[df_filtered["Total Score"] == filter_score]
+    if filter_rekomendasi != "Semua": df_filtered = df_filtered[df_filtered["Rekomendasi"] == filter_rekomendasi]
+    if filter_likuiditas != "Semua": df_filtered = df_filtered[df_filtered["Likuiditas"] == filter_likuiditas]
 
-# ==========================================
-# 5. PAGINASI & FORMAT TABEL
-# ==========================================
+    # ==========================================
+    # 5. PAGINASI & FORMAT TABEL
+    # ==========================================
     saham_per_halaman = 20
     total_halaman = int(np.ceil(len(df_filtered) / saham_per_halaman))
 
     if total_halaman > 0:
         st.markdown("### Hasil Penapisan (Screener)")
-        
         halaman_aktif = st.selectbox("Pilih Halaman:", range(1, total_halaman + 1))
         
         indeks_awal = (halaman_aktif - 1) * saham_per_halaman
         indeks_akhir = indeks_awal + saham_per_halaman
         df_tampil = df_filtered.iloc[indeks_awal:indeks_akhir]
         
-        # Fungsi Format Kustom untuk Angka & Persen
-        def format_angka(val):
-            return f"{int(val):,}".replace(",", ".")
-            
-        def format_persen(val):
-            return f"{val:+.2f}%"
+        def format_angka(val): return f"{int(val):,}".replace(",", ".")
+        def format_persen(val): return f"{val:+.2f}%"
         
-        # Fungsi Warna
         def warna_tabel(val):
             style = '' 
             if isinstance(val, (int, float)):
@@ -291,7 +248,6 @@ if not df_hasil.empty:
                 elif val == "> 1 Miliar": style = 'color: #3b82f6; font-weight: 600;'
             return style
 
-        # MENGGUNAKAN SUBSET: Warna hanya diterapkan pada kolom-kolom ini
         kolom_berwarna = ["Change (%)", "Momentum", "MA Signal", "Rekomendasi", "Likuiditas"]
 
         tabel_akhir = df_tampil.style.format({
@@ -301,61 +257,68 @@ if not df_hasil.empty:
             "RSI (14D)": "{:.0f}"
         }).map(warna_tabel, subset=kolom_berwarna)
 
-        st.dataframe(
-            tabel_akhir,
-            use_container_width=True,
-            hide_index=True,
-            height=750 
-        )
+        st.dataframe(tabel_akhir, use_container_width=True, hide_index=True, height=750)
 
-    # ==========================================
-    # FITUR BARU: SIMPAN CEPAT KE WATCHLIST
-    # (Letakkan ini tepat di bawah kode st.dataframe)
-    # ==========================================
-    st.markdown("---")
-    st.markdown("#### ⭐ Simpan Cepat ke Watchlist")
-    
-    # Dropdown mengambil data dari df_filtered (saham yang lolos filter saja)
-    pilihan_saham = st.selectbox(
-        "Pilih saham dari tabel di atas untuk dipantau:", 
-        ["- Pilih Saham -"] + list(df_filtered["Ticker"])
-    )
-    
-    if st.button("Simpan ke Watchlist 📌"):
-        if pilihan_saham != "- Pilih Saham -":
-            # Memanggil mesin watchlist yang sudah kita buat di Sidebar tadi
-            watchlist_sekarang = baca_watchlist()
-            
-            if pilihan_saham not in watchlist_sekarang:
-                watchlist_sekarang.append(pilihan_saham)
-                simpan_watchlist(watchlist_sekarang)
-                st.success(f"Berhasil! {pilihan_saham} sudah ditambahkan ke menu Sidebar.")
-            else:
-                st.warning(f"{pilihan_saham} sudah ada di Watchlist Anda.")
-
+        # ==========================================
+        # FITUR BARU: SIMPAN CEPAT KE WATCHLIST
+        # ==========================================
+        st.markdown("---")
+        st.markdown("#### ⭐ Simpan Cepat ke Watchlist")
+        
+        pilihan_saham = st.selectbox("Pilih saham dari tabel di atas untuk dipantau:", ["- Pilih Saham -"] + list(df_filtered["Ticker"]))
+        
+        if st.button("Simpan ke Watchlist 📌"):
+            if pilihan_saham != "- Pilih Saham -":
+                watchlist_sekarang = baca_watchlist()
+                if pilihan_saham not in watchlist_sekarang:
+                    watchlist_sekarang.append(pilihan_saham)
+                    simpan_watchlist(watchlist_sekarang)
+                    st.success(f"Berhasil! {pilihan_saham} sudah ditambahkan ke menu Sidebar.")
+                else:
+                    st.warning(f"{pilihan_saham} sudah ada di Watchlist Anda.")
+                    
         st.caption(f"Menampilkan urutan {(indeks_awal + 1)} - {min(indeks_akhir, len(df_filtered))} dari total {len(df_filtered)} saham yang lolos filter.")
     else:
         st.warning("Tidak ada saham yang memenuhi kriteria filter Anda saat ini.")
 
-    # ==========================================
-    # 5. TABEL KHUSUS WATCHLIST (DATA LENGKAP)
-    # ==========================================
-    st.markdown("---")
-    st.markdown("### 🌟 Data Lengkap Watchlist Pribadi Anda")
+# ==========================================
+# 6. TABEL KHUSUS WATCHLIST (DATA LENGKAP & BERWARNA)
+# ==========================================
+st.markdown("---")
+st.markdown("### 🌟 Data Lengkap Watchlist Pribadi Anda")
 
-    # Mengambil daftar nama saham dari file txt
-    watchlist_terbaru = baca_watchlist()
+watchlist_terbaru = baca_watchlist()
 
-    # Jika watchlist ada isinya (tidak kosong)
-    if len(watchlist_terbaru) > 0:
-        # Menyaring master data (df_hasil) HANYA untuk saham yang ada di watchlist
-        df_watchlist = df_hasil[df_hasil['Ticker'].isin(watchlist_terbaru)]
-        
-        # Menampilkan tabel khusus watchlist
-        st.dataframe(
-            df_watchlist,
-            use_container_width=True,
-            hide_index=True
-        )
-    else:
-        st.info("📌 Watchlist Anda masih kosong. Silakan tambahkan saham melalui panel di atas atau dari menu samping (Sidebar).")
+if len(watchlist_terbaru) > 0 and not df_hasil.empty:
+    df_watchlist = df_hasil[df_hasil['Ticker'].isin(watchlist_terbaru)]
+    
+    def pewarnaan_tabel_watchlist(val):
+        if isinstance(val, str):
+            if val in ["Uptrend", "Positif", "BELI", "Tembus MA20"]:
+                return "color: #4ade80; font-weight: bold;" 
+            elif val in ["Downtrend", "Negatif"]:
+                return "color: #f87171; font-weight: bold;" 
+            elif val == "WAIT & SEE":
+                return "color: #fbbf24; font-weight: bold;" 
+        elif isinstance(val, (int, float)) and val < 0:
+            return "color: #f87171; font-weight: bold;" 
+        return "" 
+
+    try:
+        tabel_watchlist_cantik = df_watchlist.style.map(pewarnaan_tabel_watchlist).format({
+            "Harga (Rp)": "{:,.0f}",
+            "Volume": "{:,.0f}",
+            "Change (%)": "{:.2f}%",
+            "RSI (14D)": "{:.0f}"
+        })
+    except AttributeError:
+        tabel_watchlist_cantik = df_watchlist.style.applymap(pewarnaan_tabel_watchlist).format({
+            "Harga (Rp)": "{:,.0f}",
+            "Volume": "{:,.0f}",
+            "Change (%)": "{:.2f}%",
+            "RSI (14D)": "{:.0f}"
+        })
+
+    st.dataframe(tabel_watchlist_cantik, use_container_width=True, hide_index=True)
+else:
+    st.info("📌 Watchlist Anda masih kosong. Silakan tambahkan saham melalui panel di atas atau dari menu samping (Sidebar).")
