@@ -1,9 +1,8 @@
 import streamlit as st
-import yfinance as yf
 import pandas as pd
 import numpy as np
-import requests
 import os
+from datetime import datetime
 
 # ==========================================
 # 1. PENGATURAN UI/UX
@@ -90,96 +89,20 @@ else:
     st.sidebar.info("Belum ada saham.")
 
 # ==========================================
-# 2. DAFTAR SAHAM (DARI FILE Teks)
+# 2. MEMUAT DATA LOKAL (SANGAT INSTAN)
 # ==========================================
-try:
-    with open("saham.txt", "r") as file:
-        daftar_saham = [baris.strip().upper() for baris in file if baris.strip()]
-    st.caption(f"📁 Berhasil memuat **{len(daftar_saham)}** saham dari file eksternal.")
-except FileNotFoundError:
-    st.error("File 'saham.txt' tidak ditemukan! Pastikan Anda sudah membuat file tersebut.")
-    daftar_saham = [] 
+FILE_HASIL = "hasil_screener.csv"
 
-# ==========================================
-# 3. MESIN KALKULASI ALGORITMA (VERSI TURBO)
-# ==========================================
-@st.cache_data(ttl=300) 
-def proses_screener_turbo(saham_list):
-    hasil = []
+if os.path.exists(FILE_HASIL):
+    # Mengambil waktu pembaruan file CSV terakhir kali
+    waktu_modifikasi = os.path.getmtime(FILE_HASIL)
+    waktu_terakhir = datetime.fromtimestamp(waktu_modifikasi).strftime('%Y-%m-%d %H:%M:%S')
     
-    with st.spinner('Menerapkan Bulk Download untuk 500+ saham secara serentak...'):
-        tickers_jk = [f"{t}.JK" for t in saham_list]
-        tickers_str = " ".join(tickers_jk)
-        
-        data_mentah = yf.download(tickers_str, period="2mo", interval="1d", group_by='ticker', threads=True, progress=False)
-        
-        progress_bar = st.progress(0)
-        
-        for i, ticker in enumerate(saham_list):
-            try:
-                t_jk = f"{ticker}.JK"
-                if t_jk in data_mentah:
-                    df_saham = data_mentah[t_jk].dropna(subset=['Close', 'Volume'])
-                    
-                    if len(df_saham) >= 25:
-                        close_today = df_saham['Close'].iloc[-1].item()
-                        close_yest = df_saham['Close'].iloc[-2].item()
-                        
-                        vol_val = df_saham['Volume'].iloc[-1].item()
-                        vol_today = int(vol_val) if not pd.isna(vol_val) else 0
-                        
-                        change_rp = close_today - close_yest
-                        change_pct = (change_rp / close_yest) * 100
-                        momentum = "Positif" if change_rp > 0 else "Negatif"
-                        
-                        ma_20 = df_saham['Close'].rolling(window=20).mean().iloc[-1].item()
-                        vol_ma_20 = df_saham['Volume'].rolling(window=20).mean().iloc[-1].item()
-                        ma_signal = "Uptrend" if close_today > ma_20 else "Downtrend"
-                        
-                        vol_breakout = "Tembus MA20" if vol_today > vol_ma_20 else "Normal"
-                        
-                        delta = df_saham['Close'].diff()
-                        gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
-                        loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
-                        rs = gain / loss
-                        rsi_raw = 100 - (100 / (1 + rs)).iloc[-1].item()
-                        rsi = int(round(rsi_raw)) if not pd.isna(rsi_raw) else 0
-                        
-                        score = 0
-                        if vol_today > vol_ma_20: score += 1
-                        if rsi > 50: score += 1
-                        if momentum == "Positif": score += 1
-                        if ma_signal == "Uptrend": score += 1
-
-                        rekomendasi = "BELI" if score == 4 else "WAIT & SEE"
-                        nilai_transaksi = close_today * vol_today
-                        likuiditas = "> 1 Miliar" if nilai_transaksi > 1000000000 else "< 1 Miliar"
-                        
-                        hasil.append({
-                            "Ticker": ticker,
-                            "Harga (Rp)": close_today,
-                            "Change (%)": change_pct,
-                            "Volume": vol_today,
-                            "Vol Breakout": vol_breakout,
-                            "RSI (14D)": rsi,
-                            "Momentum": momentum,
-                            "MA Signal": ma_signal,
-                            "Likuiditas": likuiditas,
-                            "Total Score": score,
-                            "Rekomendasi": rekomendasi
-                        })
-            except Exception:
-                pass
-                
-            progress_bar.progress((i + 1) / len(saham_list))
-            
-        progress_bar.empty() 
-        
-    kolom = ["Ticker", "Harga (Rp)", "Change (%)", "Volume", "Vol Breakout", "RSI (14D)", "Momentum", "MA Signal", "Likuiditas", "Total Score", "Rekomendasi"]
-    if not hasil: return pd.DataFrame(columns=kolom)
-    return pd.DataFrame(hasil)
-
-df_hasil = proses_screener_turbo(daftar_saham)
+    st.success(f"💾 Data berhasil dimuat secara instan! Terakhir diperbarui pada: **{waktu_terakhir}**")
+    df_hasil = pd.read_csv(FILE_HASIL)
+else:
+    st.error(f"❌ File '{FILE_HASIL}' belum ditemukan! Silakan jalankan script `update_data.py` terlebih dahulu di terminal untuk memproses data.")
+    df_hasil = pd.DataFrame()
 
 # ==========================================
 # 4. DASHBOARD RINGKASAN & FILTER 
@@ -216,7 +139,9 @@ if not df_hasil.empty:
     elif filter_rsi == "<= 50 (Bearish)": df_filtered = df_filtered[df_filtered["RSI (14D)"] <= 50]
     if filter_trend != "Semua": df_filtered = df_filtered[df_filtered["MA Signal"] == filter_trend]
     if filter_momentum != "Semua": df_filtered = df_filtered[df_filtered["Momentum"] == filter_momentum]
-    if filter_score != "Semua": df_filtered = df_filtered[df_filtered["Total Score"] == filter_score]
+    
+    # Penyesuaian filter tipe numerik dari file CSV lokal
+    if filter_score != "Semua": df_filtered = df_filtered[df_filtered["Total Score"] == int(filter_score)]
     if filter_rekomendasi != "Semua": df_filtered = df_filtered[df_filtered["Rekomendasi"] == filter_rekomendasi]
     if filter_likuiditas != "Semua": df_filtered = df_filtered[df_filtered["Likuiditas"] == filter_likuiditas]
 
@@ -260,7 +185,7 @@ if not df_hasil.empty:
         st.dataframe(tabel_akhir, use_container_width=True, hide_index=True, height=750)
 
         # ==========================================
-        # FITUR BARU: SIMPAN CEPAT KE WATCHLIST
+        # FITUR: SIMPAN CEPAT KE WATCHLIST
         # ==========================================
         st.markdown("---")
         st.markdown("#### ⭐ Simpan Cepat ke Watchlist")
