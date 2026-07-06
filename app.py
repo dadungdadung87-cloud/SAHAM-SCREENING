@@ -127,10 +127,12 @@ if not df_hasil.empty:
     with col4: filter_momentum = st.selectbox("⚡ 4. Momentum", ["Semua", "Positif", "Negatif"])
 
     st.write("") 
-    col5, col6, col7 = st.columns(3)
+    # 🌟 PERUBAHAN: Menambahkan filter Bollinger Bands menjadi 4 kolom di baris kedua
+    col5, col6, col7, col8 = st.columns(4)
     with col5: filter_score = st.selectbox("⭐ Total Score", ["Semua", 4, 3, 2, 1, 0])
     with col6: filter_rekomendasi = st.selectbox("🎯 Rekomendasi", ["Semua", "BELI", "WAIT & SEE"])
     with col7: filter_likuiditas = st.selectbox("💧 Likuiditas", ["Semua", "> 1 Miliar", "< 1 Miliar"])
+    with col8: filter_bb = st.selectbox("🌐 Bollinger Bands", ["Semua", "Squeeze", "Bottom Rebound", "Breakout Upper", "Normal"])
 
     df_filtered = df_hasil.copy()
     if search_ticker: df_filtered = df_filtered[df_filtered["Ticker"].str.contains(search_ticker.upper(), na=False)]
@@ -144,6 +146,13 @@ if not df_hasil.empty:
     if filter_score != "Semua": df_filtered = df_filtered[df_filtered["Total Score"] == int(filter_score)]
     if filter_rekomendasi != "Semua": df_filtered = df_filtered[df_filtered["Rekomendasi"] == filter_rekomendasi]
     if filter_likuiditas != "Semua": df_filtered = df_filtered[df_filtered["Likuiditas"] == filter_likuiditas]
+    
+    # 🌟 PERUBAHAN: Logika filter untuk Bollinger Bands
+    if filter_bb != "Semua":
+        if "Status BB" in df_filtered.columns:
+            df_filtered = df_filtered[df_filtered["Status BB"] == filter_bb]
+        else:
+            st.warning("⚠️ Kolom 'Status BB' belum ada di CSV. Silakan jalankan update_data.py terlebih dahulu.")
 
     # ==========================================
     # 5. PAGINASI & FORMAT TABEL
@@ -151,7 +160,6 @@ if not df_hasil.empty:
     if not df_filtered.empty:
         st.markdown("### Hasil Penapisan (Screener)")
         
-        # Fitur Baru: Dropdown jumlah baris dan pilihan halaman disejajarkan
         col_pg1, col_pg2, col_pg3 = st.columns([1, 1, 2])
         
         with col_pg1:
@@ -178,21 +186,26 @@ if not df_hasil.empty:
                 if val > 0: style = 'color: #22c55e; font-weight: 600;' 
                 elif val < 0: style = 'color: #ef4444; font-weight: 600;' 
             elif isinstance(val, str):
-                if val in ["Positif", "Uptrend", "BELI"]: style = 'color: #22c55e; font-weight: 600;'
+                # 🌟 PERUBAHAN: Menambahkan pewarnaan untuk status BB
+                if val in ["Positif", "Uptrend", "BELI", "Breakout Upper", "Bottom Rebound"]: style = 'color: #22c55e; font-weight: 600;'
                 elif val in ["Negatif", "Downtrend", "WAIT & SEE"]: style = 'color: #ef4444; font-weight: 600;'
                 elif val == "> 1 Miliar": style = 'color: #3b82f6; font-weight: 600;'
+                elif val == "Squeeze": style = 'color: #fbbf24; font-weight: 600;'
             return style
 
-        kolom_berwarna = ["Change (%)", "Momentum", "MA Signal", "Rekomendasi", "Likuiditas"]
+        # 🌟 PERUBAHAN: Menambahkan "Status BB" ke dalam daftar kolom yang diwarnai
+        kolom_berwarna = ["Change (%)", "Momentum", "MA Signal", "Rekomendasi", "Likuiditas", "Status BB"]
+        
+        # Memastikan hanya mewarnai kolom yang memang ada di dataframe
+        kolom_berwarna_aktual = [col for col in kolom_berwarna if col in df_tampil.columns]
 
         tabel_akhir = df_tampil.style.format({
             "Harga (Rp)": format_angka,
             "Volume": format_angka,
             "Change (%)": format_persen,
             "RSI (14D)": "{:.0f}"
-        }).map(warna_tabel, subset=kolom_berwarna)
+        }).map(warna_tabel, subset=kolom_berwarna_aktual)
 
-        # Menghapus height=750 agar tinggi tabel dinamis menyesuaikan baris
         st.dataframe(tabel_akhir, use_container_width=True, hide_index=True)
 
         # ==========================================
@@ -230,11 +243,12 @@ if len(watchlist_terbaru) > 0 and not df_hasil.empty:
     
     def pewarnaan_tabel_watchlist(val):
         if isinstance(val, str):
-            if val in ["Uptrend", "Positif", "BELI", "Tembus MA20"]:
+            # 🌟 PERUBAHAN: Menambahkan status BB ke pewarnaan Watchlist
+            if val in ["Uptrend", "Positif", "BELI", "Tembus MA20", "Breakout Upper", "Bottom Rebound"]:
                 return "color: #4ade80; font-weight: bold;" 
             elif val in ["Downtrend", "Negatif"]:
                 return "color: #f87171; font-weight: bold;" 
-            elif val == "WAIT & SEE":
+            elif val in ["WAIT & SEE", "Squeeze"]:
                 return "color: #fbbf24; font-weight: bold;" 
         elif isinstance(val, (int, float)) and val < 0:
             return "color: #f87171; font-weight: bold;" 
