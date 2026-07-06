@@ -36,12 +36,34 @@ def main():
                     change_pct = (change_rp / close_yest) * 100
                     momentum = "Positif" if change_rp > 0 else "Negatif"
                     
+                    # Kalkulasi Moving Average
                     ma_20 = df_saham['Close'].rolling(window=20).mean().iloc[-1].item()
                     vol_ma_20 = df_saham['Volume'].rolling(window=20).mean().iloc[-1].item()
                     ma_signal = "Uptrend" if close_today > ma_20 else "Downtrend"
-                    
                     vol_breakout = "Tembus MA20" if vol_today > vol_ma_20 else "Normal"
                     
+                    # 🌟 KALKULASI BOLLINGER BANDS
+                    std_20 = df_saham['Close'].rolling(window=20).std().iloc[-1].item()
+                    upper_bb = ma_20 + (std_20 * 2)
+                    lower_bb = ma_20 - (std_20 * 2)
+                    
+                    # Mencegah error pembagian dengan nol
+                    if ma_20 != 0:
+                        bandwidth = ((upper_bb - lower_bb) / ma_20) * 100
+                    else:
+                        bandwidth = 0
+                        
+                    # Menentukan Status Bollinger Bands
+                    if bandwidth < 8.0:
+                        status_bb = "Squeeze"
+                    elif close_today > upper_bb:
+                        status_bb = "Breakout Upper"
+                    elif close_today > lower_bb and (abs(close_today - lower_bb) / lower_bb) < 0.02:
+                        status_bb = "Bottom Rebound"
+                    else:
+                        status_bb = "Normal"
+                    
+                    # Kalkulasi RSI
                     delta = df_saham['Close'].diff()
                     gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
                     loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
@@ -49,6 +71,7 @@ def main():
                     rsi_raw = 100 - (100 / (1 + rs)).iloc[-1].item()
                     rsi = int(round(rsi_raw)) if not pd.isna(rsi_raw) else 0
                     
+                    # Kalkulasi Skor
                     score = 0
                     if vol_today > vol_ma_20: score += 1
                     if rsi > 50: score += 1
@@ -68,11 +91,13 @@ def main():
                         "RSI (14D)": rsi,
                         "Momentum": momentum,
                         "MA Signal": ma_signal,
+                        "Status BB": status_bb, # 🌟 DATA BARU DIMASUKKAN KE CSV
                         "Likuiditas": likuiditas,
                         "Total Score": score,
                         "Rekomendasi": rekomendasi
                     })
-        except Exception:
+        except Exception as e:
+            # Mengabaikan error pada ticker tertentu agar proses tetap berjalan
             pass
 
     if hasil:
