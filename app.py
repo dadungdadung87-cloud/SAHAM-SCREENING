@@ -89,12 +89,26 @@ else:
     st.sidebar.info("Belum ada saham.")
 
 # ==========================================
-# 2. MEMUAT DATA LOKAL (SANGAT INSTAN & DYNAMIC REFRESH)
+# 2. MEMUAT DATA LOKAL (DENGAN LIVE MARKET UPDATER)
 # ==========================================
 FILE_HASIL = "hasil_screener.csv"
+SCRIPT_UPDATER = "update_data.py" # Sesuaikan dengan nama script backend Anda
 
-# Fungsi internal untuk membaca/memperbarui data ke dalam session_state
-def muat_ulang_data():
+import subprocess
+
+# Fungsi untuk menjalankan script update_data.py dan membaca hasilnya
+def muat_ulang_data(jalankan_script=False):
+    # Jika dipicu tombol refresh, jalankan script backend terlebih dahulu
+    if jalankan_script:
+        with st.spinner("🔄 Mengambil data live market terbaru... Mohon tunggu..."):
+            try:
+                # Menjalankan script update_data.py secara otomatis di background
+                subprocess.run(["python", SCRIPT_UPDATER], check=True)
+                st.toast("Data live market berhasil diperbarui!", icon="✅")
+            except Exception as e:
+                st.error(f"⚠️ Gagal memperbarui data otomatis: {e}")
+    
+    # Baca file CSV hasil update
     if os.path.exists(FILE_HASIL):
         st.session_state['df_hasil'] = pd.read_csv(FILE_HASIL)
         waktu_modifikasi = os.path.getmtime(FILE_HASIL)
@@ -103,27 +117,26 @@ def muat_ulang_data():
         st.session_state['df_hasil'] = pd.DataFrame()
         st.session_state['waktu_terakhir'] = None
 
-# Inisialisasi data saat aplikasi pertama kali dibuka
+# Inisialisasi data saat aplikasi pertama kali dibuka (tanpa jalankan script biar cepat)
 if 'df_hasil' not in st.session_state:
-    muat_ulang_data()
+    muat_ulang_data(jalankan_script=False)
 
-# Membuat layout tombol refresh berdampingan dengan info data
+# Membuat layout info data dan tombol refresh
 col_info, col_btn = st.columns([4, 1])
 
 with col_info:
     if st.session_state['df_hasil'] is not None and not st.session_state['df_hasil'].empty:
-        st.success(f"💾 Data berhasil dimuat secara instan! Terakhir diperbarui pada: **{st.session_state['waktu_terakhir']}**")
+        st.success(f"💾 Data saat ini: **{st.session_state['waktu_terakhir']}** (Gunakan tombol di samping untuk fetch data live market terbaru)")
     else:
-        st.error(f"❌ File '{FILE_HASIL}' belum ditemukan! Silakan jalankan script `update_data.py` terlebih dahulu di terminal untuk memproses data.")
+        st.error(f"❌ File '{FILE_HASIL}' belum ditemukan! Silakan jalankan script `{SCRIPT_UPDATER}` terlebih dahulu.")
 
 with col_btn:
-    # Tombol refresh yang memicu fungsi baca ulang tanpa mereset komponen UI filter
+    # Tombol refresh sekarang akan memicu jalankan_script=True
     if st.button("🔄 Refresh Data", use_container_width=True):
-        muat_ulang_data()
-        st.toast("Data saham berhasil diperbarui!", icon="🔄")
+        muat_ulang_data(jalankan_script=True)
         st.rerun()
 
-# Menghubungkan variabel lama Anda dengan session_state agar kode di bawahnya tidak error
+# Menghubungkan ke variabel utama Anda
 df_hasil = st.session_state['df_hasil']
 
 # ==========================================
