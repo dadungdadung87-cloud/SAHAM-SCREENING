@@ -148,13 +148,23 @@ if not df_hasil.empty:
     # ==========================================
     # 5. PAGINASI & FORMAT TABEL
     # ==========================================
-    saham_per_halaman = 20
-    total_halaman = int(np.ceil(len(df_filtered) / saham_per_halaman))
-
-    if total_halaman > 0:
+    if not df_filtered.empty:
         st.markdown("### Hasil Penapisan (Screener)")
-        halaman_aktif = st.selectbox("Pilih Halaman:", range(1, total_halaman + 1))
         
+        # Fitur Baru: Dropdown jumlah baris dan pilihan halaman disejajarkan
+        col_pg1, col_pg2, col_pg3 = st.columns([1, 1, 2])
+        
+        with col_pg1:
+            saham_per_halaman = st.selectbox("Tampilkan baris:", [20, 50, 100])
+            
+        total_halaman = int(np.ceil(len(df_filtered) / saham_per_halaman))
+        
+        with col_pg2:
+            if total_halaman > 0:
+                halaman_aktif = st.selectbox("Pilih Halaman:", range(1, total_halaman + 1))
+            else:
+                halaman_aktif = 1
+                
         indeks_awal = (halaman_aktif - 1) * saham_per_halaman
         indeks_akhir = indeks_awal + saham_per_halaman
         df_tampil = df_filtered.iloc[indeks_awal:indeks_akhir]
@@ -182,7 +192,8 @@ if not df_hasil.empty:
             "RSI (14D)": "{:.0f}"
         }).map(warna_tabel, subset=kolom_berwarna)
 
-        st.dataframe(tabel_akhir, use_container_width=True, hide_index=True, height=750)
+        # Menghapus height=750 agar tinggi tabel dinamis menyesuaikan baris
+        st.dataframe(tabel_akhir, use_container_width=True, hide_index=True)
 
         # ==========================================
         # FITUR: SIMPAN CEPAT KE WATCHLIST
