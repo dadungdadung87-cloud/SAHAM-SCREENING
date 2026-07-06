@@ -89,20 +89,42 @@ else:
     st.sidebar.info("Belum ada saham.")
 
 # ==========================================
-# 2. MEMUAT DATA LOKAL (SANGAT INSTAN)
+# 2. MEMUAT DATA LOKAL (SANGAT INSTAN & DYNAMIC REFRESH)
 # ==========================================
 FILE_HASIL = "hasil_screener.csv"
 
-if os.path.exists(FILE_HASIL):
-    # Mengambil waktu pembaruan file CSV terakhir kali
-    waktu_modifikasi = os.path.getmtime(FILE_HASIL)
-    waktu_terakhir = datetime.fromtimestamp(waktu_modifikasi).strftime('%Y-%m-%d %H:%M:%S')
-    
-    st.success(f"💾 Data berhasil dimuat secara instan! Terakhir diperbarui pada: **{waktu_terakhir}**")
-    df_hasil = pd.read_csv(FILE_HASIL)
-else:
-    st.error(f"❌ File '{FILE_HASIL}' belum ditemukan! Silakan jalankan script `update_data.py` terlebih dahulu di terminal untuk memproses data.")
-    df_hasil = pd.DataFrame()
+# Fungsi internal untuk membaca/memperbarui data ke dalam session_state
+def muat_ulang_data():
+    if os.path.exists(FILE_HASIL):
+        st.session_state['df_hasil'] = pd.read_csv(FILE_HASIL)
+        waktu_modifikasi = os.path.getmtime(FILE_HASIL)
+        st.session_state['waktu_terakhir'] = datetime.fromtimestamp(waktu_modifikasi).strftime('%Y-%m-%d %H:%M:%S')
+    else:
+        st.session_state['df_hasil'] = pd.DataFrame()
+        st.session_state['waktu_terakhir'] = None
+
+# Inisialisasi data saat aplikasi pertama kali dibuka
+if 'df_hasil' not in st.session_state:
+    muat_ulang_data()
+
+# Membuat layout tombol refresh berdampingan dengan info data
+col_info, col_btn = st.columns([4, 1])
+
+with col_info:
+    if st.session_state['df_hasil'] is not None and not st.session_state['df_hasil'].empty:
+        st.success(f"💾 Data berhasil dimuat secara instan! Terakhir diperbarui pada: **{st.session_state['waktu_terakhir']}**")
+    else:
+        st.error(f"❌ File '{FILE_HASIL}' belum ditemukan! Silakan jalankan script `update_data.py` terlebih dahulu di terminal untuk memproses data.")
+
+with col_btn:
+    # Tombol refresh yang memicu fungsi baca ulang tanpa mereset komponen UI filter
+    if st.button("🔄 Refresh Data", use_container_width=True):
+        muat_ulang_data()
+        st.toast("Data saham berhasil diperbarui!", icon="🔄")
+        st.rerun()
+
+# Menghubungkan variabel lama Anda dengan session_state agar kode di bawahnya tidak error
+df_hasil = st.session_state['df_hasil']
 
 # ==========================================
 # 4. DASHBOARD RINGKASAN & FILTER 
