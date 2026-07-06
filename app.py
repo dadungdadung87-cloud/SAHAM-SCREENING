@@ -89,26 +89,34 @@ else:
     st.sidebar.info("Belum ada saham.")
 
 # ==========================================
-# 2. MEMUAT DATA LOKAL (DENGAN LIVE MARKET UPDATER)
+# 2. MEMUAT DATA LOKAL (DENGAN LIVE MARKET UPDATER & DEBUGGER)
 # ==========================================
 FILE_HASIL = "hasil_screener.csv"
-SCRIPT_UPDATER = "update_data.py" # Sesuaikan dengan nama script backend Anda
+SCRIPT_UPDATER = "update_data.py" 
 
 import subprocess
+import sys
 
-# Fungsi untuk menjalankan script update_data.py dan membaca hasilnya
 def muat_ulang_data(jalankan_script=False):
-    # Jika dipicu tombol refresh, jalankan script backend terlebih dahulu
     if jalankan_script:
         with st.spinner("🔄 Mengambil data live market terbaru... Mohon tunggu..."):
             try:
-                # Menjalankan script update_data.py secara otomatis di background
-                subprocess.run(["python", SCRIPT_UPDATER], check=True)
+                # Menjalankan script update dengan interpreter python yang sama
+                proses = subprocess.run(
+                    [sys.executable, SCRIPT_UPDATER], 
+                    capture_output=True, 
+                    text=True, 
+                    check=True
+                )
                 st.toast("Data live market berhasil diperbarui!", icon="✅")
+            except subprocess.CalledProcessError as e:
+                st.error(f"⚠️ **Script backend `update_data.py` mengalami ERROR:**")
+                st.code(e.stderr if e.stderr else e.stdout, language="python")
+                return 
             except Exception as e:
-                st.error(f"⚠️ Gagal memperbarui data otomatis: {e}")
+                st.error(f"⚠️ Gagal menjalankan perintah: {e}")
+                return
     
-    # Baca file CSV hasil update
     if os.path.exists(FILE_HASIL):
         st.session_state['df_hasil'] = pd.read_csv(FILE_HASIL)
         waktu_modifikasi = os.path.getmtime(FILE_HASIL)
@@ -117,11 +125,9 @@ def muat_ulang_data(jalankan_script=False):
         st.session_state['df_hasil'] = pd.DataFrame()
         st.session_state['waktu_terakhir'] = None
 
-# Inisialisasi data saat aplikasi pertama kali dibuka (tanpa jalankan script biar cepat)
 if 'df_hasil' not in st.session_state:
     muat_ulang_data(jalankan_script=False)
 
-# Membuat layout info data dan tombol refresh
 col_info, col_btn = st.columns([4, 1])
 
 with col_info:
@@ -131,12 +137,11 @@ with col_info:
         st.error(f"❌ File '{FILE_HASIL}' belum ditemukan! Silakan jalankan script `{SCRIPT_UPDATER}` terlebih dahulu.")
 
 with col_btn:
-    # Tombol refresh sekarang akan memicu jalankan_script=True
-    if st.button("🔄 Refresh Data", use_container_width=True):
+    # Memperbarui sintaks tombol ke standar terbaru (width='stretch') untuk menghilangkan warning
+    if st.button("🔄 Refresh Data", width="stretch"):
         muat_ulang_data(jalankan_script=True)
         st.rerun()
 
-# Menghubungkan ke variabel utama Anda
 df_hasil = st.session_state['df_hasil']
 
 # ==========================================
@@ -228,7 +233,7 @@ if not df_hasil.empty:
         }).map(warna_tabel, subset=kolom_berwarna)
 
         # Menghapus height=750 agar tinggi tabel dinamis menyesuaikan baris
-        st.dataframe(tabel_akhir, use_container_width=True, hide_index=True)
+        st.dataframe(tabel_akhir, width="stretch", hide_index=True)
 
         # ==========================================
         # FITUR: SIMPAN CEPAT KE WATCHLIST
@@ -290,6 +295,6 @@ if len(watchlist_terbaru) > 0 and not df_hasil.empty:
             "RSI (14D)": "{:.0f}"
         })
 
-    st.dataframe(tabel_watchlist_cantik, use_container_width=True, hide_index=True)
+    st.dataframe(tabel_watchlist_cantik, width="stretch", hide_index=True)
 else:
     st.info("📌 Watchlist Anda masih kosong. Silakan tambahkan saham melalui panel di atas atau dari menu samping (Sidebar).")
