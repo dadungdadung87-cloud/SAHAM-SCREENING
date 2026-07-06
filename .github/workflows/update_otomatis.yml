@@ -1,0 +1,36 @@
+name: Update Data Screener Otomatis
+
+on:
+  schedule:
+    # Perintah cron untuk menjalankan setiap 5 menit
+    - cron: '*/5 * * * *'
+  workflow_dispatch: # Mengizinkan Anda menekan tombol jalankan manual di web GitHub
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install yfinance pandas numpy
+
+      - name: Run update script
+        run: python update_data.py
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action Bot"
+          git add hasil_screener.csv
+          # Menyimpan hasil, abaikan jika tidak ada perubahan
+          git commit -m "Auto-update data saham [skip ci]" || echo "Tidak ada perubahan data"
+          git push
