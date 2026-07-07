@@ -2,9 +2,13 @@ name: Update Data Screener Otomatis
 
 on:
   schedule:
-    # Perintah cron untuk menjalankan setiap 5 menit
-    - cron: '*/5 * * * *'
+    # Jalan tiap 5 menit, HANYA jam 02:00 - 09:00 UTC (09:00 - 16:00 WIB), HANYA hari Senin-Jumat
+    - cron: '*/5 2-9 * * 1-5'
   workflow_dispatch: # Mengizinkan Anda menekan tombol jalankan manual di web GitHub
+
+# WAJIB: Memberikan izin agar GitHub Action Bot bisa melakukan 'git push' menyimpan CSV ke repo
+permissions:
+  contents: write
 
 jobs:
   update-data:
