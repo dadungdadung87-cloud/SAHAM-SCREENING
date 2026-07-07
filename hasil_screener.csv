@@ -1,939 +1,941 @@
 Ticker,Harga (Rp),Change (%),Volume,Vol Breakout,RSI (14D),Momentum,MA Signal,Status BB,Likuiditas,Total Score,Rekomendasi
-BUMI,139.0,2.9629629629629632,1674495100,Normal,39,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-BNBR,105.0,0.0,1985692600,Tembus MA20,42,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-BRMS,498.0,2.8925619834710745,426069900,Normal,46,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-DEWA,314.0,4.666666666666667,443690100,Normal,47,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-PADI,89.0,12.658227848101266,782533300,Tembus MA20,62,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
-TPIA,1785.0,0.847457627118644,255806900,Normal,48,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-BIPI,121.0,0.8333333333333334,489664600,Normal,27,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-DSSA,820.0,1.8633540372670807,748789100,Normal,49,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-CUAN,610.0,-0.8130081300813009,179242700,Normal,38,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
-BRPT,1483.3699951171875,-0.9999990223643921,228013300,Normal,42,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
-BBRI,2710.0,0.7434944237918215,219292600,Normal,42,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-BUVA,765.0,0.6578947368421052,94590700,Normal,49,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-BULL,324.0,2.5316455696202533,98980400,Normal,38,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-COCO,290.0,25.0,374543100,Tembus MA20,68,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
-YELO,69.0,1.4705882352941175,21143100,Normal,45,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-EPAC,73.0,2.8169014084507045,190552200,Normal,67,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-MBMA,520.0,0.0,74105000,Normal,57,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-BBRM,121.0,-0.819672131147541,19286600,Normal,58,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-BMRI,4010.0,2.8205128205128207,97694100,Normal,42,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-LPKR,61.0,1.6666666666666667,26761000,Normal,43,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-BKSL,61.0,1.6666666666666667,158832800,Normal,35,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-KIOS,86.0,2.380952380952381,13028100,Normal,47,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-BBCA,6050.0,4.310344827586207,200465200,Normal,52,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-KOTA,88.0,3.5294117647058822,134995500,Normal,49,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-TLKM,2520.0,2.857142857142857,83587600,Normal,42,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-CSMI,82.0,18.84057971014493,160518500,Tembus MA20,59,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
-MINA,262.0,1.550387596899225,62717200,Normal,41,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-ELTY,23.0,4.545454545454546,40358600,Normal,41,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-INET,196.0,0.5128205128205128,74523600,Normal,49,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-BUKA,100.0,2.0408163265306123,100493400,Normal,36,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-MAPI,1515.0,0.33112582781456956,73774900,Normal,67,Positif,Uptrend,Squeeze,> 1 Miliar,3,WAIT & SEE
-ENRG,1075.0,2.380952380952381,57413500,Normal,27,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-TOOL,63.0,3.278688524590164,48945700,Normal,62,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-RGAS,188.0,11.242603550295858,168714000,Tembus MA20,59,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
-PSAB,408.0,4.081632653061225,84406700,Normal,29,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-ESSA,540.0,-0.9174311926605505,73091900,Normal,48,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
-PEGE,132.0,-2.2222222222222223,28688300,Tembus MA20,68,Negatif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-DEWI,119.0,-0.8333333333333334,108505000,Tembus MA20,52,Negatif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-HOKI,50.0,0.0,4116400,Normal,33,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,0,WAIT & SEE
-IRSX,294.0,4.25531914893617,43005100,Normal,50,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-RAJA,3940.0,0.7672634271099744,18655700,Normal,55,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-ANTM,2930.0,6.159420289855073,103473600,Normal,61,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-UVCR,129.0,-0.7692307692307693,55559700,Normal,32,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
-MDIA,71.0,20.33898305084746,215921800,Tembus MA20,49,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-BBNI,3250.0,2.5236593059936907,28681500,Normal,37,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-VKTR,520.0,-1.8867924528301887,47342400,Normal,37,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
-RBMS,58.0,7.4074074074074066,304653600,Tembus MA20,54,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
-SGER,408.0,-1.4492753623188406,12929000,Normal,51,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-CDIA,610.0,0.8264462809917356,29636500,Normal,38,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-OMED,195.0,7.734806629834254,14907400,Normal,51,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
-BEEF,204.0,2.0,114794900,Tembus MA20,68,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
-MBTO,102.0,2.0,7572000,Tembus MA20,22,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-AMMN,3500.0,8.024691358024691,65773700,Normal,51,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-BBKP,51.0,0.0,23839900,Normal,33,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
-BMTR,115.0,1.7699115044247788,20459700,Normal,45,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-KOKA,135.0,35.0,116340000,Tembus MA20,72,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
-ERAA,366.0,2.2346368715083798,39293600,Tembus MA20,51,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
-BTEK,11.0,10.0,50013000,Normal,44,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-MTEL,490.0,-0.8097165991902834,40936600,Tembus MA20,47,Negatif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-SMIL,290.0,0.6944444444444444,11911000,Normal,69,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-MSKY,58.0,3.571428571428571,11016100,Normal,44,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-AYLS,159.0,-1.8518518518518516,3786900,Normal,61,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-DMAS,138.0,2.2222222222222223,49020600,Normal,52,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-MARK,990.0,1.5384615384615385,21732900,Normal,85,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-ESIP,132.0,3.125,84885700,Normal,57,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-KPIG,73.0,1.3888888888888888,85266700,Tembus MA20,33,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
-PNLF,212.0,0.9523809523809524,18886200,Normal,50,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-EMTK,525.0,1.9417475728155338,21564800,Normal,44,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-ENZO,68.0,4.615384615384616,30624500,Tembus MA20,51,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
-GOTO,50.0,0.0,15650300,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-PTRO,3860.0,0.7832898172323759,13904600,Normal,43,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-KIJA,118.0,0.0,17843800,Normal,53,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-BREN,3400.0,4.747318080096829,51464400,Tembus MA20,34,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
-SCMA,210.0,6.0606060606060606,48126300,Normal,58,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-PACK,232.0,-1.694915254237288,43753300,Normal,39,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
-LEAD,93.0,1.0869565217391304,17494000,Normal,47,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-NCKL,860.0,5.521472392638037,37637500,Normal,46,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-AYAM,350.0,1.744186046511628,34283700,Normal,63,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-ASPR,147.0,3.5211267605633805,59580500,Normal,24,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-WMPP,18.0,5.88235294117647,18889900,Normal,33,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-TOWR,372.0,0.0,25151600,Normal,59,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-MDKA,2700.0,6.299212598425196,23591700,Normal,55,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-ASII,4810.0,5.021834061135371,24908400,Normal,52,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-LCKM,106.0,0.9523809523809524,10576100,Normal,20,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-KLBF,750.0,0.6711409395973155,41752900,Normal,52,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-JGLE,50.0,0.0,88805500,Normal,27,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
-PPRE,101.0,3.061224489795918,32118800,Normal,56,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-GIAA,54.0,3.8461538461538463,27932900,Normal,45,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-AMRT,1395.0,1.4545454545454546,21031400,Normal,56,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-FUJI,199.0,0.0,24750600,Tembus MA20,15,Negatif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-SUPA,550.0,1.8518518518518516,15661200,Normal,39,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-PWON,254.0,5.833333333333333,46547400,Normal,54,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-BWPT,74.0,1.36986301369863,50844300,Normal,50,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-PGAS,1390.0,1.8315018315018317,28229900,Normal,31,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-MEDC,1100.0,3.7735849056603774,26142400,Normal,32,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-KOCI,97.0,-1.0204081632653061,17216000,Normal,62,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-HOPE,136.0,-0.7299270072992701,4400300,Normal,54,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-BAIK,620.0,-3.875968992248062,22442400,Normal,44,Negatif,Uptrend,Normal,> 1 Miliar,1,WAIT & SEE
-WIRG,53.0,1.9230769230769231,30866400,Normal,31,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-CYBR,600.0,0.0,30560400,Tembus MA20,45,Negatif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-MMIX,610.0,5.172413793103448,19529400,Tembus MA20,41,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
-SRSN,67.0,3.076923076923077,22875900,Normal,52,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-BSDE,570.0,4.587155963302752,17400900,Normal,41,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-MSIN,460.0,0.0,18311100,Normal,38,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
-RATU,5325.0,1.4285714285714286,3421800,Normal,60,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-RSCH,282.0,-3.4246575342465753,19585800,Normal,38,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
-HUMI,118.0,1.7241379310344827,15992300,Normal,45,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-CMNT,795.0,0.0,24216600,Tembus MA20,42,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-SMLE,101.0,4.123711340206185,19097400,Tembus MA20,64,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
-NICL,500.0,2.459016393442623,17653700,Normal,34,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-BBTN,1160.0,6.422018348623854,27689400,Tembus MA20,36,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
-VTNY,55.0,0.0,3049600,Normal,27,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-SLIS,57.0,1.7857142857142856,35619900,Tembus MA20,46,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
-PYFA,202.0,2.0202020202020203,10975700,Normal,54,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-ACES,338.0,3.048780487804878,20230300,Normal,60,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-IBOS,72.0,9.090909090909092,6779700,Tembus MA20,34,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-BAPA,378.0,9.883720930232558,13954500,Tembus MA20,100,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
-INDO,162.0,3.8461538461538463,31989900,Normal,45,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-NTBK,50.0,0.0,10100900,Normal,26,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-TINS,3430.0,2.3880597014925375,15598400,Normal,56,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-GPRA,98.0,-1.0101010101010102,1690500,Normal,32,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-PMUI,79.0,-1.25,4635200,Normal,61,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-DGWG,296.0,1.36986301369863,16611900,Tembus MA20,49,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-FOLK,212.0,-0.9345794392523363,5048300,Normal,54,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-BCIP,56.0,0.0,4397000,Normal,27,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-ARCI,1005.0,8.64864864864865,49556700,Normal,52,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-DEFI,108.0,3.8461538461538463,24294600,Normal,48,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-PADA,105.0,2.941176470588235,8927200,Normal,33,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-INCO,4580.0,5.529953917050691,20347400,Tembus MA20,47,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
-HMSP,660.0,0.0,5863700,Normal,65,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-FUTR,220.0,34.96932515337423,172191500,Tembus MA20,71,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
-GULA,615.0,3.361344537815126,22447700,Normal,55,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-IATA,63.0,-1.5625,48560000,Normal,50,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
-KRYA,54.0,-1.8181818181818181,14464000,Normal,41,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-JPFA,2030.0,4.370179948586118,12183200,Normal,61,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-CBRE,700.0,0.7194244604316548,19487500,Tembus MA20,51,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
-DOOH,116.0,0.8695652173913043,7690000,Normal,44,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-DILD,107.0,0.0,5816600,Normal,30,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-KJEN,110.0,2.803738317757009,1833800,Normal,44,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-MSJA,416.0,2.9702970297029703,12844300,Normal,51,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-UNIQ,101.0,-0.9803921568627451,413900,Normal,51,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-MPPA,45.0,0.0,11524700,Normal,57,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-WBSA,640.0,2.4,18772300,Normal,33,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-WIFI,1720.0,0.2915451895043732,17139800,Normal,59,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-GTSI,128.0,3.200001574707055,13119800,Normal,47,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-OASA,260.0,0.0,21112100,Normal,50,Negatif,Uptrend,Normal,> 1 Miliar,1,WAIT & SEE
-MEDS,68.0,3.0303030303030303,32252000,Tembus MA20,42,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
-MIDI,276.0,0.0,2197900,Normal,42,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-ADRO,2300.0,0.8771929824561403,12685900,Normal,52,Positif,Uptrend,Squeeze,> 1 Miliar,3,WAIT & SEE
-UNVR,1800.0,2.272727272727273,7797200,Normal,77,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-KETR,510.0,2.4096385542168677,8254000,Normal,34,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-HATM,404.0,4.66321243523316,22376400,Tembus MA20,70,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
-UNTD,73.0,2.8169014084507045,18156900,Normal,54,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-ELSA,565.0,4.62962962962963,9512500,Normal,46,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-NPGF,56.0,0.0,12490500,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-BIPP,54.0,1.8867924528301887,6041800,Normal,43,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-ICON,104.0,0.0,5426300,Normal,52,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-INDY,1950.0,3.1746031746031744,13311200,Normal,35,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-SEMA,90.0,-2.1739130434782608,1031900,Normal,44,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-SSMS,765.0,1.3245033112582782,10999300,Normal,54,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-SDMU,85.0,8.974358974358974,25976000,Normal,65,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-PIPA,107.0,0.9433962264150944,14757000,Normal,46,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-EMDE,68.0,-1.4492753623188406,6265700,Normal,66,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-BDKR,145.0,-2.684563758389262,11549600,Normal,72,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-DFAM,82.0,2.5,77252300,Tembus MA20,31,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
-MGNA,89.0,0.0,2686200,Normal,62,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-GSMF,80.0,1.2658227848101267,2746100,Normal,61,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-PGEO,875.0,0.0,8898400,Normal,52,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-OILS,186.0,2.7624309392265194,7841300,Normal,45,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-OPMS,97.0,-2.0202020202020203,16708000,Tembus MA20,58,Negatif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-RMKE,2180.0,3.8095238095238098,12399500,Normal,46,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-SNLK,228.0,0.8849557522123894,13801900,Tembus MA20,42,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-PSKT,184.0,2.2222222222222223,2619000,Normal,47,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-KAQI,83.0,3.75,11166200,Normal,41,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-DKHH,59.0,1.7241379310344827,7807100,Normal,58,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-PTBA,2310.0,1.762114537444934,8696800,Normal,26,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-SIDO,368.0,1.098901098901099,6708800,Normal,50,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-SMGR,1425.0,2.1505376344086025,11522500,Normal,40,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-ADMR,1445.0,4.710144927536232,17341000,Normal,38,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-CITY,157.0,-0.6329113924050633,490700,Normal,61,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-HAJJ,106.0,2.912621359223301,9191100,Tembus MA20,59,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
-LAJU,64.0,-4.477611940298507,49203900,Normal,57,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-DPUM,91.0,1.1111111111111112,32323100,Tembus MA20,33,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
-CPIN,3080.0,-0.964630225080386,11873300,Normal,41,Negatif,Downtrend,Bottom Rebound,> 1 Miliar,0,WAIT & SEE
-IMPC,1510.0,6.713780918727916,8685200,Normal,40,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-GMFI,52.0,1.9607843137254901,57090500,Tembus MA20,50,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-CTRA,575.0,2.6785714285714284,20921100,Normal,42,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-EMAS,5925.0,4.867256637168142,29278000,Tembus MA20,32,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
-ANDI,17.0,6.25,3469300,Normal,45,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-YOII,85.0,0.0,6381900,Normal,41,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-SMRA,278.0,2.9629629629629632,7788800,Normal,33,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-APLN,107.0,0.0,8034600,Normal,24,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-BRIS,1750.0,3.5502958579881656,7333200,Normal,39,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-ISAT,1985.0,8.767123287671232,79331700,Tembus MA20,63,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
-SMDR,272.0,3.619047619047619,10794700,Tembus MA20,47,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-MLPL,82.0,3.79746835443038,21707400,Tembus MA20,54,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
-SQMI,48.0,9.090909090909092,2780600,Normal,58,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-TAXI,13.0,8.333333333333332,4354900,Normal,44,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-TAPG,1550.0,2.990033222591362,12511900,Normal,57,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-BSML,505.0,3.061224489795918,21336200,Tembus MA20,83,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
-NZIA,140.0,0.7194244604316548,46612900,Normal,38,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-PRIM,89.0,-1.1111111111111112,6239900,Tembus MA20,78,Negatif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-KEEN,835.0,1.2121212121212122,7341900,Normal,50,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-MIKA,1720.0,1.1764705882352942,3426100,Normal,77,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-MPOW,89.0,1.1363636363636365,2452300,Normal,30,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-MNCN,202.0,0.0,13713700,Normal,33,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
-BSBK,51.0,0.0,7907700,Normal,50,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-BABY,168.0,0.5988023952095809,3491400,Normal,37,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-TOSK,59.0,1.7241379310344827,7835500,Normal,71,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-HRTA,1815.0,4.310344827586207,14156400,Normal,43,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-COIN,665.0,4.724409448818897,7303500,Normal,44,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-MIRA,18.0,5.88235294117647,2297700,Normal,33,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-MSIE,85.0,8.974358974358974,5415600,Normal,42,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-BELL,96.0,2.127659574468085,68725900,Tembus MA20,51,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
-WMUU,50.0,0.0,4853900,Normal,25,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-WINR,24.0,9.090909090909092,7620900,Normal,50,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-BHIT,25.0,0.0,22808500,Tembus MA20,38,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-KREN,12.0,9.090909090909092,19767100,Tembus MA20,44,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-ISAP,22.0,4.761904761904762,12650600,Normal,36,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-FILM,1660.0,1.8404907975460123,1562900,Normal,44,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-SSIA,1505.0,0.0,3674200,Normal,43,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
-BJTM,510.0,0.9900990099009901,3400500,Normal,44,Positif,Uptrend,Squeeze,> 1 Miliar,2,WAIT & SEE
-LAND,50.0,0.0,2791500,Normal,37,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-AADI,7975.0,0.949367088607595,4980300,Normal,30,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-AKRA,1255.0,1.6194331983805668,8838800,Normal,51,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-VERN,135.0,0.0,3149200,Normal,71,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-BBYB,212.0,0.0,10652000,Normal,37,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
-BFIN,745.0,1.3605442176870748,4854000,Normal,67,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-NAYZ,56.0,-3.4482758620689653,5146400,Normal,51,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-ASHA,51.0,2.0,12046500,Normal,21,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-GPSO,286.0,-3.3783783783783785,12213800,Normal,43,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
-DSNG,1145.0,0.43859649122807015,1712500,Normal,61,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-KUAS,86.0,2.380952380952381,11033600,Normal,39,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-GRPM,308.0,0.6535947712418301,4128400,Tembus MA20,71,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
-BEER,79.0,6.756756756756757,6183000,Normal,38,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-SRTG,1555.0,1.6339869281045754,1581700,Normal,64,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-GZCO,138.0,1.4705882352941175,6455600,Normal,44,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-IOTF,51.0,0.0,2783400,Normal,47,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-CNMA,86.0,-1.1494252873563218,16127900,Normal,33,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
-MCOR,68.0,3.0303030303030303,2467500,Normal,64,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-RICY,78.0,1.2987012987012987,4544600,Normal,58,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-APEX,122.0,2.5210084033613445,2994200,Normal,35,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-MEJA,86.0,1.1764705882352942,4750100,Normal,57,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-WIDI,27.0,3.8461538461538463,9259400,Tembus MA20,64,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
-FIRE,101.0,-0.9803921568627451,5252000,Normal,41,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-AVIA,320.0,4.57516339869281,8179200,Normal,55,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-ACRO,56.0,-3.4482758620689653,7122000,Tembus MA20,46,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-IKAI,17.0,6.25,2994200,Normal,33,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-HRUM,725.0,2.8368794326241136,3697300,Normal,40,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-AGRO,137.0,2.2388059701492535,5935400,Normal,35,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-KBAG,36.0,2.857142857142857,2006900,Normal,43,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-BEKS,21.0,5.0,3274400,Normal,50,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-BJBR,765.0,1.3245033112582782,1349000,Normal,53,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-HEAL,875.0,4.166666666666666,5067600,Normal,54,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-LSIP,1247.0,3.5019492311335125,8680600,Normal,66,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-SIMP,524.0,2.8037413393619395,5439200,Normal,57,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-NANO,22.0,4.761904761904762,30876800,Tembus MA20,38,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-PART,109.0,0.9259259259259258,1712800,Normal,58,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-IDEA,57.0,0.0,368000,Normal,27,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-PSDN,110.0,10.0,45917200,Tembus MA20,46,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
-KBLV,84.0,5.0,8508000,Normal,41,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-PTMP,53.0,3.9215686274509802,5585200,Normal,35,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-PBRX,28.0,0.0,746600,Normal,47,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
-INDF,6925.0,2.214022140221402,5134800,Normal,73,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-MYOR,1785.0,2.292263610315186,3203700,Normal,59,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-STRK,70.0,7.6923076923076925,27440300,Normal,51,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-ASRI,109.0,2.8301886792452833,2218800,Normal,49,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-TOBA,376.0,2.73224043715847,5086800,Normal,43,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-PPRO,17.0,6.25,12196400,Normal,67,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-PANI,5975.0,1.2711864406779663,2422000,Normal,31,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-HOMI,181.0,0.5555555555555556,3084500,Tembus MA20,40,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-LABA,89.0,2.2988505747126435,10149400,Normal,52,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-MGRO,680.0,0.0,3897200,Normal,48,Negatif,Uptrend,Squeeze,> 1 Miliar,1,WAIT & SEE
-BLTA,32.0,6.666666666666667,1681600,Normal,25,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-ICBP,6950.0,2.9629629629629632,4350800,Normal,71,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-CTTH,118.0,-0.8403361344537815,7169500,Normal,40,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BUMI,142.0,0.7092198581560284,497474100,Normal,30,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+BNBR,101.0,-2.8846153846153846,351994400,Normal,54,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+BRMS,515.0,-1.9047619047619049,82991100,Normal,23,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+DEWA,314.0,-1.257861635220126,92869300,Normal,39,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+PADI,89.0,-2.197802197802198,130542200,Normal,63,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+TPIA,1885.0,0.0,141527900,Normal,46,Negatif,Uptrend,Normal,> 1 Miliar,1,WAIT & SEE
+BIPI,125.0,-1.574803149606299,106666300,Normal,28,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+DSSA,820.0,0.6134969325153374,56273400,Normal,57,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+CUAN,615.0,0.0,68160800,Normal,40,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+BRPT,1555.0,3.322259136212625,135944700,Normal,45,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+BBRI,2830.0,1.4336917562724014,73809400,Normal,34,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+BUVA,860.0,-1.1494252873563218,96085100,Normal,53,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+BULL,332.0,0.6060606060606061,40291000,Normal,33,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+COCO,320.0,-2.4390243902439024,223251000,Tembus MA20,69,Negatif,Uptrend,Breakout Upper,> 1 Miliar,3,WAIT & SEE
+YELO,72.0,1.4084507042253522,4719700,Normal,49,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+EPAC,75.0,-3.8461538461538463,71057900,Normal,64,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+MBMA,505.0,-0.9803921568627451,14567600,Normal,48,Negatif,Uptrend,Normal,> 1 Miliar,1,WAIT & SEE
+BBRM,120.0,-1.639344262295082,2065000,Normal,59,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+BMRI,4020.0,-0.24813895781637718,45816900,Normal,26,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+LPKR,61.0,0.0,22782000,Normal,39,Negatif,Uptrend,Normal,> 1 Miliar,1,WAIT & SEE
+BKSL,61.0,0.0,9887700,Normal,35,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+KIOS,86.0,-1.1494252873563218,2693200,Normal,46,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+BBCA,6225.0,1.6326530612244898,52338900,Normal,49,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+KOTA,92.0,4.545454545454546,174363300,Normal,39,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+TLKM,2440.0,-1.6129032258064515,24161400,Normal,31,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+CSMI,79.0,-2.4691358024691357,3838200,Normal,55,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+MINA,284.0,-1.3888888888888888,49247200,Normal,47,Negatif,Uptrend,Normal,> 1 Miliar,1,WAIT & SEE
+ELTY,22.0,0.0,14821900,Normal,36,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+INET,202.0,1.0,23276600,Normal,49,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+BUKA,98.0,0.0,8149400,Normal,42,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MAPI,1520.0,0.33003300330033003,30814600,Normal,71,Positif,Uptrend,Squeeze,> 1 Miliar,3,WAIT & SEE
+ENRG,1125.0,0.0,9797800,Normal,30,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+TOOL,67.0,6.349206349206349,139212700,Tembus MA20,70,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
+RGAS,197.0,-7.0754716981132075,44316000,Normal,52,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+PSAB,402.0,-1.4705882352941175,32798100,Normal,32,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+ESSA,545.0,0.9259259259259258,5955900,Normal,33,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+PEGE,117.25,-6.818182644994201,46138060,Tembus MA20,56,Negatif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+DEWI,119.0,0.0,40103800,Normal,50,Negatif,Uptrend,Squeeze,> 1 Miliar,1,WAIT & SEE
+HOKI,53.0,1.9230769230769231,2255600,Normal,43,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+IRSX,290.0,-0.684931506849315,8619600,Normal,53,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+RAJA,4120.0,-0.24213075060532688,8519100,Normal,58,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+ANTM,2950.0,0.3401360544217687,11465300,Normal,50,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+UVCR,128.0,-2.2900763358778624,17414200,Normal,25,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+MDIA,71.0,1.4285714285714286,110327700,Normal,44,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+BBNI,3320.0,1.2195121951219512,10474600,Normal,26,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+VKTR,525.0,-0.9433962264150944,6189800,Normal,38,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+RBMS,58.0,3.571428571428571,19566800,Normal,51,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+SGER,402.0,1.5151515151515151,1489100,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+CDIA,640.0,2.4,16123700,Normal,42,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+OMED,197.0,-0.5050505050505051,1101400,Normal,47,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BEEF,222.0,5.714285714285714,18519100,Normal,71,Positif,Uptrend,Breakout Upper,> 1 Miliar,3,WAIT & SEE
+MBTO,109.0,0.0,371700,Normal,41,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+AMMN,3540.0,2.608695652173913,13634900,Normal,45,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+BBKP,51.0,0.0,3509600,Normal,25,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BMTR,112.0,-1.7543859649122806,2815100,Normal,37,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+KOKA,124.0,-3.125,5369200,Normal,61,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+ERAA,366.0,0.0,9191300,Normal,45,Negatif,Uptrend,Normal,> 1 Miliar,1,WAIT & SEE
+BTEK,10.0,0.0,17590400,Normal,33,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MTEL,490.0,3.298313226719967,10496500,Normal,55,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+SMIL,290.0,1.3986013986013985,3214200,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+MSKY,59.0,1.7241379310344827,8373500,Normal,41,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+AYLS,158.0,0.0,747900,Normal,62,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+DMAS,138.0,0.0,4145700,Normal,48,Negatif,Uptrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+MARK,990.0,2.0618556701030926,12216900,Normal,78,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+ESIP,134.0,0.7518796992481203,23109500,Normal,45,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+KPIG,77.0,-2.5316455696202533,42595600,Normal,35,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+PNLF,216.0,1.8867924528301887,12604900,Normal,50,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+EMTK,525.0,1.9417475728155338,3850800,Normal,36,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+ENZO,70.0,2.941176470588235,28346600,Tembus MA20,49,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+GOTO,50.0,0.0,4439400,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+PTRO,3990.0,1.0126582278481013,14219000,Normal,44,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+KIJA,122.0,2.5210084033613445,22821400,Normal,50,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+BREN,3430.0,-0.29069767441860467,28711400,Normal,39,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+SCMA,212.0,0.9523809523809524,8466700,Normal,58,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+PACK,228.0,-0.8695652173913043,9054800,Normal,36,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+LEAD,95.0,0.0,6866000,Normal,49,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+NCKL,845.0,0.0,5709400,Normal,32,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+AYAM,348.0,-0.5714285714285714,11684000,Normal,52,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+ASPR,152.0,1.3333333333333335,15806900,Normal,35,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+WMPP,20.0,5.263157894736842,11194200,Normal,38,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+TOWR,368.0,-1.0752688172043012,3993300,Normal,40,Negatif,Uptrend,Normal,> 1 Miliar,1,WAIT & SEE
+MDKA,2700.0,-0.36900369003690037,9127900,Normal,49,Negatif,Uptrend,Normal,> 1 Miliar,1,WAIT & SEE
+ASII,4900.0,2.510460251046025,5758400,Normal,54,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+LCKM,107.0,0.0,1637900,Normal,26,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+KLBF,740.0,-1.3333333333333335,8495200,Normal,55,Negatif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+JGLE,51.0,2.0,52660500,Normal,27,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+PPRE,101.0,-0.9803921568627451,6782200,Normal,55,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+GIAA,53.0,0.0,7169800,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+AMRT,1380.0,-1.0752688172043012,6210000,Normal,45,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+FUJI,190.0,-1.5544041450777202,575300,Normal,13,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+SUPA,560.0,-0.8849557522123894,1982000,Normal,40,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+PWON,258.0,0.78125,6997300,Normal,61,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+BWPT,75.0,0.0,14999800,Normal,46,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+PGAS,1400.0,-0.3558718861209964,4195000,Normal,25,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+MEDC,1100.0,-0.9009009009009009,7449900,Normal,35,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+KOCI,100.0,2.0408163265306123,55935300,Tembus MA20,66,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
+HOPE,128.0,-3.7593984962406015,2551900,Normal,53,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+BAIK,665.0,0.0,6077300,Normal,53,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+WIRG,53.0,0.0,19739900,Normal,27,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+CYBR,590.0,0.0,3863100,Normal,29,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+MMIX,615.0,6.956521739130435,5278300,Normal,46,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+SRSN,68.0,0.0,39982300,Normal,60,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+BSDE,560.0,0.9009009009009009,4037400,Normal,39,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+MSIN,472.0,2.608695652173913,26350700,Normal,32,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+RATU,5450.0,-0.9090909090909091,1375600,Normal,61,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+RSCH,292.0,0.0,2331100,Normal,42,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+HUMI,118.0,-1.6666666666666667,4203800,Normal,42,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+CMNT,795.0,-0.625,4958600,Normal,52,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+SMLE,110.0,7.8431372549019605,2173100,Normal,69,Positif,Uptrend,Breakout Upper,< 1 Miliar,3,WAIT & SEE
+NICL,505.0,0.0,12161400,Normal,27,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+BBTN,1175.0,0.8583690987124464,5405900,Normal,38,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+VTNY,58.0,-1.694915254237288,2705100,Normal,42,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+SLIS,62.0,3.3333333333333335,12546700,Normal,46,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+PYFA,212.0,1.9230769230769231,2351400,Normal,47,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+ACES,340.0,1.7964071856287425,7531500,Normal,49,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+IBOS,69.0,-1.4285714285714286,868300,Normal,30,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BAPA,440.0,6.280193236714976,1272200,Normal,100,Positif,Uptrend,Breakout Upper,< 1 Miliar,3,WAIT & SEE
+INDO,162.0,0.6211180124223602,14098000,Normal,41,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+NTBK,81.0,20.8955223880597,595596100,Tembus MA20,72,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
+TINS,3470.0,1.461988304093567,6176700,Normal,50,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+GPRA,99.0,1.0204081632653061,996200,Normal,44,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+PMUI,82.0,2.5,10505700,Normal,54,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+DGWG,300.0,-1.3157894736842104,3193100,Normal,49,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+FOLK,204.0,-1.9230769230769231,1474100,Normal,52,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+BCIP,60.0,5.263157894736842,22832400,Tembus MA20,47,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+ARCI,995.0,0.0,5127900,Normal,37,Negatif,Uptrend,Normal,> 1 Miliar,1,WAIT & SEE
+DEFI,107.0,-0.9259259259259258,8490900,Normal,21,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PADA,109.0,-1.8018018018018018,2325300,Normal,40,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+INCO,4600.0,0.43668122270742354,1738000,Normal,39,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+HMSP,670.0,1.5151515151515151,892900,Normal,71,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+FUTR,230.0,-0.8620689655172413,15569700,Normal,72,Negatif,Uptrend,Breakout Upper,> 1 Miliar,2,WAIT & SEE
+GULA,625.0,2.459016393442623,8593400,Normal,44,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+IATA,63.0,-1.5625,4425800,Normal,50,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+KRYA,61.0,8.928571428571429,81560600,Tembus MA20,47,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+JPFA,2040.0,2.0,3905300,Normal,60,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+CBRE,720.0,0.6993006993006993,5201400,Normal,58,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+DOOH,117.0,-0.847457627118644,1380900,Normal,39,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+DILD,115.0,3.6036036036036037,2628600,Normal,45,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+KJEN,110.0,0.0,1385700,Normal,44,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MSJA,410.0,0.49019607843137253,2810500,Normal,41,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+UNIQ,101.0,-0.9803921568627451,98600,Normal,48,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+MPPA,48.0,0.0,5423200,Normal,57,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+WBSA,655.0,-0.7575757575757576,6233400,Normal,37,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+WIFI,1715.0,-0.5797101449275363,1893200,Normal,55,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+GTSI,130.0,-1.5151515151515151,1512000,Normal,46,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+OASA,260.0,-0.7633587786259541,3299500,Normal,55,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+MEDS,70.0,1.4492753623188406,4401900,Normal,41,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+MIDI,276.0,1.4705882352941175,1578400,Normal,41,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+ADRO,2280.0,-0.8695652173913043,5013800,Normal,44,Negatif,Uptrend,Squeeze,> 1 Miliar,1,WAIT & SEE
+UNVR,1755.0,-0.847457627118644,2172400,Normal,64,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+KETR,520.0,0.9708737864077669,3016900,Normal,44,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+HATM,412.0,-8.444444444444445,19882100,Normal,70,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+UNTD,76.0,0.0,5600500,Normal,59,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+ELSA,575.0,2.6785714285714284,5808600,Normal,51,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+NPGF,56.0,-1.7543859649122806,41997500,Tembus MA20,30,Negatif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+BIPP,62.0,14.814814814814813,67432000,Tembus MA20,60,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
+ICON,109.0,3.8095238095238098,3579300,Normal,54,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+INDY,2010.0,-0.49504950495049505,2541700,Normal,35,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+SEMA,91.0,2.247191011235955,125200,Normal,38,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+SSMS,780.0,0.0,6194200,Normal,49,Negatif,Uptrend,Normal,> 1 Miliar,1,WAIT & SEE
+SDMU,85.0,2.4096385542168677,4861500,Normal,59,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+PIPA,117.0,0.0,12881900,Normal,51,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+EMDE,71.0,0.0,3248600,Normal,67,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+BDKR,143.0,0.0,4559400,Normal,68,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+DFAM,82.0,-1.2048192771084338,3661600,Normal,39,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MGNA,90.0,-1.098901098901099,327900,Normal,52,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+GSMF,82.0,1.2345679012345678,2813400,Normal,50,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+PGEO,880.0,0.0,1147500,Normal,44,Negatif,Uptrend,Normal,> 1 Miliar,1,WAIT & SEE
+OILS,185.0,0.5434782608695652,919700,Normal,49,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+OPMS,99.0,0.0,1817100,Normal,56,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+RMKE,2180.0,-0.9090909090909091,4714800,Normal,46,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+SNLK,220.0,-2.6548672566371683,3992400,Normal,33,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PSKT,191.0,-2.051282051282051,4122300,Normal,47,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+KAQI,85.0,1.1904761904761905,4683800,Normal,45,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+DKHH,60.0,0.0,1969500,Normal,56,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+PTBA,2340.0,0.4291845493562232,2048900,Normal,33,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+SIDO,370.0,0.5434782608695652,2439900,Normal,34,Positif,Downtrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+SMGR,1465.0,4.270462633451958,11573100,Normal,39,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+ADMR,1425.0,0.35211267605633806,2294000,Normal,29,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+CITY,166.0,0.0,238800,Normal,57,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+HAJJ,107.0,0.0,1829600,Normal,56,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+LAJU,65.0,1.5625,33819900,Normal,58,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+DPUM,99.0,-1.9801980198019802,11567500,Normal,41,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+CPIN,3100.0,0.9771986970684038,2671400,Normal,39,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+IMPC,1530.0,-0.9708737864077669,1451500,Normal,39,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+GMFI,53.0,0.0,14691700,Normal,44,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+CTRA,545.0,2.0599250936329585,17672700,Normal,47,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+EMAS,5775.0,0.0,1685300,Normal,29,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+ANDI,18.0,0.0,74100,Normal,50,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+YOII,84.0,1.2048192771084338,1392500,Normal,41,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+SMRA,284.0,1.4285714285714286,1684700,Normal,31,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+APLN,112.0,5.660377358490567,10388500,Normal,32,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+BRIS,1790.0,-2.452316076294278,7262800,Normal,45,Negatif,Uptrend,Normal,> 1 Miliar,1,WAIT & SEE
+ISAT,1865.0,-1.0610079575596816,4047200,Normal,51,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+SMDR,274.0,3.007518796992481,2915200,Normal,46,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+MLPL,83.0,2.4691358024691357,2279300,Normal,52,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+SQMI,57.0,9.615384615384617,1064700,Normal,71,Positif,Uptrend,Breakout Upper,< 1 Miliar,3,WAIT & SEE
+TAXI,13.0,8.333333333333332,1990600,Normal,44,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+TAPG,1545.0,-0.9615384615384616,1196300,Normal,59,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+BSML,520.0,-0.9523809523809524,15604800,Normal,78,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+NZIA,144.0,0.6993006993006993,2474700,Normal,26,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+PRIM,91.0,1.1111111111111112,1371500,Normal,75,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+KEEN,815.0,-1.2121212121212122,2061500,Normal,42,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+MIKA,1700.0,-0.2932551319648094,1022200,Normal,69,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+MPOW,93.0,3.3333333333333335,3758800,Normal,35,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+MNCN,200.0,-0.9900990099009901,1113400,Normal,23,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BSBK,52.0,1.9607843137254901,19254000,Normal,40,Positif,Uptrend,Squeeze,> 1 Miliar,2,WAIT & SEE
+BABY,178.0,-0.5586592178770949,745500,Normal,41,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+TOSK,63.0,3.278688524590164,3580700,Normal,78,Positif,Uptrend,Breakout Upper,< 1 Miliar,3,WAIT & SEE
+HRTA,1815.0,0.0,1444000,Normal,20,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+COIN,665.0,-1.4814814814814816,818300,Normal,27,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MIRA,19.0,0.0,776100,Normal,40,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MSIE,82.0,-3.5294117647058822,1827900,Normal,23,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BELL,114.0,-6.557377049180328,32382400,Normal,57,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+WMUU,50.0,0.0,455600,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+WINR,24.0,9.090909090909092,2773600,Normal,50,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+BHIT,25.0,-3.8461538461538463,2149000,Normal,25,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+KREN,12.0,0.0,1212800,Normal,43,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+ISAP,24.0,0.0,4651800,Normal,44,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+FILM,1705.0,0.8875739644970414,486800,Normal,46,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+SSIA,1510.0,0.33222591362126247,635100,Normal,18,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+BJTM,515.0,1.9801980198019802,2588900,Normal,44,Positif,Uptrend,Squeeze,> 1 Miliar,2,WAIT & SEE
+LAND,68.0,30.76923076923077,242423400,Tembus MA20,66,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
+AADI,8000.0,0.0,1350900,Normal,45,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+AKRA,1300.0,0.0,4398800,Normal,64,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+VERN,139.0,1.4598540145985401,4399400,Normal,47,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+BBYB,216.0,0.9345794392523363,2971200,Normal,31,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+BFIN,750.0,0.0,3578500,Normal,59,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+NAYZ,57.0,-1.7241379310344827,750800,Normal,47,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+ASHA,55.0,-1.7857142857142856,9162900,Normal,39,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+GPSO,280.0,-1.4084507042253522,1098500,Normal,25,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+DSNG,1140.0,-0.8695652173913043,291200,Normal,64,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+KUAS,98.0,5.376344086021505,44472900,Tembus MA20,57,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
+GRPM,282.0,-8.441558441558442,6364100,Tembus MA20,58,Negatif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+BEER,84.0,7.6923076923076925,7736100,Tembus MA20,47,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+SRTG,1560.0,0.0,129900,Normal,56,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+GZCO,140.0,0.7194244604316548,397800,Normal,38,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+IOTF,60.0,17.647058823529413,78032800,Tembus MA20,69,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
+CNMA,88.0,0.0,3002000,Normal,46,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+MCOR,67.0,-1.4705882352941175,1196900,Normal,54,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+RICY,78.0,1.2987012987012987,1375300,Normal,55,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+APEX,122.0,0.0,530700,Normal,33,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MEJA,89.0,0.0,2365000,Normal,58,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+WIDI,26.0,0.0,221000,Normal,50,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+FIRE,102.0,0.0,1024700,Normal,43,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+AVIA,320.0,0.0,2961600,Normal,44,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+ACRO,61.0,-1.6129032258064515,6763900,Normal,51,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+IKAI,17.0,0.0,968600,Normal,43,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+HRUM,735.0,1.3793103448275863,549500,Normal,35,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+AGRO,142.0,0.7092198581560284,347400,Normal,34,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+KBAG,37.0,0.0,356200,Normal,46,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+BEKS,20.0,0.0,1555900,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BJBR,770.0,0.6535947712418301,608900,Normal,49,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+HEAL,900.0,1.694915254237288,642300,Normal,52,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+LSIP,1270.0,1.1952191235059761,4543300,Normal,65,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+SIMP,530.0,0.0,1191300,Normal,53,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+NANO,23.0,0.0,673600,Normal,36,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PART,111.0,-1.7699115044247788,1652300,Normal,54,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+IDEA,59.0,5.357142857142857,1152900,Normal,44,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+PSDN,116.0,7.4074074074074066,9569400,Tembus MA20,44,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+KBLV,83.0,-4.597701149425287,8854800,Normal,40,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PTMP,71.0,22.413793103448278,233131600,Tembus MA20,65,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
+PBRX,27.0,-3.571428571428571,1157900,Normal,47,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+INDF,6625.0,0.22692889561270801,1716100,Normal,60,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+MYOR,1750.0,-1.4084507042253522,747100,Normal,49,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+STRK,72.0,0.0,15178200,Normal,46,Negatif,Uptrend,Normal,> 1 Miliar,1,WAIT & SEE
+ASRI,111.0,3.7383177570093453,2036000,Normal,51,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+TOBA,390.0,1.0362694300518136,1585400,Normal,44,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+PPRO,18.0,0.0,1792700,Normal,63,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+PANI,6025.0,0.8368200836820083,1281900,Normal,39,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+HOMI,181.0,-0.5494505494505495,476400,Normal,42,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+LABA,91.0,2.247191011235955,10607100,Normal,42,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+MGRO,675.0,-2.1739130434782608,984300,Normal,50,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+BLTA,31.0,-3.125,1002300,Normal,27,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+ICBP,6750.0,1.3513513513513513,738500,Normal,66,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+CTTH,122.0,0.0,2619600,Normal,42,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 FLMC,52.0,0.0,0,Normal,5,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-ADHI,153.0,1.3245033112582782,2685000,Normal,43,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-BAPI,17.0,6.25,4568900,Normal,46,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-JSMR,2740.0,1.4814814814814816,3380800,Normal,55,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
-KOPI,182.0,1.675977653631285,1354700,Normal,48,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-SMGA,67.0,3.076923076923077,10443900,Tembus MA20,50,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-CGAS,143.0,-0.6944444444444444,2312800,Normal,44,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-PLAN,37.0,0.0,2839700,Normal,44,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
-BMBL,33.0,0.0,789200,Normal,50,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
-LAPD,58.0,1.7543859649122806,7227900,Normal,42,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-FORE,625.0,5.042016806722689,4746500,Normal,35,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-SOCI,318.0,3.2467532467532463,4373300,Normal,49,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-BCIC,121.0,2.5423728813559325,5683400,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-PURA,31.0,3.3333333333333335,2223000,Normal,40,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-TRIN,342.0,1.183431952662722,2446900,Normal,21,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-CLEO,382.0,0.0,4125200,Normal,53,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-AREA,224.0,1.8181818181818181,592800,Normal,48,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-DKFT,645.0,3.2,3989600,Normal,44,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-SAME,328.0,-3.5294117647058822,1490800,Normal,56,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-NSSS,620.0,1.639344262295082,4661000,Normal,82,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-IPTV,34.0,-2.857142857142857,2674500,Normal,69,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-BATR,84.0,2.4390243902439024,204800,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-ASSA,590.0,1.7241379310344827,1939700,Normal,45,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-ERAL,282.0,2.9197080291970803,1684200,Normal,59,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-IKAN,71.0,2.898550724637681,2348600,Normal,47,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-LOPI,58.0,7.4074074074074066,6035300,Tembus MA20,45,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-KRAS,199.0,1.530612244897959,4452700,Normal,54,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-MPIX,98.0,-1.0101010101010102,4113000,Normal,65,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-VIVA,33.0,6.451612903225806,6367700,Normal,50,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-FAST,258.0,4.032258064516129,2713000,Tembus MA20,58,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
-AHAP,87.0,2.3529411764705883,3790600,Normal,56,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-TCPI,6950.0,2.2058823529411766,5256500,Normal,22,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-UNTR,24000.0,5.263157894736842,4589100,Normal,63,Positif,Uptrend,Breakout Upper,> 1 Miliar,3,WAIT & SEE
-BANK,276.0,6.976744186046512,3206300,Normal,48,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-MAIN,655.0,7.377049180327869,8396100,Tembus MA20,45,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
-POLA,54.0,1.8867924528301887,3374700,Normal,48,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-BGTG,110.0,-1.7857142857142856,3109800,Normal,58,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-TRON,96.0,2.127659574468085,14327300,Tembus MA20,67,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
-STAA,995.0,-3.3980582524271843,2876500,Normal,55,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-BNGA,1545.0,1.9801980198019802,1440500,Normal,49,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-NIKL,179.0,2.2857142857142856,4444500,Normal,43,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-MAPA,615.0,0.6546644844517185,7408500,Normal,66,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-SPRE,79.0,1.282051282051282,703500,Normal,55,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-MKAP,1210.0,1.2552301255230125,3750600,Normal,74,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-EXCL,2530.0,4.979253112033195,6663200,Normal,46,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-CFIN,322.0,0.625,2564200,Normal,75,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-WEHA,100.0,1.0101010101010102,3434000,Normal,55,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-JAST,76.0,2.7027027027027026,1999300,Normal,45,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-TRJA,105.0,0.9615384615384616,117600,Normal,38,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-DYAN,77.0,0.0,1225800,Normal,54,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-JARR,1840.0,2.793296089385475,1465400,Normal,61,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-DGIK,122.0,0.0,313900,Normal,49,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
-ASLC,60.0,3.4482758620689653,1855200,Normal,43,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-HBAT,296.0,2.0689655172413794,439700,Normal,30,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-ESTA,180.0,-2.1739130434782608,204400,Normal,51,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-WOWS,56.0,0.0,3062200,Normal,44,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-MAHA,134.0,0.0,2036500,Normal,50,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
-BTPS,990.0,2.5906735751295336,1208300,Normal,55,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-TRUS,600.0,10.091743119266056,3474200,Tembus MA20,87,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
-INKP,7075.0,1.7985611510791366,2504000,Normal,31,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-HALO,57.0,-1.7241379310344827,3140100,Normal,37,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-RLCO,3170.0,0.31645569620253167,322800,Normal,53,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
-TKIM,5500.0,2.3255813953488373,1279200,Normal,47,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-IPCM,308.0,0.6535947712418301,591100,Normal,68,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-GOLF,172.0,2.380952380952381,1040500,Normal,55,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-CHEM,57.0,0.0,4576600,Normal,33,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-WAPO,105.0,0.0,184200,Normal,41,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-FPNI,316.0,0.0,2327600,Normal,52,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-TOTL,1040.0,0.4830917874396135,1088600,Normal,41,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-MUTU,110.0,0.0,2725600,Normal,59,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-MOLI,238.0,4.385964912280701,2185100,Normal,56,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-BRRC,55.0,1.8518518518518516,4281200,Normal,44,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-TMPO,101.0,2.0202020202020203,3508800,Normal,25,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-BKSW,52.0,1.9607843137254901,228700,Normal,60,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
-ERTX,132.0,0.0,191300,Normal,47,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-BOLA,147.0,1.3793103448275863,407800,Normal,63,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-TMAS,114.0,1.7857142857142856,4825900,Tembus MA20,42,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
-TBLA,610.0,0.0,660800,Normal,67,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-RMKO,390.0,25.0,71556200,Tembus MA20,62,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
-WTON,71.0,2.898550724637681,727200,Normal,27,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-ARTO,920.0,-2.127659574468085,3723500,Normal,38,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
-MPMX,960.0,0.0,1471100,Normal,57,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-DSFI,67.0,1.5151515151515151,1867000,Normal,41,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-KLAS,66.0,0.0,1653100,Normal,45,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
-GJTL,1120.0,0.0,1617000,Normal,54,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-MHKI,120.0,0.8403361344537815,880100,Normal,52,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-MANG,40.0,0.0,2079200,Normal,42,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-VAST,115.0,0.0,1579000,Normal,40,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-BDMN,3830.0,1.8617021276595744,299000,Normal,44,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-BAUT,27.0,8.0,2900500,Tembus MA20,56,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
-IRRA,374.0,0.0,1184800,Normal,64,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-CPRO,50.0,0.0,885000,Normal,50,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-PAMG,51.0,0.0,4521300,Normal,50,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-SOLA,100.0,1.0101010101010102,1346900,Normal,66,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-JATI,91.0,3.4090909090909087,2890400,Normal,45,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-CASH,191.0,9.770114942528735,1308300,Tembus MA20,56,Positif,Uptrend,Breakout Upper,< 1 Miliar,4,BELI
-ASPI,414.0,24.69879518072289,1582700,Tembus MA20,62,Positif,Uptrend,Breakout Upper,< 1 Miliar,4,BELI
-NAIK,80.0,0.0,509900,Normal,44,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-OKAS,100.0,3.0927835051546393,316200,Normal,56,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-BOBA,268.0,-7.586206896551724,9240900,Tembus MA20,37,Negatif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-TAMU,18.0,5.88235294117647,3752200,Normal,40,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-OLIV,51.0,2.0,269100,Normal,50,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-PKPK,3310.0,0.60790273556231,2189500,Tembus MA20,82,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
-NISP,1185.0,1.7167381974248928,1182300,Normal,41,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-TAMA,154.0,1.9867549668874174,2881300,Normal,56,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-RUIS,182.0,2.824858757062147,47000,Normal,45,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-AISA,98.0,2.083333333333333,3681700,Tembus MA20,44,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-TPMA,454.0,6.572769953051644,9081800,Tembus MA20,77,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
-MERI,106.0,-0.9345794392523363,4188500,Tembus MA20,47,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-ISEA,60.0,-3.225806451612903,1496200,Normal,35,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-KKES,44.0,2.3255813953488373,1208900,Normal,50,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-LPPS,70.0,0.0,172600,Normal,54,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-SATU,272.0,-0.7299270072992701,1273400,Normal,50,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-ELIT,172.0,0.0,1376200,Normal,46,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
-TUGU,1205.0,0.8368200836820083,502800,Normal,72,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-LUCY,715.0,10.0,2570700,Tembus MA20,19,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
-BACA,101.0,0.0,1245500,Normal,37,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-NRCA,426.0,2.403846153846154,1992800,Normal,53,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-BAJA,155.0,-1.2738853503184715,1051900,Normal,64,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-PANS,1465.0,-0.3401360544217687,396100,Normal,52,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-WINS,525.0,0.0,1389700,Tembus MA20,75,Negatif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-WIIM,1570.0,4.318936877076411,537300,Normal,52,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-WGSH,137.0,5.384615384615385,5332400,Normal,68,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-PTPP,178.0,2.2988505747126435,1882600,Normal,24,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-GEMA,78.0,1.2987012987012987,284600,Normal,50,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-DIVA,104.0,0.9708737864077669,2410300,Normal,41,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-CHEK,125.0,4.166666666666666,758000,Normal,56,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-GRIA,107.0,0.0,3076000,Normal,47,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-AGRS,62.0,3.3333333333333335,2223500,Tembus MA20,50,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-LPPF,1485.0,1.3651877133105803,990800,Normal,22,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-INPC,132.0,4.761904761904762,4867600,Tembus MA20,50,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-RALS,374.0,0.5376344086021506,2470300,Normal,41,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-IMJS,138.0,1.4705882352941175,2106300,Normal,48,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-CENT,72.0,2.857142857142857,3162400,Tembus MA20,33,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-KKGI,258.0,0.78125,731900,Normal,40,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-INDS,252.0,2.857142857142857,1278500,Normal,41,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-PPRI,136.0,0.0,236200,Normal,31,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-KOBX,142.0,1.4285714285714286,348700,Normal,50,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-AUTO,2390.0,1.2711864406779663,896300,Normal,49,Positif,Downtrend,Squeeze,> 1 Miliar,1,WAIT & SEE
-ITMG,22525.0,0.22246941045606228,718100,Normal,34,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-VISI,950.0,11.11111111111111,1717600,Normal,26,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-LUCK,95.0,1.0638297872340425,458700,Normal,33,Positif,Downtrend,Bottom Rebound,< 1 Miliar,1,WAIT & SEE
-PURI,134.0,3.076923076923077,413200,Normal,55,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-ESTI,117.0,0.0,4604900,Normal,52,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-TRIS,160.0,0.628930817610063,81500,Normal,55,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-AWAN,142.0,-2.0689655172413794,424400,Normal,47,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-DATA,2000.0,0.0,1516600,Normal,69,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-TARA,29.0,7.4074074074074066,622600,Tembus MA20,50,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-SMKL,131.0,-1.5037593984962405,57000,Normal,58,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-BOAT,105.0,0.9615384615384616,963700,Normal,52,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-ECII,153.0,34.21052631578947,22484400,Tembus MA20,74,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
-UDNG,1410.0,9.72762645914397,2131800,Tembus MA20,50,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-ELPI,1330.0,-1.8450184501845017,1988900,Tembus MA20,55,Negatif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-POWR,705.0,0.0,2103700,Normal,61,Negatif,Uptrend,Squeeze,> 1 Miliar,2,WAIT & SEE
-RELF,34.0,0.0,490200,Normal,50,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-CBDK,3480.0,2.0527859237536656,1716200,Normal,39,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-SMSM,1645.0,0.3048780487804878,478000,Normal,51,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
-ARKO,4840.0,-1.2244897959183674,693600,Normal,44,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
-PJHB,158.0,2.5974025974025974,977600,Normal,31,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-AEGS,37.0,2.7777777777777777,801100,Normal,36,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-SURI,61.0,3.389830508474576,1733500,Normal,55,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-JIHD,404.0,0.4975124378109453,572300,Tembus MA20,49,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-VRNA,70.0,-2.7777777777777777,204000,Normal,41,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-BLES,139.0,0.0,134700,Normal,60,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-UFOE,134.0,-2.18978102189781,97400,Normal,48,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-AXIO,109.0,0.9259259259259258,377500,Tembus MA20,59,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
-MCAS,164.0,1.2345679012345678,189900,Normal,35,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-KBLM,286.0,1.4184397163120568,3500,Normal,54,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-BMHS,171.0,-0.5813953488372093,1206300,Tembus MA20,36,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,1,WAIT & SEE
-PGLI,173.0,-1.1428571428571428,28800,Normal,34,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,0,WAIT & SEE
-SAPX,210.0,3.9603960396039604,180400,Tembus MA20,47,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-IPOL,105.0,1.9417475728155338,440600,Normal,45,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-IPAC,142.0,-1.3888888888888888,54200,Normal,39,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-APII,178.0,0.0,59500,Tembus MA20,57,Negatif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-SCNP,143.0,0.0,99100,Normal,54,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-PZZA,184.0,2.2222222222222223,592800,Tembus MA20,44,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-WOMF,240.0,1.694915254237288,159500,Tembus MA20,45,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-BINO,95.0,1.0638297872340425,275700,Normal,38,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-DART,120.0,1.694915254237288,13000,Normal,52,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-LMPI,135.0,3.8461538461538463,141400,Normal,47,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-KICI,189.0,8.0,408500,Tembus MA20,63,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
-CRSN,98.0,0.0,50700,Normal,47,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
-NIRO,132.0,0.0,320400,Tembus MA20,31,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-ASJT,156.0,-0.6369426751592357,34700,Normal,51,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-CAMP,166.0,1.2195121951219512,4231700,Tembus MA20,38,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-MDKI,177.0,1.7241379310344827,72400,Normal,49,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-LRNA,174.0,1.7543859649122806,29700,Normal,42,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-STAR,274.0,0.7352941176470588,67800,Normal,31,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-DMMX,157.0,1.948051948051948,268000,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-WINE,150.0,3.4482758620689653,23900,Normal,38,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-SBMA,107.0,1.9047619047619049,91000,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-KLIN,96.0,-1.0309278350515463,26000,Normal,35,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-TYRE,102.0,-0.9708737864077669,718900,Tembus MA20,48,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-CINT,158.0,-1.8633540372670807,116800,Tembus MA20,39,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-KMTR,228.0,2.7027027027027026,39000,Normal,49,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-TNCA,133.0,1.5267175572519083,230100,Normal,33,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-VOKS,194.0,0.0,57400,Normal,42,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-EKAD,170.0,0.591715976331361,100500,Normal,71,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-VICO,131.0,0.0,14600,Normal,31,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-MKTR,117.0,-2.5,190600,Normal,43,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,0,WAIT & SEE
-SKLT,177.0,2.9069767441860463,22800,Normal,49,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-VINS,136.0,3.816793893129771,6400,Normal,46,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-INTD,214.0,0.9433962264150944,8600,Normal,35,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-ADMG,199.0,-0.5,15700,Normal,43,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-AKPI,472.0,0.0,13700,Normal,31,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-TRST,480.0,0.41841004184100417,29000,Normal,43,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-SDPC,182.0,1.675977653631285,35400,Normal,63,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-FMII,252.0,-1.5625,4300,Normal,50,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
-PTIS,272.0,-0.7299270072992701,19000,Normal,29,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,0,WAIT & SEE
-RELI,494.0,0.40650406504065045,5400,Normal,61,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-MICE,496.0,0.4048582995951417,1700,Normal,40,Positif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
-CSAP,286.0,0.6944438475232019,45700,Tembus MA20,61,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
-TFAS,197.0,-1.5,16600,Normal,44,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
-CAKK,136.0,3.816793893129771,6700,Normal,46,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-TRGU,166.0,-2.3529411764705883,393500,Tembus MA20,37,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,1,WAIT & SEE
-GLVA,290.0,0.6944444444444444,3800,Normal,47,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-MTWI,264.0,-0.7518796992481203,1100,Normal,48,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-BMAS,474.0,-0.42016806722689076,1300,Normal,34,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-IKPM,180.0,0.0,6500,Normal,49,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-BTON,346.0,-1.1428571428571428,15900,Normal,51,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-FOOD,176.0,0.0,0,Normal,66,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+ADHI,153.0,4.794520547945205,3149300,Normal,34,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+BAPI,16.0,-5.88235294117647,2751000,Normal,42,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+JSMR,2750.0,-0.36231884057971014,1285400,Normal,51,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+KOPI,182.0,-0.546448087431694,87300,Normal,50,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+SMGA,67.0,-1.4705882352941175,2988600,Normal,43,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+CGAS,144.0,0.6993006993006993,1548000,Normal,39,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+PLAN,35.0,-2.7777777777777777,183000,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BMBL,32.0,0.0,736900,Normal,32,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+LAPD,72.0,-7.6923076923076925,197663100,Tembus MA20,60,Negatif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+FORE,635.0,0.0,1486800,Normal,28,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+SOCI,320.0,0.0,821000,Normal,48,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+BCIC,121.0,0.8333333333333334,672800,Normal,44,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+PURA,31.0,0.0,1105200,Normal,50,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+TRIN,354.0,-1.1173184357541899,726300,Normal,28,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+CLEO,382.0,1.0582010582010581,1413800,Normal,49,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+AREA,230.0,-1.7094017094017095,151000,Normal,45,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+DKFT,620.0,-2.3622047244094486,680500,Normal,35,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+SAME,332.0,-1.1904761904761905,1133900,Normal,56,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+NSSS,620.0,0.0,1247700,Normal,76,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+IPTV,33.0,0.0,181300,Normal,50,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BATR,85.0,0.0,22400,Normal,40,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+ASSA,590.0,-2.479338842975207,1525900,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+ERAL,278.0,-0.7142857142857143,164700,Normal,50,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+IKAN,74.0,1.36986301369863,1858900,Normal,44,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+LOPI,59.0,0.0,1007100,Normal,49,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+KRAS,208.0,0.9708737864077669,603100,Normal,52,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+MPIX,96.0,0.0,692800,Normal,58,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+VIVA,35.0,0.0,1228700,Normal,58,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+FAST,268.0,0.0,185900,Normal,58,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+AHAP,87.0,0.0,739100,Normal,44,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+TCPI,6975.0,-1.6705434552759568,1103100,Normal,24,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+UNTR,23850.0,0.21008403361344538,989200,Normal,58,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+BANK,278.0,0.0,450500,Normal,49,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+MAIN,670.0,2.2900763358778624,331000,Normal,40,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+POLA,61.0,8.928571428571429,24524400,Tembus MA20,58,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
+BGTG,109.0,0.0,381300,Normal,48,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+TRON,101.0,0.0,2140100,Normal,49,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+STAA,995.0,1.530612244897959,1734600,Normal,48,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+BNGA,1550.0,0.6493506493506493,195900,Normal,39,Positif,Downtrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+NIKL,180.0,0.0,583100,Normal,22,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MAPA,595.0,0.847457627118644,4978300,Normal,51,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
+SPRE,79.0,2.5974025974025974,1975900,Normal,42,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+MKAP,1200.0,0.0,2420800,Normal,73,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+EXCL,2530.0,0.796812749003984,551000,Normal,45,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+CFIN,324.0,0.0,389000,Normal,60,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+WEHA,102.0,2.0,687900,Normal,58,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+JAST,78.0,1.2987012987012987,607800,Normal,48,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+TRJA,114.0,4.587155963302752,612400,Normal,55,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+DYAN,78.0,0.0,364100,Normal,52,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+JARR,1805.0,-0.8241758241758242,245000,Normal,37,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+DGIK,124.0,0.8130081300813009,40700,Normal,50,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+ASLC,59.0,0.0,382100,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+HBAT,290.0,-1.3605442176870748,44300,Normal,30,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+ESTA,185.0,0.0,1226600,Normal,51,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+WOWS,61.0,7.017543859649122,15330000,Tembus MA20,61,Positif,Uptrend,Breakout Upper,< 1 Miliar,4,BELI
+MAHA,137.0,0.0,228800,Normal,53,Negatif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+BTPS,990.0,-1.0,331700,Normal,46,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+TRUS,535.0,-1.834862385321101,451500,Normal,85,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+INKP,7225.0,2.1201413427561837,960100,Normal,38,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+HALO,63.0,3.278688524590164,5338200,Normal,45,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+RLCO,3290.0,0.6116207951070336,94900,Normal,46,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+TKIM,5625.0,2.272727272727273,756300,Normal,38,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+IPCM,312.0,0.6451612903225806,70700,Normal,66,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
+GOLF,170.0,-0.5847953216374269,298100,Normal,50,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+CHEM,63.0,-1.5625,6164000,Normal,55,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+WAPO,111.0,1.834862385321101,125000,Normal,47,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+FPNI,316.0,-0.628930817610063,284100,Normal,41,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+TOTL,1040.0,0.0,101000,Normal,32,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MUTU,112.0,0.0,1535400,Normal,50,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+MOLI,238.0,0.0,1221700,Normal,56,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+BRRC,64.0,10.344827586206897,53543700,Tembus MA20,60,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
+TMPO,101.0,0.0,423800,Normal,28,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BKSW,52.0,4.0,1423200,Normal,43,Positif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+ERTX,158.0,-1.8633540372670807,3329500,Tembus MA20,59,Negatif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+BOLA,156.0,3.3112582781456954,1584500,Normal,46,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+TMAS,113.0,0.0,183400,Normal,41,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+TBLA,615.0,0.819672131147541,612100,Normal,63,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+RMKO,364.0,-6.185567010309279,9336800,Normal,58,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+WTON,71.0,1.4285714285714286,459000,Normal,36,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+ARTO,980.0,3.1578947368421053,1629100,Normal,47,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+MPMX,970.0,-0.5128205128205128,418600,Normal,57,Negatif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+DSFI,70.0,0.0,104200,Normal,45,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+KLAS,67.0,1.5151515151515151,337400,Normal,42,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+GJTL,1125.0,0.0,177000,Normal,32,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MHKI,119.0,0.0,426600,Normal,45,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MANG,40.0,0.0,160000,Normal,42,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+VAST,117.0,1.7391304347826086,1095800,Normal,44,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+BDMN,3850.0,1.0498687664041995,88700,Normal,37,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+BAUT,27.0,0.0,66100,Normal,43,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+IRRA,376.0,0.0,417700,Normal,55,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+CPRO,50.0,0.0,183100,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+PAMG,52.0,1.9607843137254901,6867500,Normal,27,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+SOLA,103.0,4.040404040404041,612100,Normal,50,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+JATI,91.0,-1.0869565217391304,1172800,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+CASH,202.0,-3.8095238095238098,5970500,Tembus MA20,62,Negatif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+ASPI,472.0,-3.278688524590164,1711900,Tembus MA20,67,Negatif,Uptrend,Breakout Upper,< 1 Miliar,3,WAIT & SEE
+NAIK,83.0,0.0,378900,Normal,47,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+OKAS,100.0,0.0,102500,Normal,29,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+BOBA,254.0,-2.307692307692308,713900,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+TAMU,19.0,0.0,700800,Normal,25,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+OLIV,50.0,0.0,176500,Normal,47,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PKPK,3260.0,-1.2121212121212122,305200,Normal,83,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+NISP,1195.0,0.42016806722689076,90600,Normal,36,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+TAMA,152.0,0.0,485800,Normal,44,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+RUIS,185.0,2.209944751381215,618000,Tembus MA20,49,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+AISA,101.0,1.0,291200,Normal,48,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+TPMA,442.0,0.0,179100,Normal,62,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+MERI,105.0,0.9615384615384616,652000,Normal,35,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+ISEA,66.0,1.5384615384615385,412700,Normal,48,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+KKES,50.0,4.166666666666666,412800,Normal,74,Positif,Uptrend,Breakout Upper,< 1 Miliar,3,WAIT & SEE
+LPPS,71.0,1.4285714285714286,45800,Normal,42,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+SATU,274.0,0.0,42800,Normal,50,Negatif,Uptrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+ELIT,170.0,-0.5847953216374269,47300,Normal,37,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+TUGU,1200.0,-0.8264462809917356,340600,Normal,62,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+LUCY,635.0,-1.550387596899225,1916300,Tembus MA20,6,Negatif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+BACA,102.0,0.9900990099009901,966600,Normal,23,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+NRCA,422.0,0.0,262000,Normal,35,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BAJA,162.0,0.6211180124223602,235000,Normal,46,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+PANS,1470.0,0.3412969283276451,61000,Normal,42,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+WINS,525.0,-0.9433962264150944,269500,Normal,67,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+WIIM,1560.0,0.3215434083601286,40000,Normal,42,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+WGSH,143.0,-2.7210884353741496,1111000,Normal,79,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+PTPP,184.0,4.545454545454546,2506900,Normal,37,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+GEMA,78.0,-1.2658227848101267,1016600,Tembus MA20,33,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+DIVA,106.0,0.0,873500,Normal,37,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+CHEK,124.0,-0.8,1120600,Normal,44,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+GRIA,107.0,-0.9259259259259258,322700,Normal,46,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+AGRS,61.0,1.6666666666666667,164400,Normal,43,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+LPPF,1500.0,0.33444816053511706,315100,Normal,30,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+INPC,130.0,0.0,319500,Normal,39,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+RALS,374.0,0.5376344086021506,93800,Normal,35,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+IMJS,140.0,0.7194244604316548,118800,Normal,46,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+CENT,76.0,-1.2987012987012987,1078700,Normal,55,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+KKGI,260.0,0.7751937984496124,44900,Normal,34,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+INDS,254.0,0.0,157800,Normal,33,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PPRI,137.0,1.4814814814814816,46500,Normal,31,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+KOBX,143.0,1.4184397163120568,784200,Normal,44,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+AUTO,2410.0,0.8368200836820083,368700,Normal,40,Positif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+ITMG,22500.0,-0.5524861878453038,114300,Normal,49,Negatif,Uptrend,Squeeze,> 1 Miliar,1,WAIT & SEE
+VISI,1035.0,1.4705882352941175,379900,Normal,38,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+LUCK,95.0,0.0,673400,Normal,25,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PURI,135.0,0.0,199900,Normal,35,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+ESTI,131.0,-4.37956204379562,4219900,Normal,53,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+TRIS,169.0,2.4242424242424243,2783100,Tembus MA20,51,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
+AWAN,147.0,0.0,172300,Normal,54,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+DATA,2010.0,-0.49504950495049505,186300,Normal,54,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+TARA,30.0,-3.225806451612903,22400,Normal,53,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+SMKL,129.0,-0.7692307692307693,15400,Normal,35,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BOAT,106.0,0.9523809523809524,270200,Normal,48,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+ECII,136.0,-1.4492753623188406,1124800,Normal,55,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+UDNG,1275.0,-2.2988505747126435,241200,Normal,41,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+ELPI,1115.0,-0.48445581685813854,906100,Normal,43,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+POWR,705.0,0.0,302300,Normal,59,Negatif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+RELF,34.0,0.0,49400,Normal,25,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+CBDK,3400.0,-0.2932551319648094,119700,Normal,32,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+SMSM,1660.0,1.2195121951219512,158600,Normal,53,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
+ARKO,4820.0,-0.2070393374741201,506100,Normal,33,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
+PJHB,158.0,0.6369426751592357,194800,Normal,20,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+AEGS,38.0,0.0,47500,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+SURI,63.0,0.0,3311700,Normal,50,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+JIHD,398.0,0.5050505050505051,32600,Normal,42,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+VRNA,77.0,4.054054054054054,1002300,Tembus MA20,57,Positif,Uptrend,Breakout Upper,< 1 Miliar,4,BELI
+BLES,139.0,-0.7142857142857143,166300,Normal,51,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+UFOE,136.0,2.2556390977443606,18100,Normal,50,Positif,Downtrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+AXIO,109.0,1.8691588785046727,8500,Normal,55,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+MCAS,164.0,1.2345679012345678,11800,Normal,25,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+KBLM,284.0,-2.0689655172413794,800,Normal,53,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+BMHS,174.0,0.0,7900,Normal,40,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PGLI,178.0,1.7142857142857144,8900,Normal,41,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+SAPX,212.0,0.9523809523809524,3000,Normal,42,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+IPOL,109.0,0.0,8000,Normal,52,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+IPAC,152.0,-0.6535947712418301,303500,Tembus MA20,53,Negatif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+APII,183.0,-1.6129032258064515,16900,Normal,59,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+SCNP,147.0,-2.0,13900,Normal,37,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+PZZA,182.0,-0.546448087431694,22400,Normal,35,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+WOMF,238.0,0.0,117900,Tembus MA20,42,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+BINO,96.0,-1.0309278350515463,10800,Normal,48,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+DART,118.0,0.0,600,Normal,36,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+LMPI,135.0,-1.4598540145985401,10800,Normal,49,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+KICI,185.0,-0.5376344086021506,30400,Normal,47,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+CRSN,100.0,2.0408163265306123,60500,Normal,48,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+NIRO,134.0,2.2900763358778624,100700,Normal,30,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+ASJT,160.0,2.564102564102564,2600,Normal,48,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+CAMP,175.0,0.0,59200,Normal,41,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+MDKI,177.0,-0.5617977528089888,17600,Normal,47,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+LRNA,176.0,1.1494252873563218,4200,Normal,36,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+STAR,282.0,4.444444444444445,65800,Normal,41,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+DMMX,158.0,-0.628930817610063,12300,Normal,33,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+WINE,151.0,0.6666666666666667,9800,Normal,36,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+SBMA,107.0,-0.9259259259259258,48600,Normal,46,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+KLIN,97.0,1.0416666666666665,700,Normal,42,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+TYRE,114.0,2.7027027027027026,531100,Normal,62,Positif,Uptrend,Breakout Upper,< 1 Miliar,3,WAIT & SEE
+CINT,160.0,1.910828025477707,11900,Normal,35,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+KMTR,224.0,-1.7543859649122806,1500,Normal,40,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+TNCA,140.0,2.941176470588235,19600,Normal,35,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+VOKS,200.0,1.0101010101010102,28700,Normal,50,Positif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+EKAD,169.0,0.5952380952380952,3200,Normal,67,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+VICO,132.0,0.7633587786259541,16400,Normal,26,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+MKTR,120.0,0.8403361344537815,32600,Normal,45,Positif,Downtrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+SKLT,189.0,5.58659217877095,934000,Tembus MA20,49,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+VINS,138.0,0.7299270072992701,4500,Normal,61,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+INTD,224.0,0.9009009009009009,700,Normal,45,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+ADMG,199.0,0.5050505050505051,8400,Normal,44,Positif,Downtrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+AKPI,486.0,2.100840336134454,11700,Normal,54,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+TRST,480.0,0.41841004184100417,1900,Normal,55,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
+SDPC,175.0,-2.7777777777777777,4500,Normal,49,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+FMII,254.0,0.0,24700,Normal,60,Negatif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+PTIS,272.0,0.7407407407407408,500,Normal,22,Positif,Downtrend,Bottom Rebound,< 1 Miliar,1,WAIT & SEE
+RELI,492.0,-0.4048582995951417,4400,Normal,55,Negatif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+MICE,520.0,4.417670682730924,31500,Tembus MA20,82,Positif,Uptrend,Squeeze,< 1 Miliar,4,BELI
+CSAP,286.0,0.0,100,Normal,54,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+TFAS,204.0,3.5532994923857872,155900,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+CAKK,136.0,0.0,1600,Normal,55,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+TRGU,169.0,3.048780487804878,44700,Normal,41,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+GLVA,292.0,0.6896551724137931,3700,Normal,36,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+MTWI,278.0,-3.4722222222222223,7100,Normal,50,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+BMAS,472.0,-0.42194092827004215,800,Normal,43,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+IKPM,180.0,0.0,200,Normal,52,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+BTON,338.0,-1.744186046511628,14300,Normal,33,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,0,WAIT & SEE
+FOOD,176.0,0.0,0,Normal,48,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
 CANI,135.0,0.0,0,Normal,24,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
 KOIN,78.0,0.0,0,Normal,60,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
 GTBO,170.0,0.0,0,Normal,17,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 INTA,61.0,0.0,0,Normal,43,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 CMPP,69.0,0.0,0,Normal,33,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-SMBR,150.0,4.166666666666666,2333800,Normal,54,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-LMAX,71.0,-1.3888888888888888,3143900,Tembus MA20,41,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-SULI,76.0,0.0,753600,Normal,48,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-KDTN,595.0,-0.8333333333333334,2736400,Tembus MA20,36,Negatif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-FWCT,75.0,0.0,706400,Normal,53,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-CARS,83.0,-1.1904761904761905,6146200,Tembus MA20,38,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-RAAM,208.0,0.9708737864077669,4512400,Tembus MA20,50,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-KBLI,318.0,1.2738853503184715,1903500,Tembus MA20,78,Positif,Uptrend,Breakout Upper,< 1 Miliar,4,BELI
-MTDL,505.0,0.0,567600,Normal,47,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
-ASLI,206.0,1.9801980198019802,1221700,Normal,47,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-ATIC,492.0,0.819672131147541,709400,Tembus MA20,57,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
-NEST,585.0,0.8620689655172413,2551400,Normal,58,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-AMAR,206.0,4.040404040404041,491000,Normal,71,Positif,Uptrend,Breakout Upper,< 1 Miliar,3,WAIT & SEE
-ARNA,450.0,0.0,2375000,Normal,100,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-SPMA,208.0,0.9708737864077669,625900,Tembus MA20,54,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
-INTP,4160.0,-1.4218009478672986,712300,Normal,53,Negatif,Uptrend,Squeeze,> 1 Miliar,2,WAIT & SEE
-BUDI,204.0,2.0,75000,Normal,50,Positif,Downtrend,Squeeze,< 1 Miliar,1,WAIT & SEE
-RISE,880.0,-1.675977653631285,1112000,Normal,26,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-PNBN,885.0,2.9069767441860463,1320400,Normal,54,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-JKON,66.0,4.761904761904762,2689100,Tembus MA20,44,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-HADE,15.0,7.142857142857142,295900,Normal,38,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-ALII,695.0,2.2058823529411766,1774800,Tembus MA20,20,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
-MBSS,2660.0,0.0,803100,Normal,60,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-SMKM,61.0,0.0,3096800,Normal,50,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-DLTA,1724.0,0.0,2513000,Tembus MA20,77,Negatif,Uptrend,Squeeze,> 1 Miliar,3,WAIT & SEE
-SAGE,23.0,9.523809523809524,1316200,Normal,41,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-RCCC,93.0,9.411764705882353,2156100,Tembus MA20,67,Positif,Uptrend,Breakout Upper,< 1 Miliar,4,BELI
-CMRY,4360.0,0.9259259259259258,2192100,Normal,48,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-MDLA,204.0,2.0,140100,Normal,57,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-BVIC,80.0,2.564102564102564,401700,Normal,38,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-PCAR,39.0,2.631578947368421,1285300,Normal,50,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-BEST,96.0,0.0,406200,Normal,48,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
-GGRM,15775.0,1.7741935483870968,404800,Normal,63,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-PPGL,194.0,9.6045197740113,4262200,Tembus MA20,70,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
-DOID,190.0,-2.564102564102564,4404600,Tembus MA20,25,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,1,WAIT & SEE
-CSIS,147.0,1.351345380313512,646800,Normal,58,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-AALI,6025.0,0.8368200836820083,716500,Normal,40,Positif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
-ABBA,30.0,0.0,0,Normal,22,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-ABDA,3310.0,0.0,100,Normal,47,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-ABMM,2280.0,0.8849557522123894,110100,Normal,32,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-ACST,76.0,0.0,57200,Normal,86,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+SMBR,152.0,0.6622516556291391,1671500,Normal,42,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+LMAX,85.0,8.974358974358974,1072200,Normal,52,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+SULI,78.0,0.0,444100,Normal,52,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+KDTN,610.0,14.018691588785046,243700,Normal,39,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+FWCT,76.0,1.3333333333333335,229000,Normal,48,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+CARS,82.0,-1.2048192771084338,2628000,Normal,30,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,0,WAIT & SEE
+RAAM,197.0,-1.5,87600,Normal,27,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+KBLI,318.0,0.6329113924050633,193700,Normal,75,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+MTDL,505.0,-0.9803921568627451,1046300,Normal,44,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+ASLI,208.0,-0.9523809523809524,454700,Normal,41,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+ATIC,488.0,1.6666666666666667,30700,Normal,59,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
+NEST,615.0,3.361344537815126,5369200,Normal,70,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+AMAR,206.0,0.0,8500,Normal,72,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+ARNA,448.0,-0.4444444444444444,624700,Normal,92,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+SPMA,216.0,1.8867924528301887,298900,Normal,71,Positif,Uptrend,Breakout Upper,< 1 Miliar,3,WAIT & SEE
+INTP,4370.0,2.823529411764706,532800,Normal,60,Positif,Uptrend,Breakout Upper,> 1 Miliar,3,WAIT & SEE
+BUDI,204.0,-0.9708737864077669,7700,Normal,44,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+RISE,900.0,1.694915254237288,79700,Normal,33,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+PNBN,880.0,0.5714285714285714,833400,Normal,46,Positif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+JKON,67.0,1.5151515151515151,201300,Normal,53,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
+HADE,16.0,0.0,253100,Normal,44,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+ALII,700.0,-1.4084507042253522,161900,Normal,27,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MBSS,2660.0,1.5267175572519083,304800,Normal,56,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+SMKM,64.0,6.666666666666667,2282400,Normal,33,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+DLTA,1765.0,0.5698005698005698,72500,Normal,75,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
+SAGE,25.0,0.0,700600,Normal,44,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+RCCC,90.0,-2.1739130434782608,84300,Normal,58,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+CMRY,4420.0,2.314814814814815,386400,Normal,54,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+MDLA,204.0,0.9900990099009901,86600,Normal,42,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+BVIC,80.0,0.0,72000,Normal,32,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PCAR,39.0,0.0,120600,Normal,50,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+BEST,97.0,0.0,151400,Normal,33,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+GGRM,16425.0,3.9556962025316458,567400,Normal,60,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+PPGL,232.0,9.433962264150944,2733400,Tembus MA20,77,Positif,Uptrend,Breakout Upper,< 1 Miliar,4,BELI
+DOID,195.0,0.5154639175257731,589000,Normal,35,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+CSIS,150.0,0.6711409395973155,87200,Normal,52,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+AALI,6100.0,1.2448132780082988,346600,Normal,42,Positif,Uptrend,Squeeze,> 1 Miliar,2,WAIT & SEE
+ABBA,30.0,0.0,0,Normal,12,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+ABDA,3330.0,0.6042296072507553,5600,Tembus MA20,68,Positif,Downtrend,Normal,< 1 Miliar,3,WAIT & SEE
+ABMM,2290.0,0.0,37100,Normal,26,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+ACST,77.0,0.0,24400,Normal,83,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
 ADCP,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-ADES,32500.0,-3.273809523809524,56400,Normal,80,Negatif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
-ADMF,7975.0,0.0,92900,Tembus MA20,24,Negatif,Downtrend,Squeeze,< 1 Miliar,1,WAIT & SEE
-AGAR,206.0,0.9803921568627451,149600,Tembus MA20,40,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-AGII,2590.0,2.7777777777777777,65300,Normal,45,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-AIMS,410.0,0.0,0,Normal,60,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+ADES,32700.0,-0.2288329519450801,4700,Normal,79,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+ADMF,8000.0,-0.6211180124223602,900,Normal,29,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+AGAR,204.0,0.9900990099009901,32500,Normal,35,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+AGII,3250.0,14.840989399293287,679800,Tembus MA20,73,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
+AIMS,410.0,0.0,0,Normal,50,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
 AKKU,38.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-AKSI,206.0,-3.7383177570093453,150000,Normal,59,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-ALDO,675.0,-2.102973168963017,168000,Tembus MA20,41,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,1,WAIT & SEE
-ALKA,525.0,-0.9433962264150944,60600,Normal,32,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+AKSI,238.0,13.333333333333334,1772100,Tembus MA20,50,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+ALDO,695.0,2.2058823529411766,2900,Normal,41,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+ALKA,540.0,5.88235294117647,151800,Normal,44,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
 ALMI,74.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 ALTO,18.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-AMAG,394.0,-0.5050505050505051,14500,Normal,53,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-AMAN,260.0,-1.5151515151515151,535600,Tembus MA20,57,Negatif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-AMFG,3030.0,-0.6557377049180327,3300,Normal,41,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
-AMIN,246.0,-0.8064516129032258,14500,Normal,33,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-AMMS,316.0,2.5974025974025974,77900,Normal,44,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-AMOR,318.0,0.0,296600,Tembus MA20,54,Negatif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-ANJT,1415.0,1.0714285714285714,16400,Normal,39,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-APIC,670.0,4.6875,820500,Normal,64,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-APLI,242.0,0.0,229500,Normal,42,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-ARGO,970.0,3.7433155080213902,27600,Tembus MA20,62,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
-ARII,272.0,-0.7299270072992701,212900,Normal,44,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+AMAG,392.0,-0.5076142131979695,8200,Normal,50,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+AMAN,268.0,1.5151515151515151,93600,Normal,56,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+AMFG,3050.0,2.0066889632107023,2700,Normal,55,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+AMIN,240.0,0.0,800,Normal,23,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+AMMS,314.0,-1.875,112900,Normal,21,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+AMOR,322.0,2.547770700636943,62100,Normal,52,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+ANJT,1425.0,1.4234875444839856,1700,Normal,29,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+APIC,670.0,-0.7407407407407408,128500,Normal,69,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+APLI,250.0,0.8064516129032258,11400,Normal,40,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+ARGO,1035.0,7.253886010362693,39700,Tembus MA20,65,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
+ARII,268.0,-1.4705882352941175,39500,Normal,42,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,0,WAIT & SEE
 ARKA,22.0,0.0,0,Normal,27,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 ARMY,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-ARTA,2730.0,-3.53356890459364,61500,Tembus MA20,65,Negatif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+ARTA,2700.0,4.247104247104247,7900,Normal,64,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
 ARTI,2.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-ASBI,406.0,-0.49019607843137253,7900,Normal,56,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-ASDM,520.0,-1.8867924528301887,92100,Tembus MA20,53,Negatif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-ASGR,1525.0,4.4520547945205475,339100,Normal,57,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-ASMI,14.0,0.0,0,Normal,40,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-ASRM,244.0,0.8264462809917356,19700,Normal,55,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
-ATAP,420.0,1.9417475728155338,232000,Normal,62,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-ATLA,50.0,0.0,119200,Normal,100,Negatif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
-BABP,50.0,0.0,92700,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-BALI,1220.0,0.8264462809917356,3900,Normal,51,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-BATA,59.0,0.0,0,Normal,33,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-BAYU,1130.0,1.345291479820628,27200,Normal,54,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-BBHI,916.7200317382812,0.0,121000,Normal,45,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-BBLD,520.0,-1.8867924528301887,29500,Normal,26,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-BBMD,1905.0,0.0,600,Normal,47,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-BBSI,4600.0,1.098901098901099,5100,Tembus MA20,61,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
-BBSS,93.0,-1.0638297872340425,366500,Normal,37,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-BCAP,50.0,0.0,40700,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+ASBI,410.0,0.0,100,Normal,53,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+ASDM,510.0,5.590062111801243,123500,Tembus MA20,56,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
+ASGR,1605.0,1.2618296529968454,133700,Normal,64,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+ASMI,14.0,0.0,0,Normal,25,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+ASRM,248.0,1.639344262295082,17300,Normal,47,Positif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+ATAP,434.0,0.9302325581395349,128200,Normal,32,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+ATLA,50.0,0.0,132400,Normal,0,Negatif,Uptrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+BABP,50.0,0.0,7700,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+BALI,1300.0,-4.761904761904762,10100,Normal,53,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+BATA,59.0,0.0,0,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BAYU,1125.0,-0.4424778761061947,1000,Normal,42,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+BBHI,935.0,0.5376344086021506,6600,Normal,46,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+BBLD,520.0,0.0,6700,Normal,26,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,0,WAIT & SEE
+BBMD,1995.0,4.724409448818897,1200,Tembus MA20,55,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
+BBSI,4610.0,0.21739130434782608,800,Normal,51,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+BBSS,97.0,1.0416666666666665,61900,Normal,37,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+BCAP,50.0,0.0,1017600,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 BEBS,5.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-BELI,274.0,-0.7246376811594203,217900,Normal,40,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-BESS,945.0,0.0,2600,Normal,52,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-BHAT,1770.0,0.0,0,Normal,76,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+BELI,274.0,0.0,66100,Normal,34,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BESS,935.0,-0.5319148936170213,438700,Tembus MA20,42,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+BHAT,1770.0,0.0,0,Normal,72,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
 BIKA,55.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 BIKE,510.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 BIMA,82.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-BINA,3970.0,-0.5012531328320802,165400,Normal,51,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-BIRD,1515.0,0.0,473500,Normal,75,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-BISI,640.0,1.5873015873015872,196200,Normal,34,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-BKDP,83.0,-9.782608695652174,8847900,Tembus MA20,0,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-BLOG,338.0,2.4242424242424243,1273200,Tembus MA20,60,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
+BINA,3670.0,-0.5420054200542005,16200,Normal,60,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+BIRD,1525.0,0.6600660066006601,61000,Normal,71,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+BISI,640.0,0.0,22000,Normal,25,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BKDP,85.0,-5.555555555555555,913500,Tembus MA20,13,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,1,WAIT & SEE
+BLOG,342.0,1.183431952662722,37700,Normal,59,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
 BLTZ,2870.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-BLUE,2990.0,0.0,297000,Normal,39,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-BMSR,290.0,2.112676056338028,26900,Normal,51,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-BNBA,760.0,1.3333333333333335,71200,Normal,45,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-BNII,188.0,1.0752688172043012,395800,Normal,50,Positif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
-BNLI,2330.0,0.43103448275862066,93600,Normal,13,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-BOGA,1575.0,1.6129032258064515,6500,Normal,95,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-BOLT,770.0,1.9867549668874174,7400,Normal,44,Positif,Downtrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+BLUE,2990.0,1.0135135135135136,57700,Normal,18,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+BMSR,282.0,0.0,28300,Normal,41,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BNBA,740.0,1.36986301369863,5800,Normal,46,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+BNII,190.0,0.0,350300,Normal,53,Negatif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+BNLI,2410.0,1.2605042016806722,8500,Normal,21,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+BOGA,1590.0,6.0,5300,Normal,77,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+BOLT,800.0,0.628930817610063,1600,Normal,57,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
 BOSS,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-BPFI,244.0,2.503777197585414,36700,Normal,43,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-BPII,424.0,0.47393364928909953,7100,Tembus MA20,41,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-BPTR,66.0,-1.4925373134328357,519400,Normal,30,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,0,WAIT & SEE
-BRAM,4500.0,3.4482758620689653,1100,Normal,51,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-BRNA,580.0,-0.8547008547008548,38900,Normal,43,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-BSIM,700.0,0.0,47500,Tembus MA20,38,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-BSSR,4030.0,0.75,491200,Normal,80,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-BSWD,1360.0,-1.4492753623188406,2400,Tembus MA20,0,Negatif,Downtrend,Squeeze,< 1 Miliar,1,WAIT & SEE
-BTPN,2140.0,0.4694835680751174,8600,Normal,50,Positif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
-BUAH,515.0,0.9803921568627451,221900,Normal,57,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
-BUKK,1115.0,7.729468599033816,122100,Normal,55,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-BYAN,11600.0,-0.4291845493562232,29400,Normal,67,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-CARE,422.0,0.4761904761904762,1253900,Tembus MA20,70,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
-CASA,1800.0,0.0,0,Normal,72,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-CASS,1840.0,1.6574585635359116,24800,Normal,56,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+BPFI,242.0,0.0,6700,Normal,45,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BPII,422.0,-0.4716981132075472,200,Normal,27,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BPTR,67.0,-1.4705882352941175,140600,Normal,33,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,0,WAIT & SEE
+BRAM,4520.0,0.4444444444444444,900,Normal,51,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+BRNA,575.0,-0.8620689655172413,2900,Normal,43,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+BSIM,715.0,2.877697841726619,1900,Normal,44,Positif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+BSSR,4030.0,0.0,102800,Normal,70,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+BSWD,1360.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+BTPN,2210.0,-0.45045045045045046,3900,Normal,67,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+BUAH,500.0,-1.9607843137254901,122100,Normal,25,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+BUKK,1160.0,0.0,11200,Normal,28,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+BYAN,11475.0,0.0,1700,Normal,67,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+CARE,436.0,1.3953488372093024,125000,Normal,78,Positif,Uptrend,Breakout Upper,< 1 Miliar,3,WAIT & SEE
+CASA,1805.0,0.2777777777777778,300,Normal,33,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+CASS,1850.0,0.0,20300,Normal,55,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
 CBMF,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-CBPE,273.0,-1.4388420248567224,233100,Normal,55,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-CBUT,800.0,5.263157894736842,359500,Normal,75,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-CCSI,246.0,0.819672131147541,73400,Normal,52,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-CEKA,2130.0,-1.8433179723502304,9200,Normal,51,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-CHIP,930.0,0.5405405405405406,112500,Normal,44,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-CITA,2990.0,0.33557046979865773,79700,Normal,57,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-CLAY,2700.0,-0.36900369003690037,21000,Normal,35,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-CLPI,1465.0,0.6872852233676976,185200,Normal,54,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-CMNP,1335.0,1.9083969465648856,32900,Normal,34,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-CNKO,37.0,0.0,0,Normal,44,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+CBPE,280.0,0.0,7000,Normal,55,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+CBUT,790.0,1.282051282051282,24400,Normal,72,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+CCSI,252.0,-0.7874015748031495,14700,Normal,46,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+CEKA,2120.0,-0.9345794392523363,4300,Normal,43,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+CHIP,940.0,0.53475935828877,15000,Normal,41,Positif,Downtrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+CITA,3050.0,-0.32679738562091504,13000,Normal,45,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+CLAY,2650.0,0.0,14500,Normal,38,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+CLPI,1465.0,-0.3401360544217687,11400,Normal,44,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+CMNP,1380.0,0.0,3100,Normal,54,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+CNKO,37.0,0.0,0,Normal,31,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 CNTX,142.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 COAL,22.0,0.0,0,Normal,24,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 CPRI,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-CRAB,208.0,0.0,0,Normal,44,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-CSRA,750.0,0.0,199500,Normal,41,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-CTBN,5450.0,0.9259259259259258,2200,Normal,36,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-DAAZ,1555.0,-0.9554140127388535,431000,Normal,45,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-DADA,50.0,0.0,634200,Tembus MA20,0,Negatif,Downtrend,Squeeze,< 1 Miliar,1,WAIT & SEE
-DAYA,975.0,3.723404255319149,19700,Tembus MA20,38,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-DCII,189775.0,5.138504155124654,1000,Tembus MA20,52,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
+CRAB,208.0,0.0,0,Normal,25,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+CSRA,770.0,4.054054054054054,59900,Normal,45,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+CTBN,5475.0,0.45871559633027525,200,Normal,36,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+DAAZ,1545.0,0.3246753246753247,38400,Normal,42,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+DADA,50.0,0.0,29300,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+DAYA,980.0,0.5128205128205128,3300,Normal,31,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+DCII,198950.0,4.834672638651035,2900,Tembus MA20,64,Positif,Uptrend,Breakout Upper,< 1 Miliar,4,BELI
 DEAL,6.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-DEPO,286.0,24.347826086956523,9479100,Tembus MA20,69,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
-DGNS,230.0,0.0,98000,Normal,53,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+DEPO,278.0,-0.7142857142857143,286300,Normal,63,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+DGNS,232.0,0.0,713800,Tembus MA20,36,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
 DIGI,29.0,0.0,0,Normal,43,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-DMND,615.0,2.5,2700,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-DNAR,110.0,0.0,910300,Tembus MA20,46,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-DNET,9825.0,-0.7575757575757576,20400,Tembus MA20,40,Negatif,Downtrend,Squeeze,< 1 Miliar,1,WAIT & SEE
-DOSS,130.0,0.7751937984496124,233100,Normal,47,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+DMND,610.0,0.0,400,Normal,46,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+DNAR,114.0,0.8849557522123894,59100,Normal,48,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+DNET,9350.0,0.0,400,Normal,25,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+DOSS,135.0,1.5037593984962405,10500,Normal,50,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
 DPNS,310.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-DRMA,890.0,-0.5586592178770949,80600,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+DRMA,895.0,1.1299435028248588,3600,Normal,42,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
 DUCK,176.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-DUTI,4050.0,0.0,1000,Normal,69,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-DVLA,1510.0,0.0,10700,Normal,66,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-DWGL,220.0,2.803738317757009,130000,Normal,32,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-EAST,88.0,1.1494252873563218,394300,Normal,44,Positif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+DUTI,4050.0,0.0,500,Normal,69,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+DVLA,1505.0,-0.33112582781456956,4900,Normal,59,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+DWGL,220.0,0.9174311926605505,35900,Normal,33,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+EAST,88.0,0.0,360600,Normal,44,Negatif,Uptrend,Squeeze,< 1 Miliar,1,WAIT & SEE
 EDGE,4790.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-ENAK,294.0,-0.6756756756756757,386400,Normal,66,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+ENAK,288.0,0.6993006993006993,98000,Normal,55,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
 ENVY,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-EPMT,2400.0,2.564102564102564,57000,Normal,63,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
+EPMT,2330.0,-1.6877637130801686,3300,Normal,47,Negatif,Uptrend,Squeeze,< 1 Miliar,1,WAIT & SEE
 ETWA,70.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-EURO,1795.0,5.899705014749262,164400,Normal,64,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-FAPA,7350.0,-0.3389830508474576,1300,Normal,60,Negatif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+EURO,1810.0,4.322766570605188,789900,Normal,49,Positif,Uptrend,Normal,> 1 Miliar,2,WAIT & SEE
+FAPA,7400.0,1.3004791238877482,1100,Normal,66,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
 FASW,5312.4970703125,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 FIMP,69.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-FISH,600.0,2.564102564102564,165500,Tembus MA20,44,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-FITT,390.0,1.5625,725500,Tembus MA20,48,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-FORU,3400.0,3.0303030303030303,3104100,Tembus MA20,39,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
+FISH,600.0,0.0,2000,Normal,36,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+FITT,378.0,-3.076923076923077,67900,Normal,53,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+FORU,2840.0,-1.7301038062283738,378300,Normal,29,Negatif,Downtrend,Normal,> 1 Miliar,0,WAIT & SEE
 GAMA,18.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-GDST,79.0,-1.25,2047200,Tembus MA20,50,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-GDYR,1100.0,1.8518518518518516,1900,Normal,54,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
-GEMS,6150.0,3.361344537815126,24800,Normal,33,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-GGRP,290.0,1.3986013986013985,117600,Normal,47,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-GHON,1600.0,0.3134796238244514,9400,Normal,38,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+GDST,81.0,1.25,30800,Normal,43,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+GDYR,1065.0,-2.73972602739726,1300,Normal,39,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+GEMS,6200.0,1.2244897959183674,1600,Normal,36,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+GGRP,290.0,0.0,330100,Normal,44,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+GHON,1600.0,0.0,3000,Normal,20,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 GLOB,155.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-GMTD,1300.0,1.9607843137254901,2300,Normal,40,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-GOLD,242.0,0.0,34500,Normal,50,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+GMTD,1305.0,-1.8796992481203008,2800,Normal,35,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+GOLD,242.0,0.8333333333333334,5900,Normal,46,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
 GOLL,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-GOOD,304.0,2.013422818791946,107900,Normal,29,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-GRPH,54.0,0.0,656200,Normal,29,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-GTRA,185.0,-1.5957446808510638,318400,Normal,47,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-GUNA,155.0,-1.2738853503184715,169400,Normal,38,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
-GWSA,115.0,-1.7094017094017095,104400,Normal,33,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-HAIS,171.0,1.183431952662722,328200,Normal,46,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-HDFA,90.0,5.88235294117647,2162600,Tembus MA20,52,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
-HDIT,50.0,0.0,6600,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-HELI,184.0,1.098901098901099,581500,Tembus MA20,60,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
-HERO,304.0,0.6622516556291391,666800,Normal,41,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-HEXA,4270.0,1.4251781472684086,126400,Normal,38,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-HGII,122.0,0.0,159700,Normal,31,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-HILL,16.0,0.0,0,Normal,40,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+GOOD,300.0,-1.9607843137254901,35200,Normal,19,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,0,WAIT & SEE
+GRPH,58.0,0.0,870300,Normal,41,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+GTRA,188.0,-0.5291005291005291,65100,Normal,44,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+GUNA,163.0,3.1645569620253164,206700,Normal,76,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+GWSA,119.0,1.7094017094017095,149700,Normal,45,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+HAIS,177.0,1.1428571428571428,46400,Normal,49,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+HDFA,87.0,0.0,21900,Normal,47,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+HDIT,52.0,4.0,36860900,Tembus MA20,67,Positif,Uptrend,Squeeze,> 1 Miliar,4,BELI
+HELI,185.0,0.5434782608695652,692300,Tembus MA20,47,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+HERO,316.0,1.282051282051282,25300,Normal,45,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+HEXA,4300.0,0.702576112412178,56300,Normal,35,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+HGII,124.0,0.8130081300813009,39300,Normal,34,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+HILL,16.0,0.0,0,Normal,25,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 HITS,116.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 HKMU,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 HOTL,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-HRME,43.0,0.0,511400,Normal,40,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-HYGN,141.0,3.6764705882352944,390600,Normal,49,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-IBFN,63.0,0.0,0,Normal,55,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+HRME,44.0,0.0,342300,Normal,53,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+HYGN,138.0,-0.7194244604316548,177200,Normal,42,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+IBFN,63.0,0.0,0,Normal,50,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 IBST,8475.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-IDPR,296.0,-0.6711409395973155,204000,Tembus MA20,56,Negatif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
-IFII,208.0,0.9708737864077669,25700,Normal,23,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-IFSH,1335.0,9.426229508196721,29200,Tembus MA20,59,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
-IGAR,412.0,0.9803921568627451,30600,Normal,45,Positif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
-IKBI,520.0,2.9702970297029703,6600,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-IMAS,800.0,4.57516339869281,152500,Normal,30,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+IDPR,304.0,3.4013605442176873,30400,Normal,66,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
+IFII,214.0,-1.834862385321101,12400,Normal,42,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+IFSH,1430.0,-2.3890784982935154,5700,Normal,55,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+IGAR,418.0,2.450980392156863,3100,Normal,51,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
+IKBI,530.0,0.0,2600,Normal,67,Negatif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+IMAS,795.0,0.6329113924050633,10200,Normal,32,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
 INAF,126.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-INAI,133.0,3.90625,570700,Normal,55,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
+INAI,132.0,-0.7518796992481203,56300,Normal,48,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 INCF,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-INCI,645.0,0.78125,8500,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-INDR,1935.0,1.574803149606299,300,Normal,56,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-INDX,60.0,0.0,0,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-INOV,113.0,1.8018018018018018,510800,Normal,52,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-INPP,645.0,-6.521739130434782,1499300,Tembus MA20,33,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-INPS,635.0,0.7936507936507936,18800,Normal,41,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+INCI,640.0,0.0,200,Normal,41,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+INDR,2030.0,-3.3333333333333335,9400,Normal,44,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+INDX,60.0,0.0,0,Normal,35,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+INOV,127.0,-5.223880597014925,5261000,Tembus MA20,56,Negatif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+INPP,650.0,0.7751937984496124,150100,Normal,18,Positif,Downtrend,Bottom Rebound,< 1 Miliar,1,WAIT & SEE
+INPS,600.0,0.0,65000,Normal,32,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 INRU,590.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-IPCC,1160.0,4.0358744394618835,296100,Normal,57,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+IPCC,1165.0,2.1929824561403506,62300,Normal,54,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
 IPPE,14.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-ISSP,384.0,1.0526315789473684,1500600,Normal,54,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-ITIC,198.0,2.0618556701030926,86600,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-ITMA,1400.0,6.870229007633588,149900,Tembus MA20,45,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-JAWA,114.0,5.555555555555555,6711000,Normal,45,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-JAYA,118.0,1.7241379310344827,311200,Normal,45,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-JECC,650.0,-1.5151515151515151,232800,Normal,65,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+ISSP,382.0,-0.5208333333333333,479500,Normal,58,Negatif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+ITIC,200.0,0.5025125628140703,70100,Normal,46,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+ITMA,1385.0,0.0,1800,Normal,45,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+JAWA,113.0,0.0,191200,Normal,39,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+JAYA,122.0,-2.4,371200,Normal,44,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+JECC,660.0,3.937007874015748,1205400,Tembus MA20,61,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
 JMAS,228.0,0.0,0,Normal,36,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-JRPT,1080.0,0.0,158500,Normal,100,Negatif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+JRPT,1080.0,0.0,200,Normal,0,Negatif,Uptrend,Squeeze,< 1 Miliar,1,WAIT & SEE
 JSKY,52.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-JSPT,1340.0,-0.37174721189591076,3000,Normal,65,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-JTPE,610.0,0.8264462809917356,12622500,Tembus MA20,52,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
-KAEF,446.0,0.904977375565611,300200,Normal,51,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+JSPT,1340.0,0.0,200,Normal,39,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+JTPE,605.0,0.0,640200,Normal,50,Negatif,Uptrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+KAEF,448.0,0.4484304932735426,13700,Normal,49,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
 KARW,212.0,0.0,0,Normal,10,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 KAYU,18.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-KDSI,432.0,-1.36986301369863,1000,Normal,41,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-KEJU,545.0,0.0,12700,Normal,24,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+KDSI,432.0,0.0,100,Normal,41,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+KEJU,555.0,1.834862385321101,8700,Normal,25,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
 KIAS,21.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-KING,314.0,0.0,819800,Tembus MA20,25,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-KINO,1130.0,-0.8771929824561403,2600,Normal,52,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-KMDS,540.0,0.0,22700,Normal,58,Negatif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
-KONI,2540.0,2.4193548387096775,35200,Normal,53,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-KSIX,310.0,-4.320987654320987,261200,Tembus MA20,36,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-LABS,140.0,1.4492753623188406,331400,Normal,50,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-LFLO,625.0,0.0,0,Normal,72,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-LIFE,5825.0,2.643171806167401,2200,Normal,54,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-LINK,1520.0,4.4673539518900345,17400,Normal,58,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-LION,310.0,-0.641025641025641,40500,Normal,35,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-LIVE,206.0,0.9803921568627451,161900,Normal,18,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+KING,310.0,-0.641025641025641,2278200,Tembus MA20,16,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+KINO,1125.0,-1.3157894736842104,1200,Normal,56,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+KMDS,515.0,-0.9615384615384616,600,Normal,38,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+KONI,2560.0,1.185770750988142,7100,Normal,33,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+KSIX,304.0,-1.935483870967742,4800,Normal,18,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,0,WAIT & SEE
+LABS,140.0,0.0,79600,Normal,35,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+LFLO,620.0,0.0,100,Normal,74,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+LIFE,5975.0,1.702127659574468,100,Normal,33,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+LINK,1460.0,1.0380622837370241,23700,Normal,46,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+LION,316.0,0.0,10000,Normal,39,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+LIVE,208.0,0.0,7600,Normal,23,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 LMSH,256.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-LPCK,498.0,2.8925619834710745,197300,Normal,35,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-LPGI,680.0,0.7407407407407408,105900,Tembus MA20,60,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
-LPIN,400.0,-0.4975124378109453,18900,Normal,54,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-LPLI,236.0,5.357142857142857,74800,Normal,43,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-LTLS,775.0,-0.641025641025641,84800,Tembus MA20,66,Negatif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+LPCK,515.0,1.9801980198019802,12500,Normal,50,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+LPGI,675.0,-0.7352941176470588,8400,Normal,63,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+LPIN,402.0,-0.49504950495049505,12100,Normal,40,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+LPLI,248.0,3.3333333333333335,48200,Normal,50,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+LTLS,790.0,3.2679738562091507,400,Normal,46,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
 MABA,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 MAGP,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-MAPB,890.0,-1.1111111111111112,600,Normal,2,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-MARI,23.0,0.0,0,Normal,50,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-MASB,3390.0,0.2958579881656805,9200,Normal,51,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
-MAXI,50.0,0.0,61000,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-MAYA,190.0,0.5291005291005291,402600,Normal,57,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-MBAP,1380.0,-1.0752688172043012,12700,Normal,35,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
-MCOL,3910.0,2.8947368421052633,5200,Normal,69,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-MDIY,885.0,-1.6666666666666667,29300,Normal,62,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-MDLN,50.0,0.0,1494800,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-MDRN,26.0,0.0,0,Normal,41,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-MEGA,2000.0,0.0,24400,Normal,49,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MAPB,880.0,-1.1235955056179776,3000,Normal,0,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MARI,23.0,0.0,0,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MASB,3380.0,-0.2949852507374631,10200,Tembus MA20,50,Negatif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+MAXI,50.0,0.0,24300,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+MAYA,190.0,0.5291005291005291,23000,Normal,52,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+MBAP,1305.0,1.556420233463035,15400,Normal,29,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+MCOL,3800.0,-2.313624678663239,700,Normal,54,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+MDIY,890.0,-1.1111111111111112,38300,Normal,58,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+MDLN,50.0,0.0,383700,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+MDRN,26.0,0.0,0,Normal,33,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MEGA,2010.0,0.5,300,Normal,27,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
 MENN,53.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-MERK,3720.0,1.3623978201634876,18100,Normal,61,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
-META,238.0,0.0,0,Normal,0,Negatif,Uptrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+MERK,3700.0,0.27100271002710025,14800,Normal,52,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+META,238.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 MFMI,1300.0,0.0,0,Normal,100,Negatif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
-MGLV,8600.0,4.878048780487805,354300,Tembus MA20,51,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
-MINE,212.0,2.912621359223301,886300,Normal,46,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-MITI,157.0,-1.257861635220126,2526200,Tembus MA20,38,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+MGLV,8525.0,-1.1594202898550725,16200,Normal,47,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+MINE,220.0,-2.6548672566371683,1101200,Tembus MA20,50,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+MITI,163.0,1.875,300400,Normal,34,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
 MKNT,1.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-MKPI,20850.0,-0.5959475566150179,41000,Normal,49,Negatif,Uptrend,Squeeze,< 1 Miliar,1,WAIT & SEE
-MLBI,6300.0,0.398406374501992,41500,Normal,78,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-MLIA,240.0,-0.8264462809917356,15200,Normal,67,Negatif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
-MLPT,18275.0,4.428571428571428,16500,Normal,41,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-MMLP,294.0,2.083333333333333,181300,Normal,39,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-MORA,6625.0,0.3787878787878788,194200,Normal,53,Positif,Downtrend,Normal,> 1 Miliar,2,WAIT & SEE
-MPRO,9000.0,3.4482758620689653,100,Normal,72,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-MPXL,147.0,2.797202797202797,301200,Normal,54,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-MRAT,436.0,0.4608294930875576,287700,Tembus MA20,35,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-MREI,920.0,0.0,0,Normal,22,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,0,WAIT & SEE
-MSTI,1220.0,2.9535864978902953,689300,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-MTFN,13.0,0.0,0,Normal,33,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-MTLA,510.0,2.4096385542168677,27900,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-MTMH,910.0,-0.546448087431694,1000,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MKPI,20900.0,0.0,40000,Normal,48,Negatif,Uptrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+MLBI,6300.0,0.0,100,Normal,73,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+MLIA,242.0,0.8333333333333334,10000,Normal,67,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
+MLPT,18000.0,-0.13869625520110956,1800,Normal,44,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MMLP,288.0,-0.6896551724137931,26100,Normal,39,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MORA,6650.0,0.0,83700,Normal,48,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MPRO,9500.0,0.0,200,Normal,69,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+MPXL,151.0,0.6666666666666667,61900,Normal,55,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+MRAT,436.0,-0.9090909090909091,17600,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MREI,920.0,0.0,0,Normal,29,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,0,WAIT & SEE
+MSTI,1250.0,2.459016393442623,529600,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+MTFN,13.0,0.0,0,Normal,20,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+MTLA,492.0,-1.6,1500,Normal,55,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+MTMH,980.0,7.6923076923076925,5800,Normal,50,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
 MTPS,81.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 MTRA,244.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 MTSM,500.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-MYOH,1020.0,-0.9708737864077669,4300,Normal,50,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-MYTX,41.0,0.0,0,Normal,32,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-NASA,29.0,3.571428571428571,1932000,Tembus MA20,33,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-NASI,111.0,5.714285714285714,1266800,Normal,62,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-NATO,590.0,1.7241379310344827,416600,Normal,50,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-NELY,197.0,1.5463917525773196,312500,Normal,54,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-NETV,50.0,0.0,396000,Normal,22,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-NFCX,1595.0,-4.491017964071856,3000,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-NICE,258.0,3.2,397800,Normal,40,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-NICK,960.0,0.0,1100,Normal,35,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-NINE,79.0,9.722222222222223,11073000,Normal,47,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-NOBU,426.0,0.9478672985781991,737100,Normal,40,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+MYOH,1025.0,0.0,1400,Normal,41,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+MYTX,41.0,0.0,0,Normal,37,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+NASA,34.0,9.67741935483871,309400,Normal,44,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+NASI,114.0,1.7857142857142856,824100,Normal,63,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+NATO,590.0,0.0,37400,Normal,48,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+NELY,204.0,2.0,75500,Normal,59,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+NETV,50.0,0.0,37914600,Tembus MA20,12,Negatif,Downtrend,Normal,> 1 Miliar,1,WAIT & SEE
+NFCX,1590.0,-0.3134796238244514,7300,Normal,37,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+NICE,252.0,-1.5625,13200,Normal,30,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+NICK,980.0,2.083333333333333,100,Normal,45,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+NINE,80.0,0.0,4444000,Normal,47,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+NOBU,428.0,0.4694835680751174,63500,Normal,30,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
 NUSA,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-OBAT,238.0,2.586206896551724,122000,Normal,54,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-OBMD,160.0,0.0,236300,Normal,46,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-OMRE,1080.0,7.462686567164178,700,Normal,51,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-PALM,300.0,1.3513513513513513,252300,Normal,34,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-PANR,408.0,0.49261083743842365,110100,Normal,29,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-PBID,470.0,0.0,145800,Normal,43,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-PBSA,830.0,2.4691358024691357,1319700,Tembus MA20,69,Positif,Uptrend,Normal,> 1 Miliar,4,BELI
-PDES,408.0,-2.3923444976076556,38100,Tembus MA20,10,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-PDPP,270.0,1.602292647942916,67100,Normal,62,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-PEHA,236.0,5.357142857142857,154000,Normal,49,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-PEVE,308.0,0.0,763600,Tembus MA20,48,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-PGJO,730.0,4.285714285714286,72500,Normal,40,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-PGUN,7000.0,0.0,5100,Normal,40,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-PICO,120.0,-1.639344262295082,230200,Normal,45,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-PJAA,448.0,1.8181818181818181,15100,Normal,55,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+OBAT,234.0,-0.847457627118644,41500,Normal,32,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+OBMD,167.0,0.6024096385542169,81600,Normal,49,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+OCAP,159.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+OMRE,1065.0,-0.46728971962616817,200,Normal,58,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+PALM,296.0,-0.6711409395973155,25000,Normal,33,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PANR,400.0,-1.477832512315271,11700,Normal,31,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PBID,478.0,0.8438818565400843,123300,Normal,43,Positif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+PBSA,845.0,1.1976047904191618,441200,Normal,67,Positif,Uptrend,Breakout Upper,< 1 Miliar,3,WAIT & SEE
+PDES,406.0,-3.3333333333333335,7100,Normal,10,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PDPP,260.0,-2.2556390977443606,900,Normal,53,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+PEHA,248.0,0.8130081300813009,9200,Normal,47,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+PEVE,306.0,-3.7735849056603774,108700,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PGJO,700.0,0.0,3500,Normal,35,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PGUN,7050.0,-3.0927835051546393,10100,Normal,37,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PICO,127.0,0.0,41600,Normal,45,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PJAA,456.0,-1.2987012987012987,1100,Normal,48,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
 PLIN,2510.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-PMJS,103.0,2.4875621890547266,246200,Normal,51,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+PMJS,104.0,0.0,120200,Normal,49,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
 PMMP,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-PNBS,50.0,0.0,137000,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-PNGO,3430.0,-0.29069767441860467,38900,Tembus MA20,50,Negatif,Downtrend,Squeeze,< 1 Miliar,1,WAIT & SEE
-PNIN,710.0,0.0,167200,Normal,50,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-PNSE,520.0,0.9708737864077669,2900,Normal,43,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-POLI,675.0,-1.4598540145985401,32200,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PNBS,50.0,0.0,1633200,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+PNGO,3450.0,0.5830903790087464,16600,Tembus MA20,52,Positif,Uptrend,Squeeze,< 1 Miliar,4,BELI
+PNIN,715.0,0.0,7600,Normal,40,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PNSE,525.0,0.0,3000,Normal,39,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+POLI,660.0,-2.941176470588235,200,Normal,19,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 POLL,112.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-POLU,12400.0,-1.5873015873015872,1900,Normal,25,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+POLU,12375.0,-0.20161290322580644,200,Normal,32,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 POLY,32.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-PORT,820.0,0.0,400,Normal,37,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PORT,900.0,0.0,1500,Normal,53,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
 POSA,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-PRAY,650.0,0.7751937984496124,3100,Normal,47,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-PRDA,2510.0,1.2096774193548387,224700,Normal,55,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-PSAT,775.0,1.9736842105263157,58700,Normal,26,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-PSGO,196.0,-1.507537688442211,56200,Normal,64,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-PSSI,270.0,0.7462686567164178,7700,Normal,35,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+PRAY,710.0,4.411764705882353,9800,Normal,51,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+PRDA,2590.0,0.3875968992248062,364800,Normal,61,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+PSAT,760.0,-4.40251572327044,157700,Normal,19,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PSGO,198.0,0.0,10300,Normal,62,Negatif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+PSSI,280.0,1.4492753623188406,1500,Normal,43,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
 PTDU,70.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 PTMR,374.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-PTPS,124.0,2.479338842975207,402700,Normal,63,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-PTPW,1250.0,-1.574803149606299,63000,Normal,66,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-PTSN,244.0,3.389830508474576,414200,Normal,63,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-PTSP,865.0,0.5813953488372093,500,Normal,43,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-PUDP,290.0,-3.3333333333333335,33900,Normal,41,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+PTPS,127.0,0.7936507936507936,144500,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+PTPW,1150.0,-2.069820783239769,86900,Normal,59,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+PTSN,242.0,0.8333333333333334,54500,Normal,57,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+PTSP,880.0,-1.1235955056179776,19300,Tembus MA20,51,Negatif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+PUDP,288.0,-2.0408163265306123,500,Normal,46,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 PURE,51.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 RAFI,36.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-RANC,520.0,-6.306306306306306,266500,Tembus MA20,45,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-RDTX,13825.0,-1.4260249554367201,200,Normal,49,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-REAL,50.0,0.0,462200,Normal,50,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-RIGS,670.0,-2.898550724637681,98400,Normal,45,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-ROCK,1735.0,0.872093023255814,9500,Normal,58,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-RODA,50.0,0.0,115700,Normal,12,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-RONY,935.0,0.5376344086021506,26100,Normal,57,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
-ROTI,610.0,0.0,244400,Normal,77,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-RSGK,1175.0,8.796296296296296,17100,Normal,83,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-RUNS,70.0,0.0,1410900,Tembus MA20,42,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-SAFE,330.0,-0.6024096385542169,68300,Normal,53,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-SAMF,280.0,0.0,11000,Normal,62,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+RANC,525.0,1.9417475728155338,6500,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+RDTX,15000.0,9.89010989010989,200,Normal,71,Positif,Uptrend,Breakout Upper,< 1 Miliar,3,WAIT & SEE
+REAL,50.0,0.0,242800,Normal,33,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+RIGS,675.0,0.0,1200,Normal,48,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+ROCK,1700.0,-1.1627906976744187,1600,Normal,43,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+RODA,66.0,26.923076923076923,110926800,Tembus MA20,71,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
+RONY,975.0,2.094240837696335,1200,Normal,38,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+ROTI,615.0,0.819672131147541,22000,Normal,75,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+RSGK,1160.0,0.4329004329004329,8800,Normal,78,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+RUNS,69.0,-1.4285714285714286,95500,Normal,24,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+SAFE,320.0,-1.8404907975460123,500,Normal,46,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+SAMF,286.0,2.142857142857143,11300,Normal,52,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
 SBAT,1.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-SCCO,2170.0,0.0,2800,Normal,49,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-SDRA,212.0,1.9230769230769231,514800,Normal,57,Positif,Uptrend,Squeeze,< 1 Miliar,3,WAIT & SEE
-SFAN,1970.0,0.2544529262086514,51100,Normal,50,Positif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
-SGRO,2990.0,4.912280701754386,145200,Normal,56,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-SHID,570.0,0.0,26500,Normal,4,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-SHIP,1695.0,-2.3054755043227666,16400,Normal,64,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-SICO,101.0,1.0,407100,Normal,43,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-SILO,2210.0,0.0,120300,Normal,37,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-SINI,9075.0,0.0,0,Normal,43,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-SIPD,715.0,2.142857142857143,6900,Normal,48,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-SKBM,430.0,1.4150943396226416,90800,Normal,14,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-SKRN,368.0,7.602339181286549,204700,Normal,65,Positif,Uptrend,Breakout Upper,< 1 Miliar,3,WAIT & SEE
-SMAR,4820.0,2.553191489361702,45400,Normal,61,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+SCCO,2200.0,-0.4524886877828055,2100,Normal,48,Negatif,Uptrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+SDRA,210.0,-1.8691588785046727,186200,Normal,46,Negatif,Uptrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+SFAN,1975.0,0.0,11900,Normal,38,Negatif,Uptrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+SGRO,2900.0,1.5050752537626881,67200,Normal,59,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+SHID,575.0,0.8771929824561403,200,Normal,9,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+SHIP,1605.0,0.3125,16600,Normal,59,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+SICO,102.0,0.0,326200,Normal,38,Negatif,Uptrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+SILO,2160.0,0.0,63300,Normal,41,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+SINI,9975.0,9.917355371900827,34600,Normal,54,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+SIPD,705.0,-1.3986013986013985,13900,Normal,46,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+SKBM,655.0,22.429906542056074,5428700,Tembus MA20,70,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
+SKRN,352.0,-0.5649717514124294,31000,Normal,61,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+SMAR,4950.0,0.8146639511201629,8600,Normal,67,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
 SMCB,775.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-SMDM,575.0,2.6785714285714284,48600,Normal,65,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-SMMA,21550.0,-1.4857142857142858,11700,Tembus MA20,0,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-SMMT,1790.0,1.7045454545454544,52600,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+SMDM,575.0,0.0,30500,Normal,64,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+SMMA,21500.0,-0.23201856148491878,200,Normal,0,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+SMMT,1790.0,-1.3774104683195594,5800,Normal,51,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
 SMRU,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-SOFA,208.0,5.05050505050505,1557900,Normal,38,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-SOHO,1085.0,-0.45871559633027525,31300,Normal,33,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-SONA,2220.0,0.4524886877828055,17500,Normal,74,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-SOSS,760.0,9.352517985611511,10000,Tembus MA20,48,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-SOTS,610.0,2.5210084033613445,346200,Normal,36,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-SOUL,37.0,0.0,0,Normal,56,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-SPTO,570.0,0.0,180700,Normal,71,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-SRAJ,11000.0,0.0,29300,Normal,50,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+SOFA,228.0,7.547169811320755,1619100,Normal,38,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+SOHO,1275.0,15.384615384615385,92200,Tembus MA20,63,Positif,Uptrend,Breakout Upper,< 1 Miliar,4,BELI
+SONA,2230.0,0.45045045045045046,2200,Normal,80,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+SOSS,850.0,1.7964071856287425,2300,Normal,69,Positif,Uptrend,Breakout Upper,< 1 Miliar,3,WAIT & SEE
+SOTS,620.0,2.479338842975207,14500,Normal,42,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+SOUL,37.0,0.0,0,Normal,47,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+SPTO,570.0,0.0,20200,Normal,56,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+SRAJ,10750.0,-2.7149321266968327,300,Normal,55,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
 SRIL,146.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-SSTM,384.0,0.0,91300,Normal,45,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-STTP,9800.0,-2.0,800,Normal,63,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-SUNI,615.0,0.0,418900,Tembus MA20,22,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+SSTM,398.0,2.051282051282051,571200,Tembus MA20,43,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+STTP,9750.0,-0.5102040816326531,1000,Normal,59,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+SUNI,620.0,2.479338842975207,190900,Normal,29,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
 SUPR,43850.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 SURE,2770.0,1.8382352941176472,2400,Normal,42,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
 SWAT,16.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-SWID,90.0,1.1235955056179776,273600,Normal,66,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-TALF,595.0,2.586206896551724,74800,Normal,32,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+SWID,90.0,1.1235955056179776,83400,Normal,47,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+TALF,610.0,2.5210084033613445,153000,Normal,38,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
 TAYS,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-TBIG,1450.0,2.8368794326241136,386000,Normal,56,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-TBMS,1240.0,2.904564315352697,7200,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-TCID,2760.0,-0.36101083032490977,100,Normal,42,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+TBIG,1405.0,-1.056338028169014,7300,Normal,53,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+TBMS,1200.0,0.0,700,Normal,45,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+TCID,2800.0,1.4492753623188406,600,Normal,50,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
 TDPM,119.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-TEBE,1005.0,1.0050251256281406,262800,Normal,42,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+TEBE,1005.0,0.0,78000,Normal,35,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 TECH,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 TELE,9.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 TFCO,680.0,0.0,0,Normal,61,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
 TGKA,4830.0,1.257861635220126,700,Normal,52,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
 TGRA,27.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 TGUK,137.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-TIFA,214.0,-1.834862385321101,255600,Tembus MA20,19,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-TIRA,590.0,0.0,549800,Normal,34,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-TIRT,590.0,0.0,0,Normal,63,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-TLDN,520.0,0.9708737864077669,795600,Tembus MA20,56,Positif,Uptrend,Normal,< 1 Miliar,4,BELI
+TIFA,228.0,0.0,36900,Normal,32,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+TIRA,575.0,0.8771929824561403,577800,Normal,35,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
+TIRT,590.0,0.0,0,Normal,62,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+TLDN,520.0,0.9708737864077669,945800,Tembus MA20,46,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
 TOPS,1.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-TOTO,234.0,0.8620689655172413,169900,Normal,55,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+TOTO,236.0,0.0,23600,Normal,44,Negatif,Uptrend,Squeeze,< 1 Miliar,1,WAIT & SEE
 TOYS,8.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-TRIM,565.0,-0.8771929824561403,1095100,Tembus MA20,61,Negatif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-TRUK,430.0,5.911330049261084,307800,Normal,62,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-TSPC,2470.0,0.40650406504065045,216300,Normal,56,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-UANG,2150.0,0.0,76600,Normal,47,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
-UCID,366.0,0.0,218100,Normal,38,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
-ULTJ,1360.0,1.4925373134328357,899500,Normal,56,Positif,Uptrend,Normal,> 1 Miliar,3,WAIT & SEE
-UNIC,12700.0,-0.19646365422396855,700,Normal,55,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-UNSP,206.0,0.0,0,Normal,55,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-URBN,214.0,2.8846153846153846,186700,Normal,60,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
-VICI,595.0,1.7094017094017095,248500,Normal,34,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-WEGE,50.0,0.0,282600,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+TRIM,570.0,1.7857142857142856,3900,Normal,57,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+TRIO,426.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
+TRUK,432.0,1.8867924528301887,17600,Normal,53,Positif,Uptrend,Normal,< 1 Miliar,3,WAIT & SEE
+TSPC,2470.0,1.2295081967213115,7400,Normal,42,Positif,Uptrend,Squeeze,< 1 Miliar,2,WAIT & SEE
+UANG,2200.0,5.263157894736842,63500,Normal,43,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+UCID,368.0,1.098901098901099,76100,Normal,37,Positif,Downtrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+ULTJ,1345.0,0.0,177600,Normal,42,Negatif,Uptrend,Normal,< 1 Miliar,1,WAIT & SEE
+UNIC,12325.0,0.40733197556008144,1600,Normal,45,Positif,Downtrend,Squeeze,< 1 Miliar,1,WAIT & SEE
+UNSP,206.0,0.0,0,Normal,40,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+URBN,220.0,10.0,2600,Normal,65,Positif,Uptrend,Breakout Upper,< 1 Miliar,3,WAIT & SEE
+VICI,635.0,-1.550387596899225,387100,Normal,53,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+WEGE,50.0,0.0,9800,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 WICO,123.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 WIKA,204.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-WOOD,218.0,3.8095238095238098,283000,Normal,42,Positif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-WSBP,14.0,0.0,0,Normal,40,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+WOOD,208.0,0.0,176400,Normal,41,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+WSBP,14.0,0.0,0,Normal,25,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 WSKT,202.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-YPAS,605.0,1.680672268907563,34300,Normal,46,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-YULE,3200.0,-0.6211180124223602,500,Normal,11,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,0,WAIT & SEE
-YUPI,1225.0,1.2396694214876034,39600,Normal,39,Positif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-ZATA,50.0,0.0,0,Normal,21,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+YPAS,615.0,-2.380952380952381,4900,Normal,35,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+YULE,3200.0,0.0,27500,Tembus MA20,11,Negatif,Downtrend,Bottom Rebound,< 1 Miliar,1,WAIT & SEE
+YUPI,1665.0,8.823529411764707,1157300,Tembus MA20,57,Positif,Uptrend,Breakout Upper,> 1 Miliar,4,BELI
+ZATA,50.0,0.0,0,Normal,8,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
 ZBRA,50.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
 ZINC,30.0,0.0,0,Normal,0,Negatif,Downtrend,Squeeze,< 1 Miliar,0,WAIT & SEE
-ZONE,570.0,-2.564102564102564,107200,Normal,64,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
-ZYRX,127.0,-0.78125,85900,Normal,52,Negatif,Downtrend,Normal,< 1 Miliar,1,WAIT & SEE
-TRUE,50.0,0.0,0,Normal,26,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
+ZONE,560.0,-0.8849557522123894,20200,Normal,63,Negatif,Uptrend,Normal,< 1 Miliar,2,WAIT & SEE
+ZYRX,129.0,1.574803149606299,54300,Normal,52,Positif,Downtrend,Normal,< 1 Miliar,2,WAIT & SEE
+TRUE,50.0,0.0,0,Normal,12,Negatif,Downtrend,Normal,< 1 Miliar,0,WAIT & SEE
