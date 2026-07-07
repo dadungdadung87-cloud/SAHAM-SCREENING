@@ -2,6 +2,7 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 import os
+from datetime import datetime # 🌟 Modul waktu ditambahkan
 
 def main():
     print("⏳ Memulai pembaruan data saham (Triggered by GitHub Actions)...")
@@ -82,6 +83,9 @@ def main():
                     nilai_transaksi = close_today * vol_today
                     likuiditas = "> 1 Miliar" if nilai_transaksi > 1000000000 else "< 1 Miliar"
                     
+                    # 🌟 Merekam waktu eksekusi saat ini
+                    waktu_sekarang = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    
                     hasil.append({
                         "Ticker": ticker,
                         "Harga (Rp)": close_today,
@@ -91,10 +95,11 @@ def main():
                         "RSI (14D)": rsi,
                         "Momentum": momentum,
                         "MA Signal": ma_signal,
-                        "Status BB": status_bb, # 🌟 DATA BARU DIMASUKKAN KE CSV
+                        "Status BB": status_bb, 
                         "Likuiditas": likuiditas,
                         "Total Score": score,
-                        "Rekomendasi": rekomendasi
+                        "Rekomendasi": rekomendasi,
+                        "Terakhir Update": waktu_sekarang # 🌟 Kolom baru dimasukkan ke CSV
                     })
         except Exception as e:
             # Mengabaikan error pada ticker tertentu agar proses tetap berjalan
