@@ -36,5 +36,5 @@ jobs:
           git config --local user.name "GitHub Action Bot"
           git add hasil_screener.csv
           # Menyimpan hasil, abaikan jika tidak ada perubahan
-          git commit -m "Auto-update data saham [skip ci]" || echo "Tidak ada perubahan data"
+          git commit -m "Auto-update data saham" || echo "Tidak ada perubahan data"
           git push
