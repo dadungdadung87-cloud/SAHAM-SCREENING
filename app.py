@@ -186,7 +186,7 @@ if not df_hasil.empty:
                 if val > 0: style = 'color: #22c55e; font-weight: 600;' 
                 elif val < 0: style = 'color: #ef4444; font-weight: 600;' 
             elif isinstance(val, str):
-                # 🌟 PERUBAHAN: Menambahkan pewarnaan untuk status BB
+                # 🌟 PERUBAHAN: Menambahkan Tube pewarnaan untuk status BB
                 if val in ["Positif", "Uptrend", "BELI", "Breakout Upper", "Bottom Rebound"]: style = 'color: #22c55e; font-weight: 600;'
                 elif val in ["Negatif", "Downtrend", "WAIT & SEE"]: style = 'color: #ef4444; font-weight: 600;'
                 elif val == "> 1 Miliar": style = 'color: #3b82f6; font-weight: 600;'
