@@ -70,16 +70,12 @@ def main():
                     rsi_raw = 100 - (100 / (1 + rs)).iloc[-1].item()
                     rsi = int(round(rsi_raw)) if not pd.isna(rsi_raw) else 0
                     
-                    # 🌟 PLACEHOLDER: Status Bandar dibuat Netral sementara waktu
-                    status_bandar = "Netral"
-                    
                     # Kalkulasi Skor
                     score = 0
                     if vol_today > vol_ma_20: score += 1
                     if rsi > 50: score += 1
                     if momentum == "Positif": score += 1
                     if ma_signal == "Uptrend": score += 1
-                    if status_bandar in ["Accumulation", "Big Accumulation"]: score += 1
 
                     rekomendasi = "BELI" if score == 4 else "WAIT & SEE"
                     nilai_transaksi = close_today * vol_today
@@ -97,7 +93,6 @@ def main():
                         "Momentum": momentum,
                         "MA Signal": ma_signal,
                         "Status BB": status_bb, 
-                        "Status Bandar": status_bandar, # 🌟 Kolom aman terisi "Netral"
                         "Likuiditas": likuiditas,
                         "Total Score": score,
                         "Rekomendasi": rekomendasi,
