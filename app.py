@@ -90,7 +90,9 @@ if not df_hasil.empty:
     with col5: filter_score = st.selectbox("⭐ Total Score", ["Semua", 4, 3, 2, 1, 0])
     with col6: filter_rekomendasi = st.selectbox("🎯 Rekomendasi", ["Semua", "BELI", "WAIT & SEE"])
     with col7: filter_likuiditas = st.selectbox("💧 Likuiditas", ["Semua", "> 1 Miliar", "< 1 Miliar"])
-    with col8: filter_bb = st.selectbox("🌐 Bollinger Bands", ["Semua", "Squeeze", "Bottom Rebound", "Breakout Upper", "Normal"])
+    
+    # 👇 Baris di bawah ini yang diperbarui (tambahkan index=3)
+    with col8: filter_bb = st.selectbox("🌐 Bollinger Bands", ["Semua", "Squeeze", "Bottom Rebound", "Breakout Upper", "Normal"], index=3 if mode_ketat else 0)
 
     df_filtered = df_hasil.copy()
     if search_ticker: df_filtered = df_filtered[df_filtered["Ticker"].str.contains(search_ticker.upper(), na=False)]
