@@ -5,11 +5,9 @@ import os
 def load_keywords(filename):
     """Memuat daftar kata kunci dari file txt."""
     if not os.path.exists(filename):
-        print(f"⚠️ Peringatan: File '{filename}' tidak ditemukan. Menggunakan daftar kosong.")
+        print(f"⚠️ Peringatan: File '{filename}' tidak ditemukan.")
         return []
-    
     with open(filename, "r", encoding="utf-8") as file:
-        # Membaca per baris, membersihkan spasi/enter, dan mengubah ke huruf kecil
         return [line.strip().lower() for line in file if line.strip()]
 
 def get_news_titles(ticker):
@@ -21,40 +19,50 @@ def get_news_titles(ticker):
     return " | ".join(titles) if titles else "Tidak ada berita terbaru."
 
 def analyze_acquisition_status(news_text, kata_rencana, kata_dalam):
-    """Menyimpulkan status akuisisi menggunakan logika kata kunci eksternal"""
+    """Menyimpulkan status akuisisi dengan prioritas frasa terpanjang (3 kata)"""
     if news_text == "Tidak ada berita terbaru.":
         return "TIDAK ADA"
         
     teks_kecil = news_text.lower()
     
-    # Cek status DALAM AKUISISI terlebih dahulu (Prioritas Utama)
-    if any(kata in teks_kecil for kata in kata_dalam):
-        return "DALAM AKUISISI"
-        
-    # Jika tidak ada kecocokan di atas, baru cek RENCANA AKUISISI
-    if any(kata in teks_kecil for kata in kata_rencana):
-        return "RENCANA AKUISISI"
+    # 1. Kelompokkan berdasarkan panjang kata
+    def kelompokkan(daftar):
+        tiga_kata = [k for k in daftar if len(k.split()) >= 3]
+        dua_kata = [k for k in daftar if len(k.split()) == 2]
+        satu_kata = [k for k in daftar if len(k.split()) == 1]
+        return tiga_kata, dua_kata, satu_kata
+
+    rencana_3, rencana_2, rencana_1 = kelompokkan(kata_rencana)
+    dalam_3, dalam_2, dalam_1 = kelompokkan(kata_dalam)
+
+    # 2. Cek Prioritas: DALAM AKUISISI (dari 3 kata ke 1 kata)
+    if any(k in teks_kecil for k in dalam_3): return "DALAM AKUISISI"
+    if any(k in teks_kecil for k in dalam_2): return "DALAM AKUISISI"
+    if any(k in teks_kecil for k in dalam_1): return "DALAM AKUISISI"
+    
+    # 3. Cek Prioritas: RENCANA AKUISISI (dari 3 kata ke 1 kata)
+    if any(k in teks_kecil for k in rencana_3): return "RENCANA AKUISISI"
+    if any(k in teks_kecil for k in rencana_2): return "RENCANA AKUISISI"
+    if any(k in teks_kecil for k in rencana_1): return "RENCANA AKUISISI"
         
     return "TIDAK ADA"
 
 def main():
-    print("🔍 Memulai pemindaian berita dengan metode Kata Kunci (Bebas Limit)...")
+    print("🔍 Memulai pemindaian berita dengan logika prioritas (3 kata -> 1 kata)...")
     
     if not os.path.exists("saham.txt"):
         print("❌ Error: File 'saham.txt' tidak ditemukan!")
         return
 
-    # 1. Membaca ratusan kata kunci dari kedua file teks
+    # Memuat kata kunci dari file eksternal
     kata_rencana = load_keywords("RENCANA_AKUISISI.txt")
     kata_dalam = load_keywords("DALAM_AKUISISI.txt")
 
-    # 2. Membaca daftar saham
     with open("saham.txt", "r") as file:
         daftar_saham = [baris.strip().upper() for baris in file if baris.strip()]
         
     hasil_akuisisi = []
     
-    # 3. Proses pemindaian tanpa jeda waktu (ngebut)
     for ticker in daftar_saham:
         print(f"Memindai berita untuk {ticker}...")
         berita = get_news_titles(ticker)
@@ -65,7 +73,6 @@ def main():
             "Status Akuisisi": status
         })
         
-    # 4. Simpan ke CSV
     if hasil_akuisisi:
         df = pd.DataFrame(hasil_akuisisi)
         df.to_csv("data_akuisisi.csv", index=False)

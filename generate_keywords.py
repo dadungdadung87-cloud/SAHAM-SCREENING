@@ -1,25 +1,30 @@
-# Daftar kata dasar untuk dikombinasikan
-subjek = ["rencana", "strategi", "kaji", "proses", "tahap", "upaya", "niat", "target", "analisis", "diskusi"]
-aksi = ["akuisisi", "pengambilalihan", "merger", "pembelian", "konsolidasi", "integrasi", "ekspansi"]
-objek = ["saham", "aset", "bisnis", "perusahaan", "unit usaha", "portofolio", "pangsa pasar", "kontribusi"]
-sektor = ["sektor energi", "sektor properti", "sektor perbankan", "sektor teknologi", "sektor ritel", "sektor logistik"]
+import random
 
-def generate_file(filename, list_kata, jumlah):
+# Daftar kata dasar yang lebih kaya
+kata_kerja = ["rencana", "kaji", "proses", "tahap", "upaya", "niat", "target", "analisis", "diskusi", "bidik"]
+kata_aksi = ["akuisisi", "merger", "pengambilalihan", "beli", "konsolidasi", "integrasi", "ekspansi"]
+kata_objek = ["saham", "aset", "bisnis", "perusahaan", "usaha", "portofolio", "pasar"]
+
+def generate_keywords(filename):
     with open(filename, "w", encoding="utf-8") as f:
-        for _ in range(jumlah):
-            import random
-            frasa = f"{random.choice(subjek)} {random.choice(aksi)} {random.choice(objek)} {random.choice(sektor)}"
-            f.write(frasa + "\n")
-    print(f"✅ {filename} berhasil dibuat dengan {jumlah} kata kunci!")
+        # 1. Kelompok 1 Kata
+        # Ambil langsung dari list aksi dan kerja
+        satu_kata = list(set(kata_kerja + kata_aksi + kata_objek))
+        for kata in satu_kata:
+            f.write(f"{kata}\n")
+        
+        # 2. Kelompok 2 Kata (Kombinasi acak)
+        for _ in range(150): # Membuat 150 variasi 2 kata
+            frasa = f"{random.choice(kata_kerja)} {random.choice(kata_aksi)}"
+            f.write(f"{frasa}\n")
+            
+        # 3. Kelompok 3 Kata (Kombinasi acak)
+        for _ in range(150): # Membuat 150 variasi 3 kata
+            frasa = f"{random.choice(kata_kerja)} {random.choice(kata_aksi)} {random.choice(kata_objek)}"
+            f.write(f"{frasa}\n")
+            
+    print(f"✅ {filename} berhasil dibuat dengan struktur 1, 2, dan 3 kata.")
 
-# Membuat RENCANA_AKUISISI.txt (200 baris)
-generate_file("RENCANA_AKUISISI.txt", subjek, 200)
-
-# Membuat DALAM_AKUISISI.txt (200 baris dengan kata kerja past tense/selesai)
-aksi_selesai = ["telah akuisisi", "resmi beli", "selesai akuisisi", "tuntas merger", "sah kuasai", "rampungkan pengambilalihan"]
-with open("DALAM_AKUISISI.txt", "w", encoding="utf-8") as f:
-    for i in range(200):
-        import random
-        frasa = f"{random.choice(aksi_selesai)} {random.choice(objek)} {random.choice(sektor)}"
-        f.write(frasa + "\n")
-print("✅ DALAM_AKUISISI.txt berhasil dibuat!")
+# Generate untuk kedua file
+generate_keywords("RENCANA_AKUISISI.txt")
+generate_keywords("DALAM_AKUISISI.txt")
