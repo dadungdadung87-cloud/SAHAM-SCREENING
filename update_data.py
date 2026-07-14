@@ -62,12 +62,20 @@ def main():
                     else:
                         status_bb = "Normal"
                     
-                    # Kalkulasi RSI
+                    # Kalkulasi RSI (Metode J. Welles Wilder - EMA)
                     delta = df_saham['Close'].diff()
-                    gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
-                    loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
-                    rs = gain / loss
-                    rsi_raw = 100 - (100 / (1 + rs)).iloc[-1].item()
+                    gain = delta.where(delta > 0, 0)
+                    loss = -delta.where(delta < 0, 0)
+                    
+                    # Menggunakan metode ewm (Exponential Weighted Math) dari Pandas
+                    # alpha = 1/14 mencerminkan Wilder's Smoothing
+                    avg_gain = gain.ewm(alpha=1/14, adjust=False).mean()
+                    avg_loss = loss.ewm(alpha=1/14, adjust=False).mean()
+                    
+                    rs = avg_gain / avg_loss
+                    rsi_raw = (100 - (100 / (1 + rs))).iloc[-1].item()
+                    
+                    # Konversi ke integer dengan aman
                     rsi = int(round(rsi_raw)) if not pd.isna(rsi_raw) else 0
                     
                     # Kalkulasi Skor
