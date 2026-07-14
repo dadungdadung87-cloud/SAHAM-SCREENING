@@ -71,6 +71,19 @@ if not df_hasil.empty:
     met2.markdown(f"<div class='metric-container'><h3>🎯 Sinyal BELI</h3><h2 style='color: #4ade80;'>{total_beli} Saham</h2></div>", unsafe_allow_html=True)
     met3.markdown(f"<div class='metric-container'><h3>📈 Fase Uptrend</h3><h2 style='color: #60a5fa;'>{total_uptrend} Saham</h2></div>", unsafe_allow_html=True)
     
+    # --- FITUR BARU: METRIK KESEHATAN PASAR ---
+    st.markdown("---")
+    persentase_uptrend = (total_uptrend / total_dianalisis) * 100 if total_dianalisis > 0 else 0
+    st.markdown(f"**📈 Indeks Kesehatan Pasar (Saham Fase Uptrend): {persentase_uptrend:.1f}%**")
+    st.progress(persentase_uptrend / 100.0)
+    
+    if persentase_uptrend > 50:
+        st.caption("🟢 Mayoritas saham sedang Uptrend. Momentum pasar secara umum mendukung untuk Swing Trading.")
+    else:
+        st.caption("🔴 Mayoritas saham sedang Downtrend. Waspada, pasar sedang lesu atau distribusi.")
+    st.markdown("---")
+    # ------------------------------------------
+
     st.markdown("### 🎛️ Panel Filter Lengkap")
     
     # Menambahkan tombol centang filter ketat
@@ -90,8 +103,6 @@ if not df_hasil.empty:
     with col5: filter_score = st.selectbox("⭐ Total Score", ["Semua", 4, 3, 2, 1, 0])
     with col6: filter_rekomendasi = st.selectbox("🎯 Rekomendasi", ["Semua", "BELI", "WAIT & SEE"])
     with col7: filter_likuiditas = st.selectbox("💧 Likuiditas", ["Semua", "> 1 Miliar", "< 1 Miliar"])
-    
-    # 👇 Baris di bawah ini yang diperbarui (tambahkan index=3)
     with col8: filter_bb = st.selectbox("🌐 Bollinger Bands", ["Semua", "Squeeze", "Bottom Rebound", "Breakout Upper", "Normal"], index=3 if mode_ketat else 0)
 
     df_filtered = df_hasil.copy()
@@ -164,8 +175,29 @@ if not df_hasil.empty:
             "RSI (14D)": "{:.0f}"
         }).map(warna_tabel, subset=kolom_berwarna_aktual)
 
+        # --- FITUR BARU: HEATMAP PADA TOTAL SCORE ---
+        if "Total Score" in df_tampil.columns:
+            tabel_akhir = tabel_akhir.background_gradient(subset=['Total Score'], cmap='RdYlGn', vmin=0, vmax=4)
+        # --------------------------------------------
+
         st.dataframe(tabel_akhir, use_container_width=True, hide_index=True)
 
         st.caption(f"Menampilkan urutan {(indeks_awal + 1)} - {min(indeks_akhir, len(df_filtered))} dari total {len(df_filtered)} saham yang lolos filter.")
+        
+        # --- FITUR BARU: TOMBOL UNDUH CSV ---
+        st.markdown("---")
+        @st.cache_data
+        def convert_df(df):
+            return df.to_csv(index=False).encode('utf-8')
+        
+        csv_data = convert_df(df_filtered)
+        st.download_button(
+            label="📥 Unduh Hasil Screener (CSV)",
+            data=csv_data,
+            file_name=f'screener_ihsg_{datetime.now().strftime("%Y%m%d")}.csv',
+            mime='text/csv',
+        )
+        # ------------------------------------
+
     else:
         st.warning("Tidak ada saham yang memenuhi kriteria filter Anda saat ini.")
