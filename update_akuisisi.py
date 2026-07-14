@@ -69,19 +69,7 @@ def main():
     if hasil_akuisisi:
         df = pd.DataFrame(hasil_akuisisi)
         df.to_csv("data_akuisisi.csv", index=False)
-        print("✅ Selesai! File 'data_akuisisi.csv' berhasil dibuat.")
-        
-        # --- PERBAIKAN ALUR OTOMATISASI ---
-        print("🔄 Sinkronisasi dengan GitHub...")
-        os.system("git add data_akuisisi.csv")
-        os.system('git commit -m "Auto-update data akuisisi"')
-        
-        # 1. Ambil perubahan terbaru dari server agar tidak konflik
-        os.system("git pull origin main") 
-        
-        # 2. Baru kirim hasil update
-        os.system("git push origin main")
-        print("🚀 Berhasil dikirim ke cloud!")
+        print("✅ Selesai! File 'data_akuisisi.csv' berhasil diperbarui.")
 
 if __name__ == "__main__":
     main()
