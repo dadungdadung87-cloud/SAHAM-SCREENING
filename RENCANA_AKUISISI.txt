@@ -1,324 +1,500 @@
-konsolidasi
-integrasi
-merger
-aset
-rencana
-ekspansi
-pasar
-bisnis
-niat
-proses
-pengambilalihan
-upaya
-perusahaan
-saham
-kaji
-analisis
-beli
-portofolio
-target
-diskusi
-usaha
-tahap
-akuisisi
-bidik
-upaya beli
-kaji akuisisi
-bidik ekspansi
-target merger
-diskusi beli
-niat merger
-proses ekspansi
-upaya ekspansi
-bidik ekspansi
-bidik beli
-bidik beli
-proses pengambilalihan
-analisis integrasi
-proses merger
-rencana akuisisi
-kaji integrasi
-diskusi konsolidasi
-diskusi akuisisi
-bidik integrasi
-diskusi ekspansi
-tahap merger
-rencana merger
-tahap akuisisi
-proses ekspansi
-upaya merger
-bidik pengambilalihan
-kaji merger
-upaya beli
-rencana merger
-analisis akuisisi
-diskusi konsolidasi
-analisis pengambilalihan
-upaya akuisisi
-analisis merger
-proses pengambilalihan
-kaji integrasi
+tuntaskan merger
 upaya pengambilalihan
-upaya integrasi
-kaji akuisisi
-niat merger
-target akuisisi
-niat beli
-diskusi akuisisi
-proses integrasi
-kaji merger
-target pengambilalihan
-proses ekspansi
-target akuisisi
-target beli
+siapkan transaksi
+proses konsolidasi
+upaya kepemilikan
 bidik akuisisi
-proses pengambilalihan
 upaya pengambilalihan
-upaya merger
-niat merger
-rencana akuisisi
-rencana akuisisi
-analisis akuisisi
+kaji pembelian
+proses pembelian
+upaya pembelian
+upaya kepemilikan
+siapkan pengambilalihan
+rencana pembelian
+bidik transaksi
+tuntaskan akuisisi
 rencana integrasi
-kaji konsolidasi
-bidik ekspansi
-rencana ekspansi
-proses merger
-analisis beli
-rencana beli
+tuntaskan pengambilalihan
+tahap konsolidasi
+proses transaksi
+upaya pengambilalihan
+siapkan pengambilalihan
+kaji kepemilikan
+resmi transaksi
+tuntaskan akuisisi
+tahap transaksi
+upaya merger
+proses kepemilikan
+tahap pembelian
+teken pengambilalihan
+teken integrasi
+tuntaskan merger
+tahap transaksi
 bidik akuisisi
-kaji ekspansi
+tahap merger
+bidik akuisisi
+resmi integrasi
+upaya konsolidasi
+siapkan konsolidasi
+bidik integrasi
+resmi kepemilikan
+rencana pengambilalihan
+rencana kepemilikan
+siapkan pengambilalihan
+tahap pengambilalihan
+teken pembelian
+resmi akuisisi
+proses transaksi
+tuntaskan pengambilalihan
+upaya kepemilikan
+resmi kepemilikan
+siapkan akuisisi
+bidik integrasi
+bidik kepemilikan
+rencana merger
+bidik transaksi
+upaya transaksi
+teken akuisisi
+kaji akuisisi
+tuntaskan transaksi
+bidik transaksi
+proses transaksi
+rencana konsolidasi
+tuntaskan konsolidasi
+tuntaskan pengambilalihan
+tuntaskan akuisisi
+siapkan pembelian
+resmi integrasi
+teken konsolidasi
+bidik kepemilikan
+bidik pembelian
+rencana konsolidasi
+resmi konsolidasi
+siapkan pengambilalihan
+bidik konsolidasi
+kaji pembelian
+tahap merger
+bidik pengambilalihan
+kaji konsolidasi
+siapkan akuisisi
+siapkan kepemilikan
+bidik akuisisi
+resmi integrasi
+bidik pengambilalihan
+teken akuisisi
+kaji akuisisi
+bidik merger
+upaya pengambilalihan
+upaya transaksi
+kaji akuisisi
+proses konsolidasi
+tahap merger
+kaji integrasi
+tuntaskan pengambilalihan
+tuntaskan integrasi
+bidik kepemilikan
+kaji integrasi
+teken kepemilikan
+resmi konsolidasi
+kaji merger
+teken konsolidasi
+proses pembelian
+bidik akuisisi
+rencana akuisisi
+tuntaskan integrasi
+teken pengambilalihan
+proses pengambilalihan
+siapkan akuisisi
+siapkan integrasi
+kaji pengambilalihan
+kaji akuisisi
+bidik integrasi
+proses konsolidasi
+proses merger
+bidik merger
+bidik integrasi
+rencana kepemilikan
+proses merger
+tahap integrasi
+rencana pembelian
+tahap integrasi
+tahap transaksi
+bidik konsolidasi
+rencana integrasi
+bidik integrasi
+kaji kepemilikan
+kaji pengambilalihan
+proses transaksi
+upaya merger
+rencana pengambilalihan
+teken pengambilalihan
+kaji konsolidasi
+rencana kepemilikan
+tahap merger
+teken konsolidasi
+kaji konsolidasi
+tahap pembelian
+upaya pembelian
+bidik kepemilikan
+siapkan integrasi
+resmi akuisisi
+tahap transaksi
 rencana pengambilalihan
 tahap integrasi
-proses konsolidasi
-kaji ekspansi
-diskusi akuisisi
-kaji merger
-kaji pengambilalihan
-bidik ekspansi
-target beli
-proses konsolidasi
+rencana kepemilikan
+rencana transaksi
+tuntaskan pembelian
+upaya kepemilikan
 tahap merger
-kaji beli
-diskusi beli
-kaji ekspansi
-target ekspansi
-diskusi integrasi
-tahap pengambilalihan
-proses integrasi
-upaya konsolidasi
-kaji akuisisi
-analisis integrasi
-bidik beli
-upaya merger
-tahap pengambilalihan
-tahap merger
-kaji integrasi
-tahap integrasi
-upaya beli
-target integrasi
-niat ekspansi
-tahap ekspansi
-tahap integrasi
-upaya konsolidasi
-diskusi konsolidasi
-proses akuisisi
-target merger
-diskusi merger
-upaya konsolidasi
-target akuisisi
-kaji integrasi
-proses pengambilalihan
-niat konsolidasi
-rencana beli
-proses beli
-kaji ekspansi
-tahap pengambilalihan
-kaji konsolidasi
-tahap ekspansi
-analisis merger
-kaji ekspansi
-upaya konsolidasi
-target beli
-niat merger
-kaji integrasi
+proses pembelian
+tuntaskan transaksi
+kaji pembelian
 upaya pengambilalihan
-target konsolidasi
-diskusi konsolidasi
-bidik integrasi
-analisis integrasi
-kaji beli
-analisis integrasi
-target merger
-diskusi integrasi
-target akuisisi
-upaya ekspansi
-kaji pengambilalihan
-diskusi pengambilalihan
-proses konsolidasi
-analisis konsolidasi
-diskusi konsolidasi
-niat ekspansi
-bidik akuisisi
-tahap pengambilalihan
-niat ekspansi
-analisis konsolidasi
-bidik akuisisi
-tahap konsolidasi
-proses integrasi
-tahap merger
-niat merger
-kaji akuisisi
+kaji pembelian
+siapkan pengambilalihan
+proses transaksi
+proses transaksi
 proses pengambilalihan
-analisis akuisisi
+resmi konsolidasi
+siapkan akuisisi
+kaji konsolidasi
+tahap integrasi
+bidik akuisisi
+kaji pembelian
+upaya pengambilalihan
+resmi integrasi
+proses pengambilalihan
+proses transaksi
+proses pembelian
+tuntaskan integrasi
+rencana kepemilikan
+proses konsolidasi
+siapkan integrasi
+tahap akuisisi
+resmi merger
 bidik konsolidasi
-upaya akuisisi perusahaan
-analisis beli aset
-kaji konsolidasi aset
-rencana integrasi saham
-analisis integrasi portofolio
-niat pengambilalihan bisnis
-analisis akuisisi perusahaan
-bidik ekspansi usaha
-target ekspansi bisnis
-niat integrasi pasar
-proses konsolidasi pasar
-bidik integrasi portofolio
-rencana konsolidasi aset
-bidik merger bisnis
-proses beli usaha
-kaji ekspansi portofolio
-kaji konsolidasi usaha
-analisis konsolidasi bisnis
-proses pengambilalihan portofolio
-target ekspansi usaha
-analisis ekspansi pasar
-kaji beli aset
-analisis integrasi perusahaan
-niat konsolidasi portofolio
-bidik integrasi portofolio
-rencana akuisisi perusahaan
-target integrasi bisnis
-proses konsolidasi portofolio
-bidik ekspansi aset
-target akuisisi aset
-rencana beli perusahaan
-tahap merger portofolio
-upaya integrasi portofolio
-kaji pengambilalihan portofolio
-upaya konsolidasi perusahaan
-kaji pengambilalihan pasar
-kaji akuisisi perusahaan
-target pengambilalihan aset
-bidik konsolidasi aset
-upaya merger usaha
-diskusi konsolidasi portofolio
-niat konsolidasi pasar
-proses konsolidasi usaha
-proses akuisisi saham
-diskusi integrasi saham
-diskusi konsolidasi bisnis
-rencana konsolidasi usaha
-niat merger pasar
-analisis integrasi bisnis
-rencana merger perusahaan
-tahap beli portofolio
-niat pengambilalihan perusahaan
-analisis beli pasar
-bidik ekspansi aset
-bidik konsolidasi aset
-proses konsolidasi saham
-tahap integrasi usaha
-tahap pengambilalihan pasar
-tahap konsolidasi aset
-rencana konsolidasi saham
-bidik ekspansi portofolio
-tahap akuisisi perusahaan
-tahap pengambilalihan portofolio
-kaji akuisisi perusahaan
-upaya integrasi portofolio
-target integrasi portofolio
-analisis beli perusahaan
-niat pengambilalihan perusahaan
-kaji integrasi portofolio
-proses integrasi bisnis
-analisis ekspansi portofolio
-target konsolidasi usaha
-kaji beli saham
-proses merger portofolio
-tahap beli aset
-bidik merger saham
-target pengambilalihan portofolio
-target pengambilalihan bisnis
-rencana merger bisnis
-proses pengambilalihan portofolio
-rencana ekspansi portofolio
-upaya konsolidasi usaha
-analisis beli usaha
-analisis pengambilalihan pasar
-niat integrasi bisnis
+bidik merger
+siapkan pengambilalihan
+bidik kepemilikan
+tuntaskan pengambilalihan
+resmi transaksi
+siapkan akuisisi
+rencana akuisisi
+upaya akuisisi
+proses kepemilikan
+tahap transaksi
+resmi pengambilalihan
+siapkan integrasi
+teken pengambilalihan
+resmi pembelian
+upaya kepemilikan
+resmi konsolidasi
+tuntaskan merger
+upaya transaksi
+kaji konsolidasi
+bidik integrasi
+bidik akuisisi
+rencana merger
+tahap pembelian
+tahap pengambilalihan
+bidik merger
+resmi konsolidasi
+resmi transaksi
+tahap kepemilikan
+tahap pembelian
+tahap merger
+tahap kepemilikan
+rencana integrasi
+siapkan pembelian
+proses integrasi
+resmi pembelian
+teken pengambilalihan
+tuntaskan kepemilikan
+rencana pengambilalihan
+tahap pengambilalihan
+resmi transaksi
+upaya konsolidasi
+kaji akuisisi
+siapkan konsolidasi
+bidik akuisisi
+tuntaskan pengambilalihan
+proses konsolidasi
+resmi transaksi
+tuntaskan konsolidasi
+siapkan transaksi
+upaya transaksi
+proses pengambilalihan
+proses pengambilalihan
+bidik konsolidasi
+tuntaskan pembelian
+proses transaksi
+teken merger
+resmi pengambilalihan
+bidik akuisisi
+resmi transaksi
+tahap integrasi
+tahap akuisisi
+rencana akuisisi
+tuntaskan integrasi
+tuntaskan akuisisi
+kaji pembelian
+proses konsolidasi
+kaji kepemilikan
+rencana integrasi
+resmi pembelian
+teken pembelian
+resmi pengambilalihan
+proses akuisisi
+rencana merger
+upaya merger
+resmi kepemilikan
 upaya merger aset
-proses ekspansi pasar
-proses konsolidasi pasar
-proses beli aset
-bidik konsolidasi portofolio
-tahap integrasi pasar
-rencana pengambilalihan pasar
-niat integrasi saham
-kaji merger saham
-target integrasi bisnis
-bidik beli usaha
-upaya konsolidasi pasar
-rencana beli aset
-target konsolidasi portofolio
-niat pengambilalihan bisnis
-niat pengambilalihan perusahaan
-diskusi beli perusahaan
-diskusi merger portofolio
-diskusi akuisisi saham
-rencana merger bisnis
-diskusi beli perusahaan
-bidik beli saham
-analisis beli usaha
-niat integrasi aset
-upaya konsolidasi aset
-kaji konsolidasi portofolio
-kaji ekspansi bisnis
-bidik akuisisi pasar
-kaji pengambilalihan aset
-bidik merger portofolio
-bidik beli bisnis
-proses konsolidasi portofolio
-analisis pengambilalihan perusahaan
-proses akuisisi bisnis
-upaya beli pasar
-proses ekspansi portofolio
-rencana merger portofolio
-upaya konsolidasi perusahaan
-target merger portofolio
-kaji akuisisi usaha
-rencana ekspansi saham
-rencana konsolidasi aset
-niat merger usaha
-diskusi ekspansi saham
-bidik konsolidasi saham
-kaji pengambilalihan saham
-target pengambilalihan usaha
-kaji ekspansi portofolio
-target konsolidasi perusahaan
-bidik konsolidasi portofolio
+tuntaskan akuisisi unit usaha
+siapkan merger pangsa pasar
 bidik pengambilalihan perusahaan
-proses beli usaha
-proses pengambilalihan aset
-niat pengambilalihan saham
-niat konsolidasi portofolio
-proses merger portofolio
-tahap konsolidasi aset
+teken merger pangsa pasar
+resmi pengambilalihan perusahaan
+proses merger entitas
+rencana akuisisi entitas
+tahap merger pangsa pasar
+tuntaskan merger saham
+rencana akuisisi bisnis
+upaya merger aset
+tuntaskan akuisisi perusahaan
+resmi akuisisi entitas
+tuntaskan pengambilalihan saham
+proses merger entitas
+tahap pengambilalihan aset
+resmi pengambilalihan unit usaha
+upaya merger pangsa pasar
+tuntaskan akuisisi bisnis
+teken merger bisnis
+teken merger saham
+proses merger entitas
+tahap merger aset
+resmi akuisisi saham
+proses pengambilalihan entitas
+proses akuisisi saham
+proses akuisisi aset
+resmi akuisisi bisnis
+teken pengambilalihan aset
+tahap pengambilalihan unit usaha
+upaya merger entitas
+tahap merger aset
+upaya pengambilalihan bisnis
+proses merger perusahaan
+siapkan pengambilalihan unit usaha
+teken merger unit usaha
+bidik akuisisi aset
+upaya merger saham
+proses merger entitas
+tahap merger aset
+siapkan merger entitas
+tuntaskan akuisisi unit usaha
+resmi akuisisi pangsa pasar
+teken pengambilalihan saham
+upaya pengambilalihan aset
+resmi akuisisi entitas
+upaya akuisisi aset
+siapkan pengambilalihan bisnis
+bidik pengambilalihan unit usaha
+tuntaskan akuisisi perusahaan
+bidik akuisisi perusahaan
+bidik pengambilalihan saham
+rencana akuisisi perusahaan
+resmi pengambilalihan pangsa pasar
+tuntaskan merger aset
+tahap merger entitas
+teken merger entitas
+proses akuisisi unit usaha
+kaji pengambilalihan pangsa pasar
+tuntaskan pengambilalihan bisnis
+kaji pengambilalihan bisnis
+upaya merger aset
+proses akuisisi saham
+siapkan pengambilalihan entitas
+bidik merger unit usaha
+proses akuisisi saham
+kaji pengambilalihan saham
+bidik pengambilalihan bisnis
+proses pengambilalihan entitas
+kaji pengambilalihan entitas
+siapkan akuisisi saham
+kaji akuisisi aset
+teken akuisisi perusahaan
+tuntaskan merger pangsa pasar
+siapkan pengambilalihan entitas
+siapkan pengambilalihan unit usaha
+rencana pengambilalihan saham
+tahap akuisisi saham
+upaya akuisisi saham
+tahap merger bisnis
+proses akuisisi aset
+tahap merger unit usaha
+teken pengambilalihan perusahaan
+teken merger entitas
+upaya merger saham
+teken akuisisi pangsa pasar
+rencana akuisisi saham
+kaji akuisisi aset
+teken akuisisi aset
+kaji akuisisi unit usaha
+bidik merger perusahaan
+resmi merger saham
+tuntaskan akuisisi pangsa pasar
+resmi merger bisnis
+kaji akuisisi saham
+resmi pengambilalihan unit usaha
+kaji akuisisi entitas
+rencana merger bisnis
+bidik merger aset
+resmi akuisisi aset
+upaya pengambilalihan bisnis
+resmi pengambilalihan aset
+proses akuisisi perusahaan
+rencana akuisisi aset
+teken pengambilalihan pangsa pasar
+siapkan akuisisi perusahaan
+rencana pengambilalihan perusahaan
+bidik akuisisi bisnis
+upaya merger bisnis
+siapkan akuisisi entitas
+teken merger bisnis
+rencana merger bisnis
+resmi pengambilalihan perusahaan
+siapkan merger unit usaha
+tuntaskan pengambilalihan aset
+siapkan pengambilalihan aset
+upaya akuisisi aset
+rencana pengambilalihan saham
+siapkan merger bisnis
+bidik merger perusahaan
 tahap pengambilalihan bisnis
-rencana pengambilalihan portofolio
-analisis akuisisi usaha
-rencana konsolidasi aset
-kaji konsolidasi usaha
-analisis akuisisi pasar
-niat integrasi usaha
-kaji konsolidasi saham
+tahap pengambilalihan saham
+resmi merger perusahaan
+resmi pengambilalihan bisnis
+siapkan pengambilalihan bisnis
+tuntaskan akuisisi aset
+teken pengambilalihan entitas
+tahap pengambilalihan entitas
+resmi merger aset
+rencana pengambilalihan bisnis
+upaya pengambilalihan pangsa pasar
+bidik merger aset
+resmi merger perusahaan
+tahap akuisisi unit usaha
+proses akuisisi aset
+tuntaskan pengambilalihan entitas
+rencana merger pangsa pasar
+siapkan akuisisi entitas
+kaji merger saham
+upaya pengambilalihan unit usaha
+bidik pengambilalihan aset
+siapkan merger unit usaha
+kaji merger aset
+upaya merger aset
+tuntaskan merger bisnis
+resmi akuisisi pangsa pasar
+upaya merger perusahaan
+tuntaskan akuisisi saham
+teken akuisisi bisnis
+tahap pengambilalihan aset
+upaya merger aset
+teken akuisisi perusahaan
+tahap akuisisi saham
+rencana merger aset
+tahap merger saham
+bidik merger perusahaan
+proses akuisisi unit usaha
+rencana akuisisi aset
+teken akuisisi perusahaan
+tahap akuisisi bisnis
+tahap pengambilalihan saham
+rencana merger perusahaan
+tahap akuisisi saham
+siapkan pengambilalihan aset
+tuntaskan merger pangsa pasar
+upaya merger perusahaan
+tahap merger unit usaha
+siapkan pengambilalihan perusahaan
+resmi akuisisi perusahaan
+resmi akuisisi saham
+rencana akuisisi entitas
+kaji pengambilalihan unit usaha
+bidik pengambilalihan bisnis
+bidik merger perusahaan
+teken pengambilalihan entitas
+proses pengambilalihan perusahaan
+tuntaskan merger unit usaha
+kaji merger unit usaha
+tuntaskan pengambilalihan entitas
+siapkan akuisisi pangsa pasar
+rencana pengambilalihan entitas
+upaya akuisisi bisnis
+proses pengambilalihan unit usaha
+bidik pengambilalihan perusahaan
+kaji merger unit usaha
+resmi akuisisi bisnis
+teken pengambilalihan perusahaan
+upaya akuisisi unit usaha
+tahap pengambilalihan perusahaan
+teken merger aset
+bidik pengambilalihan bisnis
+bidik pengambilalihan pangsa pasar
+proses pengambilalihan pangsa pasar
+teken pengambilalihan saham
+bidik pengambilalihan bisnis
+rencana akuisisi unit usaha
+proses merger aset
+tahap pengambilalihan unit usaha
+rencana merger unit usaha
+siapkan merger pangsa pasar
+kaji akuisisi saham
+proses merger aset
+kaji akuisisi aset
+kaji pengambilalihan pangsa pasar
+tuntaskan akuisisi unit usaha
+rencana pengambilalihan perusahaan
+siapkan akuisisi saham
+proses akuisisi bisnis
+proses pengambilalihan saham
+teken pengambilalihan bisnis
+rencana merger unit usaha
+kaji merger aset
+proses merger bisnis
+tuntaskan merger unit usaha
+rencana merger saham
+resmi akuisisi saham
+kaji akuisisi unit usaha
+tahap merger saham
+kaji akuisisi pangsa pasar
+kaji pengambilalihan saham
+tuntaskan akuisisi entitas
+upaya merger unit usaha
+rencana pengambilalihan entitas
+resmi akuisisi bisnis
+rencana akuisisi saham
+tahap pengambilalihan pangsa pasar
+siapkan pengambilalihan bisnis
+kaji akuisisi unit usaha
+teken pengambilalihan entitas
+upaya merger entitas
+resmi pengambilalihan entitas
+resmi merger bisnis
+upaya pengambilalihan bisnis
+bidik pengambilalihan entitas
+tuntaskan merger bisnis
+bidik pengambilalihan aset
+upaya merger saham
+teken merger entitas
+tahap pengambilalihan pangsa pasar
+siapkan pengambilalihan pangsa pasar
+proses akuisisi entitas
+teken pengambilalihan saham
+tahap pengambilalihan perusahaan
+kaji akuisisi saham
+upaya pengambilalihan pangsa pasar
+upaya merger aset
+proses pengambilalihan entitas
+tuntaskan akuisisi saham
+tuntaskan pengambilalihan perusahaan
