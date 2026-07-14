@@ -75,8 +75,8 @@ def main():
             "Status Akuisisi": status
         })
         
-        # Jeda 3 detik agar tidak membebani server Google
-        time.sleep(3) 
+        # Jeda 5 detik agar aman dari limit 15 request/menit Google API
+        time.sleep(5) 
         
     if hasil_akuisisi:
         df = pd.DataFrame(hasil_akuisisi)
