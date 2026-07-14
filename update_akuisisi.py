@@ -1,17 +1,16 @@
-import os
-import time
-import pandas as pd
 import feedparser
-from google import genai
+import pandas as pd
+import os
 
-# 1. Mengambil API Key dari sistem
-API_KEY = os.environ.get("GEMINI_API_KEY")
-if not API_KEY:
-    print("❌ Error: API Key tidak ditemukan di sistem!")
-    exit()
-
-# 2. Inisiasi Client Gemini (Menggunakan library versi TERBARU)
-client = genai.Client(api_key=API_KEY)
+def load_keywords(filename):
+    """Memuat daftar kata kunci dari file txt."""
+    if not os.path.exists(filename):
+        print(f"⚠️ Peringatan: File '{filename}' tidak ditemukan. Menggunakan daftar kosong.")
+        return []
+    
+    with open(filename, "r", encoding="utf-8") as file:
+        # Membaca per baris, membersihkan spasi/enter, dan mengubah ke huruf kecil
+        return [line.strip().lower() for line in file if line.strip()]
 
 def get_news_titles(ticker):
     """Menarik judul berita terbaru dari Google News RSS"""
@@ -21,67 +20,56 @@ def get_news_titles(ticker):
     titles = [entry.title for entry in feed.entries[:5]]
     return " | ".join(titles) if titles else "Tidak ada berita terbaru."
 
-def analyze_acquisition_status(ticker, news_text):
-    """Meminta AI menyimpulkan status akuisisi"""
+def analyze_acquisition_status(news_text, kata_rencana, kata_dalam):
+    """Menyimpulkan status akuisisi menggunakan logika kata kunci eksternal"""
     if news_text == "Tidak ada berita terbaru.":
         return "TIDAK ADA"
         
-    prompt = f"""
-    Kamu adalah analis saham profesional. 
-    Baca kumpulan judul berita berikut untuk saham {ticker}:
-    {news_text}
+    teks_kecil = news_text.lower()
     
-    Apakah ada informasi valid tentang aksi korporasi akuisisi?
-    Wajib balas HANYA dengan satu dari tiga pilihan ini, tanpa penjelasan apapun:
-    TIDAK ADA
-    RENCANA AKUISISI
-    DALAM AKUISISI
-    """
-    
-    try:
-        # Format pemanggilan model Gemini versi terbaru
-        response = client.models.generate_content(
-            model='gemini-2.0-flash',
-            contents=prompt
-        )
+    # Cek status DALAM AKUISISI terlebih dahulu (Prioritas Utama)
+    if any(kata in teks_kecil for kata in kata_dalam):
+        return "DALAM AKUISISI"
         
-        kesimpulan = response.text.strip().upper() 
-        if kesimpulan not in ["TIDAK ADA", "RENCANA AKUISISI", "DALAM AKUISISI"]:
-            return "TIDAK ADA"
-        return kesimpulan
-    except Exception as e:
-        print(f"⚠️ Error menganalisis {ticker}: {e}")
-        return "TIDAK ADA"
+    # Jika tidak ada kecocokan di atas, baru cek RENCANA AKUISISI
+    if any(kata in teks_kecil for kata in kata_rencana):
+        return "RENCANA AKUISISI"
+        
+    return "TIDAK ADA"
 
 def main():
-    print("🤖 Memulai pengecekan berita akuisisi menggunakan AI...")
+    print("🔍 Memulai pemindaian berita dengan metode Kata Kunci (Bebas Limit)...")
     
     if not os.path.exists("saham.txt"):
         print("❌ Error: File 'saham.txt' tidak ditemukan!")
         return
 
+    # 1. Membaca ratusan kata kunci dari kedua file teks
+    kata_rencana = load_keywords("RENCANA_AKUISISI.txt")
+    kata_dalam = load_keywords("DALAM_AKUISISI.txt")
+
+    # 2. Membaca daftar saham
     with open("saham.txt", "r") as file:
         daftar_saham = [baris.strip().upper() for baris in file if baris.strip()]
         
     hasil_akuisisi = []
     
+    # 3. Proses pemindaian tanpa jeda waktu (ngebut)
     for ticker in daftar_saham:
-        print(f"Menganalisis berita untuk {ticker}...")
+        print(f"Memindai berita untuk {ticker}...")
         berita = get_news_titles(ticker)
-        status = analyze_acquisition_status(ticker, berita)
+        status = analyze_acquisition_status(berita, kata_rencana, kata_dalam)
         
         hasil_akuisisi.append({
             "Ticker": ticker,
             "Status Akuisisi": status
         })
         
-        # Jeda 6 detik agar aman dari limit 15 request/menit Google API
-        time.sleep(6) 
-        
+    # 4. Simpan ke CSV
     if hasil_akuisisi:
         df = pd.DataFrame(hasil_akuisisi)
         df.to_csv("data_akuisisi.csv", index=False)
-        print("✅ Selesai! File 'data_akuisisi.csv' berhasil dibuat.")
+        print("✅ Selesai! File 'data_akuisisi.csv' berhasil diperbarui dalam sekejap.")
 
 if __name__ == "__main__":
     main()
