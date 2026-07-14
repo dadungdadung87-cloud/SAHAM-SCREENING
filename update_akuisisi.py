@@ -41,7 +41,7 @@ def analyze_acquisition_status(ticker, news_text):
     try:
         # Format pemanggilan model Gemini versi terbaru
         response = client.models.generate_content(
-            model='gemini-2.0-flash',
+            model='gemini-1.5-flash-8b',
             contents=prompt
         )
         
