@@ -1,7 +1,200 @@
-resmi akuisisi
-telah mengakuisisi
-selesai akuisisi
-sepakat akuisisi
-merger dengan
-penyelesaian akuisisi
-rampungkan akuisisi
+resmi beli saham sektor perbankan
+tuntas merger aset sektor ritel
+sah kuasai aset sektor ritel
+telah akuisisi unit usaha sektor teknologi
+resmi beli perusahaan sektor properti
+rampungkan pengambilalihan perusahaan sektor perbankan
+sah kuasai unit usaha sektor perbankan
+resmi beli aset sektor logistik
+selesai akuisisi aset sektor logistik
+telah akuisisi aset sektor properti
+resmi beli kontribusi sektor teknologi
+sah kuasai kontribusi sektor logistik
+resmi beli pangsa pasar sektor ritel
+tuntas merger kontribusi sektor properti
+tuntas merger unit usaha sektor ritel
+rampungkan pengambilalihan perusahaan sektor properti
+sah kuasai perusahaan sektor properti
+telah akuisisi saham sektor teknologi
+sah kuasai perusahaan sektor perbankan
+resmi beli kontribusi sektor logistik
+resmi beli kontribusi sektor properti
+sah kuasai unit usaha sektor teknologi
+selesai akuisisi aset sektor properti
+telah akuisisi bisnis sektor teknologi
+selesai akuisisi perusahaan sektor properti
+rampungkan pengambilalihan bisnis sektor logistik
+tuntas merger perusahaan sektor ritel
+telah akuisisi perusahaan sektor logistik
+sah kuasai perusahaan sektor properti
+tuntas merger aset sektor perbankan
+sah kuasai aset sektor energi
+telah akuisisi aset sektor perbankan
+sah kuasai pangsa pasar sektor perbankan
+resmi beli perusahaan sektor logistik
+tuntas merger saham sektor logistik
+selesai akuisisi perusahaan sektor teknologi
+telah akuisisi portofolio sektor perbankan
+resmi beli bisnis sektor logistik
+telah akuisisi saham sektor teknologi
+resmi beli kontribusi sektor perbankan
+selesai akuisisi saham sektor perbankan
+sah kuasai saham sektor logistik
+sah kuasai unit usaha sektor perbankan
+telah akuisisi kontribusi sektor teknologi
+resmi beli aset sektor energi
+sah kuasai kontribusi sektor logistik
+resmi beli bisnis sektor ritel
+selesai akuisisi perusahaan sektor teknologi
+selesai akuisisi pangsa pasar sektor perbankan
+tuntas merger bisnis sektor teknologi
+tuntas merger saham sektor ritel
+rampungkan pengambilalihan pangsa pasar sektor logistik
+sah kuasai aset sektor perbankan
+sah kuasai aset sektor energi
+sah kuasai kontribusi sektor perbankan
+resmi beli perusahaan sektor energi
+telah akuisisi kontribusi sektor ritel
+tuntas merger portofolio sektor logistik
+sah kuasai saham sektor logistik
+rampungkan pengambilalihan pangsa pasar sektor ritel
+resmi beli aset sektor perbankan
+sah kuasai kontribusi sektor perbankan
+tuntas merger perusahaan sektor properti
+tuntas merger perusahaan sektor teknologi
+rampungkan pengambilalihan kontribusi sektor logistik
+sah kuasai perusahaan sektor perbankan
+resmi beli unit usaha sektor energi
+resmi beli perusahaan sektor ritel
+telah akuisisi bisnis sektor perbankan
+resmi beli pangsa pasar sektor energi
+tuntas merger perusahaan sektor properti
+sah kuasai bisnis sektor energi
+sah kuasai perusahaan sektor properti
+resmi beli portofolio sektor perbankan
+tuntas merger aset sektor ritel
+tuntas merger aset sektor teknologi
+telah akuisisi bisnis sektor properti
+rampungkan pengambilalihan pangsa pasar sektor energi
+sah kuasai kontribusi sektor properti
+sah kuasai pangsa pasar sektor logistik
+rampungkan pengambilalihan pangsa pasar sektor perbankan
+selesai akuisisi perusahaan sektor energi
+sah kuasai kontribusi sektor energi
+sah kuasai kontribusi sektor properti
+tuntas merger perusahaan sektor energi
+telah akuisisi aset sektor perbankan
+selesai akuisisi unit usaha sektor perbankan
+sah kuasai bisnis sektor perbankan
+sah kuasai saham sektor ritel
+tuntas merger portofolio sektor energi
+sah kuasai pangsa pasar sektor logistik
+resmi beli portofolio sektor logistik
+sah kuasai aset sektor teknologi
+tuntas merger portofolio sektor ritel
+sah kuasai saham sektor teknologi
+tuntas merger saham sektor perbankan
+telah akuisisi kontribusi sektor ritel
+selesai akuisisi pangsa pasar sektor energi
+resmi beli bisnis sektor perbankan
+rampungkan pengambilalihan bisnis sektor ritel
+sah kuasai pangsa pasar sektor energi
+resmi beli kontribusi sektor perbankan
+resmi beli pangsa pasar sektor perbankan
+resmi beli aset sektor energi
+selesai akuisisi saham sektor ritel
+resmi beli kontribusi sektor ritel
+selesai akuisisi unit usaha sektor logistik
+rampungkan pengambilalihan portofolio sektor energi
+telah akuisisi unit usaha sektor energi
+resmi beli aset sektor logistik
+sah kuasai pangsa pasar sektor energi
+resmi beli saham sektor perbankan
+tuntas merger unit usaha sektor ritel
+selesai akuisisi saham sektor energi
+sah kuasai pangsa pasar sektor logistik
+selesai akuisisi bisnis sektor teknologi
+rampungkan pengambilalihan bisnis sektor logistik
+telah akuisisi perusahaan sektor energi
+telah akuisisi perusahaan sektor properti
+sah kuasai aset sektor perbankan
+telah akuisisi unit usaha sektor energi
+tuntas merger kontribusi sektor properti
+sah kuasai kontribusi sektor perbankan
+resmi beli unit usaha sektor energi
+rampungkan pengambilalihan aset sektor teknologi
+tuntas merger saham sektor properti
+tuntas merger aset sektor properti
+selesai akuisisi saham sektor teknologi
+resmi beli portofolio sektor ritel
+rampungkan pengambilalihan pangsa pasar sektor energi
+rampungkan pengambilalihan pangsa pasar sektor ritel
+resmi beli bisnis sektor perbankan
+resmi beli bisnis sektor ritel
+selesai akuisisi saham sektor logistik
+tuntas merger pangsa pasar sektor properti
+sah kuasai portofolio sektor energi
+resmi beli perusahaan sektor perbankan
+resmi beli aset sektor logistik
+rampungkan pengambilalihan perusahaan sektor properti
+telah akuisisi pangsa pasar sektor logistik
+tuntas merger kontribusi sektor teknologi
+telah akuisisi unit usaha sektor perbankan
+telah akuisisi perusahaan sektor logistik
+telah akuisisi perusahaan sektor ritel
+resmi beli perusahaan sektor perbankan
+resmi beli portofolio sektor logistik
+rampungkan pengambilalihan aset sektor perbankan
+rampungkan pengambilalihan kontribusi sektor teknologi
+resmi beli aset sektor teknologi
+selesai akuisisi saham sektor teknologi
+rampungkan pengambilalihan pangsa pasar sektor properti
+sah kuasai pangsa pasar sektor energi
+resmi beli pangsa pasar sektor logistik
+tuntas merger portofolio sektor perbankan
+telah akuisisi kontribusi sektor perbankan
+selesai akuisisi bisnis sektor perbankan
+sah kuasai portofolio sektor teknologi
+telah akuisisi kontribusi sektor properti
+selesai akuisisi bisnis sektor teknologi
+selesai akuisisi bisnis sektor energi
+rampungkan pengambilalihan pangsa pasar sektor teknologi
+tuntas merger saham sektor ritel
+selesai akuisisi perusahaan sektor properti
+selesai akuisisi pangsa pasar sektor logistik
+telah akuisisi kontribusi sektor logistik
+rampungkan pengambilalihan aset sektor properti
+resmi beli perusahaan sektor properti
+resmi beli bisnis sektor energi
+selesai akuisisi perusahaan sektor logistik
+sah kuasai kontribusi sektor teknologi
+rampungkan pengambilalihan pangsa pasar sektor perbankan
+resmi beli pangsa pasar sektor perbankan
+telah akuisisi perusahaan sektor energi
+sah kuasai portofolio sektor ritel
+resmi beli pangsa pasar sektor energi
+rampungkan pengambilalihan aset sektor ritel
+selesai akuisisi pangsa pasar sektor ritel
+resmi beli unit usaha sektor teknologi
+telah akuisisi unit usaha sektor ritel
+telah akuisisi pangsa pasar sektor perbankan
+sah kuasai pangsa pasar sektor energi
+tuntas merger aset sektor teknologi
+rampungkan pengambilalihan aset sektor teknologi
+telah akuisisi perusahaan sektor teknologi
+telah akuisisi unit usaha sektor ritel
+selesai akuisisi bisnis sektor properti
+rampungkan pengambilalihan kontribusi sektor teknologi
+telah akuisisi pangsa pasar sektor properti
+rampungkan pengambilalihan pangsa pasar sektor ritel
+selesai akuisisi unit usaha sektor teknologi
+rampungkan pengambilalihan portofolio sektor ritel
+sah kuasai bisnis sektor properti
+selesai akuisisi saham sektor logistik
+selesai akuisisi bisnis sektor properti
+resmi beli pangsa pasar sektor logistik
+resmi beli pangsa pasar sektor logistik
+resmi beli pangsa pasar sektor teknologi
+rampungkan pengambilalihan pangsa pasar sektor perbankan
+tuntas merger perusahaan sektor energi
+sah kuasai unit usaha sektor logistik
