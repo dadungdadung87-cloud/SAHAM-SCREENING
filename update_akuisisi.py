@@ -19,31 +19,22 @@ def get_news_titles(ticker):
     return " | ".join(titles) if titles else "Tidak ada berita terbaru."
 
 def analyze_acquisition_status(news_text, kata_rencana, kata_dalam):
-    """Menyimpulkan status akuisisi dengan prioritas frasa terpanjang (3 kata)"""
     if news_text == "Tidak ada berita terbaru.":
         return "TIDAK ADA"
         
     teks_kecil = news_text.lower()
     
-    # 1. Kelompokkan berdasarkan panjang kata
-    def kelompokkan(daftar):
-        tiga_kata = [k for k in daftar if len(k.split()) >= 3]
-        dua_kata = [k for k in daftar if len(k.split()) == 2]
-        satu_kata = [k for k in daftar if len(k.split()) == 1]
-        return tiga_kata, dua_kata, satu_kata
-
-    rencana_3, rencana_2, rencana_1 = kelompokkan(kata_rencana)
-    dalam_3, dalam_2, dalam_1 = kelompokkan(kata_dalam)
-
-    # 2. Cek Prioritas: DALAM AKUISISI (dari 3 kata ke 1 kata)
-    if any(k in teks_kecil for k in dalam_3): return "DALAM AKUISISI"
-    if any(k in teks_kecil for k in dalam_2): return "DALAM AKUISISI"
-    if any(k in teks_kecil for k in dalam_1): return "DALAM AKUISISI"
+    # Hanya ambil yang panjangnya >= 2 kata
+    dalam_valid = [k for k in kata_dalam if len(k.split()) >= 2]
+    rencana_valid = [k for k in kata_rencana if len(k.split()) >= 2]
     
-    # 3. Cek Prioritas: RENCANA AKUISISI (dari 3 kata ke 1 kata)
-    if any(k in teks_kecil for k in rencana_3): return "RENCANA AKUISISI"
-    if any(k in teks_kecil for k in rencana_2): return "RENCANA AKUISISI"
-    if any(k in teks_kecil for k in rencana_1): return "RENCANA AKUISISI"
+    # Prioritas: DALAM AKUISISI
+    if any(k in teks_kecil for k in dalam_valid):
+        return "DALAM AKUISISI"
+        
+    # Prioritas kedua: RENCANA AKUISISI
+    if any(k in teks_kecil for k in rencana_valid):
+        return "RENCANA AKUISISI"
         
     return "TIDAK ADA"
 
