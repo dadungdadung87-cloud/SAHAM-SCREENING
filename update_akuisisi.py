@@ -1,17 +1,17 @@
-import google.generativeai as genai
-import feedparser
-import pandas as pd
-import time
 import os
+import time
+import pandas as pd
+import feedparser
+from google import genai
 
-# Mengambil API Key dari sistem (yang sudah kamu masukkan di venv)
+# 1. Mengambil API Key dari sistem
 API_KEY = os.environ.get("GEMINI_API_KEY")
 if not API_KEY:
     print("❌ Error: API Key tidak ditemukan di sistem!")
     exit()
 
-genai.configure(api_key=API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
+# 2. Inisiasi Client Gemini (Menggunakan library versi TERBARU)
+client = genai.Client(api_key=API_KEY)
 
 def get_news_titles(ticker):
     """Menarik judul berita terbaru dari Google News RSS"""
@@ -39,7 +39,12 @@ def analyze_acquisition_status(ticker, news_text):
     """
     
     try:
-        response = model.generate_content(prompt)
+        # Format pemanggilan model Gemini versi terbaru
+        response = client.models.generate_content(
+            model='gemini-1.5-flash',
+            contents=prompt
+        )
+        
         kesimpulan = response.text.strip().upper() 
         if kesimpulan not in ["TIDAK ADA", "RENCANA AKUISISI", "DALAM AKUISISI"]:
             return "TIDAK ADA"
