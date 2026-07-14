@@ -41,7 +41,7 @@ def analyze_acquisition_status(ticker, news_text):
     try:
         # Format pemanggilan model Gemini versi terbaru
         response = client.models.generate_content(
-            model='gemini-1.5-flash-8b',
+            model='gemini-1.5-flash',
             contents=prompt
         )
         
@@ -75,8 +75,8 @@ def main():
             "Status Akuisisi": status
         })
         
-        # Jeda 5 detik agar aman dari limit 15 request/menit Google API
-        time.sleep(5) 
+        # Jeda 6 detik agar aman dari limit 15 request/menit Google API
+        time.sleep(6) 
         
     if hasil_akuisisi:
         df = pd.DataFrame(hasil_akuisisi)
