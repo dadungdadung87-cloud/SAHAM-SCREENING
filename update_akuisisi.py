@@ -69,7 +69,14 @@ def main():
     if hasil_akuisisi:
         df = pd.DataFrame(hasil_akuisisi)
         df.to_csv("data_akuisisi.csv", index=False)
-        print("✅ Selesai! File 'data_akuisisi.csv' berhasil diperbarui dalam sekejap.")
+        print("✅ Selesai! File 'data_akuisisi.csv' berhasil dibuat.")
+        
+        # --- TAMBAHAN OTOMATISASI ---
+        print("🔄 Mengirim file ke GitHub secara otomatis...")
+        os.system("git add data_akuisisi.csv")
+        os.system('git commit -m "Auto-update data akuisisi"')
+        os.system("git push")
+        print("🚀 Berhasil dikirim ke cloud!")
 
 if __name__ == "__main__":
     main()
