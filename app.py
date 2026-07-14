@@ -175,10 +175,17 @@ if not df_hasil.empty:
             "RSI (14D)": "{:.0f}"
         }).map(warna_tabel, subset=kolom_berwarna_aktual)
 
-        # --- FITUR BARU: HEATMAP PADA TOTAL SCORE ---
+        # --- MODIFIKASI: WARNA TEKS TOTAL SCORE ---
+        def warna_skor(val):
+            if val in [3, 4]:
+                return 'color: #22c55e; font-weight: 600;' # Hijau
+            elif val in [0, 1, 2]:
+                return 'color: #ef4444; font-weight: 600;' # Merah
+            return ''
+
         if "Total Score" in df_tampil.columns:
-            tabel_akhir = tabel_akhir.background_gradient(subset=['Total Score'], cmap='RdYlGn', vmin=0, vmax=4)
-        # --------------------------------------------
+            tabel_akhir = tabel_akhir.map(warna_skor, subset=['Total Score'])
+        # ------------------------------------------
 
         st.dataframe(tabel_akhir, use_container_width=True, hide_index=True)
 
