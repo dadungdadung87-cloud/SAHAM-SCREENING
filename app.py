@@ -7,7 +7,8 @@ from datetime import datetime
 # ==========================================
 # 1. PENGATURAN UI/UX
 # ==========================================
-st.set_page_config(page_title="Screener Saham IHSG", layout="wide", initial_sidebar_state="collapsed")
+# Mengubah initial_sidebar_state menjadi "expanded" agar sidebar langsung terlihat
+st.set_page_config(page_title="Screener Saham IHSG", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
     <style>
@@ -34,16 +35,32 @@ st.markdown("""
         border: 1px solid #334155;
         background-color: #1e293b;
         color: #f8fafc;
+        margin-bottom: 20px;
     }
     </style>
 """, unsafe_allow_html=True)
 
+# ==========================================
+# 2. SIDEBAR (BILAH SAMPING) UNTUK PENCARIAN CEPAT
+# ==========================================
+st.sidebar.title("⚙️ Pengaturan Cepat")
+st.sidebar.markdown("Gunakan panel ini untuk pencarian instan.")
+
+search_ticker = st.sidebar.text_input("🔍 Cari Kode Saham (Cth: BBCA)", "")
+mode_ketat = st.sidebar.checkbox("🔥 Aktifkan Filter Super Ketat", value=False, help="Otomatis menyetel filter ke mode paling ketat untuk Swing Trading.")
+
+st.sidebar.markdown("---")
+st.sidebar.caption("© AlgoTrade Screener")
+
+# ==========================================
+# 3. KONTEN UTAMA (HEADER)
+# ==========================================
 st.title("⚡ AlgoTrade Screener - IHSG")
 st.markdown("Analisis Tren, Momentum, Volume, dan Sentimen Akuisisi.")
 st.markdown("---")
 
 # ==========================================
-# 2. MEMUAT DATA LOKAL
+# 4. MEMUAT DATA LOKAL
 # ==========================================
 FILE_HASIL = "hasil_screener.csv"
 FILE_AKUISISI = "data_akuisisi.csv"
@@ -59,7 +76,6 @@ if os.path.exists(FILE_HASIL):
     if os.path.exists(FILE_AKUISISI):
         df_akuisisi = pd.read_csv(FILE_AKUISISI)
         df_hasil = pd.merge(df_hasil, df_akuisisi, on="Ticker", how="left")
-        # Jika ada saham yang kosong beritanya, jadikan "TIDAK ADA"
         df_hasil["Status Akuisisi"] = df_hasil["Status Akuisisi"].fillna("TIDAK ADA")
     else:
         df_hasil["Status Akuisisi"] = "TIDAK ADA"
@@ -68,9 +84,10 @@ else:
     df_hasil = pd.DataFrame()
 
 # ==========================================
-# 3. DASHBOARD RINGKASAN & FILTER 
+# 5. DASHBOARD METRIK & EXPANDER FILTER
 # ==========================================
 if not df_hasil.empty:
+    # --- METRIK KESEHATAN PASAR ---
     total_dianalisis = len(df_hasil)
     total_beli = len(df_hasil[df_hasil['Rekomendasi'] == 'BELI'])
     total_uptrend = len(df_hasil[df_hasil['MA Signal'] == 'Uptrend'])
@@ -80,7 +97,6 @@ if not df_hasil.empty:
     met2.markdown(f"<div class='metric-container'><h3>🎯 Sinyal BELI</h3><h2 style='color: #4ade80;'>{total_beli} Saham</h2></div>", unsafe_allow_html=True)
     met3.markdown(f"<div class='metric-container'><h3>📈 Fase Uptrend</h3><h2 style='color: #60a5fa;'>{total_uptrend} Saham</h2></div>", unsafe_allow_html=True)
     
-    st.markdown("---")
     persentase_uptrend = (total_uptrend / total_dianalisis) * 100 if total_dianalisis > 0 else 0
     st.markdown(f"**📈 Indeks Kesehatan Pasar (Saham Fase Uptrend): {persentase_uptrend:.1f}%**")
     st.progress(persentase_uptrend / 100.0)
@@ -91,27 +107,26 @@ if not df_hasil.empty:
         st.caption("🔴 Mayoritas saham sedang Downtrend. Waspada, pasar sedang lesu atau distribusi.")
     st.markdown("---")
 
-    st.markdown("### 🎛️ Panel Filter Lengkap")
-    
-    mode_ketat = st.checkbox("🔥 Aktifkan Preset Kriteria Super (Saring Ketat)")
-    search_ticker = st.text_input("🔍 Cari Kode Saham Spesifik (Contoh: BBCA, BMRI)", "")
-    
-    col1, col2, col3, col4 = st.columns(4)
-    with col1: filter_vol = st.selectbox("🔊 1. Volume", ["Semua", "Tembus MA20", "Normal"], index=1 if mode_ketat else 0)
-    with col2: filter_rsi = st.selectbox("📊 2. RSI (14D)", ["Semua", "> 50 (Bullish)", "<= 50 (Bearish)"], index=1 if mode_ketat else 0)
-    with col3: filter_trend = st.selectbox("📈 3. Tren (MA20)", ["Semua", "Uptrend", "Downtrend"], index=1 if mode_ketat else 0)
-    with col4: filter_momentum = st.selectbox("⚡ 4. Momentum", ["Semua", "Positif", "Negatif"], index=1 if mode_ketat else 0)
+    # --- EXPANDER UNTUK FILTER SPESIFIK ---
+    with st.expander("🎛️ Buka Panel Filter Lengkap (Klik untuk menyesuaikan kriteria)", expanded=False):
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            filter_vol = st.selectbox("🔊 Volume", ["Semua", "Tembus MA20", "Normal"], index=1 if mode_ketat else 0)
+            filter_momentum = st.selectbox("⚡ Momentum", ["Semua", "Positif", "Negatif"], index=1 if mode_ketat else 0)
+            filter_likuiditas = st.selectbox("💧 Likuiditas", ["Semua", "> 1 Miliar", "< 1 Miliar"])
+            
+        with col2:
+            filter_rsi = st.selectbox("📊 RSI (14D)", ["Semua", "> 50 (Bullish)", "<= 50 (Bearish)"], index=1 if mode_ketat else 0)
+            filter_score = st.selectbox("⭐ Total Score", ["Semua", 4, 3, 2, 1, 0])
+            filter_bb = st.selectbox("🌐 Bollinger Bands", ["Semua", "Squeeze", "Bottom Rebound", "Breakout Upper", "Normal"], index=3 if mode_ketat else 0)
+            
+        with col3:
+            filter_trend = st.selectbox("📈 Tren (MA20)", ["Semua", "Uptrend", "Downtrend"], index=1 if mode_ketat else 0)
+            filter_rekomendasi = st.selectbox("🎯 Rekomendasi", ["Semua", "BELI", "WAIT & SEE"])
+            filter_akuisisi = st.selectbox("🤝 Sentimen Akuisisi", ["Semua", "TIDAK ADA", "RENCANA AKUISISI", "DALAM AKUISISI"])
 
-    st.write("") 
-    
-    # --- FILTER BARU: MENJADI 5 KOLOM UNTUK AKUISISI ---
-    col5, col6, col7, col8, col9 = st.columns(5)
-    with col5: filter_score = st.selectbox("⭐ Total Score", ["Semua", 4, 3, 2, 1, 0])
-    with col6: filter_rekomendasi = st.selectbox("🎯 Rekomendasi", ["Semua", "BELI", "WAIT & SEE"])
-    with col7: filter_likuiditas = st.selectbox("💧 Likuiditas", ["Semua", "> 1 Miliar", "< 1 Miliar"])
-    with col8: filter_bb = st.selectbox("🌐 Bollinger Bands", ["Semua", "Squeeze", "Bottom Rebound", "Breakout Upper", "Normal"], index=3 if mode_ketat else 0)
-    with col9: filter_akuisisi = st.selectbox("🤝 Akuisisi", ["Semua", "TIDAK ADA", "RENCANA AKUISISI", "DALAM AKUISISI"])
-
+    # --- LOGIKA FILTERING DATA ---
     df_filtered = df_hasil.copy()
     if search_ticker: df_filtered = df_filtered[df_filtered["Ticker"].str.contains(search_ticker.upper(), na=False)]
     if filter_vol != "Semua": df_filtered = df_filtered[df_filtered["Vol Breakout"] == filter_vol]
@@ -128,16 +143,15 @@ if not df_hasil.empty:
         if "Status BB" in df_filtered.columns:
             df_filtered = df_filtered[df_filtered["Status BB"] == filter_bb]
             
-    # LOGIKA FILTER AKUISISI
     if filter_akuisisi != "Semua": 
         if "Status Akuisisi" in df_filtered.columns:
             df_filtered = df_filtered[df_filtered["Status Akuisisi"] == filter_akuisisi]
 
     # ==========================================
-    # 4. PAGINASI & FORMAT TABEL
+    # 6. PAGINASI & FORMAT TABEL
     # ==========================================
     if not df_filtered.empty:
-        st.markdown("### Hasil Penapisan (Screener)")
+        st.markdown("### 📊 Hasil Penapisan (Screener)")
         
         col_pg1, col_pg2, col_pg3 = st.columns([1, 1, 2])
         with col_pg1: saham_per_halaman = st.selectbox("Tampilkan baris:", [20, 50, 100])
@@ -172,13 +186,12 @@ if not df_hasil.empty:
             elif val in [0, 1, 2]: return 'color: #ef4444; font-weight: 600;'
             return ''
 
-        # --- TAMBAHAN KOLOM "Status Akuisisi" KE LIST WARNA ---
         kolom_berwarna = ["Change (%)", "Momentum", "MA Signal", "Rekomendasi", "Likuiditas", "Status BB", "Status Akuisisi"]
         kolom_berwarna_aktual = [col for col in kolom_berwarna if col in df_tampil.columns]
 
         tabel_akhir = df_tampil.style.format({
             "Harga (Rp)": format_angka,
-            "Harga MA20": format_angka,  # <--- BARIS BARU YANG DITAMBAHKAN
+            "Harga MA20": format_angka,  
             "Volume": format_angka,
             "Change (%)": format_persen,
             "RSI (14D)": "{:.0f}"
