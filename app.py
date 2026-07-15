@@ -110,7 +110,6 @@ if not df_hasil.empty:
     # --- TAMBAHAN BARU: VISUALISASI GRAFIK (CHART) ---
     st.markdown("### 📊 Visualisasi Data Pasar")
     
-    # Mengubah proporsi kolom menjadi 1 : 2 agar pie chart lebih kecil dan bar chart punya ruang luas untuk 15 saham
     col_chart1, col_chart2 = st.columns([1, 2]) 
     
     with col_chart1:
@@ -131,12 +130,12 @@ if not df_hasil.empty:
             title_text='Rasio Sinyal Rekomendasi', 
             margin=dict(t=40, b=20, l=20, r=20),
             showlegend=True,
-            height=380 # Membatasi tinggi grafik agar tidak terlalu membesar
+            height=380 
         )
         st.plotly_chart(fig_pie, use_container_width=True)
         
     with col_chart2:
-        # Bar Chart untuk Top 15 Gainers (Dulu 5, sekarang 15)
+        # Bar Chart untuk Top 15 Gainers
         df_top15 = df_hasil.nlargest(15, 'Change (%)')
         
         # Membuat Bar Chart
@@ -144,13 +143,12 @@ if not df_hasil.empty:
             df_top15, 
             x='Ticker', 
             y='Change (%)', 
-            text='Change (%)',
             color='Change (%)', 
             color_continuous_scale=['#86efac', '#22c55e', '#166534']
         )
-        # Menghapus angka desimal di belakang koma (%.0f)
+        # Menghapus angka desimal di belakang koma dengan mengambil nilai dari sumbu y langsung (%{y:.0f}%)
         fig_bar.update_traces(
-            texttemplate='%{text:+.0f}%', 
+            texttemplate='%{y:.0f}%', 
             textposition='outside'
         )
         fig_bar.update_layout(
@@ -159,7 +157,7 @@ if not df_hasil.empty:
             showlegend=False,
             xaxis_title="Kode Saham",
             yaxis_title="Perubahan (%)",
-            height=380 # Menyamakan tinggi dengan pie chart agar sejajar rapi
+            height=380 
         )
         # Menambahkan batas atas (y-axis) agar teks angka tidak terpotong
         if not df_top15.empty:
