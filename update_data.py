@@ -94,6 +94,7 @@ def main():
                     hasil.append({
                         "Ticker": ticker,
                         "Harga (Rp)": close_today,
+                        "Harga MA20": int(ma_20), # <--- BARIS BARU YANG DITAMBAHKAN
                         "Change (%)": change_pct,
                         "Volume": vol_today,
                         "Vol Breakout": vol_breakout,

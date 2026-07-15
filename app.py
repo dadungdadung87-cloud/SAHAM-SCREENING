@@ -178,6 +178,7 @@ if not df_hasil.empty:
 
         tabel_akhir = df_tampil.style.format({
             "Harga (Rp)": format_angka,
+            "Harga MA20": format_angka,  # <--- BARIS BARU YANG DITAMBAHKAN
             "Volume": format_angka,
             "Change (%)": format_persen,
             "RSI (14D)": "{:.0f}"
