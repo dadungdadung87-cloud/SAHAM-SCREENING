@@ -3,11 +3,11 @@ import pandas as pd
 import numpy as np
 import os
 from datetime import datetime
+import plotly.express as px  # <-- TAMBAHAN LIBRARY UNTUK GRAFIK
 
 # ==========================================
 # 1. PENGATURAN UI/UX
 # ==========================================
-# Mengubah initial_sidebar_state menjadi "expanded" agar sidebar langsung terlihat
 st.set_page_config(page_title="Screener Saham IHSG", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
@@ -41,7 +41,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. SIDEBAR (BILAH SAMPING) UNTUK PENCARIAN CEPAT
+# 2. SIDEBAR (BILAH SAMPING)
 # ==========================================
 st.sidebar.title("⚙️ Pengaturan Cepat")
 st.sidebar.markdown("Gunakan panel ini untuk pencarian instan.")
@@ -84,7 +84,7 @@ else:
     df_hasil = pd.DataFrame()
 
 # ==========================================
-# 5. DASHBOARD METRIK & EXPANDER FILTER
+# 5. DASHBOARD METRIK, GRAFIK & FILTER
 # ==========================================
 if not df_hasil.empty:
     # --- METRIK KESEHATAN PASAR ---
@@ -105,6 +105,61 @@ if not df_hasil.empty:
         st.caption("🟢 Mayoritas saham sedang Uptrend. Momentum pasar secara umum mendukung untuk Swing Trading.")
     else:
         st.caption("🔴 Mayoritas saham sedang Downtrend. Waspada, pasar sedang lesu atau distribusi.")
+    st.markdown("---")
+
+    # --- TAMBAHAN BARU: VISUALISASI GRAFIK (CHART) ---
+    st.markdown("### 📊 Visualisasi Data Pasar")
+    col_chart1, col_chart2 = st.columns(2)
+    
+    with col_chart1:
+        # Donut Chart untuk Rasio Rekomendasi
+        df_rekomendasi = df_hasil['Rekomendasi'].value_counts().reset_index()
+        df_rekomendasi.columns = ['Rekomendasi', 'Jumlah']
+        
+        # Membuat Donut Chart
+        fig_pie = px.pie(
+            df_rekomendasi, 
+            names='Rekomendasi', 
+            values='Jumlah', 
+            hole=0.5,
+            color='Rekomendasi', 
+            color_discrete_map={'BELI': '#22c55e', 'WAIT & SEE': '#ef4444'}
+        )
+        fig_pie.update_layout(
+            title_text='Rasio Sinyal Rekomendasi', 
+            margin=dict(t=40, b=20, l=20, r=20),
+            showlegend=True
+        )
+        st.plotly_chart(fig_pie, use_container_width=True)
+        
+    with col_chart2:
+        # Bar Chart untuk Top 5 Gainers
+        df_top5 = df_hasil.nlargest(5, 'Change (%)')
+        
+        # Membuat Bar Chart
+        fig_bar = px.bar(
+            df_top5, 
+            x='Ticker', 
+            y='Change (%)', 
+            text='Change (%)',
+            color='Change (%)', 
+            color_continuous_scale=['#86efac', '#22c55e', '#166534']
+        )
+        fig_bar.update_traces(
+            texttemplate='%{text:+.2f}%', 
+            textposition='outside'
+        )
+        fig_bar.update_layout(
+            title_text='Top 5 Saham Gainers Hari Ini', 
+            margin=dict(t=40, b=20, l=20, r=20), 
+            showlegend=False,
+            xaxis_title="Kode Saham",
+            yaxis_title="Perubahan (%)"
+        )
+        # Menambahkan batas atas (y-axis) agar teks angka tidak terpotong
+        fig_bar.update_yaxes(range=[0, df_top5['Change (%)'].max() * 1.2]) 
+        st.plotly_chart(fig_bar, use_container_width=True)
+        
     st.markdown("---")
 
     # --- EXPANDER UNTUK FILTER SPESIFIK ---
@@ -151,7 +206,7 @@ if not df_hasil.empty:
     # 6. PAGINASI & FORMAT TABEL
     # ==========================================
     if not df_filtered.empty:
-        st.markdown("### 📊 Hasil Penapisan (Screener)")
+        st.markdown("### 📋 Hasil Penapisan (Screener)")
         
         col_pg1, col_pg2, col_pg3 = st.columns([1, 1, 2])
         with col_pg1: saham_per_halaman = st.selectbox("Tampilkan baris:", [20, 50, 100])
