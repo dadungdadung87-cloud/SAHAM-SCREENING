@@ -37,7 +37,6 @@ st.markdown("""
         color: #f8fafc;
         margin-bottom: 20px;
     }
-    /* Mempercantik tampilan Tab */
     .stTabs [data-baseweb="tab-list"] {
         gap: 24px;
     }
@@ -84,7 +83,6 @@ if os.path.exists(FILE_HASIL):
     st.success(f"💾 Data berhasil dimuat secara instan! Terakhir diperbarui pada: **{waktu_terakhir}**")
     df_hasil = pd.read_csv(FILE_HASIL)
     
-    # --- PENGGABUNGAN DATA AKUISISI ---
     if os.path.exists(FILE_AKUISISI):
         df_akuisisi = pd.read_csv(FILE_AKUISISI)
         df_hasil = pd.merge(df_hasil, df_akuisisi, on="Ticker", how="left")
@@ -100,11 +98,10 @@ else:
 # ==========================================
 if not df_hasil.empty:
     
-    # Membuat 3 Tab
     tab1, tab2, tab3 = st.tabs(["📊 Ringkasan Pasar", "🎯 Screener Utama", "💡 Insight & Edukasi"])
     
     # ----------------------------------------
-    # ISI TAB 1: RINGKASAN PASAR (METRIK & GRAFIK)
+    # ISI TAB 1: RINGKASAN PASAR
     # ----------------------------------------
     with tab1:
         st.markdown("### Performa Pasar Keseluruhan")
@@ -152,20 +149,18 @@ if not df_hasil.empty:
             st.plotly_chart(fig_pie, use_container_width=True)
             
         with col_chart2:
-            # Mengambil data top 15 gainers lalu mengurutkannya agar yang paling tinggi berada di posisi paling atas pada grafik horisontal
             df_top15 = df_hasil.nlargest(15, 'Change (%)').iloc[::-1]
             
-            # --- PENYESUAIAN GRAFIK: DIBUAT HORISONTAL KEBAWAH (GAYA STOCKBIT) ---
             fig_bar = px.bar(
                 df_top15, 
                 x='Change (%)', 
                 y='Ticker', 
-                orientation='h', # <--- Mengubah orientasi menjadi Horisontal
+                orientation='h', 
                 color='Change (%)', 
                 color_continuous_scale=['#86efac', '#22c55e', '#166534']
             )
             fig_bar.update_traces(
-                texttemplate='%{x:.0f}%', # Menggunakan nilai x untuk teks persen tanpa koma
+                texttemplate='%{x:.0f}%',
                 textposition='outside'
             )
             fig_bar.update_layout(
@@ -182,7 +177,7 @@ if not df_hasil.empty:
             st.plotly_chart(fig_bar, use_container_width=True)
 
     # ----------------------------------------
-    # ISI TAB 2: SCREENER UTAMA (FILTER & TABEL)
+    # ISI TAB 2: SCREENER UTAMA
     # ----------------------------------------
     with tab2:
         with st.expander("🎛️ Buka Panel Filter Lengkap (Klik untuk menyesuaikan kriteria)", expanded=False):
@@ -196,13 +191,17 @@ if not df_hasil.empty:
                 
             with col2:
                 filter_rsi = st.selectbox("📊 RSI (14D)", ["Semua", "> 50 (Bullish)", "<= 50 (Bearish)"], index=1 if mode_ketat else 0)
-                filter_score = st.selectbox("⭐ Total Score", ["Semua", 4, 3, 2, 1, 0])
+                # Maksimal skor diperbarui menjadi 6
+                filter_score = st.selectbox("⭐ Total Score", ["Semua", 6, 5, 4, 3, 2, 1, 0])
                 filter_bb = st.selectbox("🌐 Bollinger Bands", ["Semua", "Squeeze", "Bottom Rebound", "Breakout Upper", "Normal"], index=3 if mode_ketat else 0)
+                filter_akuisisi = st.selectbox("🤝 Sentimen Akuisisi", ["Semua", "TIDAK ADA", "RENCANA AKUISISI", "DALAM AKUISISI"])
                 
             with col3:
                 filter_trend = st.selectbox("📈 Tren (MA20)", ["Semua", "Uptrend", "Downtrend"], index=1 if mode_ketat else 0)
                 filter_rekomendasi = st.selectbox("🎯 Rekomendasi", ["Semua", "BELI", "WAIT & SEE"])
-                filter_akuisisi = st.selectbox("🤝 Sentimen Akuisisi", ["Semua", "TIDAK ADA", "RENCANA AKUISISI", "DALAM AKUISISI"])
+                # Menambahkan filter baru untuk MACD dan Crossover
+                filter_macross = st.selectbox("🔀 MA Cross (5/20)", ["Semua", "Golden Cross", "Bullish", "Death Cross", "Bearish"])
+                filter_macd = st.selectbox("📈 MACD", ["Semua", "Strong Bullish", "Bullish MACD", "Strong Bearish", "Bearish MACD"])
 
         # LOGIKA FILTERING DATA
         df_filtered = df_hasil.copy()
@@ -212,22 +211,22 @@ if not df_hasil.empty:
         elif filter_rsi == "<= 50 (Bearish)": df_filtered = df_filtered[df_filtered["RSI (14D)"] <= 50]
         if filter_trend != "Semua": df_filtered = df_filtered[df_filtered["MA Signal"] == filter_trend]
         if filter_momentum != "Semua": df_filtered = df_filtered[df_filtered["Momentum"] == filter_momentum]
-        
         if filter_score != "Semua": df_filtered = df_filtered[df_filtered["Total Score"] == int(filter_score)]
         if filter_rekomendasi != "Semua": df_filtered = df_filtered[df_filtered["Rekomendasi"] == filter_rekomendasi]
         if filter_likuiditas != "Semua": df_filtered = df_filtered[df_filtered["Likuiditas"] == filter_likuiditas]
         
         if filter_bb != "Semua":
-            if "Status BB" in df_filtered.columns:
-                df_filtered = df_filtered[df_filtered["Status BB"] == filter_bb]
-                
+            if "Status BB" in df_filtered.columns: df_filtered = df_filtered[df_filtered["Status BB"] == filter_bb]
         if filter_akuisisi != "Semua": 
-            if "Status Akuisisi" in df_filtered.columns:
-                df_filtered = df_filtered[df_filtered["Status Akuisisi"] == filter_akuisisi]
-                
+            if "Status Akuisisi" in df_filtered.columns: df_filtered = df_filtered[df_filtered["Status Akuisisi"] == filter_akuisisi]
         if filter_risiko != "Semua":
-            if "Risiko" in df_filtered.columns:
-                df_filtered = df_filtered[df_filtered["Risiko"] == filter_risiko]
+            if "Risiko" in df_filtered.columns: df_filtered = df_filtered[df_filtered["Risiko"] == filter_risiko]
+            
+        # Logika filter baru
+        if filter_macross != "Semua":
+            if "MA Cross" in df_filtered.columns: df_filtered = df_filtered[df_filtered["MA Cross"] == filter_macross]
+        if filter_macd != "Semua":
+            if "MACD" in df_filtered.columns: df_filtered = df_filtered[df_filtered["MACD"] == filter_macd]
 
         # PAGINASI & FORMAT TABEL
         if not df_filtered.empty:
@@ -246,7 +245,6 @@ if not df_hasil.empty:
             indeks_akhir = indeks_awal + saham_per_halaman
             df_tampil = df_filtered.iloc[indeks_awal:indeks_akhir].copy()
             
-            # --- PENYESUAIAN BERSIH: HANYA TAMPILKAN BINTANG EMAS (TANPA BULATAN HITAM) ---
             def format_skor_bintang_bersih(score):
                 if pd.isna(score) or int(score) == 0: return "-"
                 return "⭐" * int(score)
@@ -270,20 +268,20 @@ if not df_hasil.empty:
             def warna_tabel(val):
                 style = '' 
                 if isinstance(val, str):
-                    if any(x in val for x in ["Positif", "Uptrend", "BELI", "Breakout Upper", "Bottom Rebound", "DALAM AKUISISI", "Rendah", "🔺"]): 
+                    if any(x in val for x in ["Positif", "Uptrend", "BELI", "Breakout Upper", "Bottom Rebound", "DALAM AKUISISI", "Rendah", "🔺", "Golden Cross", "Bullish"]): 
                         style = 'color: #22c55e; font-weight: 600;'
-                    elif any(x in val for x in ["Negatif", "Downtrend", "WAIT & SEE", "Tinggi", "🔻"]): 
+                    elif any(x in val for x in ["Negatif", "Downtrend", "WAIT & SEE", "Tinggi", "🔻", "Death Cross", "Bearish"]): 
                         style = 'color: #ef4444; font-weight: 600;'
                     elif val == "> 1 Miliar": 
                         style = 'color: #3b82f6; font-weight: 600;'
                     elif val in ["Squeeze", "RENCANA AKUISISI", "Sedang"]: 
                         style = 'color: #eab308; font-weight: 600;'
                     elif "⭐" in val:
-                        if len(val) >= 3: style = 'color: #22c55e;'
+                        if len(val) >= 4: style = 'color: #22c55e;'
                         else: style = 'color: #ef4444;'
                 return style
 
-            kolom_berwarna = ["Change (%)", "Momentum", "MA Signal", "Rekomendasi", "Likuiditas", "Status BB", "Status Akuisisi", "Risiko", "Total Score"]
+            kolom_berwarna = ["Change (%)", "Momentum", "MA Signal", "MA Cross", "MACD", "Rekomendasi", "Likuiditas", "Status BB", "Status Akuisisi", "Risiko", "Total Score"]
             kolom_berwarna_aktual = [col for col in kolom_berwarna if col in df_tampil.columns]
 
             tabel_akhir = df_tampil.style.format({
@@ -297,10 +295,10 @@ if not df_hasil.empty:
                 "RSI (14D)": "{:.0f}"
             }).map(warna_tabel, subset=kolom_berwarna_aktual)
 
-            # --- DITAMBAHKAN KUNCIAN URUTAN KOLOM (column_order) AGAR STRUKTUR ANTI-GESER DI HP ---
+            # Update urutan kunci untuk memastikan MACD dan MA Cross masuk
             urutan_kolom_tetap = [
                 "Ticker", "Harga (Rp)", "Harga MA20", "Support", "Resistance", "Change (%)", 
-                "Volume", "Vol Breakout", "RSI (14D)", "Momentum", "MA Signal", 
+                "Volume", "Vol Breakout", "RSI (14D)", "Momentum", "MA Signal", "MA Cross", "MACD",
                 "Status BB", "Risiko", "Likuiditas", "Total Score", "Rekomendasi", "Status Akuisisi", "Terakhir Update"
             ]
             kolom_tersedia = [col for col in urutan_kolom_tetap if col in df_tampil.columns]
@@ -309,7 +307,7 @@ if not df_hasil.empty:
                 tabel_akhir, 
                 use_container_width=True, 
                 hide_index=True,
-                column_order=kolom_tersedia # <--- Fitur pengunci urutan kolom
+                column_order=kolom_tersedia
             )
             st.caption(f"Menampilkan urutan {(indeks_awal + 1)} - {min(indeks_akhir, len(df_filtered))} dari total {len(df_filtered)} saham yang lolos filter.")
             
@@ -336,23 +334,19 @@ if not df_hasil.empty:
         st.info("Gunakan panduan di bawah ini untuk memahami setiap metrik yang digunakan dalam AlgoTrade Screener.")
         
         st.markdown("""
+        * **MA Cross (5/20):** 
+          * **Golden Cross:** Rata-rata harga 5 hari memotong ke atas 20 hari. Sinyal kuat untuk mulai mengakumulasi (beli).
+          * **Death Cross:** Rata-rata harga 5 hari memotong ke bawah 20 hari. Sinyal untuk waspada atau jual.
+        * **MACD (Moving Average Convergence Divergence):**
+          * **Strong Bullish / Bullish MACD:** Histogram MACD berada di atas garis sinyal, mengonfirmasi tren naik (*uptrend*) memiliki tenaga yang kuat.
         * **Support & Resistance:** 
           * **Support:** Area batas bawah historis (20 hari terakhir). Sering digunakan sebagai acuan titik pantul atau area *cutloss*.
           * **Resistance:** Area batas atas historis (20 hari terakhir). Sering digunakan sebagai target *Take Profit*.
         * **Risiko (Tingkat Volatilitas):** Diukur menggunakan lebar pita *Bollinger Bands*.
-          * **Tinggi (Merah):** Pergerakan harga sangat liar dan cepat (berisiko tinggi namun potensi cuan besar).
-          * **Sedang (Kuning):** Pergerakan harga normal dan stabil.
-          * **Rendah (Hijau):** Pergerakan harga sangat sempit, berisiko rendah namun cenderung lambat (konsolidasi).
-        * **RSI (14D) - Relative Strength Index:** Mengukur kecepatan dan perubahan pergerakan harga. 
-          * **> 50 (Bullish):** Momentum sedang naik, bagus untuk mencari peluang beli.
-          * **<= 50 (Bearish):** Momentum sedang turun atau lemah.
-        * **Tren (MA20):** Membandingkan harga saat ini dengan harga rata-rata 20 hari ke belakang. 
-          * **Uptrend:** Harga saat ini di atas MA20. Tren secara umum positif.
-          * **Downtrend:** Harga saat ini di bawah MA20. Sebaiknya dihindari.
-        * **Bollinger Bands:** Mengukur volatilitas pasar.
-          * **Squeeze:** Pita menyempit. Sering kali menjadi pertanda akan ada pergerakan harga yang sangat besar (breakout).
-          * **Breakout Upper:** Harga menembus pita atas. Menandakan pergerakan *bullish* yang sangat kuat.
+          * **Tinggi (Merah):** Pergerakan harga liar dan cepat.
+          * **Rendah (Hijau):** Pergerakan harga sempit, berisiko rendah namun cenderung lambat (konsolidasi).
+        * **Bollinger Bands:** 
+          * **Squeeze:** Pita menyempit. Pertanda akan ada pergerakan harga yang sangat besar (*breakout*).
           * **Bottom Rebound:** Harga memantul dari pita bawah. Peluang untuk *buy on weakness*.
-        * **Vol Breakout (Tembus MA20):** Menandakan volume transaksi hari ini lebih tinggi daripada rata-rata volume 20 hari terakhir. Ini adalah konfirmasi penting bahwa kenaikan harga didukung oleh minat beli (uang) yang riil.
-        * **Total Score:** Skor penilaian dari algoritma (Maksimal 4) yang kini divisualisasikan menggunakan kombinasi rating bintang emas (⭐).
+        * **Total Score (Maks 6 ⭐):** Saham dengan skor 5 ke atas mendapatkan rekomendasi **BELI**.
         """)
