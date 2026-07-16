@@ -25,7 +25,8 @@ def main():
         try:
             t_jk = f"{ticker}.JK"
             if t_jk in data_mentah:
-                df_saham = data_mentah[t_jk].dropna(subset=['Close', 'Volume'])
+                # Menambahkan 'High' dan 'Low' pada dropna untuk kebutuhan Support & Resistance
+                df_saham = data_mentah[t_jk].dropna(subset=['Close', 'Volume', 'High', 'Low'])
                 
                 if len(df_saham) >= 25:
                     close_today = df_saham['Close'].iloc[-1].item()
@@ -61,6 +62,18 @@ def main():
                         status_bb = "Bottom Rebound"
                     else:
                         status_bb = "Normal"
+
+                    # --- IDE BARU 1: SUPPORT & RESISTANCE (20 Hari Terakhir) ---
+                    support_20 = df_saham['Low'].rolling(window=20).min().iloc[-1].item()
+                    resist_20 = df_saham['High'].rolling(window=20).max().iloc[-1].item()
+
+                    # --- IDE BARU 2: TINGKAT RISIKO (Berdasarkan Lebar Volatilitas/Bandwidth) ---
+                    if bandwidth > 15.0:
+                        risiko = "Tinggi"
+                    elif bandwidth > 8.0:
+                        risiko = "Sedang"
+                    else:
+                        risiko = "Rendah"
                     
                     # Kalkulasi RSI (Metode J. Welles Wilder - EMA)
                     delta = df_saham['Close'].diff()
@@ -94,7 +107,9 @@ def main():
                     hasil.append({
                         "Ticker": ticker,
                         "Harga (Rp)": close_today,
-                        "Harga MA20": int(ma_20), # <--- BARIS BARU YANG DITAMBAHKAN
+                        "Harga MA20": int(ma_20),
+                        "Support": int(support_20),      # <--- KOLOM BARU DITAMBAHKAN
+                        "Resistance": int(resist_20),    # <--- KOLOM BARU DITAMBAHKAN
                         "Change (%)": change_pct,
                         "Volume": vol_today,
                         "Vol Breakout": vol_breakout,
@@ -102,6 +117,7 @@ def main():
                         "Momentum": momentum,
                         "MA Signal": ma_signal,
                         "Status BB": status_bb, 
+                        "Risiko": risiko,                # <--- KOLOM BARU DITAMBAHKAN
                         "Likuiditas": likuiditas,
                         "Total Score": score,
                         "Rekomendasi": rekomendasi,
