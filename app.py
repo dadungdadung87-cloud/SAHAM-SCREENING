@@ -147,34 +147,37 @@ if not df_hasil.empty:
                 title_text='Rasio Sinyal Rekomendasi', 
                 margin=dict(t=40, b=20, l=20, r=20),
                 showlegend=True,
-                height=380 
+                height=450 
             )
             st.plotly_chart(fig_pie, use_container_width=True)
             
         with col_chart2:
-            df_top15 = df_hasil.nlargest(15, 'Change (%)')
+            # Mengambil data top 15 gainers lalu mengurutkannya agar yang paling tinggi berada di posisi paling atas pada grafik horisontal
+            df_top15 = df_hasil.nlargest(15, 'Change (%)').iloc[::-1]
             
+            # --- PENYESUAIAN GRAFIK: DIBUAT HORISONTAL KEBAWAH (GAYA STOCKBIT) ---
             fig_bar = px.bar(
                 df_top15, 
-                x='Ticker', 
-                y='Change (%)', 
+                x='Change (%)', 
+                y='Ticker', 
+                orientation='h', # <--- Mengubah orientasi menjadi Horisontal
                 color='Change (%)', 
                 color_continuous_scale=['#86efac', '#22c55e', '#166534']
             )
             fig_bar.update_traces(
-                texttemplate='%{y:.0f}%', 
+                texttemplate='%{x:.0f}%', # Menggunakan nilai x untuk teks persen tanpa koma
                 textposition='outside'
             )
             fig_bar.update_layout(
-                title_text='Top 15 Saham Gainers Hari Ini', 
-                margin=dict(t=40, b=20, l=20, r=20), 
+                title_text='Top 15 Saham Gainers Hari Ini (Stockbit Style)', 
+                margin=dict(t=40, b=20, l=40, r=40), 
                 showlegend=False,
-                xaxis_title="Kode Saham",
-                yaxis_title="Perubahan (%)",
-                height=380 
+                xaxis_title="Perubahan (%)",
+                yaxis_title="Kode Saham",
+                height=450 
             )
             if not df_top15.empty:
-                fig_bar.update_yaxes(range=[0, df_top15['Change (%)'].max() * 1.2]) 
+                fig_bar.update_xaxes(range=[0, df_top15['Change (%)'].max() * 1.2]) 
                 
             st.plotly_chart(fig_bar, use_container_width=True)
 
@@ -243,11 +246,10 @@ if not df_hasil.empty:
             indeks_akhir = indeks_awal + saham_per_halaman
             df_tampil = df_filtered.iloc[indeks_awal:indeks_akhir].copy()
             
-            # --- IDE BARU 1 & 2: CONVERT SKOR KE BINTANG DAN TAMBAH IKON PANAH ---
-            def format_skor_bintang(score):
-                if pd.isna(score): return "-"
-                s = int(score)
-                return "⭐" * s + "🌑" * (4 - s)
+            # --- PENYESUAIAN BERSIH: HANYA TAMPILKAN BINTANG EMAS (TANPA BULATAN HITAM) ---
+            def format_skor_bintang_bersih(score):
+                if pd.isna(score) or int(score) == 0: return "-"
+                return "⭐" * int(score)
 
             def format_persen_ikon(val):
                 if pd.isna(val): return "-"
@@ -259,7 +261,7 @@ if not df_hasil.empty:
                 if val == "Negatif": return "🔻 Negatif"
                 return val
 
-            df_tampil["Total Score"] = df_tampil["Total Score"].apply(format_skor_bintang)
+            df_tampil["Total Score"] = df_tampil["Total Score"].apply(format_skor_bintang_bersih)
             
             def format_angka(val): 
                 if pd.isna(val): return "-"
@@ -277,8 +279,7 @@ if not df_hasil.empty:
                     elif val in ["Squeeze", "RENCANA AKUISISI", "Sedang"]: 
                         style = 'color: #eab308; font-weight: 600;'
                     elif "⭐" in val:
-                        # Jika barisan bintang mengandung 3 atau 4 bintang emas, beri warna hijau
-                        if val.count("⭐") >= 3: style = 'color: #22c55e;'
+                        if len(val) >= 3: style = 'color: #22c55e;'
                         else: style = 'color: #ef4444;'
                 return style
 
@@ -296,7 +297,20 @@ if not df_hasil.empty:
                 "RSI (14D)": "{:.0f}"
             }).map(warna_tabel, subset=kolom_berwarna_aktual)
 
-            st.dataframe(tabel_akhir, use_container_width=True, hide_index=True)
+            # --- DITAMBAHKAN KUNCIAN URUTAN KOLOM (column_order) AGAR STRUKTUR ANTI-GESER DI HP ---
+            urutan_kolom_tetap = [
+                "Ticker", "Harga (Rp)", "Harga MA20", "Support", "Resistance", "Change (%)", 
+                "Volume", "Vol Breakout", "RSI (14D)", "Momentum", "MA Signal", 
+                "Status BB", "Risiko", "Likuiditas", "Total Score", "Rekomendasi", "Status Akuisisi", "Terakhir Update"
+            ]
+            kolom_tersedia = [col for col in urutan_kolom_tetap if col in df_tampil.columns]
+
+            st.dataframe(
+                tabel_akhir, 
+                use_container_width=True, 
+                hide_index=True,
+                column_order=kolom_tersedia # <--- Fitur pengunci urutan kolom
+            )
             st.caption(f"Menampilkan urutan {(indeks_awal + 1)} - {min(indeks_akhir, len(df_filtered))} dari total {len(df_filtered)} saham yang lolos filter.")
             
             st.markdown("---")
@@ -340,5 +354,5 @@ if not df_hasil.empty:
           * **Breakout Upper:** Harga menembus pita atas. Menandakan pergerakan *bullish* yang sangat kuat.
           * **Bottom Rebound:** Harga memantul dari pita bawah. Peluang untuk *buy on weakness*.
         * **Vol Breakout (Tembus MA20):** Menandakan volume transaksi hari ini lebih tinggi daripada rata-rata volume 20 hari terakhir. Ini adalah konfirmasi penting bahwa kenaikan harga didukung oleh minat beli (uang) yang riil.
-        * **Total Score:** Skor penilaian dari algoritma (Maksimal 4) yang kini divisualisasikan menggunakan kombinasi bintang emas (⭐) dan hitam (🌑).
+        * **Total Score:** Skor penilaian dari algoritma (Maksimal 4) yang kini divisualisasikan menggunakan kombinasi rating bintang emas (⭐).
         """)
