@@ -189,6 +189,8 @@ if not df_hasil.empty:
                 filter_vol = st.selectbox("🔊 Volume", ["Semua", "Tembus MA20", "Normal"], index=1 if mode_ketat else 0)
                 filter_momentum = st.selectbox("⚡ Momentum", ["Semua", "Positif", "Negatif"], index=1 if mode_ketat else 0)
                 filter_likuiditas = st.selectbox("💧 Likuiditas", ["Semua", "> 1 Miliar", "< 1 Miliar"])
+                # --- TAMBAHAN FILTER RISIKO ---
+                filter_risiko = st.selectbox("⚠️ Risiko Volatilitas", ["Semua", "Tinggi", "Sedang", "Rendah"])
                 
             with col2:
                 filter_rsi = st.selectbox("📊 RSI (14D)", ["Semua", "> 50 (Bullish)", "<= 50 (Bearish)"], index=1 if mode_ketat else 0)
@@ -220,6 +222,11 @@ if not df_hasil.empty:
         if filter_akuisisi != "Semua": 
             if "Status Akuisisi" in df_filtered.columns:
                 df_filtered = df_filtered[df_filtered["Status Akuisisi"] == filter_akuisisi]
+                
+        # --- LOGIKA FILTER RISIKO ---
+        if filter_risiko != "Semua":
+            if "Risiko" in df_filtered.columns:
+                df_filtered = df_filtered[df_filtered["Risiko"] == filter_risiko]
 
         # PAGINASI & FORMAT TABEL
         if not df_filtered.empty:
@@ -238,8 +245,13 @@ if not df_hasil.empty:
             indeks_akhir = indeks_awal + saham_per_halaman
             df_tampil = df_filtered.iloc[indeks_awal:indeks_akhir]
             
-            def format_angka(val): return f"{int(val):,}".replace(",", ".")
-            def format_persen(val): return f"{val:+.2f}%"
+            def format_angka(val): 
+                if pd.isna(val): return "-"
+                return f"{int(val):,}".replace(",", ".")
+                
+            def format_persen(val): 
+                if pd.isna(val): return "-"
+                return f"{val:+.2f}%"
             
             def warna_tabel(val):
                 style = '' 
@@ -247,10 +259,11 @@ if not df_hasil.empty:
                     if val > 0: style = 'color: #22c55e; font-weight: 600;' 
                     elif val < 0: style = 'color: #ef4444; font-weight: 600;' 
                 elif isinstance(val, str):
-                    if val in ["Positif", "Uptrend", "BELI", "Breakout Upper", "Bottom Rebound", "DALAM AKUISISI"]: style = 'color: #22c55e; font-weight: 600;'
-                    elif val in ["Negatif", "Downtrend", "WAIT & SEE"]: style = 'color: #ef4444; font-weight: 600;'
+                    # --- MENAMBAHKAN PEWARNAAN UNTUK STATUS RISIKO ---
+                    if val in ["Positif", "Uptrend", "BELI", "Breakout Upper", "Bottom Rebound", "DALAM AKUISISI", "Rendah"]: style = 'color: #22c55e; font-weight: 600;'
+                    elif val in ["Negatif", "Downtrend", "WAIT & SEE", "Tinggi"]: style = 'color: #ef4444; font-weight: 600;'
                     elif val == "> 1 Miliar": style = 'color: #3b82f6; font-weight: 600;'
-                    elif val in ["Squeeze", "RENCANA AKUISISI"]: style = 'color: #eab308; font-weight: 600;'
+                    elif val in ["Squeeze", "RENCANA AKUISISI", "Sedang"]: style = 'color: #eab308; font-weight: 600;'
                 return style
 
             def warna_skor(val):
@@ -258,12 +271,16 @@ if not df_hasil.empty:
                 elif val in [0, 1, 2]: return 'color: #ef4444; font-weight: 600;'
                 return ''
 
-            kolom_berwarna = ["Change (%)", "Momentum", "MA Signal", "Rekomendasi", "Likuiditas", "Status BB", "Status Akuisisi"]
+            # --- MENAMBAHKAN "Risiko" KE DALAM DAFTAR KOLOM YANG DIWARNAI ---
+            kolom_berwarna = ["Change (%)", "Momentum", "MA Signal", "Rekomendasi", "Likuiditas", "Status BB", "Status Akuisisi", "Risiko"]
             kolom_berwarna_aktual = [col for col in kolom_berwarna if col in df_tampil.columns]
 
+            # --- MENAMBAHKAN SUPPORT DAN RESISTANCE KE FORMAT ANGKA ---
             tabel_akhir = df_tampil.style.format({
                 "Harga (Rp)": format_angka,
-                "Harga MA20": format_angka,  
+                "Harga MA20": format_angka,
+                "Support": format_angka,
+                "Resistance": format_angka,
                 "Volume": format_angka,
                 "Change (%)": format_persen,
                 "RSI (14D)": "{:.0f}"
@@ -298,6 +315,13 @@ if not df_hasil.empty:
         st.info("Gunakan panduan di bawah ini untuk memahami setiap metrik yang digunakan dalam AlgoTrade Screener.")
         
         st.markdown("""
+        * **Support & Resistance:** 
+          * **Support:** Area batas bawah historis (20 hari terakhir). Sering digunakan sebagai acuan titik pantul atau area *cutloss*.
+          * **Resistance:** Area batas atas historis (20 hari terakhir). Sering digunakan sebagai target *Take Profit*.
+        * **Risiko (Tingkat Volatilitas):** Diukur menggunakan lebar pita *Bollinger Bands*.
+          * **Tinggi (Merah):** Pergerakan harga sangat liar dan cepat (berisiko tinggi namun potensi cuan besar).
+          * **Sedang (Kuning):** Pergerakan harga normal dan stabil.
+          * **Rendah (Hijau):** Pergerakan harga sangat sempit, berisiko rendah namun cenderung lambat (konsolidasi).
         * **RSI (14D) - Relative Strength Index:** Mengukur kecepatan dan perubahan pergerakan harga. 
           * **> 50 (Bullish):** Momentum sedang naik, bagus untuk mencari peluang beli.
           * **<= 50 (Bearish):** Momentum sedang turun atau lemah.
