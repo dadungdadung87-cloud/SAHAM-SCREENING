@@ -25,10 +25,9 @@ def main():
         try:
             t_jk = f"{ticker}.JK"
             if t_jk in data_mentah:
-                # Menambahkan 'High' dan 'Low' pada dropna untuk kebutuhan Support & Resistance
                 df_saham = data_mentah[t_jk].dropna(subset=['Close', 'Volume', 'High', 'Low'])
                 
-                if len(df_saham) >= 25:
+                if len(df_saham) >= 26: # Syarat diubah menjadi 26 hari untuk perhitungan MACD
                     close_today = df_saham['Close'].iloc[-1].item()
                     close_yest = df_saham['Close'].iloc[-2].item()
                     vol_val = df_saham['Volume'].iloc[-1].item()
@@ -43,6 +42,38 @@ def main():
                     vol_ma_20 = df_saham['Volume'].rolling(window=20).mean().iloc[-1].item()
                     ma_signal = "Uptrend" if close_today > ma_20 else "Downtrend"
                     vol_breakout = "Tembus MA20" if vol_today > vol_ma_20 else "Normal"
+                    
+                    # --- IDE BARU 1: MA CROSSOVER (MA5 vs MA20) ---
+                    ma_5 = df_saham['Close'].rolling(window=5).mean().iloc[-1].item()
+                    ma_5_prev = df_saham['Close'].rolling(window=5).mean().iloc[-2].item()
+                    ma_20_prev = df_saham['Close'].rolling(window=20).mean().iloc[-2].item()
+                    
+                    if ma_5 > ma_20 and ma_5_prev <= ma_20_prev:
+                        ma_cross = "Golden Cross"
+                    elif ma_5 < ma_20 and ma_5_prev >= ma_20_prev:
+                        ma_cross = "Death Cross"
+                    elif ma_5 > ma_20:
+                        ma_cross = "Bullish"
+                    else:
+                        ma_cross = "Bearish"
+
+                    # --- IDE BARU 2: MACD (12, 26, 9) ---
+                    ema_12 = df_saham['Close'].ewm(span=12, adjust=False).mean()
+                    ema_26 = df_saham['Close'].ewm(span=26, adjust=False).mean()
+                    macd_line = ema_12 - ema_26
+                    signal_line = macd_line.ewm(span=9, adjust=False).mean()
+                    
+                    macd_val = macd_line.iloc[-1].item()
+                    sig_val = signal_line.iloc[-1].item()
+                    
+                    if macd_val > sig_val and macd_val > 0:
+                        status_macd = "Strong Bullish"
+                    elif macd_val > sig_val:
+                        status_macd = "Bullish MACD"
+                    elif macd_val < sig_val and macd_val < 0:
+                        status_macd = "Strong Bearish"
+                    else:
+                        status_macd = "Bearish MACD"
                     
                     # KALKULASI BOLLINGER BANDS
                     std_20 = df_saham['Close'].rolling(window=20).std().iloc[-1].item()
@@ -63,11 +94,10 @@ def main():
                     else:
                         status_bb = "Normal"
 
-                    # --- IDE BARU 1: SUPPORT & RESISTANCE (20 Hari Terakhir) ---
+                    # SUPPORT, RESISTANCE & RISIKO
                     support_20 = df_saham['Low'].rolling(window=20).min().iloc[-1].item()
                     resist_20 = df_saham['High'].rolling(window=20).max().iloc[-1].item()
 
-                    # --- IDE BARU 2: TINGKAT RISIKO (Berdasarkan Lebar Volatilitas/Bandwidth) ---
                     if bandwidth > 15.0:
                         risiko = "Tinggi"
                     elif bandwidth > 8.0:
@@ -80,25 +110,24 @@ def main():
                     gain = delta.where(delta > 0, 0)
                     loss = -delta.where(delta < 0, 0)
                     
-                    # Menggunakan metode ewm (Exponential Weighted Math) dari Pandas
-                    # alpha = 1/14 mencerminkan Wilder's Smoothing
                     avg_gain = gain.ewm(alpha=1/14, adjust=False).mean()
                     avg_loss = loss.ewm(alpha=1/14, adjust=False).mean()
                     
                     rs = avg_gain / avg_loss
                     rsi_raw = (100 - (100 / (1 + rs))).iloc[-1].item()
-                    
-                    # Konversi ke integer dengan aman
                     rsi = int(round(rsi_raw)) if not pd.isna(rsi_raw) else 0
                     
-                    # Kalkulasi Skor
+                    # Kalkulasi Skor (Maksimal 6)
                     score = 0
                     if vol_today > vol_ma_20: score += 1
                     if rsi > 50: score += 1
                     if momentum == "Positif": score += 1
                     if ma_signal == "Uptrend": score += 1
+                    if ma_cross in ["Golden Cross", "Bullish"]: score += 1
+                    if status_macd in ["Strong Bullish", "Bullish MACD"]: score += 1
 
-                    rekomendasi = "BELI" if score == 4 else "WAIT & SEE"
+                    # Rekomendasi BELI jika mendapat minimal 5 dari 6 poin
+                    rekomendasi = "BELI" if score >= 5 else "WAIT & SEE"
                     nilai_transaksi = close_today * vol_today
                     likuiditas = "> 1 Miliar" if nilai_transaksi > 1000000000 else "< 1 Miliar"
                     
@@ -108,16 +137,18 @@ def main():
                         "Ticker": ticker,
                         "Harga (Rp)": close_today,
                         "Harga MA20": int(ma_20),
-                        "Support": int(support_20),      # <--- KOLOM BARU DITAMBAHKAN
-                        "Resistance": int(resist_20),    # <--- KOLOM BARU DITAMBAHKAN
+                        "Support": int(support_20),
+                        "Resistance": int(resist_20),
                         "Change (%)": change_pct,
                         "Volume": vol_today,
                         "Vol Breakout": vol_breakout,
                         "RSI (14D)": rsi,
                         "Momentum": momentum,
                         "MA Signal": ma_signal,
+                        "MA Cross": ma_cross,         # <--- KOLOM BARU DITAMBAHKAN
+                        "MACD": status_macd,          # <--- KOLOM BARU DITAMBAHKAN
                         "Status BB": status_bb, 
-                        "Risiko": risiko,                # <--- KOLOM BARU DITAMBAHKAN
+                        "Risiko": risiko,
                         "Likuiditas": likuiditas,
                         "Total Score": score,
                         "Rekomendasi": rekomendasi,
