@@ -52,51 +52,66 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. SIDEBAR - SISTEM PRESET FILTER CEPAT CUSTOM
+# 2. DEFINISI MASTER INDIKATOR (UNTUK SINKRONISASI OTOMATIS)
+# ==========================================
+# Jika di kemudian hari Anda ingin menambah filter baru, CUKUP TAMBAHKAN di dalam dictionary MASTER_FILTERS ini.
+# Sidebar dan Panel Utama akan otomatis mendeteksi dan menambahkannya ke layar.
+MASTER_FILTERS = {
+    "Vol Breakout": {"label": "🔊 Volume", "options": ["Semua", "Tembus MA20", "Normal"]},
+    "RSI (14D)": {"label": "📊 RSI (14D)", "options": ["Semua", "> 50 (Bullish)", "<= 50 (Bearish)"]},
+    "MA Signal": {"label": "📈 Tren (MA20)", "options": ["Semua", "Uptrend", "Downtrend"]},
+    "Momentum": {"label": "⚡ Momentum", "options": ["Semua", "Positif", "Negatif"]},
+    "Total Score": {"label": "⭐ Total Score", "options": ["Semua", 6, 5, 4, 3, 2, 1, 0]},
+    "Rekomendasi": {"label": "🎯 Rekomendasi", "options": ["Semua", "BELI", "WAIT & SEE"]},
+    "Likuiditas": {"label": "💧 Likuiditas", "options": ["Semua", "> 1 Miliar", "< 1 Miliar"]},
+    "Status BB": {"label": "🌐 Bollinger Bands", "options": ["Semua", "Squeeze", "Bottom Rebound", "Breakout Upper", "Normal"]},
+    "MA Cross": {"label": "🔀 MA Cross (5/20)", "options": ["Semua", "Golden Cross", "Bullish", "Death Cross", "Bearish"]},
+    "Risiko": {"label": "⚠️ Risiko Volatilitas", "options": ["Semua", "Tinggi", "Sedang", "Rendah"]},
+    "Status Akuisisi": {"label": "🤝 Sentimen Akuisisi", "options": ["Semua", "TIDAK ADA", "RENCANA AKUISISI", "DALAM AKUISISI"]},
+    "MACD": {"label": "📈 MACD", "options": ["Semua", "Strong Bullish", "Bullish MACD", "Strong Bearish", "Bearish MACD"]}
+}
+
+# ==========================================
+# 3. SIDEBAR - SISTEM PRESET FILTER CEPAT CUSTOM DINAMIS
 # ==========================================
 st.sidebar.title("⚙️ Preset Filter Cepat")
 st.sidebar.markdown("Pilih preset kriteria bawaan atau aktifkan kriteria kustom Anda sendiri.")
 
-# Inisialisasi session state untuk menyimpan preset buatan user
+# Inisialisasi session state untuk menyimpan preset bawaan (Default)
 if 'custom_presets' not in st.session_state:
+    # Membuat preset bawaan yang otomatis mengisi semua komponen di MASTER_FILTERS dengan "Semua"
+    base_default = {k: "Semua" for k in MASTER_FILTERS.keys()}
+    
+    # Customisasi nilai spesifik untuk preset bawaan
+    preset_super_ketat = base_default.copy()
+    preset_super_ketat.update({"Vol Breakout": "Tembus MA20", "RSI (14D)": "> 50 (Bullish)", "MA Signal": "Uptrend", "Status BB": "Breakout Upper"})
+    
+    preset_uptrend_likuid = base_default.copy()
+    preset_uptrend_likuid.update({"MA Signal": "Uptrend", "Likuiditas": "> 1 Miliar"})
+
     st.session_state.custom_presets = {
-        "🔥 Super Ketat (Swing Trading)": {
-            "vol": "Tembus MA20", "rsi": "> 50 (Bullish)", "trend": "Uptrend", 
-            "bb": "Breakout Upper", "score": "Semua", "rekomendasi": "Semua", 
-            "likuiditas": "Semua", "akuisisi": "Semua", "risiko": "Semua",
-            "macross": "Semua", "macd": "Semua"
-        },
-        "🟢 Hanya Saham Uptrend & Likuid": {
-            "vol": "Semua", "rsi": "Semua", "trend": "Uptrend", 
-            "bb": "Semua", "score": "Semua", "rekomendasi": "Semua", 
-            "likuiditas": "> 1 Miliar", "akuisisi": "Semua", "risiko": "Semua",
-            "macross": "Semua", "macd": "Semua"
-        }
+        "🔥 Super Ketat (Swing Trading)": preset_super_ketat,
+        "🟢 Hanya Saham Uptrend & Likuid": preset_uptrend_likuid
     }
 
 opsi_preset = ["Matikan Preset (Manual)"] + list(st.session_state.custom_presets.keys())
 preset_terpilih = st.sidebar.selectbox("🎯 Pilih Preset Aktif:", opsi_preset)
 
 st.sidebar.markdown("---")
-# Fitur Pembuat Preset Tanpa Koding Ulang
+
+# AUTOMATED FILTER CREATOR (Mengikuti MASTER_FILTERS secara otomatis)
 with st.sidebar.expander("➕ Buat Preset Sendiri Kustom"):
     st.caption("Atur kombinasi kriteria di bawah ini lalu simpan ke sistem.")
     nama_preset_baru = st.text_input("Nama Preset Anda:", placeholder="Contoh: Akumulasi Uang Besar")
     
-    p_vol = st.selectbox("P-Volume", ["Semua", "Tembus MA20", "Normal"], key="p_v")
-    p_trend = st.selectbox("P-Tren (MA20)", ["Semua", "Uptrend", "Downtrend"], key="p_t")
-    p_likuid = st.selectbox("P-Likuiditas", ["Semua", "> 1 Miliar", "< 1 Miliar"], key="p_l")
-    p_recom = st.selectbox("P-Rekomendasi", ["Semua", "BELI", "WAIT & SEE"], key="p_r")
-    p_macross = st.selectbox("P-MA Cross", ["Semua", "Golden Cross", "Bullish", "Death Cross", "Bearish"], key="p_mc")
+    # Loop otomatis memunculkan pilihan dropdown di sidebar berdasarkan MASTER_FILTERS
+    kustom_input_user = {}
+    for key, info in MASTER_FILTERS.items():
+        kustom_input_user[key] = st.selectbox(f"P-{info['label']}", info['options'], key=f"sidebar_{key}")
     
     if st.button("💾 Simpan Jadi Preset Cepat"):
         if nama_preset_baru.strip():
-            st.session_state.custom_presets[nama_preset_baru.strip()] = {
-                "vol": p_vol, "rsi": "Semua", "trend": p_trend, 
-                "bb": "Semua", "score": "Semua", "rekomendasi": p_recom, 
-                "likuiditas": p_likuid, "akuisisi": "Semua", "risiko": "Semua",
-                "macross": p_macross, "macd": "Semua"
-            }
+            st.session_state.custom_presets[nama_preset_baru.strip()] = kustom_input_user
             st.success(f"Preset '{nama_preset_baru}' disimpan! Silakan pilih di menu atas.")
         else:
             st.error("Nama preset tidak boleh kosong!")
@@ -105,7 +120,7 @@ st.sidebar.markdown("---")
 st.sidebar.caption("© AlgoTrade Screener")
 
 # ==========================================
-# 3. MEMUAT DATA LOKAL
+# 4. MEMUAT DATA LOKAL
 # ==========================================
 FILE_HASIL = "hasil_screener.csv"
 FILE_AKUISISI = "data_akuisisi.csv"
@@ -128,7 +143,7 @@ else:
     df_hasil = pd.DataFrame()
 
 # ==========================================
-# 4. PEMBAGIAN SISTEM TAB & KONTEN
+# 5. PEMBAGIAN SISTEM TAB & KONTEN
 # ==========================================
 if not df_hasil.empty:
     
@@ -214,80 +229,50 @@ if not df_hasil.empty:
     # ISI TAB 2: SCREENER UTAMA (FILTER & TABEL)
     # ----------------------------------------
     with tab2:
-        # Menentukan nilai default indeks pilihan filter berdasarkan preset aktif di sidebar
         use_preset = preset_terpilih != "Matikan Preset (Manual)"
         vals = st.session_state.custom_presets[preset_terpilih] if use_preset else None
 
+        # RENDER PANEL FILTER SECARA DINAMIS & OTOMATIS BERDASARKAN MASTER_FILTERS
         with st.expander("🎛️ Buka Panel Filter Lengkap (Klik untuk menyesuaikan kriteria)", expanded=False):
-            col1, col2, col3 = st.columns(3)
+            # Membagi area filter menjadi susunan 3 kolom seimbang
+            col_f1, col_f2, col_f3 = st.columns(3)
             
-            with col1:
-                opt_vol = ["Semua", "Tembus MA20", "Normal"]
-                filter_vol = st.selectbox("🔊 Volume", opt_vol, index=opt_vol.index(vals["vol"]) if use_preset else 0)
+            filter_terpilih_tabel = {}
+            
+            # Mendistribusikan ke-12 filter secara merata ke dalam 3 kolom layout
+            for idx, (db_key, info) in enumerate(MASTER_FILTERS.items()):
+                target_col = col_f1 if idx % 3 == 0 else (col_f2 if idx % 3 == 1 else col_f3)
                 
-                opt_mom = ["Semua", "Positif", "Negatif"]
-                filter_momentum = st.selectbox("⚡ Momentum", opt_mom, index=0)
-                
-                opt_liq = ["Semua", "> 1 Miliar", "< 1 Miliar"]
-                filter_likuiditas = st.selectbox("💧 Likuiditas", opt_liq, index=opt_liq.index(vals["likuiditas"]) if use_preset else 0)
-                
-                opt_risk = ["Semua", "Tinggi", "Sedang", "Rendah"]
-                filter_risiko = st.selectbox("⚠️ Risiko Volatilitas", opt_risk, index=opt_risk.index(vals["risiko"]) if use_preset else 0)
-                
-            with col2:
-                opt_rsi = ["Semua", "> 50 (Bullish)", "<= 50 (Bearish)"]
-                filter_rsi = st.selectbox("📊 RSI (14D)", opt_rsi, index=opt_rsi.index(vals["rsi"]) if use_preset else 0)
-                
-                opt_scr = ["Semua", 6, 5, 4, 3, 2, 1, 0]
-                filter_score = st.selectbox("⭐ Total Score", opt_scr, index=opt_scr.index(vals["score"]) if use_preset else 0)
-                
-                opt_bb = ["Semua", "Squeeze", "Bottom Rebound", "Breakout Upper", "Normal"]
-                filter_bb = st.selectbox("🌐 Bollinger Bands", opt_bb, index=opt_bb.index(vals["bb"]) if use_preset else 0)
-                
-                opt_acq = ["Semua", "TIDAK ADA", "RENCANA AKUISISI", "DALAM AKUISISI"]
-                filter_akuisisi = st.selectbox("🤝 Sentimen Akuisisi", opt_acq, index=opt_acq.index(vals["akuisisi"]) if use_preset else 0)
-                
-            with col3:
-                opt_trd = ["Semua", "Uptrend", "Downtrend"]
-                filter_trend = st.selectbox("📈 Tren (MA20)", opt_trd, index=opt_trd.index(vals["trend"]) if use_preset else 0)
-                
-                opt_rec = ["Semua", "BELI", "WAIT & SEE"]
-                filter_rekomendasi = st.selectbox("🎯 Rekomendasi", opt_rec, index=opt_rec.index(vals["rekomendasi"]) if use_preset else 0)
-                
-                opt_mc = ["Semua", "Golden Cross", "Bullish", "Death Cross", "Bearish"]
-                filter_macross = st.selectbox("🔀 MA Cross (5/20)", opt_mc, index=opt_mc.index(vals["macross"]) if use_preset else 0)
-                
-                opt_macd = ["Semua", "Strong Bullish", "Bullish MACD", "Strong Bearish", "Bearish MACD"]
-                filter_macd = st.selectbox("📈 MACD", opt_macd, index=opt_macd.index(vals["macd"]) if use_preset else 0)
+                with target_col:
+                    default_idx = info["options"].index(vals[db_key]) if use_preset else 0
+                    filter_terpilih_tabel[db_key] = st.selectbox(
+                        info["label"], 
+                        info["options"], 
+                        index=default_idx, 
+                        key=f"main_{db_key}"
+                    )
 
-        # --- PENGATURAN BARU POIN 1: KOLOM PENCARIAN DI INTEGRASIKAN DI SCREENER UTAMA ---
         st.markdown("### 📋 Tabel Data Saham")
         col_search, col_empty = st.columns([1, 2])
         with col_search:
             search_ticker = st.text_input("🔍 Cari Kode Saham Spesifik (Contoh: BBCA, BMRI)", "", placeholder="Ketik kode...")
 
-        # LOGIKA FILTERING DATA
+        # LOGIKA FILTERING DATA OTOMATIS BERDASARKAN SELECTION USER
         df_filtered = df_hasil.copy()
-        if search_ticker: df_filtered = df_filtered[df_filtered["Ticker"].str.contains(search_ticker.upper(), na=False)]
-        if filter_vol != "Semua": df_filtered = df_filtered[df_filtered["Vol Breakout"] == filter_vol]
-        if filter_rsi == "> 50 (Bullish)": df_filtered = df_filtered[df_filtered["RSI (14D)"] > 50]
-        elif filter_rsi == "<= 50 (Bearish)": df_filtered = df_filtered[df_filtered["RSI (14D)"] <= 50]
-        if filter_trend != "Semua": df_filtered = df_filtered[df_filtered["MA Signal"] == filter_trend]
-        if filter_momentum != "Semua": df_filtered = df_filtered[df_filtered["Momentum"] == filter_momentum]
-        if filter_score != "Semua": df_filtered = df_filtered[df_filtered["Total Score"] == int(filter_score)]
-        if filter_rekomendasi != "Semua": df_filtered = df_filtered[df_filtered["Rekomendasi"] == filter_rekomendasi]
-        if filter_likuiditas != "Semua": df_filtered = df_filtered[df_filtered["Likuiditas"] == filter_likuiditas]
         
-        if filter_bb != "Semua":
-            if "Status BB" in df_filtered.columns: df_filtered = df_filtered[df_filtered["Status BB"] == filter_bb]
-        if filter_akuisisi != "Semua": 
-            if "Status Akuisisi" in df_filtered.columns: df_filtered = df_filtered[df_filtered["Status Akuisisi"] == filter_akuisisi]
-        if filter_risiko != "Semua":
-            if "Risiko" in df_filtered.columns: df_filtered = df_filtered[df_filtered["Risiko"] == filter_risiko]
-        if filter_macross != "Semua":
-            if "MA Cross" in df_filtered.columns: df_filtered = df_filtered[df_filtered["MA Cross"] == filter_macross]
-        if filter_macd != "Semua":
-            if "MACD" in df_filtered.columns: df_filtered = df_filtered[df_filtered["MACD"] == filter_macd]
+        if search_ticker: 
+            df_filtered = df_filtered[df_filtered["Ticker"].str.contains(search_ticker.upper(), na=False)]
+            
+        for db_key, nilai_filter in filter_terpilih_tabel.items():
+            if nilai_filter != "Semua":
+                if db_key == "RSI (14D)":
+                    if nilai_filter == "> 50 (Bullish)": df_filtered = df_filtered[df_filtered["RSI (14D)"] > 50]
+                    elif nilai_filter == "<= 50 (Bearish)": df_filtered = df_filtered[df_filtered["RSI (14D)"] <= 50]
+                elif db_key == "Total Score":
+                    df_filtered = df_filtered[df_filtered["Total Score"] == int(nilai_filter)]
+                else:
+                    if db_key in df_filtered.columns:
+                        df_filtered = df_filtered[df_filtered[db_key] == nilai_filter]
 
         # PAGINASI & FORMAT TABEL
         if not df_filtered.empty:
@@ -324,7 +309,6 @@ if not df_hasil.empty:
             def warna_tabel(val):
                 style = '' 
                 if isinstance(val, str):
-                    # --- POIN 3 & 4: WARNA HIJAU/MERAH UTK PERSEN & TANGKAP TEMBUS MA20 MENJADI HIJAU ---
                     if any(x in val for x in ["Positif", "Uptrend", "BELI", "Breakout Upper", "Bottom Rebound", "DALAM AKUISISI", "Rendah", "🔺", "Golden Cross", "Bullish", "Tembus MA20"]): 
                         style = 'color: #22c55e; font-weight: 600;'
                     elif any(x in val for x in ["Negatif", "Downtrend", "WAIT & SEE", "Tinggi", "🔻", "Death Cross", "Bearish"]): 
