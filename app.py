@@ -53,14 +53,16 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. DEFINISI MASTER INDIKATOR
+# 2. DEFINISI MASTER INDIKATOR (DITAMBAHKAN BANDARMOLOGI)
 # ==========================================
 MASTER_FILTERS = {
+    "Status Bandar": {"label": "🕵️ Status Bandar", "options": ["Semua", "Akumulasi Kuat", "Distribusi Kuat", "Normal"]},
+    "OBV Trend": {"label": "🌊 Tren Uang (OBV)", "options": ["Semua", "Akumulasi (Naik)", "Distribusi (Turun)", "Netral"]},
     "Vol Breakout": {"label": "🔊 Volume", "options": ["Semua", "Tembus MA20", "Normal"]},
     "RSI (14D)": {"label": "📊 RSI (14D)", "options": ["Semua", "> 50 (Bullish)", "<= 50 (Bearish)"]},
     "MA Signal": {"label": "📈 Tren (MA20)", "options": ["Semua", "Uptrend", "Downtrend"]},
     "Momentum": {"label": "⚡ Momentum", "options": ["Semua", "Positif", "Negatif"]},
-    "Total Score": {"label": "⭐ Total Score", "options": ["Semua", 6, 5, 4, 3, 2, 1, 0]},
+    "Total Score": {"label": "⭐ Total Score", "options": ["Semua", 8, 7, 6, 5, 4, 3, 2, 1, 0]},
     "Rekomendasi": {"label": "🎯 Rekomendasi", "options": ["Semua", "BELI", "WAIT & SEE"]},
     "Likuiditas": {"label": "💧 Likuiditas", "options": ["Semua", "> 1 Miliar", "< 1 Miliar"]},
     "Status BB": {"label": "🌐 Bollinger Bands", "options": ["Semua", "Squeeze", "Bottom Rebound", "Breakout Upper", "Normal"]},
@@ -77,7 +79,11 @@ FILE_PRESET = "preset_kustom.json"
 
 base_default = {k: "Semua" for k in MASTER_FILTERS.keys()}
 preset_super_ketat = base_default.copy()
-preset_super_ketat.update({"Vol Breakout": "Tembus MA20", "RSI (14D)": "> 50 (Bullish)", "MA Signal": "Uptrend", "Status BB": "Breakout Upper"})
+preset_super_ketat.update({
+    "Vol Breakout": "Tembus MA20", "RSI (14D)": "> 50 (Bullish)", 
+    "MA Signal": "Uptrend", "Status BB": "Breakout Upper",
+    "Status Bandar": "Akumulasi Kuat"
+})
 preset_uptrend_likuid = base_default.copy()
 preset_uptrend_likuid.update({"MA Signal": "Uptrend", "Likuiditas": "> 1 Miliar"})
 
@@ -113,25 +119,18 @@ def simpan_preset_baru(nama, kriteria):
 
 daftar_preset_aktif = muat_preset()
 
-# Inisialisasi State Awal agar memori sinkron
 if "preset_selector" not in st.session_state:
     st.session_state.preset_selector = "Matikan Preset (Manual)"
 
-for k, info in MASTER_FILTERS.items():
-    if f"main_{k}" not in st.session_state:
-        st.session_state[f"main_{k}"] = info["options"][0]
-
-# FUNGSI CALLBACK (Memaksa perubahan dari Sidebar ke Panel Utama dan sebaliknya)
 def apply_preset():
     chosen = st.session_state.preset_selector
     if chosen != "Matikan Preset (Manual)":
         vals = daftar_preset_aktif[chosen]
         for k in MASTER_FILTERS.keys():
-            # Memaksa memori panel utama menuruti preset
-            st.session_state[f"main_{k}"] = vals[k]
+            if k in vals:
+                st.session_state[f"main_{k}"] = vals[k]
 
 def manual_override():
-    # Jika user mengubah panel utama secara manual, matikan status preset aktif
     st.session_state.preset_selector = "Matikan Preset (Manual)"
 
 # ==========================================
@@ -141,7 +140,9 @@ st.sidebar.title("⚙️ Preset Filter Cepat")
 st.sidebar.markdown("Pilih preset kriteria bawaan atau aktifkan kriteria kustom Anda sendiri.")
 
 opsi_preset = ["Matikan Preset (Manual)"] + list(daftar_preset_aktif.keys())
-st.sidebar.selectbox("🎯 Pilih Preset Aktif:", opsi_preset, key="preset_selector", on_change=apply_preset)
+idx_default = opsi_preset.index(st.session_state.preset_selector) if st.session_state.preset_selector in opsi_preset else 0
+
+st.sidebar.selectbox("🎯 Pilih Preset Aktif:", opsi_preset, index=idx_default, key="preset_selector", on_change=apply_preset)
 
 st.sidebar.markdown("---")
 
@@ -156,12 +157,10 @@ with st.sidebar.expander("➕ Buat Preset Sendiri Kustom"):
     if st.button("💾 Simpan Jadi Preset Cepat"):
         if nama_preset_baru.strip():
             simpan_preset_baru(nama_preset_baru.strip(), kustom_input_user)
-            st.success(f"Preset '{nama_preset_baru}' Berhasil Disimpan!")
-            
-            # Otomatis langsung mengaplikasikan preset yang baru dibuat ke tabel
-            daftar_preset_aktif[nama_preset_baru.strip()] = kustom_input_user
+            for k in MASTER_FILTERS.keys():
+                st.session_state[f"main_{k}"] = kustom_input_user[k]
             st.session_state.preset_selector = nama_preset_baru.strip()
-            apply_preset()
+            st.success(f"Preset '{nama_preset_baru}' Berhasil Disimpan!")
             st.rerun()
         else:
             st.error("Nama preset tidak boleh kosong!")
@@ -276,22 +275,26 @@ if not df_hasil.empty:
             st.plotly_chart(fig_bar, use_container_width=True)
 
     # ----------------------------------------
-    # ISI TAB 2: SCREENER UTAMA (FILTER & TABEL)
+    # ISI TAB 2: SCREENER UTAMA
     # ----------------------------------------
     with tab2:
         with st.expander("🎛️ Buka Panel Filter Lengkap (Klik untuk menyesuaikan kriteria)", expanded=False):
-            col_f1, col_f2, col_f3 = st.columns(3)
+            # Membagi 14 kolom ke dalam 4 layout grid agar tidak memanjang ke bawah
+            col_f1, col_f2, col_f3, col_f4 = st.columns(4)
             
             filter_terpilih_tabel = {}
             
             for idx, (db_key, info) in enumerate(MASTER_FILTERS.items()):
-                target_col = col_f1 if idx % 3 == 0 else (col_f2 if idx % 3 == 1 else col_f3)
+                target_col = col_f1 if idx % 4 == 0 else (col_f2 if idx % 4 == 1 else (col_f3 if idx % 4 == 2 else col_f4))
                 
                 with target_col:
-                    # Filter mengambil nilai langsung dari session_state dan memicu override jika diubah manual
+                    val_sekarang = st.session_state.get(f"main_{db_key}", info["options"][0])
+                    idx_opsi = info["options"].index(val_sekarang) if val_sekarang in info["options"] else 0
+                    
                     filter_terpilih_tabel[db_key] = st.selectbox(
                         info["label"], 
                         info["options"], 
+                        index=idx_opsi,
                         key=f"main_{db_key}",
                         on_change=manual_override
                     )
@@ -353,20 +356,22 @@ if not df_hasil.empty:
             def warna_tabel(val):
                 style = '' 
                 if isinstance(val, str):
-                    if any(x in val for x in ["Positif", "Uptrend", "BELI", "Breakout Upper", "Bottom Rebound", "DALAM AKUISISI", "Rendah", "🔺", "Golden Cross", "Bullish", "Tembus MA20"]): 
+                    # Menambahkan warna hijau untuk Akumulasi Kuat & Akumulasi (Naik)
+                    if any(x in val for x in ["Positif", "Uptrend", "BELI", "Breakout Upper", "Bottom Rebound", "DALAM AKUISISI", "Rendah", "🔺", "Golden Cross", "Bullish", "Tembus MA20", "Akumulasi"]): 
                         style = 'color: #22c55e; font-weight: 600;'
-                    elif any(x in val for x in ["Negatif", "Downtrend", "WAIT & SEE", "Tinggi", "🔻", "Death Cross", "Bearish"]): 
+                    # Menambahkan warna merah untuk Distribusi
+                    elif any(x in val for x in ["Negatif", "Downtrend", "WAIT & SEE", "Tinggi", "🔻", "Death Cross", "Bearish", "Distribusi"]): 
                         style = 'color: #ef4444; font-weight: 600;'
                     elif val == "> 1 Miliar": 
                         style = 'color: #3b82f6; font-weight: 600;'
                     elif val in ["Squeeze", "RENCANA AKUISISI", "Sedang"]: 
                         style = 'color: #eab308; font-weight: 600;'
                     elif "⭐" in val:
-                        if len(val) >= 4: style = 'color: #22c55e;'
+                        if len(val) >= 5: style = 'color: #22c55e;'
                         else: style = 'color: #ef4444;'
                 return style
 
-            kolom_berwarna = ["Change (%)", "Momentum", "MA Signal", "MA Cross", "MACD", "Rekomendasi", "Likuiditas", "Status BB", "Status Akuisisi", "Risiko", "Total Score", "Vol Breakout"]
+            kolom_berwarna = ["Change (%)", "Momentum", "MA Signal", "MA Cross", "MACD", "Rekomendasi", "Likuiditas", "Status BB", "Status Akuisisi", "Risiko", "Total Score", "Vol Breakout", "Status Bandar", "OBV Trend"]
             kolom_berwarna_aktual = [col for col in kolom_berwarna if col in df_tampil.columns]
 
             tabel_akhir = df_tampil.style.format({
@@ -380,9 +385,10 @@ if not df_hasil.empty:
                 "RSI (14D)": "{:.0f}"
             }).map(warna_tabel, subset=kolom_berwarna_aktual)
 
+            # Menambahkan kolom bandarmologi ke urutan kunci
             urutan_kolom_tetap = [
                 "Ticker", "Harga (Rp)", "Harga MA20", "Support", "Resistance", "Change (%)", 
-                "Volume", "Vol Breakout", "RSI (14D)", "Momentum", "MA Signal", "MA Cross", "MACD",
+                "Volume", "Vol Breakout", "Status Bandar", "OBV Trend", "RSI (14D)", "Momentum", "MA Signal", "MA Cross", "MACD",
                 "Status BB", "Risiko", "Likuiditas", "Total Score", "Rekomendasi", "Status Akuisisi", "Terakhir Update"
             ]
             kolom_tersedia = [col for col in urutan_kolom_tetap if col in df_tampil.columns]
@@ -414,23 +420,24 @@ if not df_hasil.empty:
     # ISI TAB 3: INSIGHT & EDUKASI
     # ----------------------------------------
     with tab3:
-        st.markdown("### 📚 Panduan Membaca Screener")
+        st.markdown("### 📚 Panduan Membaca Screener & Bandarmologi")
         st.info("Gunakan panduan di bawah ini untuk memahami setiap metrik yang digunakan dalam AlgoTrade Screener.")
         
         st.markdown("""
+        * **🕵️ Status Bandar (Anomali Volume):**
+          * **Akumulasi Kuat:** Volume melonjak >200% dari rata-rata bulanan diiringi kenaikan harga. Sinyal kuat uang besar (*Big Money*) sedang memborong saham.
+          * **Distribusi Kuat:** Volume melonjak namun harga ditutup turun/merah. Tanda bahaya, uang besar sedang buang barang (*guyur*).
+        * **🌊 Tren Uang (OBV - On Balance Volume):** 
+          * Mengukur tekanan beli vs jual kumulatif. Jika **Akumulasi (Naik)**, arus dana masuk mengungguli dana keluar selama 5 hari terakhir.
         * **MA Cross (5/20):** 
-          * **Golden Cross:** Rata-rata harga 5 hari memotong ke atas 20 hari. Sinyal kuat untuk mulai mengakumulasi (beli).
-          * **Death Cross:** Rata-rata harga 5 hari memotong ke bawah 20 hari. Sinyal untuk waspada atau jual.
+          * **Golden Cross:** Rata-rata harga 5 hari memotong ke atas 20 hari. Sinyal teknikal kuat untuk beli.
         * **MACD (Moving Average Convergence Divergence):**
-          * **Strong Bullish / Bullish MACD:** Histogram MACD berada di atas garis sinyal, mengonfirmasi tren naik (*uptrend*) memiliki tenaga yang kuat.
+          * **Strong Bullish / Bullish MACD:** Histogram MACD berada di atas garis sinyal, mengonfirmasi *uptrend* bertenaga kuat.
         * **Support & Resistance:** 
-          * **Support:** Area batas bawah historis (20 hari terakhir). Sering digunakan sebagai acuan titik pantul atau area *cutloss*.
-          * **Resistance:** Area batas atas historis (20 hari terakhir). Sering digunakan sebagai target *Take Profit*.
-        * **Risiko (Tingkat Volatilitas):** Diukur menggunakan lebar pita *Bollinger Bands*.
+          * **Support:** Area batas bawah (20 hari). Acuan titik pantul atau area *cutloss*.
+          * **Resistance:** Area batas atas (20 hari). Acuan target *Take Profit*.
+        * **Risiko (Volatilitas Bollinger Bands):** 
           * **Tinggi (Merah):** Pergerakan harga liar dan cepat.
-          * **Rendah (Hijau):** Pergerakan harga sempit, berisiko rendah namun cenderung lambat (konsolidasi).
-        * **Vol Breakout (Tembus MA20):** 
-          * **Tembus MA20 (Hijau):** **SANGAT BAIK.** Menandakan volume transaksi melonjak tajam melampaui rata-rata bulanan, mengonfirmasi saham digerakkan oleh akumulasi dana besar (*Smart Money*).
-          * **Normal (Putih):** Aktivitas transaksi berjalan wajar seperti biasa.
-        * **Total Score (Maks 6 ⭐):** Saham dengan skor 5 ke atas mendapatkan rekomendasi **BELI**.
+          * **Rendah (Hijau):** Pergerakan harga sempit, berisiko rendah namun lambat.
+        * **Total Score (Maks 8 ⭐):** Menggabungkan 8 indikator sentimen dan teknikal. Saham dengan skor 6 ke atas mendapatkan rekomendasi **BELI**.
         """)
