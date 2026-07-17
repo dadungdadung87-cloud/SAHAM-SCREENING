@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import os
+import json  # <-- TAMBAHAN BARU UNTUK SAVE FILE PERMANEN
 from datetime import datetime
 import plotly.express as px
 
@@ -52,10 +53,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. DEFINISI MASTER INDIKATOR (UNTUK SINKRONISASI OTOMATIS)
+# 2. DEFINISI MASTER INDIKATOR
 # ==========================================
-# Jika di kemudian hari Anda ingin menambah filter baru, CUKUP TAMBAHKAN di dalam dictionary MASTER_FILTERS ini.
-# Sidebar dan Panel Utama akan otomatis mendeteksi dan menambahkannya ke layar.
 MASTER_FILTERS = {
     "Vol Breakout": {"label": "🔊 Volume", "options": ["Semua", "Tembus MA20", "Normal"]},
     "RSI (14D)": {"label": "📊 RSI (14D)", "options": ["Semua", "> 50 (Bullish)", "<= 50 (Bearish)"]},
@@ -72,47 +71,79 @@ MASTER_FILTERS = {
 }
 
 # ==========================================
-# 3. SIDEBAR - SISTEM PRESET FILTER CEPAT CUSTOM DINAMIS
+# 3. DATABASE PRESET PERMANEN (.JSON)
+# ==========================================
+FILE_PRESET = "preset_kustom.json"
+
+# Definisikan preset bawaan pabrik (Default)
+base_default = {k: "Semua" for k in MASTER_FILTERS.keys()}
+preset_super_ketat = base_default.copy()
+preset_super_ketat.update({"Vol Breakout": "Tembus MA20", "RSI (14D)": "> 50 (Bullish)", "MA Signal": "Uptrend", "Status BB": "Breakout Upper"})
+preset_uptrend_likuid = base_default.copy()
+preset_uptrend_likuid.update({"MA Signal": "Uptrend", "Likuiditas": "> 1 Miliar"})
+
+PRESET_BAWAAN = {
+    "🔥 Super Ketat (Swing Trading)": preset_super_ketat,
+    "🟢 Hanya Saham Uptrend & Likuid": preset_uptrend_likuid
+}
+
+# Fungsi memuat preset dari file JSON
+def muat_preset():
+    if os.path.exists(FILE_PRESET):
+        try:
+            with open(FILE_PRESET, "r") as f:
+                kustom = json.load(f)
+                # Gabungkan bawaan dengan kustom user
+                total_preset = PRESET_BAWAAN.copy()
+                total_preset.update(kustom)
+                return total_preset
+        except:
+            return PRESET_BAWAAN
+    return PRESET_BAWAAN
+
+# Fungsi menyimpan preset baru ke JSON
+def simpan_preset_baru(nama, kriteria):
+    data_kustom_lama = {}
+    if os.path.exists(FILE_PRESET):
+        try:
+            with open(FILE_PRESET, "r") as f:
+                data_kustom_lama = json.load(f)
+        except:
+            pass
+    
+    data_kustom_lama[nama] = kriteria
+    with open(FILE_PRESET, "w") as f:
+        json.dump(data_kustom_lama, f, indent=4)
+
+# Load data list preset terupdate
+daftar_preset_aktif = muat_preset()
+
+# ==========================================
+# 4. SIDEBAR - TAMPILAN
 # ==========================================
 st.sidebar.title("⚙️ Preset Filter Cepat")
 st.sidebar.markdown("Pilih preset kriteria bawaan atau aktifkan kriteria kustom Anda sendiri.")
 
-# Inisialisasi session state untuk menyimpan preset bawaan (Default)
-if 'custom_presets' not in st.session_state:
-    # Membuat preset bawaan yang otomatis mengisi semua komponen di MASTER_FILTERS dengan "Semua"
-    base_default = {k: "Semua" for k in MASTER_FILTERS.keys()}
-    
-    # Customisasi nilai spesifik untuk preset bawaan
-    preset_super_ketat = base_default.copy()
-    preset_super_ketat.update({"Vol Breakout": "Tembus MA20", "RSI (14D)": "> 50 (Bullish)", "MA Signal": "Uptrend", "Status BB": "Breakout Upper"})
-    
-    preset_uptrend_likuid = base_default.copy()
-    preset_uptrend_likuid.update({"MA Signal": "Uptrend", "Likuiditas": "> 1 Miliar"})
-
-    st.session_state.custom_presets = {
-        "🔥 Super Ketat (Swing Trading)": preset_super_ketat,
-        "🟢 Hanya Saham Uptrend & Likuid": preset_uptrend_likuid
-    }
-
-opsi_preset = ["Matikan Preset (Manual)"] + list(st.session_state.custom_presets.keys())
+opsi_preset = ["Matikan Preset (Manual)"] + list(daftar_preset_aktif.keys())
 preset_terpilih = st.sidebar.selectbox("🎯 Pilih Preset Aktif:", opsi_preset)
 
 st.sidebar.markdown("---")
 
-# AUTOMATED FILTER CREATOR (Mengikuti MASTER_FILTERS secara otomatis)
 with st.sidebar.expander("➕ Buat Preset Sendiri Kustom"):
     st.caption("Atur kombinasi kriteria di bawah ini lalu simpan ke sistem.")
     nama_preset_baru = st.text_input("Nama Preset Anda:", placeholder="Contoh: Akumulasi Uang Besar")
     
-    # Loop otomatis memunculkan pilihan dropdown di sidebar berdasarkan MASTER_FILTERS
     kustom_input_user = {}
     for key, info in MASTER_FILTERS.items():
         kustom_input_user[key] = st.selectbox(f"P-{info['label']}", info['options'], key=f"sidebar_{key}")
     
     if st.button("💾 Simpan Jadi Preset Cepat"):
         if nama_preset_baru.strip():
-            st.session_state.custom_presets[nama_preset_baru.strip()] = kustom_input_user
-            st.success(f"Preset '{nama_preset_baru}' disimpan! Silakan pilih di menu atas.")
+            # Simpan secara fisik ke file JSON
+            simpan_preset_baru(nama_preset_baru.strip(), kustom_input_user)
+            st.success(f"Preset '{nama_preset_baru}' Berhasil Disimpan!")
+            # Memicu Streamlit me-refresh UI agar pilihan langsung muncul seketika
+            st.rerun()
         else:
             st.error("Nama preset tidak boleh kosong!")
 
@@ -120,7 +151,7 @@ st.sidebar.markdown("---")
 st.sidebar.caption("© AlgoTrade Screener")
 
 # ==========================================
-# 4. MEMUAT DATA LOKAL
+# 5. MEMUAT DATA LOKAL
 # ==========================================
 FILE_HASIL = "hasil_screener.csv"
 FILE_AKUISISI = "data_akuisisi.csv"
@@ -143,7 +174,7 @@ else:
     df_hasil = pd.DataFrame()
 
 # ==========================================
-# 5. PEMBAGIAN SISTEM TAB & KONTEN
+# 6. PEMBAGIAN SISTEM TAB & KONTEN
 # ==========================================
 if not df_hasil.empty:
     
@@ -230,16 +261,13 @@ if not df_hasil.empty:
     # ----------------------------------------
     with tab2:
         use_preset = preset_terpilih != "Matikan Preset (Manual)"
-        vals = st.session_state.custom_presets[preset_terpilih] if use_preset else None
+        vals = daftar_preset_aktif[preset_terpilih] if use_preset else None
 
-        # RENDER PANEL FILTER SECARA DINAMIS & OTOMATIS BERDASARKAN MASTER_FILTERS
         with st.expander("🎛️ Buka Panel Filter Lengkap (Klik untuk menyesuaikan kriteria)", expanded=False):
-            # Membagi area filter menjadi susunan 3 kolom seimbang
             col_f1, col_f2, col_f3 = st.columns(3)
             
             filter_terpilih_tabel = {}
             
-            # Mendistribusikan ke-12 filter secara merata ke dalam 3 kolom layout
             for idx, (db_key, info) in enumerate(MASTER_FILTERS.items()):
                 target_col = col_f1 if idx % 3 == 0 else (col_f2 if idx % 3 == 1 else col_f3)
                 
@@ -257,7 +285,7 @@ if not df_hasil.empty:
         with col_search:
             search_ticker = st.text_input("🔍 Cari Kode Saham Spesifik (Contoh: BBCA, BMRI)", "", placeholder="Ketik kode...")
 
-        # LOGIKA FILTERING DATA OTOMATIS BERDASARKAN SELECTION USER
+        # LOGIKA FILTERING DATA
         df_filtered = df_hasil.copy()
         
         if search_ticker: 
@@ -364,7 +392,7 @@ if not df_hasil.empty:
                 mime='text/csv',
             )
         else:
-            st.warning("Tidak ada saham yang memenuhi kriteria filter Anda saat ini.")
+            st.warning("Tidak ada saham yang memenuhi kombinasi kriteria filter kustom Anda saat ini. (Silakan sesuaikan kriteria kembali)")
 
     # ----------------------------------------
     # ISI TAB 3: INSIGHT & EDUKASI
