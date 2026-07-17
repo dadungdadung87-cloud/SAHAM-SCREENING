@@ -53,16 +53,15 @@ def hitung_semua_indikator(df_saham):
     change_pct = (change_rp / close_yest) * 100
     momentum = "Positif" if change_rp > 0 else "Negatif"
     
-    # --- IDE BARU 1: DETEKSI GAP (Manipulasi Pre-Opening Bandar) ---
+    # Deteksi GAP
     gap_pct = ((open_today - close_yest) / close_yest) * 100
     if gap_pct >= 2.0: status_gap = f"Gap Up (+{gap_pct:.1f}%)"
     elif gap_pct <= -2.0: status_gap = f"Gap Down ({gap_pct:.1f}%)"
     else: status_gap = "Normal"
     
-    # --- IDE BARU 2: TEKANAN BANDAR (Wick & Body Analysis) ---
+    # Deteksi Tekanan Bandar (Wick Analysis)
     range_today = high_today - low_today
     if range_today > 0:
-        # Mengukur posisi penutupan relatif terhadap range harian
         buying_power = (close_today - low_today) / range_today
         if buying_power > 0.7: tekanan = "Dominan Beli (Hajar Kanan)"
         elif buying_power < 0.3: tekanan = "Dominan Jual (Guyur)"
@@ -99,7 +98,7 @@ def hitung_semua_indikator(df_saham):
     elif macd_val < sig_val and macd_val < 0: status_macd = "Strong Bearish"
     else: status_macd = "Bearish MACD"
     
-    # Status Bandar (Anomali Volume)
+    # Status Bandar
     if vol_today > (vol_ma_20 * 2):
         if close_today > open_today: status_bandar = "Akumulasi Kuat"
         elif close_today < open_today: status_bandar = "Distribusi Kuat"
@@ -107,7 +106,7 @@ def hitung_semua_indikator(df_saham):
     else:
         status_bandar = "Normal"
 
-    # OBV Trend (5 Hari)
+    # OBV Trend
     obv = [0]
     for i in range(1, len(df_saham)):
         if df_saham['Close'].iloc[i] > df_saham['Close'].iloc[i-1]: obv.append(obv[-1] + df_saham['Volume'].iloc[i])
@@ -121,7 +120,7 @@ def hitung_semua_indikator(df_saham):
     elif obv_sekarang < obv_5_hari_lalu: obv_trend = "Distribusi (Turun)"
     else: obv_trend = "Netral"
     
-    # Bollinger Bands, Support, Resistance & Risiko
+    # Bollinger Bands
     std_20 = df_saham['Close'].rolling(window=20).std().iloc[-1].item()
     upper_bb = ma_20 + (std_20 * 2)
     lower_bb = ma_20 - (std_20 * 2)
@@ -159,10 +158,10 @@ def hitung_semua_indikator(df_saham):
     }
 
 # ==========================================
-# SECTION 4: SISTEM PENILAIAN (SKOR) & EKSEKUSI UTAMA
+# SECTION 4: SISTEM PENILAIAN & EKSEKUSI UTAMA
 # ==========================================
 def main():
-    print("⏳ Memulai pembaruan data saham (Advanced Bandar Version)...")
+    print("⏳ Memulai pembaruan data saham (Tahan Banting Version)...")
     daftar_saham = load_tickers()
     if not daftar_saham: return
     
@@ -182,7 +181,6 @@ def main():
                     ind = hitung_semua_indikator(df_saham)
                     kat, per, pbv = get_fundamental(t_jk)
                     
-                    # Logika Skoring (Maks 10)
                     score = 0
                     if ind["Vol Breakout"] == "Tembus MA20": score += 1
                     if ind["RSI (14D)"] > 50: score += 1
@@ -214,6 +212,8 @@ def main():
         df_hasil = pd.DataFrame(hasil)
         df_hasil.to_csv(FILE_HASIL, index=False)
         print(f"✅ Selesai! Data berhasil diperbarui.")
+        # BARIS INI AKAN MEMBUKTIKAN BAHWA KOLOM BARU SUDAH MASUK!
+        print(f"🔍 Validasi Kolom Tersimpan: {list(df_hasil.columns)}")
 
 if __name__ == "__main__":
     main()
