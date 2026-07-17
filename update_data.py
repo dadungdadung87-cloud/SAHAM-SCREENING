@@ -25,7 +25,6 @@ def main():
         try:
             t_jk = f"{ticker}.JK"
             if t_jk in data_mentah:
-                # Membutuhkan kolom 'Open' untuk mendeteksi warna candle (Akumulasi/Distribusi)
                 df_saham = data_mentah[t_jk].dropna(subset=['Open', 'Close', 'Volume', 'High', 'Low'])
                 
                 if len(df_saham) >= 26:
@@ -69,38 +68,27 @@ def main():
                     elif macd_val < sig_val and macd_val < 0: status_macd = "Strong Bearish"
                     else: status_macd = "Bearish MACD"
                     
-                    # --- IDE BARU 1: STATUS BANDAR (Deteksi Anomali Volume + Price Action) ---
-                    # Jika volume hari ini melonjak > 2x lipat dari rata-rata (Uang besar beraksi)
+                    # Status Bandar
                     if vol_today > (vol_ma_20 * 2):
-                        if close_today > open_today:
-                            status_bandar = "Akumulasi Kuat" # Tarik harga ke atas
-                        elif close_today < open_today:
-                            status_bandar = "Distribusi Kuat" # Buang barang (Guyur)
-                        else:
-                            status_bandar = "Normal"
+                        if close_today > open_today: status_bandar = "Akumulasi Kuat"
+                        elif close_today < open_today: status_bandar = "Distribusi Kuat"
+                        else: status_bandar = "Normal"
                     else:
                         status_bandar = "Normal"
 
-                    # --- IDE BARU 2: ON-BALANCE VOLUME (OBV) TREND ---
+                    # OBV Trend
                     obv = [0]
                     for i in range(1, len(df_saham)):
-                        if df_saham['Close'].iloc[i] > df_saham['Close'].iloc[i-1]:
-                            obv.append(obv[-1] + df_saham['Volume'].iloc[i])
-                        elif df_saham['Close'].iloc[i] < df_saham['Close'].iloc[i-1]:
-                            obv.append(obv[-1] - df_saham['Volume'].iloc[i])
-                        else:
-                            obv.append(obv[-1])
+                        if df_saham['Close'].iloc[i] > df_saham['Close'].iloc[i-1]: obv.append(obv[-1] + df_saham['Volume'].iloc[i])
+                        elif df_saham['Close'].iloc[i] < df_saham['Close'].iloc[i-1]: obv.append(obv[-1] - df_saham['Volume'].iloc[i])
+                        else: obv.append(obv[-1])
                     df_saham['OBV'] = obv
                     
-                    # Cek tren OBV 5 hari terakhir
                     obv_sekarang = df_saham['OBV'].iloc[-1]
                     obv_5_hari_lalu = df_saham['OBV'].iloc[-6]
-                    if obv_sekarang > obv_5_hari_lalu:
-                        obv_trend = "Akumulasi (Naik)"
-                    elif obv_sekarang < obv_5_hari_lalu:
-                        obv_trend = "Distribusi (Turun)"
-                    else:
-                        obv_trend = "Netral"
+                    if obv_sekarang > obv_5_hari_lalu: obv_trend = "Akumulasi (Naik)"
+                    elif obv_sekarang < obv_5_hari_lalu: obv_trend = "Distribusi (Turun)"
+                    else: obv_trend = "Netral"
                     
                     # Bollinger Bands & Risiko
                     std_20 = df_saham['Close'].rolling(window=20).std().iloc[-1].item()
@@ -129,6 +117,25 @@ def main():
                     rs = avg_gain / avg_loss
                     rsi_raw = (100 - (100 / (1 + rs))).iloc[-1].item()
                     rsi = int(round(rsi_raw)) if not pd.isna(rsi_raw) else 0
+
+                    # --- IDE BARU: FUNDAMENTAL RINGAN ---
+                    try:
+                        ticker_obj = yf.Ticker(t_jk)
+                        info_data = ticker_obj.info
+                        mcap = info_data.get('marketCap', 0)
+                        per = info_data.get('trailingPE', 0)
+                        pbv = info_data.get('priceToBook', 0)
+                    except:
+                        mcap, per, pbv = 0, 0, 0
+
+                    if mcap > 10000000000000:
+                        kategori_saham = "Big Cap (Lapis 1)"
+                    elif mcap > 1000000000000:
+                        kategori_saham = "Mid Cap (Lapis 2)"
+                    elif mcap > 0:
+                        kategori_saham = "Small Cap (Lapis 3)"
+                    else:
+                        kategori_saham = "Tidak Diketahui"
                     
                     # Kalkulasi Skor (Maksimal 8)
                     score = 0
@@ -138,8 +145,8 @@ def main():
                     if ma_signal == "Uptrend": score += 1
                     if ma_cross in ["Golden Cross", "Bullish"]: score += 1
                     if status_macd in ["Strong Bullish", "Bullish MACD"]: score += 1
-                    if status_bandar == "Akumulasi Kuat": score += 1  # Skor Bandarmologi
-                    if obv_trend == "Akumulasi (Naik)": score += 1   # Skor Bandarmologi
+                    if status_bandar == "Akumulasi Kuat": score += 1  
+                    if obv_trend == "Akumulasi (Naik)": score += 1   
 
                     rekomendasi = "BELI" if score >= 6 else "WAIT & SEE"
                     nilai_transaksi = close_today * vol_today
@@ -150,24 +157,28 @@ def main():
                     hasil.append({
                         "Ticker": ticker,
                         "Harga (Rp)": close_today,
+                        "Kategori": kategori_saham,   # <--- KOLOM BARU DITAMBAHKAN
+                        "PER (x)": per,               # <--- KOLOM BARU DITAMBAHKAN
+                        "PBV (x)": pbv,               # <--- KOLOM BARU DITAMBAHKAN
                         "Harga MA20": int(ma_20),
                         "Support": int(support_20),
                         "Resistance": int(resist_20),
                         "Change (%)": change_pct,
                         "Volume": vol_today,
                         "Vol Breakout": vol_breakout,
+                        "Status Bandar": status_bandar,
+                        "OBV Trend": obv_trend,
                         "RSI (14D)": rsi,
                         "Momentum": momentum,
                         "MA Signal": ma_signal,
                         "MA Cross": ma_cross,         
                         "MACD": status_macd,
-                        "Status Bandar": status_bandar, # <--- KOLOM BARU DITAMBAHKAN
-                        "OBV Trend": obv_trend,         # <--- KOLOM BARU DITAMBAHKAN
                         "Status BB": status_bb, 
                         "Risiko": risiko,
                         "Likuiditas": likuiditas,
                         "Total Score": score,
                         "Rekomendasi": rekomendasi,
+                        "Status Akuisisi": "TIDAK ADA", # Dikosongkan agar ditimpa app.py
                         "Terakhir Update": waktu_sekarang
                     })
         except Exception as e:
