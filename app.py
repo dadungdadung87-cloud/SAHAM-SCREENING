@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import os
-import json  # <-- TAMBAHAN BARU UNTUK SAVE FILE PERMANEN
+import json  
 from datetime import datetime
 import plotly.express as px
 
@@ -75,7 +75,6 @@ MASTER_FILTERS = {
 # ==========================================
 FILE_PRESET = "preset_kustom.json"
 
-# Definisikan preset bawaan pabrik (Default)
 base_default = {k: "Semua" for k in MASTER_FILTERS.keys()}
 preset_super_ketat = base_default.copy()
 preset_super_ketat.update({"Vol Breakout": "Tembus MA20", "RSI (14D)": "> 50 (Bullish)", "MA Signal": "Uptrend", "Status BB": "Breakout Upper"})
@@ -87,13 +86,11 @@ PRESET_BAWAAN = {
     "🟢 Hanya Saham Uptrend & Likuid": preset_uptrend_likuid
 }
 
-# Fungsi memuat preset dari file JSON
 def muat_preset():
     if os.path.exists(FILE_PRESET):
         try:
             with open(FILE_PRESET, "r") as f:
                 kustom = json.load(f)
-                # Gabungkan bawaan dengan kustom user
                 total_preset = PRESET_BAWAAN.copy()
                 total_preset.update(kustom)
                 return total_preset
@@ -101,7 +98,6 @@ def muat_preset():
             return PRESET_BAWAAN
     return PRESET_BAWAAN
 
-# Fungsi menyimpan preset baru ke JSON
 def simpan_preset_baru(nama, kriteria):
     data_kustom_lama = {}
     if os.path.exists(FILE_PRESET):
@@ -115,7 +111,6 @@ def simpan_preset_baru(nama, kriteria):
     with open(FILE_PRESET, "w") as f:
         json.dump(data_kustom_lama, f, indent=4)
 
-# Load data list preset terupdate
 daftar_preset_aktif = muat_preset()
 
 # ==========================================
@@ -125,7 +120,23 @@ st.sidebar.title("⚙️ Preset Filter Cepat")
 st.sidebar.markdown("Pilih preset kriteria bawaan atau aktifkan kriteria kustom Anda sendiri.")
 
 opsi_preset = ["Matikan Preset (Manual)"] + list(daftar_preset_aktif.keys())
-preset_terpilih = st.sidebar.selectbox("🎯 Pilih Preset Aktif:", opsi_preset)
+
+# --- SOLUSI MASALAH NO 2: Gunakan session_state sebagai indeks default dropdown agar otomatis berpindah ---
+if 'preset_berjalan' not in st.session_state:
+    st.session_state.preset_berjalan = "Matikan Preset (Manual)"
+
+# Jika preset yang tersimpan di memori tidak ada di opsi (misal baru dihapus), kembalikan ke manual
+if st.session_state.preset_berjalan not in opsi_preset:
+    st.session_state.preset_berjalan = "Matikan Preset (Manual)"
+
+preset_terpilih = st.sidebar.selectbox(
+    "🎯 Pilih Preset Aktif:", 
+    opsi_preset, 
+    index=opsi_preset.index(st.session_state.preset_berjalan)
+)
+
+# Selaras isi memori dengan apa yang diklik user saat ini
+st.session_state.preset_berjalan = preset_terpilih
 
 st.sidebar.markdown("---")
 
@@ -138,11 +149,12 @@ with st.sidebar.expander("➕ Buat Preset Sendiri Kustom"):
         kustom_input_user[key] = st.selectbox(f"P-{info['label']}", info['options'], key=f"sidebar_{key}")
     
     if st.button("💾 Simpan Jadi Preset Cepat"):
-        if nama_preset_baru.strip():
-            # Simpan secara fisik ke file JSON
-            simpan_preset_baru(nama_preset_baru.strip(), kustom_input_user)
-            st.success(f"Preset '{nama_preset_baru}' Berhasil Disimpan!")
-            # Memicu Streamlit me-refresh UI agar pilihan langsung muncul seketika
+        nama_bersih = nama_preset_baru.strip()
+        if nama_bersih:
+            simpan_preset_baru(nama_bersih, kustom_input_user)
+            # --- SOLUSI UTAMA: Paksa dropdown utama langsung berganti ke nama preset baru ini ---
+            st.session_state.preset_berjalan = nama_bersih
+            st.success(f"Preset '{nama_bersih}' Berhasil Disimpan & Diaktifkan!")
             st.rerun()
         else:
             st.error("Nama preset tidak boleh kosong!")
@@ -260,8 +272,8 @@ if not df_hasil.empty:
     # ISI TAB 2: SCREENER UTAMA (FILTER & TABEL)
     # ----------------------------------------
     with tab2:
-        use_preset = preset_terpilih != "Matikan Preset (Manual)"
-        vals = daftar_preset_aktif[preset_terpilih] if use_preset else None
+        use_preset = st.session_state.preset_berjalan != "Matikan Preset (Manual)"
+        vals = daftar_preset_aktif[st.session_state.preset_berjalan] if use_preset else None
 
         with st.expander("🎛️ Buka Panel Filter Lengkap (Klik untuk menyesuaikan kriteria)", expanded=False):
             col_f1, col_f2, col_f3 = st.columns(3)
