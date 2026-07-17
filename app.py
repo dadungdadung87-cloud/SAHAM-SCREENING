@@ -56,6 +56,7 @@ st.markdown("""
 # 2. DEFINISI MASTER INDIKATOR
 # ==========================================
 MASTER_FILTERS = {
+    "Kategori": {"label": "🏢 Kategori Saham", "options": ["Semua", "Big Cap (Lapis 1)", "Mid Cap (Lapis 2)", "Small Cap (Lapis 3)"]},
     "Status Bandar": {"label": "🕵️ Status Bandar", "options": ["Semua", "Akumulasi Kuat", "Distribusi Kuat", "Normal"]},
     "OBV Trend": {"label": "🌊 Tren Uang (OBV)", "options": ["Semua", "Akumulasi (Naik)", "Distribusi (Turun)", "Netral"]},
     "Vol Breakout": {"label": "🔊 Volume", "options": ["Semua", "Tembus MA20", "Normal"]},
@@ -82,13 +83,13 @@ preset_super_ketat = base_default.copy()
 preset_super_ketat.update({
     "Vol Breakout": "Tembus MA20", "RSI (14D)": "> 50 (Bullish)", 
     "MA Signal": "Uptrend", "Status BB": "Breakout Upper",
-    "Status Bandar": "Akumulasi Kuat"
+    "Status Bandar": "Akumulasi Kuat", "Kategori": "Big Cap (Lapis 1)"
 })
 preset_uptrend_likuid = base_default.copy()
 preset_uptrend_likuid.update({"MA Signal": "Uptrend", "Likuiditas": "> 1 Miliar"})
 
 PRESET_BAWAAN = {
-    "🔥 Super Ketat (Swing Trading)": preset_super_ketat,
+    "🔥 Aman & Akumulasi (Bluechip)": preset_super_ketat,
     "🟢 Hanya Saham Uptrend & Likuid": preset_uptrend_likuid
 }
 
@@ -185,6 +186,9 @@ if os.path.exists(FILE_HASIL):
     
     if os.path.exists(FILE_AKUISISI):
         df_akuisisi = pd.read_csv(FILE_AKUISISI)
+        # Hapus kolom sementara dan timpa dengan data akusisi asli
+        if "Status Akuisisi" in df_hasil.columns:
+            df_hasil = df_hasil.drop(columns=["Status Akuisisi"])
         df_hasil = pd.merge(df_hasil, df_akuisisi, on="Ticker", how="left")
         df_hasil["Status Akuisisi"] = df_hasil["Status Akuisisi"].fillna("TIDAK ADA")
     else:
@@ -281,6 +285,7 @@ if not df_hasil.empty:
     # ----------------------------------------
     with tab2:
         with st.expander("🎛️ Buka Panel Filter Lengkap (Klik untuk menyesuaikan kriteria)", expanded=False):
+            # Membagi 15 kolom ke dalam 4 layout grid
             col_f1, col_f2, col_f3, col_f4 = st.columns(4)
             
             filter_terpilih_tabel = {}
@@ -341,7 +346,6 @@ if not df_hasil.empty:
             def format_persen_ikon(val):
                 if pd.isna(val): return "-"
                 if val == 0: return "0.00%"
-                # Menggunakan simbol standar panah (▲ / ▼) agar support di semua font
                 ikon = "▲ " if val > 0 else "▼ "
                 return f"{ikon}{val:+.2f}%"
 
@@ -349,6 +353,10 @@ if not df_hasil.empty:
                 if val == "Positif": return "▲ Positif"
                 if val == "Negatif": return "▼ Negatif"
                 return val
+                
+            def format_desimal(val):
+                if pd.isna(val) or val == 0: return "-"
+                return f"{val:.2f}"
 
             df_tampil["Total Score"] = df_tampil["Total Score"].apply(format_skor_bintang_bersih)
             
@@ -358,30 +366,26 @@ if not df_hasil.empty:
             
             def warna_tabel(val):
                 style = '' 
-                # Logika Baru: Mengecek dan mewarnai nilai mentah (float/angka) untuk kolom Change (%)
                 if isinstance(val, (int, float)):
                     if val > 0:
-                        style = 'color: #22c55e; font-weight: 600;' # Hijau
+                        style = 'color: #22c55e; font-weight: 600;' 
                     elif val < 0:
-                        style = 'color: #ef4444; font-weight: 600;' # Merah
-                    # Jika val == 0, style tetap '' sehingga teks menjadi warna putih bawaan
-                
-                # Logika untuk kolom lain yang berbasis teks (string)
+                        style = 'color: #ef4444; font-weight: 600;' 
                 elif isinstance(val, str):
-                    if any(x in val for x in ["Positif", "Uptrend", "BELI", "Breakout Upper", "Bottom Rebound", "DALAM AKUISISI", "Rendah", "Golden Cross", "Bullish", "Tembus MA20", "Akumulasi"]): 
+                    if any(x in val for x in ["Positif", "Uptrend", "BELI", "Breakout Upper", "Bottom Rebound", "DALAM AKUISISI", "Rendah", "▲", "Golden Cross", "Bullish", "Tembus MA20", "Akumulasi", "Big Cap"]): 
                         style = 'color: #22c55e; font-weight: 600;'
-                    elif any(x in val for x in ["Negatif", "Downtrend", "WAIT & SEE", "Tinggi", "Death Cross", "Bearish", "Distribusi"]): 
+                    elif any(x in val for x in ["Negatif", "Downtrend", "WAIT & SEE", "Tinggi", "▼", "Death Cross", "Bearish", "Distribusi", "Small Cap"]): 
                         style = 'color: #ef4444; font-weight: 600;'
                     elif val == "> 1 Miliar": 
                         style = 'color: #3b82f6; font-weight: 600;'
-                    elif val in ["Squeeze", "RENCANA AKUISISI", "Sedang"]: 
+                    elif any(x in val for x in ["Squeeze", "RENCANA AKUISISI", "Sedang", "Mid Cap"]): 
                         style = 'color: #eab308; font-weight: 600;'
                     elif "⭐" in val:
                         if len(val) >= 5: style = 'color: #22c55e;'
                         else: style = 'color: #ef4444;'
                 return style
 
-            kolom_berwarna = ["Change (%)", "Momentum", "MA Signal", "MA Cross", "MACD", "Rekomendasi", "Likuiditas", "Status BB", "Status Akuisisi", "Risiko", "Total Score", "Vol Breakout", "Status Bandar", "OBV Trend"]
+            kolom_berwarna = ["Change (%)", "Momentum", "MA Signal", "MA Cross", "MACD", "Rekomendasi", "Likuiditas", "Status BB", "Status Akuisisi", "Risiko", "Total Score", "Vol Breakout", "Status Bandar", "OBV Trend", "Kategori"]
             kolom_berwarna_aktual = [col for col in kolom_berwarna if col in df_tampil.columns]
 
             tabel_akhir = df_tampil.style.format({
@@ -392,11 +396,13 @@ if not df_hasil.empty:
                 "Volume": format_angka,
                 "Change (%)": format_persen_ikon,
                 "Momentum": format_momentum_ikon,
+                "PER (x)": format_desimal,
+                "PBV (x)": format_desimal,
                 "RSI (14D)": "{:.0f}"
             }).map(warna_tabel, subset=kolom_berwarna_aktual)
 
             urutan_kolom_tetap = [
-                "Ticker", "Harga (Rp)", "Harga MA20", "Support", "Resistance", "Change (%)", 
+                "Ticker", "Kategori", "Harga (Rp)", "PER (x)", "PBV (x)", "Harga MA20", "Support", "Resistance", "Change (%)", 
                 "Volume", "Vol Breakout", "Status Bandar", "OBV Trend", "RSI (14D)", "Momentum", "MA Signal", "MA Cross", "MACD",
                 "Status BB", "Risiko", "Likuiditas", "Total Score", "Rekomendasi", "Status Akuisisi", "Terakhir Update"
             ]
@@ -429,24 +435,21 @@ if not df_hasil.empty:
     # ISI TAB 3: INSIGHT & EDUKASI
     # ----------------------------------------
     with tab3:
-        st.markdown("### 📚 Panduan Membaca Screener & Bandarmologi")
+        st.markdown("### 📚 Panduan Membaca Screener & Fundamental")
         st.info("Gunakan panduan di bawah ini untuk memahami setiap metrik yang digunakan dalam AlgoTrade Screener.")
         
         st.markdown("""
+        * **🏢 Kategori Saham (Market Cap):**
+          * **Big Cap (Lapis 1):** Kapitalisasi > 10 Triliun. Bluechip, sangat aman, pergerakan stabil (Hijau).
+          * **Mid Cap (Lapis 2):** Kapitalisasi 1 - 10 Triliun. Saham bertumbuh dengan potensi apresiasi tinggi (Kuning).
+          * **Small Cap (Lapis 3):** Kapitalisasi < 1 Triliun. Saham berisiko tinggi / gorengan, mudah digerakkan (Merah).
+        * **💰 Valuasi (PER & PBV):**
+          * **PER (Price to Earnings):** Angka di bawah 15x umumnya dianggap murah (undervalued).
+          * **PBV (Price to Book):** Angka di bawah 1x berarti saham dihargai lebih rendah dari nilai aset bersihnya (sangat murah).
         * **🕵️ Status Bandar (Anomali Volume):**
           * **Akumulasi Kuat:** Volume melonjak >200% dari rata-rata bulanan diiringi kenaikan harga. Sinyal kuat uang besar (*Big Money*) sedang memborong saham.
           * **Distribusi Kuat:** Volume melonjak namun harga ditutup turun/merah. Tanda bahaya, uang besar sedang buang barang (*guyur*).
         * **🌊 Tren Uang (OBV - On Balance Volume):** 
           * Mengukur tekanan beli vs jual kumulatif. Jika **Akumulasi (Naik)**, arus dana masuk mengungguli dana keluar selama 5 hari terakhir.
-        * **MA Cross (5/20):** 
-          * **Golden Cross:** Rata-rata harga 5 hari memotong ke atas 20 hari. Sinyal teknikal kuat untuk beli.
-        * **MACD (Moving Average Convergence Divergence):**
-          * **Strong Bullish / Bullish MACD:** Histogram MACD berada di atas garis sinyal, mengonfirmasi *uptrend* bertenaga kuat.
-        * **Support & Resistance:** 
-          * **Support:** Area batas bawah (20 hari). Acuan titik pantul atau area *cutloss*.
-          * **Resistance:** Area batas atas (20 hari). Acuan target *Take Profit*.
-        * **Risiko (Volatilitas Bollinger Bands):** 
-          * **Tinggi (Merah):** Pergerakan harga liar dan cepat.
-          * **Rendah (Hijau):** Pergerakan harga sempit, berisiko rendah namun lambat.
         * **Total Score (Maks 8 ⭐):** Menggabungkan 8 indikator sentimen dan teknikal. Saham dengan skor 6 ke atas mendapatkan rekomendasi **BELI**.
         """)
