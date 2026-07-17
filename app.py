@@ -53,7 +53,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. DEFINISI MASTER INDIKATOR (DITAMBAHKAN BANDARMOLOGI)
+# 2. DEFINISI MASTER INDIKATOR
 # ==========================================
 MASTER_FILTERS = {
     "Status Bandar": {"label": "🕵️ Status Bandar", "options": ["Semua", "Akumulasi Kuat", "Distribusi Kuat", "Normal"]},
@@ -119,9 +119,11 @@ def simpan_preset_baru(nama, kriteria):
 
 daftar_preset_aktif = muat_preset()
 
+# Inisialisasi State Awal
 if "preset_selector" not in st.session_state:
     st.session_state.preset_selector = "Matikan Preset (Manual)"
 
+# FUNGSI CALLBACK
 def apply_preset():
     chosen = st.session_state.preset_selector
     if chosen != "Matikan Preset (Manual)":
@@ -279,7 +281,6 @@ if not df_hasil.empty:
     # ----------------------------------------
     with tab2:
         with st.expander("🎛️ Buka Panel Filter Lengkap (Klik untuk menyesuaikan kriteria)", expanded=False):
-            # Membagi 14 kolom ke dalam 4 layout grid agar tidak memanjang ke bawah
             col_f1, col_f2, col_f3, col_f4 = st.columns(4)
             
             filter_terpilih_tabel = {}
@@ -339,12 +340,14 @@ if not df_hasil.empty:
 
             def format_persen_ikon(val):
                 if pd.isna(val): return "-"
-                ikon = "🔺 " if val > 0 else ("🔻 " if val < 0 else "")
+                if val == 0: return "0.00%"
+                # Menggunakan simbol standar panah (▲ / ▼) agar support di semua font
+                ikon = "▲ " if val > 0 else "▼ "
                 return f"{ikon}{val:+.2f}%"
 
             def format_momentum_ikon(val):
-                if val == "Positif": return "🔺 Positif"
-                if val == "Negatif": return "🔻 Negatif"
+                if val == "Positif": return "▲ Positif"
+                if val == "Negatif": return "▼ Negatif"
                 return val
 
             df_tampil["Total Score"] = df_tampil["Total Score"].apply(format_skor_bintang_bersih)
@@ -355,12 +358,19 @@ if not df_hasil.empty:
             
             def warna_tabel(val):
                 style = '' 
-                if isinstance(val, str):
-                    # Menambahkan warna hijau untuk Akumulasi Kuat & Akumulasi (Naik)
-                    if any(x in val for x in ["Positif", "Uptrend", "BELI", "Breakout Upper", "Bottom Rebound", "DALAM AKUISISI", "Rendah", "🔺", "Golden Cross", "Bullish", "Tembus MA20", "Akumulasi"]): 
+                # Logika Baru: Mengecek dan mewarnai nilai mentah (float/angka) untuk kolom Change (%)
+                if isinstance(val, (int, float)):
+                    if val > 0:
+                        style = 'color: #22c55e; font-weight: 600;' # Hijau
+                    elif val < 0:
+                        style = 'color: #ef4444; font-weight: 600;' # Merah
+                    # Jika val == 0, style tetap '' sehingga teks menjadi warna putih bawaan
+                
+                # Logika untuk kolom lain yang berbasis teks (string)
+                elif isinstance(val, str):
+                    if any(x in val for x in ["Positif", "Uptrend", "BELI", "Breakout Upper", "Bottom Rebound", "DALAM AKUISISI", "Rendah", "Golden Cross", "Bullish", "Tembus MA20", "Akumulasi"]): 
                         style = 'color: #22c55e; font-weight: 600;'
-                    # Menambahkan warna merah untuk Distribusi
-                    elif any(x in val for x in ["Negatif", "Downtrend", "WAIT & SEE", "Tinggi", "🔻", "Death Cross", "Bearish", "Distribusi"]): 
+                    elif any(x in val for x in ["Negatif", "Downtrend", "WAIT & SEE", "Tinggi", "Death Cross", "Bearish", "Distribusi"]): 
                         style = 'color: #ef4444; font-weight: 600;'
                     elif val == "> 1 Miliar": 
                         style = 'color: #3b82f6; font-weight: 600;'
@@ -385,7 +395,6 @@ if not df_hasil.empty:
                 "RSI (14D)": "{:.0f}"
             }).map(warna_tabel, subset=kolom_berwarna_aktual)
 
-            # Menambahkan kolom bandarmologi ke urutan kunci
             urutan_kolom_tetap = [
                 "Ticker", "Harga (Rp)", "Harga MA20", "Support", "Resistance", "Change (%)", 
                 "Volume", "Vol Breakout", "Status Bandar", "OBV Trend", "RSI (14D)", "Momentum", "MA Signal", "MA Cross", "MACD",
