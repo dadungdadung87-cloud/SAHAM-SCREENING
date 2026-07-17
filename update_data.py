@@ -38,19 +38,38 @@ def get_fundamental(ticker_jk):
     return kategori_saham, per, pbv
 
 # ==========================================
-# SECTION 3: KALKULASI TEKNIKAL & BANDARMOLOGI
+# SECTION 3: KALKULASI TEKNIKAL & BANDARMOLOGI ADVANCED
 # ==========================================
 def hitung_semua_indikator(df_saham):
     # Harga dan Volume Dasar
     close_today = df_saham['Close'].iloc[-1].item()
     close_yest = df_saham['Close'].iloc[-2].item()
     open_today = df_saham['Open'].iloc[-1].item()
+    high_today = df_saham['High'].iloc[-1].item()
+    low_today = df_saham['Low'].iloc[-1].item()
     vol_today = int(df_saham['Volume'].iloc[-1].item()) if not pd.isna(df_saham['Volume'].iloc[-1].item()) else 0
     
     change_rp = close_today - close_yest
     change_pct = (change_rp / close_yest) * 100
     momentum = "Positif" if change_rp > 0 else "Negatif"
     
+    # --- IDE BARU 1: DETEKSI GAP (Manipulasi Pre-Opening Bandar) ---
+    gap_pct = ((open_today - close_yest) / close_yest) * 100
+    if gap_pct >= 2.0: status_gap = f"Gap Up (+{gap_pct:.1f}%)"
+    elif gap_pct <= -2.0: status_gap = f"Gap Down ({gap_pct:.1f}%)"
+    else: status_gap = "Normal"
+    
+    # --- IDE BARU 2: TEKANAN BANDAR (Wick & Body Analysis) ---
+    range_today = high_today - low_today
+    if range_today > 0:
+        # Mengukur posisi penutupan relatif terhadap range harian
+        buying_power = (close_today - low_today) / range_today
+        if buying_power > 0.7: tekanan = "Dominan Beli (Hajar Kanan)"
+        elif buying_power < 0.3: tekanan = "Dominan Jual (Guyur)"
+        else: tekanan = "Seimbang / Adu Mekanik"
+    else:
+        tekanan = "Tidak Ada Transaksi"
+
     # MA dan Volume MA20
     ma_20 = df_saham['Close'].rolling(window=20).mean().iloc[-1].item()
     vol_ma_20 = df_saham['Volume'].rolling(window=20).mean().iloc[-1].item()
@@ -134,7 +153,8 @@ def hitung_semua_indikator(df_saham):
         "Harga (Rp)": close_today, "Harga MA20": int(ma_20), "Support": int(support_20), "Resistance": int(resist_20),
         "Change (%)": change_pct, "Volume": vol_today, "Vol Breakout": vol_breakout, "RSI (14D)": rsi,
         "Momentum": momentum, "MA Signal": ma_signal, "MA Cross": ma_cross, "MACD": status_macd,
-        "Status Bandar": status_bandar, "OBV Trend": obv_trend, "Status BB": status_bb, "Risiko": risiko,
+        "Status Bandar": status_bandar, "OBV Trend": obv_trend, "Status Gap": status_gap, "Tekanan Bandar": tekanan, 
+        "Status BB": status_bb, "Risiko": risiko,
         "Likuiditas": "> 1 Miliar" if (close_today * vol_today) > 1000000000 else "< 1 Miliar"
     }
 
@@ -142,7 +162,7 @@ def hitung_semua_indikator(df_saham):
 # SECTION 4: SISTEM PENILAIAN (SKOR) & EKSEKUSI UTAMA
 # ==========================================
 def main():
-    print("⏳ Memulai pembaruan data saham (Modular Version)...")
+    print("⏳ Memulai pembaruan data saham (Advanced Bandar Version)...")
     daftar_saham = load_tickers()
     if not daftar_saham: return
     
@@ -159,11 +179,10 @@ def main():
                 df_saham = data_mentah[t_jk].dropna(subset=['Open', 'Close', 'Volume', 'High', 'Low'])
                 
                 if len(df_saham) >= 26:
-                    # Ambil Semua Data
                     ind = hitung_semua_indikator(df_saham)
                     kat, per, pbv = get_fundamental(t_jk)
                     
-                    # Logika Skoring (Maks 8)
+                    # Logika Skoring (Maks 10)
                     score = 0
                     if ind["Vol Breakout"] == "Tembus MA20": score += 1
                     if ind["RSI (14D)"] > 50: score += 1
@@ -173,13 +192,19 @@ def main():
                     if ind["MACD"] in ["Strong Bullish", "Bullish MACD"]: score += 1
                     if ind["Status Bandar"] == "Akumulasi Kuat": score += 1  
                     if ind["OBV Trend"] == "Akumulasi (Naik)": score += 1   
+                    if ind["Tekanan Bandar"] == "Dominan Beli (Hajar Kanan)": score += 1
+                    if "Gap Up" in ind["Status Gap"]: score += 1
 
-                    rekomendasi = "BELI" if score >= 6 else "WAIT & SEE"
+                    rekomendasi = "BELI" if score >= 7 else "WAIT & SEE"
                     
-                    # Susun Dictionary Akhir
                     data_akhir = {"Ticker": ticker, "Kategori": kat, "PER (x)": per, "PBV (x)": pbv}
                     data_akhir.update(ind)
-                    data_akhir.update({"Total Score": score, "Rekomendasi": rekomendasi, "Status Akuisisi": "TIDAK ADA", "Terakhir Update": datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+                    data_akhir.update({
+                        "Total Score": score, 
+                        "Rekomendasi": rekomendasi, 
+                        "Status Akuisisi": "TIDAK ADA", 
+                        "Terakhir Update": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    })
                     
                     hasil.append(data_akhir)
         except Exception as e:
