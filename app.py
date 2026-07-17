@@ -52,26 +52,60 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. SIDEBAR (BILAH SAMPING)
+# 2. SIDEBAR - SISTEM PRESET FILTER CEPAT CUSTOM
 # ==========================================
-st.sidebar.title("⚙️ Pengaturan Cepat")
-st.sidebar.markdown("Gunakan panel ini untuk pencarian instan.")
+st.sidebar.title("⚙️ Preset Filter Cepat")
+st.sidebar.markdown("Pilih preset kriteria bawaan atau aktifkan kriteria kustom Anda sendiri.")
 
-search_ticker = st.sidebar.text_input("🔍 Cari Kode Saham (Cth: BBCA)", "")
-mode_ketat = st.sidebar.checkbox("🔥 Aktifkan Filter Super Ketat", value=False, help="Otomatis menyetel filter ke mode paling ketat untuk Swing Trading.")
+# Inisialisasi session state untuk menyimpan preset buatan user
+if 'custom_presets' not in st.session_state:
+    st.session_state.custom_presets = {
+        "🔥 Super Ketat (Swing Trading)": {
+            "vol": "Tembus MA20", "rsi": "> 50 (Bullish)", "trend": "Uptrend", 
+            "bb": "Breakout Upper", "score": "Semua", "rekomendasi": "Semua", 
+            "likuiditas": "Semua", "akuisisi": "Semua", "risiko": "Semua",
+            "macross": "Semua", "macd": "Semua"
+        },
+        "🟢 Hanya Saham Uptrend & Likuid": {
+            "vol": "Semua", "rsi": "Semua", "trend": "Uptrend", 
+            "bb": "Semua", "score": "Semua", "rekomendasi": "Semua", 
+            "likuiditas": "> 1 Miliar", "akuisisi": "Semua", "risiko": "Semua",
+            "macross": "Semua", "macd": "Semua"
+        }
+    }
+
+opsi_preset = ["Matikan Preset (Manual)"] + list(st.session_state.custom_presets.keys())
+preset_terpilih = st.sidebar.selectbox("🎯 Pilih Preset Aktif:", opsi_preset)
+
+st.sidebar.markdown("---")
+# Fitur Pembuat Preset Tanpa Koding Ulang
+with st.sidebar.expander("➕ Buat Preset Sendiri Kustom"):
+    st.caption("Atur kombinasi kriteria di bawah ini lalu simpan ke sistem.")
+    nama_preset_baru = st.text_input("Nama Preset Anda:", placeholder="Contoh: Akumulasi Uang Besar")
+    
+    p_vol = st.selectbox("P-Volume", ["Semua", "Tembus MA20", "Normal"], key="p_v")
+    p_trend = st.selectbox("P-Tren (MA20)", ["Semua", "Uptrend", "Downtrend"], key="p_t")
+    p_likuid = st.selectbox("P-Likuiditas", ["Semua", "> 1 Miliar", "< 1 Miliar"], key="p_l")
+    p_recom = st.selectbox("P-Rekomendasi", ["Semua", "BELI", "WAIT & SEE"], key="p_r")
+    p_macross = st.selectbox("P-MA Cross", ["Semua", "Golden Cross", "Bullish", "Death Cross", "Bearish"], key="p_mc")
+    
+    if st.button("💾 Simpan Jadi Preset Cepat"):
+        if nama_preset_baru.strip():
+            st.session_state.custom_presets[nama_preset_baru.strip()] = {
+                "vol": p_vol, "rsi": "Semua", "trend": p_trend, 
+                "bb": "Semua", "score": "Semua", "rekomendasi": p_recom, 
+                "likuiditas": p_likuid, "akuisisi": "Semua", "risiko": "Semua",
+                "macross": p_macross, "macd": "Semua"
+            }
+            st.success(f"Preset '{nama_preset_baru}' disimpan! Silakan pilih di menu atas.")
+        else:
+            st.error("Nama preset tidak boleh kosong!")
 
 st.sidebar.markdown("---")
 st.sidebar.caption("© AlgoTrade Screener")
 
 # ==========================================
-# 3. KONTEN UTAMA (HEADER)
-# ==========================================
-st.title("⚡ AlgoTrade Screener - IHSG")
-st.markdown("Analisis Tren, Momentum, Volume, dan Sentimen Akuisisi.")
-st.markdown("---")
-
-# ==========================================
-# 4. MEMUAT DATA LOKAL
+# 3. MEMUAT DATA LOKAL
 # ==========================================
 FILE_HASIL = "hasil_screener.csv"
 FILE_AKUISISI = "data_akuisisi.csv"
@@ -94,7 +128,7 @@ else:
     df_hasil = pd.DataFrame()
 
 # ==========================================
-# 5. PEMBAGIAN SISTEM TAB & KONTEN
+# 4. PEMBAGIAN SISTEM TAB & KONTEN
 # ==========================================
 if not df_hasil.empty:
     
@@ -177,31 +211,60 @@ if not df_hasil.empty:
             st.plotly_chart(fig_bar, use_container_width=True)
 
     # ----------------------------------------
-    # ISI TAB 2: SCREENER UTAMA
+    # ISI TAB 2: SCREENER UTAMA (FILTER & TABEL)
     # ----------------------------------------
     with tab2:
+        # Menentukan nilai default indeks pilihan filter berdasarkan preset aktif di sidebar
+        use_preset = preset_terpilih != "Matikan Preset (Manual)"
+        vals = st.session_state.custom_presets[preset_terpilih] if use_preset else None
+
         with st.expander("🎛️ Buka Panel Filter Lengkap (Klik untuk menyesuaikan kriteria)", expanded=False):
             col1, col2, col3 = st.columns(3)
             
             with col1:
-                filter_vol = st.selectbox("🔊 Volume", ["Semua", "Tembus MA20", "Normal"], index=1 if mode_ketat else 0)
-                filter_momentum = st.selectbox("⚡ Momentum", ["Semua", "Positif", "Negatif"], index=1 if mode_ketat else 0)
-                filter_likuiditas = st.selectbox("💧 Likuiditas", ["Semua", "> 1 Miliar", "< 1 Miliar"])
-                filter_risiko = st.selectbox("⚠️ Risiko Volatilitas", ["Semua", "Tinggi", "Sedang", "Rendah"])
+                opt_vol = ["Semua", "Tembus MA20", "Normal"]
+                filter_vol = st.selectbox("🔊 Volume", opt_vol, index=opt_vol.index(vals["vol"]) if use_preset else 0)
+                
+                opt_mom = ["Semua", "Positif", "Negatif"]
+                filter_momentum = st.selectbox("⚡ Momentum", opt_mom, index=0)
+                
+                opt_liq = ["Semua", "> 1 Miliar", "< 1 Miliar"]
+                filter_likuiditas = st.selectbox("💧 Likuiditas", opt_liq, index=opt_liq.index(vals["likuiditas"]) if use_preset else 0)
+                
+                opt_risk = ["Semua", "Tinggi", "Sedang", "Rendah"]
+                filter_risiko = st.selectbox("⚠️ Risiko Volatilitas", opt_risk, index=opt_risk.index(vals["risiko"]) if use_preset else 0)
                 
             with col2:
-                filter_rsi = st.selectbox("📊 RSI (14D)", ["Semua", "> 50 (Bullish)", "<= 50 (Bearish)"], index=1 if mode_ketat else 0)
-                # Maksimal skor diperbarui menjadi 6
-                filter_score = st.selectbox("⭐ Total Score", ["Semua", 6, 5, 4, 3, 2, 1, 0])
-                filter_bb = st.selectbox("🌐 Bollinger Bands", ["Semua", "Squeeze", "Bottom Rebound", "Breakout Upper", "Normal"], index=3 if mode_ketat else 0)
-                filter_akuisisi = st.selectbox("🤝 Sentimen Akuisisi", ["Semua", "TIDAK ADA", "RENCANA AKUISISI", "DALAM AKUISISI"])
+                opt_rsi = ["Semua", "> 50 (Bullish)", "<= 50 (Bearish)"]
+                filter_rsi = st.selectbox("📊 RSI (14D)", opt_rsi, index=opt_rsi.index(vals["rsi"]) if use_preset else 0)
+                
+                opt_scr = ["Semua", 6, 5, 4, 3, 2, 1, 0]
+                filter_score = st.selectbox("⭐ Total Score", opt_scr, index=opt_scr.index(vals["score"]) if use_preset else 0)
+                
+                opt_bb = ["Semua", "Squeeze", "Bottom Rebound", "Breakout Upper", "Normal"]
+                filter_bb = st.selectbox("🌐 Bollinger Bands", opt_bb, index=opt_bb.index(vals["bb"]) if use_preset else 0)
+                
+                opt_acq = ["Semua", "TIDAK ADA", "RENCANA AKUISISI", "DALAM AKUISISI"]
+                filter_akuisisi = st.selectbox("🤝 Sentimen Akuisisi", opt_acq, index=opt_acq.index(vals["akuisisi"]) if use_preset else 0)
                 
             with col3:
-                filter_trend = st.selectbox("📈 Tren (MA20)", ["Semua", "Uptrend", "Downtrend"], index=1 if mode_ketat else 0)
-                filter_rekomendasi = st.selectbox("🎯 Rekomendasi", ["Semua", "BELI", "WAIT & SEE"])
-                # Menambahkan filter baru untuk MACD dan Crossover
-                filter_macross = st.selectbox("🔀 MA Cross (5/20)", ["Semua", "Golden Cross", "Bullish", "Death Cross", "Bearish"])
-                filter_macd = st.selectbox("📈 MACD", ["Semua", "Strong Bullish", "Bullish MACD", "Strong Bearish", "Bearish MACD"])
+                opt_trd = ["Semua", "Uptrend", "Downtrend"]
+                filter_trend = st.selectbox("📈 Tren (MA20)", opt_trd, index=opt_trd.index(vals["trend"]) if use_preset else 0)
+                
+                opt_rec = ["Semua", "BELI", "WAIT & SEE"]
+                filter_rekomendasi = st.selectbox("🎯 Rekomendasi", opt_rec, index=opt_rec.index(vals["rekomendasi"]) if use_preset else 0)
+                
+                opt_mc = ["Semua", "Golden Cross", "Bullish", "Death Cross", "Bearish"]
+                filter_macross = st.selectbox("🔀 MA Cross (5/20)", opt_mc, index=opt_mc.index(vals["macross"]) if use_preset else 0)
+                
+                opt_macd = ["Semua", "Strong Bullish", "Bullish MACD", "Strong Bearish", "Bearish MACD"]
+                filter_macd = st.selectbox("📈 MACD", opt_macd, index=opt_macd.index(vals["macd"]) if use_preset else 0)
+
+        # --- PENGATURAN BARU POIN 1: KOLOM PENCARIAN DI INTEGRASIKAN DI SCREENER UTAMA ---
+        st.markdown("### 📋 Tabel Data Saham")
+        col_search, col_empty = st.columns([1, 2])
+        with col_search:
+            search_ticker = st.text_input("🔍 Cari Kode Saham Spesifik (Contoh: BBCA, BMRI)", "", placeholder="Ketik kode...")
 
         # LOGIKA FILTERING DATA
         df_filtered = df_hasil.copy()
@@ -221,8 +284,6 @@ if not df_hasil.empty:
             if "Status Akuisisi" in df_filtered.columns: df_filtered = df_filtered[df_filtered["Status Akuisisi"] == filter_akuisisi]
         if filter_risiko != "Semua":
             if "Risiko" in df_filtered.columns: df_filtered = df_filtered[df_filtered["Risiko"] == filter_risiko]
-            
-        # Logika filter baru
         if filter_macross != "Semua":
             if "MA Cross" in df_filtered.columns: df_filtered = df_filtered[df_filtered["MA Cross"] == filter_macross]
         if filter_macd != "Semua":
@@ -230,16 +291,11 @@ if not df_hasil.empty:
 
         # PAGINASI & FORMAT TABEL
         if not df_filtered.empty:
-            st.markdown("### 📋 Tabel Data Saham")
-            
             col_pg1, col_pg2, col_pg3 = st.columns([1, 1, 2])
             with col_pg1: saham_per_halaman = st.selectbox("Tampilkan baris:", [20, 50, 100])
             total_halaman = int(np.ceil(len(df_filtered) / saham_per_halaman))
             with col_pg2:
-                if total_halaman > 0:
-                    halaman_aktif = st.selectbox("Pilih Halaman:", range(1, total_halaman + 1))
-                else:
-                    halaman_aktif = 1
+                halaman_aktif = st.selectbox("Pilih Halaman:", range(1, total_halaman + 1)) if total_halaman > 0 else 1
                     
             indeks_awal = (halaman_aktif - 1) * saham_per_halaman
             indeks_akhir = indeks_awal + saham_per_halaman
@@ -268,7 +324,8 @@ if not df_hasil.empty:
             def warna_tabel(val):
                 style = '' 
                 if isinstance(val, str):
-                    if any(x in val for x in ["Positif", "Uptrend", "BELI", "Breakout Upper", "Bottom Rebound", "DALAM AKUISISI", "Rendah", "🔺", "Golden Cross", "Bullish"]): 
+                    # --- POIN 3 & 4: WARNA HIJAU/MERAH UTK PERSEN & TANGKAP TEMBUS MA20 MENJADI HIJAU ---
+                    if any(x in val for x in ["Positif", "Uptrend", "BELI", "Breakout Upper", "Bottom Rebound", "DALAM AKUISISI", "Rendah", "🔺", "Golden Cross", "Bullish", "Tembus MA20"]): 
                         style = 'color: #22c55e; font-weight: 600;'
                     elif any(x in val for x in ["Negatif", "Downtrend", "WAIT & SEE", "Tinggi", "🔻", "Death Cross", "Bearish"]): 
                         style = 'color: #ef4444; font-weight: 600;'
@@ -281,7 +338,7 @@ if not df_hasil.empty:
                         else: style = 'color: #ef4444;'
                 return style
 
-            kolom_berwarna = ["Change (%)", "Momentum", "MA Signal", "MA Cross", "MACD", "Rekomendasi", "Likuiditas", "Status BB", "Status Akuisisi", "Risiko", "Total Score"]
+            kolom_berwarna = ["Change (%)", "Momentum", "MA Signal", "MA Cross", "MACD", "Rekomendasi", "Likuiditas", "Status BB", "Status Akuisisi", "Risiko", "Total Score", "Vol Breakout"]
             kolom_berwarna_aktual = [col for col in kolom_berwarna if col in df_tampil.columns]
 
             tabel_akhir = df_tampil.style.format({
@@ -295,7 +352,6 @@ if not df_hasil.empty:
                 "RSI (14D)": "{:.0f}"
             }).map(warna_tabel, subset=kolom_berwarna_aktual)
 
-            # Update urutan kunci untuk memastikan MACD dan MA Cross masuk
             urutan_kolom_tetap = [
                 "Ticker", "Harga (Rp)", "Harga MA20", "Support", "Resistance", "Change (%)", 
                 "Volume", "Vol Breakout", "RSI (14D)", "Momentum", "MA Signal", "MA Cross", "MACD",
@@ -345,8 +401,8 @@ if not df_hasil.empty:
         * **Risiko (Tingkat Volatilitas):** Diukur menggunakan lebar pita *Bollinger Bands*.
           * **Tinggi (Merah):** Pergerakan harga liar dan cepat.
           * **Rendah (Hijau):** Pergerakan harga sempit, berisiko rendah namun cenderung lambat (konsolidasi).
-        * **Bollinger Bands:** 
-          * **Squeeze:** Pita menyempit. Pertanda akan ada pergerakan harga yang sangat besar (*breakout*).
-          * **Bottom Rebound:** Harga memantul dari pita bawah. Peluang untuk *buy on weakness*.
+        * **Vol Breakout (Tembus MA20):** 
+          * **Tembus MA20 (Hijau):** **SANGAT BAIK.** Menandakan volume transaksi melonjak tajam melampaui rata-rata bulanan, mengonfirmasi saham digerakkan oleh akumulasi dana besar (*Smart Money*).
+          * **Normal (Putih):** Aktivitas transaksi berjalan wajar seperti biasa.
         * **Total Score (Maks 6 ⭐):** Saham dengan skor 5 ke atas mendapatkan rekomendasi **BELI**.
         """)
