@@ -318,13 +318,27 @@ if not df_hasil.empty:
 
             st.markdown("<br>", unsafe_allow_html=True)
             st.markdown("### 🤫 Fase Akumulasi Senyap (Curi Start)")
-            st.caption("Algoritma: Saham Lapis 3 + Pergerakan Sempit (Squeeze) + Uang Masuk Diam-diam (OBV Naik).")
+            st.caption("Algoritma: Saham Lapis 3 + Pergerakan Sempit (Squeeze) + Uang Masuk Diam-diam (OBV Naik). Diurutkan berdasarkan Skor Teknikal dan Volume.")
+            
             if not df_senyap.empty:
+                # 1. SORTING: Urutkan dari Total Score tertinggi, lalu Volume terbesar
+                df_senyap = df_senyap.sort_values(by=['Total Score', 'Volume'], ascending=[False, False]).reset_index(drop=True)
+                
+                # 2. PENOMORAN: Buat kolom 'Prioritas' dengan ikon piala untuk urutan pertama
+                df_senyap.insert(0, 'Prioritas', ['🏆 #1'] + [f'#{i+1}' for i in range(1, len(df_senyap))])
+                
+                # 3. FORMATTING
                 df_senyap["Total Score"] = df_senyap["Total Score"].apply(format_skor)
-                kolom_b = ["Ticker", "Harga (Rp)", "Change (%)", "Status Gap", "Volume", "Vol Breakout", "Tekanan Bandar", "Status Bandar", "OBV Trend", "Status BB", "Total Score"]
-                tabel_senyap = df_senyap.style.format({"Harga (Rp)": format_angka, "Volume": format_angka, "Change (%)": format_pct}).map(warna_tabel, subset=[c for c in kolom_b if c not in ["Ticker"]])
+                
+                # Tambahkan 'Prioritas' di urutan paling depan kolom yang ditampilkan
+                kolom_b = ["Prioritas", "Ticker", "Harga (Rp)", "Change (%)", "Status Gap", "Volume", "Vol Breakout", "Tekanan Bandar", "Status Bandar", "OBV Trend", "Status BB", "Total Score"]
+                
+                # Render tabel (kolom Prioritas tidak diberi warna khusus agar teks tetap bersih)
+                tabel_senyap = df_senyap.style.format({"Harga (Rp)": format_angka, "Volume": format_angka, "Change (%)": format_pct}).map(warna_tabel, subset=[c for c in kolom_b if c not in ["Ticker", "Prioritas"]])
+                
                 st.dataframe(tabel_senyap, use_container_width=True, hide_index=True, column_order=kolom_b)
-            else: st.info("Belum ada saham yang terpantau masuk fase persiapan.")
+            else: 
+                st.info("Belum ada saham yang terpantau masuk fase persiapan.")
 
             st.markdown("<br>", unsafe_allow_html=True)
             st.markdown("### ☠️ Fase Guyuran / Distribusi (HINDARI!)")
