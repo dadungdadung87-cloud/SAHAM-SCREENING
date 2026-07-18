@@ -2,13 +2,30 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 import os
+import time
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from datetime import datetime
 
 # ==========================================
-# SECTION 1: KONFIGURASI AWAL
+# SECTION 1: KONFIGURASI & SESSION ANTI-BLOKIR
 # ==========================================
 FILE_SAHAM = "saham.txt"
 FILE_HASIL = "hasil_screener.csv"
+LOCK_FILE = "sedang_update.lock"
+
+# Sesi dengan Auto-Retry bawaan. Jika kena 429, sistem otomatis mundur sejenak tanpa sleep manual.
+def get_safe_session():
+    session = requests.Session()
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    })
+    retry = Retry(connect=5, backoff_factor=0.5, status_forcelist=[429, 500, 502, 503, 504])
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
 
 def load_tickers():
     if not os.path.exists(FILE_SAHAM):
@@ -38,10 +55,9 @@ def get_fundamental(ticker_jk):
     return kategori_saham, per, pbv
 
 # ==========================================
-# SECTION 3: KALKULASI TEKNIKAL & BANDARMOLOGI ADVANCED
+# SECTION 3: KALKULASI TEKNIKAL & BANDARMOLOGI
 # ==========================================
 def hitung_semua_indikator(df_saham):
-    # Harga dan Volume Dasar
     close_today = df_saham['Close'].iloc[-1].item()
     close_yest = df_saham['Close'].iloc[-2].item()
     open_today = df_saham['Open'].iloc[-1].item()
@@ -69,13 +85,11 @@ def hitung_semua_indikator(df_saham):
     else:
         tekanan = "Tidak Ada Transaksi"
 
-    # MA dan Volume MA20
     ma_20 = df_saham['Close'].rolling(window=20).mean().iloc[-1].item()
     vol_ma_20 = df_saham['Volume'].rolling(window=20).mean().iloc[-1].item()
     ma_signal = "Uptrend" if close_today > ma_20 else "Downtrend"
     vol_breakout = "Tembus MA20" if vol_today > vol_ma_20 else "Normal"
     
-    # MA Cross (5 vs 20)
     ma_5 = df_saham['Close'].rolling(window=5).mean().iloc[-1].item()
     ma_5_prev = df_saham['Close'].rolling(window=5).mean().iloc[-2].item()
     ma_20_prev = df_saham['Close'].rolling(window=20).mean().iloc[-2].item()
@@ -85,7 +99,6 @@ def hitung_semua_indikator(df_saham):
     elif ma_5 > ma_20: ma_cross = "Bullish"
     else: ma_cross = "Bearish"
 
-    # MACD
     ema_12 = df_saham['Close'].ewm(span=12, adjust=False).mean()
     ema_26 = df_saham['Close'].ewm(span=26, adjust=False).mean()
     macd_line = ema_12 - ema_26
@@ -98,7 +111,6 @@ def hitung_semua_indikator(df_saham):
     elif macd_val < sig_val and macd_val < 0: status_macd = "Strong Bearish"
     else: status_macd = "Bearish MACD"
     
-    # Status Bandar
     if vol_today > (vol_ma_20 * 2):
         if close_today > open_today: status_bandar = "Akumulasi Kuat"
         elif close_today < open_today: status_bandar = "Distribusi Kuat"
@@ -106,7 +118,6 @@ def hitung_semua_indikator(df_saham):
     else:
         status_bandar = "Normal"
 
-    # OBV Trend
     obv = [0]
     for i in range(1, len(df_saham)):
         if df_saham['Close'].iloc[i] > df_saham['Close'].iloc[i-1]: obv.append(obv[-1] + df_saham['Volume'].iloc[i])
@@ -120,7 +131,6 @@ def hitung_semua_indikator(df_saham):
     elif obv_sekarang < obv_5_hari_lalu: obv_trend = "Distribusi (Turun)"
     else: obv_trend = "Netral"
     
-    # Bollinger Bands
     std_20 = df_saham['Close'].rolling(window=20).std().iloc[-1].item()
     upper_bb = ma_20 + (std_20 * 2)
     lower_bb = ma_20 - (std_20 * 2)
@@ -138,7 +148,6 @@ def hitung_semua_indikator(df_saham):
     elif bandwidth > 8.0: risiko = "Sedang"
     else: risiko = "Rendah"
     
-    # RSI
     delta = df_saham['Close'].diff()
     gain = delta.where(delta > 0, 0)
     loss = -delta.where(delta < 0, 0)
@@ -158,62 +167,99 @@ def hitung_semua_indikator(df_saham):
     }
 
 # ==========================================
-# SECTION 4: SISTEM PENILAIAN & EKSEKUSI UTAMA
+# SECTION 4: SISTEM ANTI-BENTROK & EKSEKUSI CEPAT
 # ==========================================
 def main():
-    print("⏳ Memulai pembaruan data saham (Tahan Banting Version)...")
-    daftar_saham = load_tickers()
-    if not daftar_saham: return
-    
-    tickers_jk = [f"{t}.JK" for t in daftar_saham]
-    tickers_str = " ".join(tickers_jk)
-    
-    data_mentah = yf.download(tickers_str, period="2mo", interval="1d", group_by='ticker', threads=True, progress=False)
-    hasil = []
-    
-    for ticker in daftar_saham:
-        try:
-            t_jk = f"{ticker}.JK"
-            if t_jk in data_mentah:
-                df_saham = data_mentah[t_jk].dropna(subset=['Open', 'Close', 'Volume', 'High', 'Low'])
-                
-                if len(df_saham) >= 26:
-                    ind = hitung_semua_indikator(df_saham)
-                    kat, per, pbv = get_fundamental(t_jk)
-                    
-                    score = 0
-                    if ind["Vol Breakout"] == "Tembus MA20": score += 1
-                    if ind["RSI (14D)"] > 50: score += 1
-                    if ind["Momentum"] == "Positif": score += 1
-                    if ind["MA Signal"] == "Uptrend": score += 1
-                    if ind["MA Cross"] in ["Golden Cross", "Bullish"]: score += 1
-                    if ind["MACD"] in ["Strong Bullish", "Bullish MACD"]: score += 1
-                    if ind["Status Bandar"] == "Akumulasi Kuat": score += 1  
-                    if ind["OBV Trend"] == "Akumulasi (Naik)": score += 1   
-                    if ind["Tekanan Bandar"] == "Dominan Beli (Hajar Kanan)": score += 1
-                    if "Gap Up" in ind["Status Gap"]: score += 1
+    # 1. CEK SISTEM ANTI-BENTROK (LOCKING)
+    if os.path.exists(LOCK_FILE):
+        # Jika file gembok berumur kurang dari 6 menit, berarti proses sebelumnya masih jalan
+        usia_file = time.time() - os.path.getmtime(LOCK_FILE)
+        if usia_file < 360:
+            print("⚠️ SKRIP DIBATALKAN: Proses sebelumnya masih berjalan. Mencegah bentrok data (Overlapping).")
+            return
+        else:
+            print("⚠️ Gembok lama kadaluarsa. Menghapus dan memulai ulang proses...")
+            os.remove(LOCK_FILE)
 
-                    rekomendasi = "BELI" if score >= 7 else "WAIT & SEE"
-                    
-                    data_akhir = {"Ticker": ticker, "Kategori": kat, "PER (x)": per, "PBV (x)": pbv}
-                    data_akhir.update(ind)
-                    data_akhir.update({
-                        "Total Score": score, 
-                        "Rekomendasi": rekomendasi, 
-                        "Status Akuisisi": "TIDAK ADA", 
-                        "Terakhir Update": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    })
-                    
-                    hasil.append(data_akhir)
-        except Exception as e:
-            pass
+    # Memasang gembok saat mulai proses
+    with open(LOCK_FILE, "w") as f:
+        f.write("SEDANG PROSES")
 
-    if hasil:
-        df_hasil = pd.DataFrame(hasil)
-        df_hasil.to_csv(FILE_HASIL, index=False)
-        print(f"✅ Selesai! Data berhasil diperbarui.")
-        # BARIS INI AKAN MEMBUKTIKAN BAHWA KOLOM BARU SUDAH MASUK!
-        print(f"🔍 Validasi Kolom Tersimpan: {list(df_hasil.columns)}")
+    try:
+        print("⏳ Memulai pembaruan data saham (Fast & Safe Version)...")
+        daftar_saham = load_tickers()
+        if not daftar_saham: 
+            return
+        
+        tickers_jk = [f"{t}.JK" for t in daftar_saham]
+        tickers_str = " ".join(tickers_jk)
+        
+        aman_session = get_safe_session()
+        
+        # 2. PENGUNDUHAN CEPAT TANPA SLEEP
+        # Menggunakan 'threads=8' membatasi maksimal 8 request bersamaan.
+        # Ini cukup lambat untuk menghindari radar bot Yahoo, tapi cukup cepat untuk selesai < 2 menit.
+        print(f"📥 Mengunduh {len(daftar_saham)} data saham secara bersamaan (Maks 8 jalur)...")
+        data_mentah = yf.download(
+            tickers_str, 
+            period="2mo", 
+            interval="1d", 
+            group_by='ticker', 
+            threads=8, 
+            session=aman_session, 
+            progress=False
+        )
+        
+        hasil = []
+        for ticker in daftar_saham:
+            try:
+                t_jk = f"{ticker}.JK"
+                if t_jk in data_mentah:
+                    df_saham = data_mentah[t_jk].dropna(subset=['Open', 'Close', 'Volume', 'High', 'Low'])
+                    
+                    if len(df_saham) >= 26:
+                        ind = hitung_semua_indikator(df_saham)
+                        kat, per, pbv = get_fundamental(t_jk)
+                        
+                        score = 0
+                        if ind["Vol Breakout"] == "Tembus MA20": score += 1
+                        if ind["RSI (14D)"] > 50: score += 1
+                        if ind["Momentum"] == "Positif": score += 1
+                        if ind["MA Signal"] == "Uptrend": score += 1
+                        if ind["MA Cross"] in ["Golden Cross", "Bullish"]: score += 1
+                        if ind["MACD"] in ["Strong Bullish", "Bullish MACD"]: score += 1
+                        if ind["Status Bandar"] == "Akumulasi Kuat": score += 1  
+                        if ind["OBV Trend"] == "Akumulasi (Naik)": score += 1   
+                        if ind["Tekanan Bandar"] == "Dominan Beli (Hajar Kanan)": score += 1
+                        if "Gap Up" in ind["Status Gap"]: score += 1
+
+                        rekomendasi = "BELI" if score >= 7 else "WAIT & SEE"
+                        
+                        data_akhir = {"Ticker": ticker, "Kategori": kat, "PER (x)": per, "PBV (x)": pbv}
+                        data_akhir.update(ind)
+                        data_akhir.update({
+                            "Total Score": score, 
+                            "Rekomendasi": rekomendasi, 
+                            "Status Akuisisi": "TIDAK ADA", 
+                            "Terakhir Update": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        })
+                        
+                        hasil.append(data_akhir)
+            except Exception as e:
+                pass
+
+        if hasil:
+            df_hasil = pd.DataFrame(hasil)
+            df_hasil.to_csv(FILE_HASIL, index=False)
+            print(f"✅ Selesai! Data {len(hasil)} saham berhasil diperbarui dan disimpan.")
+            print(f"🔍 Validasi Kolom Tersimpan: {list(df_hasil.columns)}")
+        else:
+            print("⚠️ Peringatan: Proses selesai namun tidak ada data yang valid untuk disimpan.")
+
+    finally:
+        # PENTING: Selalu lepas gembok apa pun yang terjadi (walaupun error/crash) agar 5 menit kemudian bisa jalan lagi
+        if os.path.exists(LOCK_FILE):
+            os.remove(LOCK_FILE)
 
 if __name__ == "__main__":
     main()
