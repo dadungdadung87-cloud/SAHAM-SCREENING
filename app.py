@@ -7,7 +7,7 @@ from datetime import datetime
 import plotly.express as px
 
 # ==========================================
-# SECTION 1: PENGATURAN UI/UX 
+# SECTION 1: PENGATURAN UI/UX & FILE EKSTERNAL
 # ==========================================
 st.set_page_config(page_title="Screener Saham IHSG", layout="wide", initial_sidebar_state="expanded")
 
@@ -87,17 +87,14 @@ DEFAULT_CONFIG = {
     }
 }
 
-# Auto-Heal: Buat atau timpa JSON jika tidak lengkap
 if not os.path.exists(FILE_CONFIG):
     with open(FILE_CONFIG, "w") as f: json.dump(DEFAULT_CONFIG, f, indent=4)
 else:
     with open(FILE_CONFIG, "r") as f:
         cek_config = json.load(f)
-    # Cek apakah filter Tekanan Bandar sudah ada di JSON lama, jika belum, timpa paksa
     if "Tekanan Bandar" not in cek_config.get("MASTER_FILTERS", {}):
         with open(FILE_CONFIG, "w") as f: json.dump(DEFAULT_CONFIG, f, indent=4)
 
-# Load data JSON yang sudah dipastikan aman
 with open(FILE_CONFIG, "r") as f:
     WEB_CONFIG = json.load(f)
 
@@ -113,8 +110,9 @@ def muat_preset():
         "🔥 Bluechip Terakumulasi": {k: "Semua" for k in MASTER_FILTERS},
         "🟢 Uptrend Aman": {k: "Semua" for k in MASTER_FILTERS}
     }
-    preset_bawaan["🔥 Bluechip Terakumulasi"].update({"Status Bandar": "Akumulasi Kuat", "Kategori": "Big Cap (Lapis 1)", "MA Signal": "Uptrend"})
-    preset_bawaan["🟢 Uptrend Aman"].update({"MA Signal": "Uptrend", "Likuiditas": "> 1 Miliar", "Risiko": "Sedang"})
+    if "Status Bandar" in preset_bawaan["🔥 Bluechip Terakumulasi"]:
+        preset_bawaan["🔥 Bluechip Terakumulasi"].update({"Status Bandar": "Akumulasi Kuat", "Kategori": "Big Cap (Lapis 1)", "MA Signal": "Uptrend"})
+        preset_bawaan["🟢 Uptrend Aman"].update({"MA Signal": "Uptrend", "Likuiditas": "> 1 Miliar", "Risiko": "Sedang"})
 
     if os.path.exists(FILE_PRESET):
         try:
@@ -180,9 +178,8 @@ def warna_tabel(val):
     return ''
 
 # ==========================================
-# SECTION 6: LOAD DATA & HAPUS CACHE OTOMATIS
+# SECTION 6: LOAD DATA
 # ==========================================
-# Memaksa pembacaan file segar setiap kali direfresh
 def load_data_saham():
     if not os.path.exists("hasil_screener.csv"): return pd.DataFrame()
     df = pd.read_csv("hasil_screener.csv")
@@ -252,6 +249,8 @@ if not df_hasil.empty:
                     df_filtered = df_filtered[df_filtered[db_key] == nilai]
 
         if not df_filtered.empty:
+            st.caption(f"Menampilkan **{len(df_filtered)}** saham yang lolos filter dari total **{len(df_hasil)}** saham.")
+            
             cp1, cp2, cp3 = st.columns([1, 1, 2])
             with cp1: per_hal = st.selectbox("Tampilkan baris:", [20, 50, 100])
             tot_hal = int(np.ceil(len(df_filtered) / per_hal))
@@ -267,7 +266,8 @@ if not df_hasil.empty:
             tabel_akhir = df_tampil.style.format({"Harga (Rp)": format_angka, "Harga MA20": format_angka, "Support": format_angka, "Resistance": format_angka, "Volume": format_angka, "Change (%)": format_pct, "Momentum": format_mom, "PER (x)": format_desimal, "PBV (x)": format_desimal, "RSI (14D)": "{:.0f}"}).map(warna_tabel, subset=[c for c in kolom_ada if c not in ["Ticker"]])
             
             st.dataframe(tabel_akhir, use_container_width=True, hide_index=True, column_order=kolom_ada)
-        else: st.warning("Tidak ada data sesuai filter.")
+        else: 
+            st.warning("Tidak ada data sesuai filter.")
 
     with tab3:
         st.markdown("### 📚 Kamus Istilah Kolom")
@@ -293,7 +293,6 @@ if not df_hasil.empty:
         st.markdown("## 🦅 Radar Copet Bandar (Fast Trade)")
         st.markdown("<div class='bandar-box'><b>⚠️ PERINGATAN RISIKO TINGGI:</b> Tab ini murni mendeteksi anomali volume dan volatilitas ekstrem pada saham Lapis 3 (Small Cap/Gorengan). Kecepatan eksekusi sangat dibutuhkan!</div>", unsafe_allow_html=True)
         
-        # Cek Keamanan Ekstra sebelum memproses Tab 5
         if 'Tekanan Bandar' not in df_hasil.columns:
             st.warning("⏳ **Fitur Radar Bandar belum menerima data terbaru.** Harap jalankan kembali perintah `python update_data.py` di terminal.")
         else:
