@@ -30,6 +30,8 @@ st.markdown("""
 # ==========================================
 FILE_CONFIG = "config_web.json"
 FILE_PRESET = "preset_kustom.json"
+FILE_HASIL = "hasil_screener.csv"
+FILE_AKUISISI = "data_akuisisi.csv"
 
 DEFAULT_CONFIG = {
     "MASTER_FILTERS": {
@@ -51,7 +53,7 @@ DEFAULT_CONFIG = {
         "MACD": {"label": "📈 MACD", "options": ["Semua", "Strong Bullish", "Bullish MACD", "Strong Bearish", "Bearish MACD"]}
     },
     "KAMUS_EDUKASI": {
-        "Ticker": "Kode unik 4 huruf perusahaan.",
+        "Ticker": "Kode unik perusahaan.",
         "Kategori": "Pengelompokan saham berdasarkan Kapitalisasi Pasar. Lapis 1 (>10T), Lapis 2 (1-10T), Lapis 3 (<1T).",
         "Harga (Rp)": "Harga penutupan terakhir.",
         "PER (x)": "Price to Earnings Ratio. < 15x = murah.",
@@ -103,16 +105,15 @@ KAMUS_EDUKASI = WEB_CONFIG["KAMUS_EDUKASI"]
 STRATEGI_SIMULASI = WEB_CONFIG["STRATEGI"]
 
 # ==========================================
-# SECTION 3: DATABASE PRESET CUSTOM
+# SECTION 3: DATABASE PRESET & LOAD DATA
 # ==========================================
 def muat_preset():
     preset_bawaan = {
         "🔥 Bluechip Terakumulasi": {k: "Semua" for k in MASTER_FILTERS},
         "🟢 Uptrend Aman": {k: "Semua" for k in MASTER_FILTERS}
     }
-    if "Status Bandar" in preset_bawaan["🔥 Bluechip Terakumulasi"]:
-        preset_bawaan["🔥 Bluechip Terakumulasi"].update({"Status Bandar": "Akumulasi Kuat", "Kategori": "Big Cap (Lapis 1)", "MA Signal": "Uptrend"})
-        preset_bawaan["🟢 Uptrend Aman"].update({"MA Signal": "Uptrend", "Likuiditas": "> 1 Miliar", "Risiko": "Sedang"})
+    preset_bawaan["🔥 Bluechip Terakumulasi"].update({"Status Bandar": "Akumulasi Kuat", "Kategori": "Big Cap (Lapis 1)", "MA Signal": "Uptrend"})
+    preset_bawaan["🟢 Uptrend Aman"].update({"MA Signal": "Uptrend", "Likuiditas": "> 1 Miliar", "Risiko": "Sedang"})
 
     if os.path.exists(FILE_PRESET):
         try:
@@ -130,9 +131,26 @@ def apply_preset():
 
 def manual_override(): st.session_state.preset_selector = "Matikan Preset (Manual)"
 
+@st.cache_data(ttl=10) # Memori cache otomatis dihapus setiap 10 detik
+def load_data_saham():
+    if not os.path.exists(FILE_HASIL): return pd.DataFrame()
+    df = pd.read_csv(FILE_HASIL)
+    if os.path.exists(FILE_AKUISISI):
+        df_akuisisi = pd.read_csv(FILE_AKUISISI)
+        if "Status Akuisisi" in df.columns: df = df.drop(columns=["Status Akuisisi"])
+        df = pd.merge(df, df_akuisisi, on="Ticker", how="left")
+        df["Status Akuisisi"] = df["Status Akuisisi"].fillna("TIDAK ADA")
+    else: df["Status Akuisisi"] = "TIDAK ADA"
+    return df
+
 # ==========================================
 # SECTION 4: HEADER & SIDEBAR
 # ==========================================
+# TOMBOL SAKTI PEMBERSH CACHE MANUAL
+if st.sidebar.button("🔄 Muat Ulang Data Server", use_container_width=True):
+    st.cache_data.clear()
+    st.rerun()
+
 st.sidebar.title("⚙️ Preset Filter Cepat")
 opsi_preset = ["Matikan Preset (Manual)"] + list(daftar_preset_aktif.keys())
 idx_default = opsi_preset.index(st.session_state.preset_selector) if st.session_state.preset_selector in opsi_preset else 0
@@ -158,6 +176,8 @@ st.title("⚡ AlgoTrade Screener - IHSG")
 st.markdown("Analisis Tren, Momentum, Bandarmologi, dan Fundamental Ringan.")
 st.markdown("---")
 
+df_hasil = load_data_saham()
+
 # ==========================================
 # SECTION 5: FUNGSI PEWARNAAN
 # ==========================================
@@ -178,23 +198,7 @@ def warna_tabel(val):
     return ''
 
 # ==========================================
-# SECTION 6: LOAD DATA
-# ==========================================
-def load_data_saham():
-    if not os.path.exists("hasil_screener.csv"): return pd.DataFrame()
-    df = pd.read_csv("hasil_screener.csv")
-    if os.path.exists("data_akuisisi.csv"):
-        df_akuisisi = pd.read_csv("data_akuisisi.csv")
-        if "Status Akuisisi" in df.columns: df = df.drop(columns=["Status Akuisisi"])
-        df = pd.merge(df, df_akuisisi, on="Ticker", how="left")
-        df["Status Akuisisi"] = df["Status Akuisisi"].fillna("TIDAK ADA")
-    else: df["Status Akuisisi"] = "TIDAK ADA"
-    return df
-
-df_hasil = load_data_saham()
-
-# ==========================================
-# SECTION 7: RENDER TABS
+# SECTION 6: RENDER TABS
 # ==========================================
 if not df_hasil.empty:
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 Ringkasan Pasar", "🎯 Screener Utama", "💡 Insight & Edukasi", "📈 Simulasi & Strategi", "🦅 Radar Bandar (Fast Trade)"])
@@ -294,7 +298,7 @@ if not df_hasil.empty:
         st.markdown("<div class='bandar-box'><b>⚠️ PERINGATAN RISIKO TINGGI:</b> Tab ini murni mendeteksi anomali volume dan volatilitas ekstrem pada saham Lapis 3 (Small Cap/Gorengan). Kecepatan eksekusi sangat dibutuhkan!</div>", unsafe_allow_html=True)
         
         if 'Tekanan Bandar' not in df_hasil.columns:
-            st.warning("⏳ **Fitur Radar Bandar belum menerima data terbaru.** Harap jalankan kembali perintah `python update_data.py` di terminal.")
+            st.warning("⏳ **Fitur Radar Bandar belum menerima data terbaru.** Harap klik tombol 'Muat Ulang Data Server' di sidebar sebelah kiri.")
         else:
             df_lapis3 = df_hasil[df_hasil['Kategori'].str.contains("Small Cap", na=False)]
             
