@@ -15,13 +15,12 @@ FILE_SAHAM = "saham.txt"
 FILE_HASIL = "hasil_screener.csv"
 LOCK_FILE = "sedang_update.lock"
 
-# Sesi dengan Auto-Retry bawaan. Jika kena 429, sistem otomatis mundur sejenak tanpa sleep manual.
 def get_safe_session():
     session = requests.Session()
     session.headers.update({
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     })
-    retry = Retry(connect=5, backoff_factor=0.5, status_forcelist=[429, 500, 502, 503, 504])
+    retry = Retry(connect=5, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
     adapter = HTTPAdapter(max_retries=retry)
     session.mount('http://', adapter)
     session.mount('https://', adapter)
@@ -69,13 +68,11 @@ def hitung_semua_indikator(df_saham):
     change_pct = (change_rp / close_yest) * 100
     momentum = "Positif" if change_rp > 0 else "Negatif"
     
-    # Deteksi GAP
     gap_pct = ((open_today - close_yest) / close_yest) * 100
     if gap_pct >= 2.0: status_gap = f"Gap Up (+{gap_pct:.1f}%)"
     elif gap_pct <= -2.0: status_gap = f"Gap Down ({gap_pct:.1f}%)"
     else: status_gap = "Normal"
     
-    # Deteksi Tekanan Bandar (Wick Analysis)
     range_today = high_today - low_today
     if range_today > 0:
         buying_power = (close_today - low_today) / range_today
@@ -167,26 +164,18 @@ def hitung_semua_indikator(df_saham):
     }
 
 # ==========================================
-# SECTION 4: SISTEM ANTI-BENTROK & EKSEKUSI CEPAT
+# SECTION 4: EKSEKUSI UTAMA (MODE DETEKTIF)
 # ==========================================
 def main():
-    # 1. CEK SISTEM ANTI-BENTROK (LOCKING)
+    # PAKSA HAPUS GEMBOK LAMA AGAR TIDAK NYANGKUT
     if os.path.exists(LOCK_FILE):
-        # Jika file gembok berumur kurang dari 6 menit, berarti proses sebelumnya masih jalan
-        usia_file = time.time() - os.path.getmtime(LOCK_FILE)
-        if usia_file < 360:
-            print("⚠️ SKRIP DIBATALKAN: Proses sebelumnya masih berjalan. Mencegah bentrok data (Overlapping).")
-            return
-        else:
-            print("⚠️ Gembok lama kadaluarsa. Menghapus dan memulai ulang proses...")
-            os.remove(LOCK_FILE)
+        os.remove(LOCK_FILE)
 
-    # Memasang gembok saat mulai proses
     with open(LOCK_FILE, "w") as f:
         f.write("SEDANG PROSES")
 
     try:
-        print("⏳ Memulai pembaruan data saham (Fast & Safe Version)...")
+        print("⏳ Memulai pembaruan data saham (Diagnostic Mode)...")
         daftar_saham = load_tickers()
         if not daftar_saham: 
             return
@@ -196,9 +185,6 @@ def main():
         
         aman_session = get_safe_session()
         
-        # 2. PENGUNDUHAN CEPAT TANPA SLEEP
-        # Menggunakan 'threads=8' membatasi maksimal 8 request bersamaan.
-        # Ini cukup lambat untuk menghindari radar bot Yahoo, tapi cukup cepat untuk selesai < 2 menit.
         print(f"📥 Mengunduh {len(daftar_saham)} data saham secara bersamaan (Maks 8 jalur)...")
         data_mentah = yf.download(
             tickers_str, 
@@ -210,7 +196,15 @@ def main():
             progress=False
         )
         
+        # Mengecek apakah Yahoo Finance memblokir kita (mengembalikan dataframe kosong)
+        if data_mentah.empty:
+            print("❌ ERROR FATAL: Yahoo Finance menolak permintaan data (Rate Limit / IP Block).")
+            print("ℹ️ Solusi: Anda harus menunggu 1-2 jam agar IP Codespaces Anda tidak diblokir lagi.")
+            return
+
         hasil = []
+        error_count = 0
+
         for ticker in daftar_saham:
             try:
                 t_jk = f"{ticker}.JK"
@@ -246,18 +240,21 @@ def main():
                         
                         hasil.append(data_akhir)
             except Exception as e:
-                pass
+                # Mode detektif: Tampilkan error apa yang membuat saham gagal dihitung
+                error_count += 1
+                print(f"⚠️ Error pada perhitungan saham {ticker}: {e}")
 
         if hasil:
             df_hasil = pd.DataFrame(hasil)
             df_hasil.to_csv(FILE_HASIL, index=False)
-            print(f"✅ Selesai! Data {len(hasil)} saham berhasil diperbarui dan disimpan.")
+            print(f"✅ Selesai! Data {len(hasil)} saham berhasil diperbarui.")
             print(f"🔍 Validasi Kolom Tersimpan: {list(df_hasil.columns)}")
+            if error_count > 0:
+                print(f"⚠️ Ada {error_count} saham yang gagal dihitung karena data tidak lengkap.")
         else:
-            print("⚠️ Peringatan: Proses selesai namun tidak ada data yang valid untuk disimpan.")
+            print("\n⚠️ GAGAL TOTAL: Proses selesai namun list hasil kosong. File lama TIDAK ditimpa.")
 
     finally:
-        # PENTING: Selalu lepas gembok apa pun yang terjadi (walaupun error/crash) agar 5 menit kemudian bisa jalan lagi
         if os.path.exists(LOCK_FILE):
             os.remove(LOCK_FILE)
 
