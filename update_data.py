@@ -82,6 +82,16 @@ def hitung_semua_indikator(df_saham):
     else:
         tekanan = "Tidak Ada Transaksi"
 
+    # --- TAMBAHAN 1: POLA CANDLESTICK ---
+    body_candle = abs(close_today - open_today)
+    upper_shadow = high_today - max(open_today, close_today)
+    lower_shadow = min(open_today, close_today) - low_today
+    
+    if body_candle <= (range_today * 0.1): pola_candle = "Doji (Ragu-ragu)"
+    elif lower_shadow > (body_candle * 2) and upper_shadow < (body_candle * 0.2): pola_candle = "Hammer (Potensi Reversal)"
+    elif body_candle > (range_today * 0.8) and close_today > open_today: pola_candle = "Marubozu (Strong Bullish)"
+    else: pola_candle = "Normal"
+
     ma_20 = df_saham['Close'].rolling(window=20).mean().iloc[-1].item()
     vol_ma_20 = df_saham['Volume'].rolling(window=20).mean().iloc[-1].item()
     ma_signal = "Uptrend" if close_today > ma_20 else "Downtrend"
@@ -141,6 +151,12 @@ def hitung_semua_indikator(df_saham):
     support_20 = df_saham['Low'].rolling(window=20).min().iloc[-1].item()
     resist_20 = df_saham['High'].rolling(window=20).max().iloc[-1].item()
 
+    # --- TAMBAHAN 2: POSISI ENTRY (JARAK KE SUPPORT) ---
+    jarak_support = ((close_today - support_20) / support_20) * 100 if support_20 > 0 else 0
+    if jarak_support <= 3.0: posisi_entry = "Dekat Support (Low Risk)"
+    elif jarak_support >= 10.0: posisi_entry = "Rawan Pucuk (High Risk)"
+    else: posisi_entry = "Area Tengah"
+
     if bandwidth > 15.0: risiko = "Tinggi"
     elif bandwidth > 8.0: risiko = "Sedang"
     else: risiko = "Rendah"
@@ -160,14 +176,14 @@ def hitung_semua_indikator(df_saham):
         "Momentum": momentum, "MA Signal": ma_signal, "MA Cross": ma_cross, "MACD": status_macd,
         "Status Bandar": status_bandar, "OBV Trend": obv_trend, "Status Gap": status_gap, "Tekanan Bandar": tekanan, 
         "Status BB": status_bb, "Risiko": risiko,
-        "Likuiditas": "> 1 Miliar" if (close_today * vol_today) > 1000000000 else "< 1 Miliar"
+        "Likuiditas": "> 1 Miliar" if (close_today * vol_today) > 1000000000 else "< 1 Miliar",
+        "Pola Candle": pola_candle, "Posisi Entry": posisi_entry # FIELD BARU
     }
 
 # ==========================================
 # SECTION 4: EKSEKUSI UTAMA (MODE DETEKTIF)
 # ==========================================
 def main():
-    # PAKSA HAPUS GEMBOK LAMA AGAR TIDAK NYANGKUT
     if os.path.exists(LOCK_FILE):
         os.remove(LOCK_FILE)
 
@@ -196,10 +212,8 @@ def main():
             progress=False
         )
         
-        # Mengecek apakah Yahoo Finance memblokir kita (mengembalikan dataframe kosong)
         if data_mentah.empty:
-            print("❌ ERROR FATAL: Yahoo Finance menolak permintaan data (Rate Limit / IP Block).")
-            print("ℹ️ Solusi: Anda harus menunggu 1-2 jam agar IP Codespaces Anda tidak diblokir lagi.")
+            print("❌ ERROR FATAL: Yahoo Finance menolak permintaan data.")
             return
 
         hasil = []
@@ -229,7 +243,12 @@ def main():
 
                         rekomendasi = "BELI" if score >= 7 else "WAIT & SEE"
                         
-                        data_akhir = {"Ticker": ticker, "Kategori": kat, "PER (x)": per, "PBV (x)": pbv}
+                        # --- TAMBAHAN 3: LOGIKA VALUASI INSTAN ---
+                        if per > 0 and per < 15 and pbv > 0 and pbv < 1.5: valuasi = "Undervalued (Murah)"
+                        elif per > 25 or pbv > 3.0: valuasi = "Overvalued (Mahal)"
+                        else: valuasi = "Fair Value (Wajar)"
+                        
+                        data_akhir = {"Ticker": ticker, "Kategori": kat, "Valuasi": valuasi, "PER (x)": per, "PBV (x)": pbv}
                         data_akhir.update(ind)
                         data_akhir.update({
                             "Total Score": score, 
@@ -240,7 +259,6 @@ def main():
                         
                         hasil.append(data_akhir)
             except Exception as e:
-                # Mode detektif: Tampilkan error apa yang membuat saham gagal dihitung
                 error_count += 1
                 print(f"⚠️ Error pada perhitungan saham {ticker}: {e}")
 
@@ -248,11 +266,8 @@ def main():
             df_hasil = pd.DataFrame(hasil)
             df_hasil.to_csv(FILE_HASIL, index=False)
             print(f"✅ Selesai! Data {len(hasil)} saham berhasil diperbarui.")
-            print(f"🔍 Validasi Kolom Tersimpan: {list(df_hasil.columns)}")
-            if error_count > 0:
-                print(f"⚠️ Ada {error_count} saham yang gagal dihitung karena data tidak lengkap.")
         else:
-            print("\n⚠️ GAGAL TOTAL: Proses selesai namun list hasil kosong. File lama TIDAK ditimpa.")
+            print("\n⚠️ GAGAL TOTAL: Proses selesai namun list hasil kosong.")
 
     finally:
         if os.path.exists(LOCK_FILE):
