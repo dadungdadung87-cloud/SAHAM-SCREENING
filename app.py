@@ -270,6 +270,25 @@ if not df_hasil.empty:
             tabel_akhir = df_tampil.style.format({"Harga (Rp)": format_angka, "Harga MA20": format_angka, "Support": format_angka, "Resistance": format_angka, "Volume": format_angka, "Change (%)": format_pct, "Momentum": format_mom, "PER (x)": format_desimal, "PBV (x)": format_desimal, "RSI (14D)": "{:.0f}"}).map(warna_tabel, subset=[c for c in kolom_ada if c not in ["Ticker"]])
             
             st.dataframe(tabel_akhir, use_container_width=True, hide_index=True, column_order=kolom_ada)
+            
+            # ================= FITUR DOWNLOAD & COPY TAB 2 =================
+            st.markdown("---")
+            col_dl, col_wl = st.columns([1, 1])
+            with col_dl:
+                # Mengubah dataframe yang sudah difilter menjadi format CSV
+                csv_filter = df_filtered[kolom_ada].to_csv(index=False).encode('utf-8')
+                st.download_button(
+                    label="📥 Download Hasil Filter (CSV)",
+                    data=csv_filter,
+                    file_name=f"Screener_Hasil_{datetime.now().strftime('%Y%m%d_%H%M')}.csv",
+                    mime="text/csv",
+                    key="dl_tab2"
+                )
+            with col_wl:
+                # Membuat format daftar ticker dengan koma
+                daftar_ticker = ", ".join(df_filtered["Ticker"].tolist())
+                st.code(daftar_ticker, language="text")
+                st.caption("📋 Klik icon 'Copy' di pojok kanan atas kotak untuk paste massal ke TradingView/Broker.")
         else: 
             st.warning("Tidak ada data sesuai filter.")
 
@@ -314,31 +333,30 @@ if not df_hasil.empty:
                 kolom_b = ["Ticker", "Harga (Rp)", "Change (%)", "Status Gap", "Volume", "Vol Breakout", "Tekanan Bandar", "Status Bandar", "OBV Trend", "Status BB", "Total Score"]
                 tabel_markup = df_markup.style.format({"Harga (Rp)": format_angka, "Volume": format_angka, "Change (%)": format_pct}).map(warna_tabel, subset=[c for c in kolom_b if c not in ["Ticker"]])
                 st.dataframe(tabel_markup, use_container_width=True, hide_index=True, column_order=kolom_b)
+                
+                # Fitur Download & Copy
+                c1, c2 = st.columns([1, 1])
+                c1.download_button("📥 Download Mark-Up (CSV)", df_markup[kolom_b].to_csv(index=False).encode('utf-8'), "Fase_MarkUp.csv", "text/csv", key="dl_markup")
+                c2.code(", ".join(df_markup["Ticker"].tolist()), language="text")
             else: st.info("Belum ada saham gorengan yang ditarik kuat oleh Bandar hari ini.")
 
             st.markdown("<br>", unsafe_allow_html=True)
             st.markdown("### 🤫 Fase Akumulasi Senyap (Curi Start)")
             st.caption("Algoritma: Saham Lapis 3 + Pergerakan Sempit (Squeeze) + Uang Masuk Diam-diam (OBV Naik). Diurutkan berdasarkan Skor Teknikal dan Volume.")
-            
             if not df_senyap.empty:
-                # 1. SORTING: Urutkan dari Total Score tertinggi, lalu Volume terbesar
                 df_senyap = df_senyap.sort_values(by=['Total Score', 'Volume'], ascending=[False, False]).reset_index(drop=True)
-                
-                # 2. PENOMORAN: Buat kolom 'Prioritas' dengan ikon piala untuk urutan pertama
                 df_senyap.insert(0, 'Prioritas', ['🏆 #1'] + [f'#{i+1}' for i in range(1, len(df_senyap))])
-                
-                # 3. FORMATTING
                 df_senyap["Total Score"] = df_senyap["Total Score"].apply(format_skor)
                 
-                # Tambahkan 'Prioritas' di urutan paling depan kolom yang ditampilkan
-                kolom_b = ["Prioritas", "Ticker", "Harga (Rp)", "Change (%)", "Status Gap", "Volume", "Vol Breakout", "Tekanan Bandar", "Status Bandar", "OBV Trend", "Status BB", "Total Score"]
+                kolom_senyap = ["Prioritas", "Ticker", "Harga (Rp)", "Change (%)", "Status Gap", "Volume", "Vol Breakout", "Tekanan Bandar", "Status Bandar", "OBV Trend", "Status BB", "Total Score"]
+                tabel_senyap = df_senyap.style.format({"Harga (Rp)": format_angka, "Volume": format_angka, "Change (%)": format_pct}).map(warna_tabel, subset=[c for c in kolom_senyap if c not in ["Ticker", "Prioritas"]])
+                st.dataframe(tabel_senyap, use_container_width=True, hide_index=True, column_order=kolom_senyap)
                 
-                # Render tabel (kolom Prioritas tidak diberi warna khusus agar teks tetap bersih)
-                tabel_senyap = df_senyap.style.format({"Harga (Rp)": format_angka, "Volume": format_angka, "Change (%)": format_pct}).map(warna_tabel, subset=[c for c in kolom_b if c not in ["Ticker", "Prioritas"]])
-                
-                st.dataframe(tabel_senyap, use_container_width=True, hide_index=True, column_order=kolom_b)
-            else: 
-                st.info("Belum ada saham yang terpantau masuk fase persiapan.")
+                # Fitur Download & Copy
+                c1, c2 = st.columns([1, 1])
+                c1.download_button("📥 Download Curi Start (CSV)", df_senyap[kolom_senyap].to_csv(index=False).encode('utf-8'), "Fase_CuriStart.csv", "text/csv", key="dl_senyap")
+                c2.code(", ".join(df_senyap["Ticker"].tolist()), language="text")
+            else: st.info("Belum ada saham yang terpantau masuk fase persiapan.")
 
             st.markdown("<br>", unsafe_allow_html=True)
             st.markdown("### ☠️ Fase Guyuran / Distribusi (HINDARI!)")
@@ -347,6 +365,11 @@ if not df_hasil.empty:
                 kolom_b = ["Ticker", "Harga (Rp)", "Change (%)", "Status Gap", "Volume", "Vol Breakout", "Tekanan Bandar", "Status Bandar", "OBV Trend", "Status BB", "Total Score"]
                 tabel_guyur = df_guyur.style.format({"Harga (Rp)": format_angka, "Volume": format_angka, "Change (%)": format_pct}).map(warna_tabel, subset=[c for c in kolom_b if c not in ["Ticker"]])
                 st.dataframe(tabel_guyur, use_container_width=True, hide_index=True, column_order=kolom_b)
+                
+                # Fitur Download & Copy
+                c1, c2 = st.columns([1, 1])
+                c1.download_button("📥 Download Guyuran (CSV)", df_guyur[kolom_b].to_csv(index=False).encode('utf-8'), "Fase_Guyuran.csv", "text/csv", key="dl_guyur")
+                c2.code(", ".join(df_guyur["Ticker"].tolist()), language="text")
             else: st.success("Pasar Lapis 3 terpantau bersih dari aksi guyuran berat Bandar hari ini.")
 else:
     st.error("Silakan jalankan `update_data.py` terlebih dahulu di terminal untuk memuat data!")
