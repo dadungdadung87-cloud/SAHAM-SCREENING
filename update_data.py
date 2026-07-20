@@ -82,7 +82,6 @@ def hitung_semua_indikator(df_saham):
     else:
         tekanan = "Tidak Ada Transaksi"
 
-    # --- TAMBAHAN 1: POLA CANDLESTICK ---
     body_candle = abs(close_today - open_today)
     upper_shadow = high_today - max(open_today, close_today)
     lower_shadow = min(open_today, close_today) - low_today
@@ -133,7 +132,7 @@ def hitung_semua_indikator(df_saham):
     df_saham['OBV'] = obv
     
     obv_sekarang = df_saham['OBV'].iloc[-1]
-    obv_5_hari_lalu = df_saham['OBV'].iloc[-6]
+    obv_5_hari_lalu = df_saham['OBV'].iloc[-6] if len(df_saham['OBV']) >= 6 else obv_sekarang
     if obv_sekarang > obv_5_hari_lalu: obv_trend = "Akumulasi (Naik)"
     elif obv_sekarang < obv_5_hari_lalu: obv_trend = "Distribusi (Turun)"
     else: obv_trend = "Netral"
@@ -151,7 +150,6 @@ def hitung_semua_indikator(df_saham):
     support_20 = df_saham['Low'].rolling(window=20).min().iloc[-1].item()
     resist_20 = df_saham['High'].rolling(window=20).max().iloc[-1].item()
 
-    # --- TAMBAHAN 2: POSISI ENTRY (JARAK KE SUPPORT) ---
     jarak_support = ((close_today - support_20) / support_20) * 100 if support_20 > 0 else 0
     if jarak_support <= 3.0: posisi_entry = "Dekat Support (Low Risk)"
     elif jarak_support >= 10.0: posisi_entry = "Rawan Pucuk (High Risk)"
@@ -170,46 +168,70 @@ def hitung_semua_indikator(df_saham):
     rsi_raw = (100 - (100 / (1 + rs))).iloc[-1].item()
     rsi = int(round(rsi_raw)) if not pd.isna(rsi_raw) else 0
 
+    # ====================================================
+    # TAMBAHAN FITUR PRO: VWAP, A/D LINE, VALUE TRANSAKSI
+    # ====================================================
+    
+    # 1. VWAP (5 Hari - Jangka Pendek)
+    typical_price = (df_saham['High'] + df_saham['Low'] + df_saham['Close']) / 3
+    vwap_5 = (typical_price * df_saham['Volume']).rolling(window=5).sum() / (df_saham['Volume'].rolling(window=5).sum() + 1)
+    vwap_val = vwap_5.iloc[-1].item()
+    if close_today > (vwap_val * 1.01): posisi_vwap = "Di Atas VWAP (Kuat)"
+    elif close_today < (vwap_val * 0.99): posisi_vwap = "Di Bawah VWAP (Lemah)"
+    else: posisi_vwap = "Persis di VWAP"
+
+    # 2. Accumulation/Distribution Line (Smart Money)
+    penyebut_ad = df_saham['High'] - df_saham['Low']
+    penyebut_ad = penyebut_ad.replace(0, 0.0001) # Mencegah error pembagian nol
+    mfm = ((df_saham['Close'] - df_saham['Low']) - (df_saham['High'] - df_saham['Close'])) / penyebut_ad
+    mfv = mfm * df_saham['Volume']
+    ad_line = mfv.cumsum()
+    ad_sekarang = ad_line.iloc[-1].item()
+    ad_5_hari_lalu = ad_line.iloc[-6].item() if len(ad_line) >= 6 else ad_sekarang
+    
+    if ad_sekarang > ad_5_hari_lalu: smart_money = "Akumulasi Pro (Smart Money)"
+    elif ad_sekarang < ad_5_hari_lalu: smart_money = "Distribusi Pro (Guyuran)"
+    else: smart_money = "Netral"
+
+    # 3. Kelas Nilai Transaksi (Avg 5 Hari)
+    vol_5_avg = df_saham['Volume'].rolling(window=5).mean().iloc[-1].item()
+    val_transaksi = vol_5_avg * close_today
+    if val_transaksi > 50_000_000_000: kelas_transaksi = "Sultan (> 50M/hari)"
+    elif val_transaksi > 5_000_000_000: kelas_transaksi = "Ritel Aktif (5M - 50M)"
+    else: kelas_transaksi = "Gorengan Sepi (< 5M)"
+
     return {
         "Harga (Rp)": close_today, "Harga MA20": int(ma_20), "Support": int(support_20), "Resistance": int(resist_20),
         "Change (%)": change_pct, "Volume": vol_today, "Vol Breakout": vol_breakout, "RSI (14D)": rsi,
         "Momentum": momentum, "MA Signal": ma_signal, "MA Cross": ma_cross, "MACD": status_macd,
         "Status Bandar": status_bandar, "OBV Trend": obv_trend, "Status Gap": status_gap, "Tekanan Bandar": tekanan, 
         "Status BB": status_bb, "Risiko": risiko,
+        "Pola Candle": pola_candle, "Posisi Entry": posisi_entry,
         "Likuiditas": "> 1 Miliar" if (close_today * vol_today) > 1000000000 else "< 1 Miliar",
-        "Pola Candle": pola_candle, "Posisi Entry": posisi_entry # FIELD BARU
+        "Posisi VWAP": posisi_vwap,          # DATA BARU
+        "Kekuatan A/D": smart_money,         # DATA BARU
+        "Kelas Transaksi": kelas_transaksi   # DATA BARU
     }
 
 # ==========================================
 # SECTION 4: EKSEKUSI UTAMA (MODE DETEKTIF)
 # ==========================================
 def main():
-    if os.path.exists(LOCK_FILE):
-        os.remove(LOCK_FILE)
-
-    with open(LOCK_FILE, "w") as f:
-        f.write("SEDANG PROSES")
+    if os.path.exists(LOCK_FILE): os.remove(LOCK_FILE)
+    with open(LOCK_FILE, "w") as f: f.write("SEDANG PROSES")
 
     try:
         print("⏳ Memulai pembaruan data saham (Diagnostic Mode)...")
         daftar_saham = load_tickers()
-        if not daftar_saham: 
-            return
+        if not daftar_saham: return
         
         tickers_jk = [f"{t}.JK" for t in daftar_saham]
         tickers_str = " ".join(tickers_jk)
-        
         aman_session = get_safe_session()
         
         print(f"📥 Mengunduh {len(daftar_saham)} data saham secara bersamaan (Maks 8 jalur)...")
         data_mentah = yf.download(
-            tickers_str, 
-            period="2mo", 
-            interval="1d", 
-            group_by='ticker', 
-            threads=8, 
-            session=aman_session, 
-            progress=False
+            tickers_str, period="2mo", interval="1d", group_by='ticker', threads=8, session=aman_session, progress=False
         )
         
         if data_mentah.empty:
@@ -224,7 +246,6 @@ def main():
                 t_jk = f"{ticker}.JK"
                 if t_jk in data_mentah:
                     df_saham = data_mentah[t_jk].dropna(subset=['Open', 'Close', 'Volume', 'High', 'Low'])
-                    
                     if len(df_saham) >= 26:
                         ind = hitung_semua_indikator(df_saham)
                         kat, per, pbv = get_fundamental(t_jk)
@@ -243,7 +264,6 @@ def main():
 
                         rekomendasi = "BELI" if score >= 7 else "WAIT & SEE"
                         
-                        # --- TAMBAHAN 3: LOGIKA VALUASI INSTAN ---
                         if per > 0 and per < 15 and pbv > 0 and pbv < 1.5: valuasi = "Undervalued (Murah)"
                         elif per > 25 or pbv > 3.0: valuasi = "Overvalued (Mahal)"
                         else: valuasi = "Fair Value (Wajar)"
@@ -251,12 +271,9 @@ def main():
                         data_akhir = {"Ticker": ticker, "Kategori": kat, "Valuasi": valuasi, "PER (x)": per, "PBV (x)": pbv}
                         data_akhir.update(ind)
                         data_akhir.update({
-                            "Total Score": score, 
-                            "Rekomendasi": rekomendasi, 
-                            "Status Akuisisi": "TIDAK ADA", 
-                            "Terakhir Update": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                            "Total Score": score, "Rekomendasi": rekomendasi, 
+                            "Status Akuisisi": "TIDAK ADA", "Terakhir Update": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         })
-                        
                         hasil.append(data_akhir)
             except Exception as e:
                 error_count += 1
@@ -268,10 +285,8 @@ def main():
             print(f"✅ Selesai! Data {len(hasil)} saham berhasil diperbarui.")
         else:
             print("\n⚠️ GAGAL TOTAL: Proses selesai namun list hasil kosong.")
-
     finally:
-        if os.path.exists(LOCK_FILE):
-            os.remove(LOCK_FILE)
+        if os.path.exists(LOCK_FILE): os.remove(LOCK_FILE)
 
 if __name__ == "__main__":
     main()
