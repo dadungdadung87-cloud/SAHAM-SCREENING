@@ -33,24 +33,66 @@ FILE_PRESET = "preset_kustom.json"
 FILE_HASIL = "hasil_screener.csv"
 FILE_AKUISISI = "data_akuisisi.csv"
 
+# SEMUA KATEGORI LAMA DIKEMBALIKAN + DITAMBAH KATEGORI BARU
 DEFAULT_CONFIG = {
     "MASTER_FILTERS": {
         "Kategori": {"label": "🏢 Kategori Saham", "options": ["Semua", "Big Cap (Lapis 1)", "Mid Cap (Lapis 2)", "Small Cap (Lapis 3)"]},
-        "Fase Siklus Bandar": {"label": "🔄 Siklus Wyckoff", "options": ["Semua", "Accumulation (Kumpul Barang)", "Mark-Up (Fase Pesta)", "Distribution (Fase Jualan)", "Mark-Down (Fase Runtuh)", "Sideways"]},
-        "RVOL (Anomali Vol)": {"label": "🌋 Ledakan Volume", "options": ["Semua", "Ledakan Ekstrem (> 300%)", "Anomali Tinggi (150-300%)", "Normal (50-150%)", "Sepi (< 50%)"]},
-        "Karakter Gorengan": {"label": "🕵️ Karakter Saham", "options": ["Semua", "Spesialis Tiang Jemuran (Banting Pucuk)", "Solid (Jarang Dibanting)", "Normal"]},
-        "Kelas Transaksi": {"label": "💸 Kelas Transaksi", "options": ["Semua", "Sultan (> 50M/hari)", "Ritel Aktif (5M - 50M)", "Gorengan Sepi (< 5M)"]},
-        "Posisi VWAP": {"label": "⚖️ Posisi thd VWAP", "options": ["Semua", "Di Atas VWAP (Kuat)", "Di Bawah VWAP (Lemah)", "Persis di VWAP"]},
-        "Kekuatan A/D": {"label": "🧠 Smart Money (A/D)", "options": ["Semua", "Akumulasi Pro (Smart Money)", "Distribusi Pro (Guyuran)", "Netral"]},
+        "Kelas Transaksi": {"label": "💸 Kelas Transaksi (Baru)", "options": ["Semua", "Sultan (> 50M/hari)", "Ritel Aktif (5M - 50M)", "Gorengan Sepi (< 5M)"]},
+        "Valuasi": {"label": "💎 Valuasi Fundamental", "options": ["Semua", "Undervalued (Murah)", "Fair Value (Wajar)", "Overvalued (Mahal)"]},
+        "Posisi VWAP": {"label": "⚖️ Posisi thd VWAP (Baru)", "options": ["Semua", "Di Atas VWAP (Kuat)", "Di Bawah VWAP (Lemah)", "Persis di VWAP"]},
+        "Fase Siklus Bandar": {"label": "🔄 Siklus Wyckoff (Baru)", "options": ["Semua", "Accumulation (Kumpul Barang)", "Mark-Up (Fase Pesta)", "Distribution (Fase Jualan)", "Mark-Down (Fase Runtuh)", "Sideways"]},
+        "RVOL (Anomali Vol)": {"label": "🌋 Ledakan Volume (Baru)", "options": ["Semua", "Ledakan Ekstrem (> 300%)", "Anomali Tinggi (150-300%)", "Normal (50-150%)", "Sepi (< 50%)"]},
+        "Karakter Gorengan": {"label": "🕵️ Karakter Saham (Baru)", "options": ["Semua", "Spesialis Tiang Jemuran (Banting Pucuk)", "Solid (Jarang Dibanting)", "Normal"]},
         "Status Bandar": {"label": "🕵️ Status Bandar", "options": ["Semua", "Akumulasi Kuat", "Distribusi Kuat", "Normal"]},
         "Tekanan Bandar": {"label": "⚔️ Tekanan Harian", "options": ["Semua", "Dominan Beli (Hajar Kanan)", "Dominan Jual (Guyur)", "Seimbang / Adu Mekanik"]},
-        "Valuasi": {"label": "💎 Valuasi", "options": ["Semua", "Undervalued (Murah)", "Fair Value (Wajar)", "Overvalued (Mahal)"]},
+        "Kekuatan A/D": {"label": "🧠 Smart Money A/D (Baru)", "options": ["Semua", "Akumulasi Pro (Smart Money)", "Distribusi Pro (Guyuran)", "Netral"]},
+        "OBV Trend": {"label": "🌊 Tren Uang (OBV)", "options": ["Semua", "Akumulasi (Naik)", "Distribusi (Turun)", "Netral"]},
+        "Pola Candle": {"label": "🕯️ Price Action", "options": ["Semua", "Marubozu (Strong Bullish)", "Hammer (Potensi Reversal)", "Doji (Ragu-ragu)", "Normal"]},
         "Posisi Entry": {"label": "🎯 Jarak ke Support", "options": ["Semua", "Dekat Support (Low Risk)", "Area Tengah", "Rawan Pucuk (High Risk)"]},
+        "Vol Breakout": {"label": "🔊 Volume", "options": ["Semua", "Tembus MA20", "Normal"]},
+        "RSI (14D)": {"label": "📊 RSI (14D)", "options": ["Semua", "> 50 (Bullish)", "<= 50 (Bearish)"]},
+        "MA Signal": {"label": "📈 Tren (MA20)", "options": ["Semua", "Uptrend", "Downtrend"]},
+        "Momentum": {"label": "⚡ Momentum", "options": ["Semua", "Positif", "Negatif"]},
         "Total Score": {"label": "⭐ Total Score", "options": ["Semua", 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]},
         "Rekomendasi": {"label": "🎯 Rekomendasi", "options": ["Semua", "BELI", "WAIT & SEE"]},
-        "MA Signal": {"label": "📈 Tren (MA20)", "options": ["Semua", "Uptrend", "Downtrend"]}
+        "Likuiditas": {"label": "💧 Likuiditas (Klasik)", "options": ["Semua", "> 1 Miliar", "< 1 Miliar"]},
+        "Status BB": {"label": "🌐 Bollinger Bands", "options": ["Semua", "Squeeze", "Bottom Rebound", "Breakout Upper", "Normal"]},
+        "MA Cross": {"label": "🔀 MA Cross (5/20)", "options": ["Semua", "Golden Cross", "Bullish", "Death Cross", "Bearish"]},
+        "Risiko": {"label": "⚠️ Risiko Volatilitas", "options": ["Semua", "Tinggi", "Sedang", "Rendah"]},
+        "Status Akuisisi": {"label": "🤝 Sentimen Akuisisi", "options": ["Semua", "TIDAK ADA", "RENCANA AKUISISI", "DALAM AKUISISI"]},
+        "MACD": {"label": "📈 MACD", "options": ["Semua", "Strong Bullish", "Bullish MACD", "Strong Bearish", "Bearish MACD"]}
     },
     "KAMUS_EDUKASI": {
+        "Ticker": "Kode unik perusahaan.",
+        "Kategori": "Pengelompokan saham berdasarkan Kapitalisasi Pasar. Lapis 1 (>10T), Lapis 2 (1-10T), Lapis 3 (<1T).",
+        "Valuasi": "Penilaian fundamental berdasarkan kombinasi PER dan PBV.",
+        "Harga (Rp)": "Harga penutupan terakhir.",
+        "PER (x)": "Price to Earnings Ratio. < 15x = murah.",
+        "PBV (x)": "Price to Book Value. < 1x = diskon dari nilai asli.",
+        "Harga MA20": "Harga rata-rata pergerakan saham 20 hari terakhir.",
+        "Support": "Area batas pantul bawah.",
+        "Resistance": "Area batas atap atas.",
+        "Posisi Entry": "Jarak persentase harga saat ini dengan area support (Low vs High Risk).",
+        "Pola Candle": "Deteksi bentuk candlestick harian (Doji, Hammer, Marubozu).",
+        "Change (%)": "Persentase pergerakan harga hari ini.",
+        "Volume": "Jumlah lembar saham yang diperdagangkan.",
+        "Vol Breakout": "Tembus MA20 = volume melonjak di atas rata-rata.",
+        "Status Bandar": "Deteksi pergerakan uang berdasarkan anomali volume. 'Akumulasi' = Bandar beli, 'Distribusi' = Bandar jualan.",
+        "Status Gap": "Manipulasi Pre-Opening. 'Gap Up' = harga dibuka langsung loncat di atas penutupan kemarin (FOMO).",
+        "Tekanan Bandar": "Analisis anatomi Candlestick harian. 'Dominan Beli' = harga ditutup dekat batas atas (bandar Hajar Kanan). 'Dominan Jual' = harga ditutup jauh di bawah batas atas (ekor panjang di atas = diguyur).",
+        "OBV Trend": "Jika 'Akumulasi (Naik)', arus volume uang masuk lebih besar daripada uang keluar dalam 5 hari.",
+        "RSI (14D)": "Momentum kecepatan harga.",
+        "Momentum": "Arah pergerakan harga harian murni.",
+        "MA Signal": "Uptrend jika harga > MA20.",
+        "MA Cross": "Golden Cross (Sinyal Beli).",
+        "MACD": "Konfirmasi tren.",
+        "Status BB": "Squeeze = harga konsolidasi/diam bersiap meledak.",
+        "Risiko": "Tingkat Volatilitas. Tinggi = pergerakan liar.",
+        "Likuiditas": "Total nilai transaksi.",
+        "Total Score": "Akumulasi skor (Maksimal 10 Bintang).",
+        "Rekomendasi": "Kesimpulan algoritma. BELI jika skor >= 7.",
+        "Status Akuisisi": "Sentimen M&A.",
+        "Terakhir Update": "Waktu sinkronisasi data.",
         "Fase Siklus Bandar": "Pendekatan Wyckoff (MA20 vs MA50). 'Accumulation' = fase persiapan naik. 'Mark-Up' = sedang uptrend kuat.",
         "RVOL (Anomali Vol)": "Relative Volume. Membandingkan volume hari ini terhadap rata-rata 10 hari. Angka ekstrem mengindikasikan aksi bandar masif.",
         "Karakter Gorengan": "Mendeteksi seberapa sering saham ini dibanting dari pucuk (membuat ekor atas panjang) dalam 20 hari terakhir. Jika sering, waspada jebakan batman.",
@@ -59,9 +101,11 @@ DEFAULT_CONFIG = {
         "Kekuatan A/D": "Deteksi uang pintar dari bentuk candle. Menghitung apakah penutupan selalu ditarik ke atas (akumulasi)."
     },
     "STRATEGI": {
-        "1. Pemburu Gorengan (Super Fast Trade)": "Gunakan tab Screener Utama, filter: RVOL = 'Ledakan Ekstrem (> 300%)', Karakter = 'Spesialis Tiang Jemuran'. Beli sangat pagi, pantau bid-offer, JUAL sebelum istirahat siang. Jangan serakah!",
-        "2. Swing Trading Aman (Follow the Trend)": "Gunakan filter: Fase Siklus = 'Mark-Up', Kekuatan A/D = 'Akumulasi Pro', Posisi VWAP = 'Di Atas VWAP'.",
-        "3. Early Reversal (Beli di Bawah)": "Filter Fase Siklus = 'Accumulation', dipadukan dengan Posisi Entry = 'Dekat Support (Low Risk)'."
+        "1. Fast Trade & Scalping (Copet)": "Gunakan Tab 5 (Radar Bandar). Cari saham Squeeze dengan Tekanan Bandar 'Dominan Beli'. Beli sore hari, jual besok pagi saat harga Gap Up.",
+        "2. Swing Trading (Follow the Trend)": "Gunakan filter: Tren = Uptrend, RSI = > 50, Kategori = Big/Mid Cap, Valuasi = Murah atau Wajar.",
+        "3. Value Investing (Beli Diskon)": "Gunakan filter: Valuasi = Undervalued (Murah), Kategori = Big Cap.",
+        "4. Menghindari Guyuran Bandar": "Jika saham naik kencang (Breakout Upper) TAPI Tekanan Bandar 'Dominan Jual' (ekor panjang di atas), itu artinya bandar sedang take profit. Segera jual!",
+        "5. Pemburu Gorengan (Super Fast Trade)": "Filter: RVOL = 'Ledakan Ekstrem (> 300%)', Karakter = 'Spesialis Tiang Jemuran'. Beli sangat pagi, pantau bid-offer, JUAL sebelum istirahat siang."
     }
 }
 
@@ -84,11 +128,13 @@ STRATEGI_SIMULASI = WEB_CONFIG["STRATEGI"]
 # ==========================================
 def muat_preset():
     preset_bawaan = {
-        "🔥 Gorengan Aktif (High Risk)": {k: "Semua" for k in MASTER_FILTERS},
-        "🟢 Swing Wyckoff Cuan": {k: "Semua" for k in MASTER_FILTERS}
+        "🔥 Bluechip Terakumulasi": {k: "Semua" for k in MASTER_FILTERS},
+        "🟢 Uptrend Aman (Murah)": {k: "Semua" for k in MASTER_FILTERS},
+        "🚀 Gorengan Aktif (High Risk)": {k: "Semua" for k in MASTER_FILTERS}
     }
-    preset_bawaan["🔥 Gorengan Aktif (High Risk)"].update({"Kategori": "Small Cap (Lapis 3)", "RVOL (Anomali Vol)": "Ledakan Ekstrem (> 300%)", "Tekanan Bandar": "Dominan Beli (Hajar Kanan)"})
-    preset_bawaan["🟢 Swing Wyckoff Cuan"].update({"Fase Siklus Bandar": "Mark-Up (Fase Pesta)", "Kekuatan A/D": "Akumulasi Pro (Smart Money)", "MA Signal": "Uptrend"})
+    preset_bawaan["🔥 Bluechip Terakumulasi"].update({"Status Bandar": "Akumulasi Kuat", "Kategori": "Big Cap (Lapis 1)", "MA Signal": "Uptrend"})
+    preset_bawaan["🟢 Uptrend Aman (Murah)"].update({"MA Signal": "Uptrend", "Valuasi": "Undervalued (Murah)", "Posisi Entry": "Dekat Support (Low Risk)"})
+    preset_bawaan["🚀 Gorengan Aktif (High Risk)"].update({"Kategori": "Small Cap (Lapis 3)", "RVOL (Anomali Vol)": "Ledakan Ekstrem (> 300%)", "Tekanan Bandar": "Dominan Beli (Hajar Kanan)"})
 
     if os.path.exists(FILE_PRESET):
         try:
@@ -131,18 +177,20 @@ idx_default = opsi_preset.index(st.session_state.preset_selector) if st.session_
 st.sidebar.selectbox("🎯 Pilih Preset Aktif:", opsi_preset, index=idx_default, key="preset_selector", on_change=apply_preset)
 
 with st.sidebar.expander("➕ Buat Preset Sendiri Kustom"):
-    nama_preset_baru = st.text_input("Nama Preset Anda:", placeholder="Contoh: Pemburu Tiang Jemuran")
+    nama_preset_baru = st.text_input("Nama Preset Anda:", placeholder="Contoh: Akumulasi Uang Besar")
     kustom_input = {k: st.selectbox(f"P-{info['label']}", info['options'], key=f"sidebar_{k}") for k, info in MASTER_FILTERS.items()}
     if st.button("💾 Simpan Jadi Preset"):
         if nama_preset_baru.strip():
             k_lama = {}
             if os.path.exists(FILE_PRESET):
-                with open(FILE_PRESET, "r") as f: k_lama = json.load(f)
+                try:
+                    with open(FILE_PRESET, "r") as f: k_lama = json.load(f)
+                except: pass
             k_lama[nama_preset_baru.strip()] = kustom_input
             with open(FILE_PRESET, "w") as f: json.dump(k_lama, f, indent=4)
             for k in MASTER_FILTERS: st.session_state[f"main_{k}"] = kustom_input[k]
             st.session_state.preset_selector = nama_preset_baru.strip()
-            st.success(f"Preset Disimpan!")
+            st.success("Preset Disimpan!")
             st.rerun()
 
 st.sidebar.markdown("---")
@@ -185,26 +233,28 @@ if not df_hasil.empty:
     
     with tab1:
         total = len(df_hasil)
-        beli = len(df_hasil[df_hasil['Rekomendasi'] == 'BELI'])
-        uptrend = len(df_hasil[df_hasil['Fase Siklus Bandar'] == 'Mark-Up (Fase Pesta)']) if 'Fase Siklus Bandar' in df_hasil.columns else 0
+        beli = len(df_hasil[df_hasil['Rekomendasi'] == 'BELI']) if 'Rekomendasi' in df_hasil.columns else 0
+        uptrend = len(df_hasil[df_hasil['MA Signal'] == 'Uptrend']) if 'MA Signal' in df_hasil.columns else 0
         
         m1, m2, m3 = st.columns(3)
         m1.markdown(f"<div class='metric-container'><h3>🔍 Total Saham</h3><h2>{total}</h2></div>", unsafe_allow_html=True)
         m2.markdown(f"<div class='metric-container'><h3>🎯 Sinyal BELI</h3><h2 style='color: #4ade80;'>{beli}</h2></div>", unsafe_allow_html=True)
-        m3.markdown(f"<div class='metric-container'><h3>🚀 Di Fase Pesta (Mark-Up)</h3><h2 style='color: #60a5fa;'>{uptrend}</h2></div>", unsafe_allow_html=True)
+        m3.markdown(f"<div class='metric-container'><h3>📈 Fase Uptrend</h3><h2 style='color: #60a5fa;'>{uptrend}</h2></div>", unsafe_allow_html=True)
         
         st.markdown("---")
         c1, c2 = st.columns([1, 2])
         with c1:
-            df_rek = df_hasil['Rekomendasi'].value_counts().reset_index()
-            df_rek.columns = ['Rekomendasi', 'Jumlah']
-            fig_pie = px.pie(df_rek, names='Rekomendasi', values='Jumlah', hole=0.5, color='Rekomendasi', color_discrete_map={'BELI': '#22c55e', 'WAIT & SEE': '#ef4444'})
-            st.plotly_chart(fig_pie, use_container_width=True)
+            if 'Rekomendasi' in df_hasil.columns:
+                df_rek = df_hasil['Rekomendasi'].value_counts().reset_index()
+                df_rek.columns = ['Rekomendasi', 'Jumlah']
+                fig_pie = px.pie(df_rek, names='Rekomendasi', values='Jumlah', hole=0.5, color='Rekomendasi', color_discrete_map={'BELI': '#22c55e', 'WAIT & SEE': '#ef4444'})
+                st.plotly_chart(fig_pie, use_container_width=True)
         with c2:
-            df_top = df_hasil.nlargest(15, 'Change (%)').iloc[::-1]
-            fig_bar = px.bar(df_top, x='Change (%)', y='Ticker', orientation='h', color='Change (%)', color_continuous_scale=['#86efac', '#22c55e', '#166534'])
-            fig_bar.update_traces(texttemplate='%{x:.0f}%', textposition='outside')
-            st.plotly_chart(fig_bar, use_container_width=True)
+            if 'Change (%)' in df_hasil.columns:
+                df_top = df_hasil.nlargest(15, 'Change (%)').iloc[::-1]
+                fig_bar = px.bar(df_top, x='Change (%)', y='Ticker', orientation='h', color='Change (%)', color_continuous_scale=['#86efac', '#22c55e', '#166534'])
+                fig_bar.update_traces(texttemplate='%{x:.0f}%', textposition='outside')
+                st.plotly_chart(fig_bar, use_container_width=True)
 
     with tab2:
         with st.expander("🎛️ Buka Panel Filter Lengkap", expanded=False):
@@ -226,9 +276,11 @@ if not df_hasil.empty:
         for db_key, nilai in filter_terpilih.items():
             if nilai != "Semua":
                 if db_key == "RSI (14D)":
-                    df_filtered = df_filtered[df_filtered["RSI (14D)"] > 50] if "Bullish" in nilai else df_filtered[df_filtered["RSI (14D)"] <= 50]
+                    if "RSI (14D)" in df_filtered.columns:
+                        df_filtered = df_filtered[df_filtered["RSI (14D)"] > 50] if "Bullish" in nilai else df_filtered[df_filtered["RSI (14D)"] <= 50]
                 elif db_key == "Total Score":
-                    df_filtered = df_filtered[df_filtered["Total Score"] == int(nilai)]
+                    if "Total Score" in df_filtered.columns:
+                        df_filtered = df_filtered[df_filtered["Total Score"] == int(nilai)]
                 elif db_key in df_filtered.columns:
                     df_filtered = df_filtered[df_filtered[db_key] == nilai]
 
@@ -242,13 +294,35 @@ if not df_hasil.empty:
                     
             idx_awal = (hal_aktif - 1) * per_hal
             df_tampil = df_filtered.iloc[idx_awal : idx_awal + per_hal].copy()
-            df_tampil["Total Score"] = df_tampil["Total Score"].apply(format_skor)
+            if "Total Score" in df_tampil.columns:
+                df_tampil["Total Score"] = df_tampil["Total Score"].apply(format_skor)
             
-            # URUTAN KOLOM YANG DI-PRIORITASKAN UNTUK MEMANTAU AKSI BANDAR
-            urutan = ["Ticker", "RVOL (Anomali Vol)", "Fase Siklus Bandar", "Karakter Gorengan", "Kategori", "Kelas Transaksi", "Harga (Rp)", "Posisi VWAP", "Tekanan Bandar", "Kekuatan A/D", "Status Bandar", "OBV Trend", "Posisi Entry", "Pola Candle", "Change (%)", "Volume", "Status Gap", "Valuasi", "Harga MA20", "RSI (14D)", "Total Score", "Rekomendasi"]
+            # SELURUH 30 KOLOM ASLI + 6 KOLOM BARU DIGABUNGKAN SEMPURNA (Total 36 Kolom)
+            urutan = [
+                "Ticker", "Kategori", "Kelas Transaksi", "Valuasi", "Harga (Rp)", "PER (x)", "PBV (x)", "Harga MA20", 
+                "Posisi VWAP", "Support", "Resistance", "Posisi Entry", "Pola Candle", "Change (%)", "Volume", 
+                "RVOL (Anomali Vol)", "Vol Breakout", "Status Gap", "Fase Siklus Bandar", "Karakter Gorengan", 
+                "Tekanan Bandar", "Kekuatan A/D", "Status Bandar", "OBV Trend", "RSI (14D)", "Momentum", "MA Signal", 
+                "MA Cross", "MACD", "Status BB", "Risiko", "Likuiditas", "Total Score", "Rekomendasi", 
+                "Status Akuisisi", "Terakhir Update"
+            ]
             kolom_ada = [c for c in urutan if c in df_tampil.columns]
 
-            tabel_akhir = df_tampil.style.format({"Harga (Rp)": format_angka, "Harga MA20": format_angka, "Volume": format_angka, "Change (%)": format_pct, "RSI (14D)": "{:.0f}"}).map(warna_tabel, subset=[c for c in kolom_ada if c not in ["Ticker"]])
+            format_dict = {}
+            if "Harga (Rp)" in df_tampil.columns: format_dict["Harga (Rp)"] = format_angka
+            if "Harga MA20" in df_tampil.columns: format_dict["Harga MA20"] = format_angka
+            if "Support" in df_tampil.columns: format_dict["Support"] = format_angka
+            if "Resistance" in df_tampil.columns: format_dict["Resistance"] = format_angka
+            if "Volume" in df_tampil.columns: format_dict["Volume"] = format_angka
+            if "Change (%)" in df_tampil.columns: format_dict["Change (%)"] = format_pct
+            if "Momentum" in df_tampil.columns: format_dict["Momentum"] = format_mom
+            if "PER (x)" in df_tampil.columns: format_dict["PER (x)"] = format_desimal
+            if "PBV (x)" in df_tampil.columns: format_dict["PBV (x)"] = format_desimal
+            if "RSI (14D)" in df_tampil.columns: format_dict["RSI (14D)"] = "{:.0f}"
+
+            styler_obj = df_tampil.style.format(format_dict)
+            subset_warna = [c for c in kolom_ada if c not in ["Ticker"]]
+            tabel_akhir = styler_obj.map(warna_tabel, subset=subset_warna) if hasattr(styler_obj, 'map') else styler_obj.applymap(warna_tabel, subset=subset_warna)
             
             st.dataframe(tabel_akhir, use_container_width=True, hide_index=True, column_order=kolom_ada)
             
@@ -259,7 +333,7 @@ if not df_hasil.empty:
                 st.download_button(
                     label="📥 Download Hasil Filter (CSV)",
                     data=csv_filter,
-                    file_name=f"Screener_Bandar_Hasil_{datetime.now().strftime('%Y%m%d_%H%M')}.csv",
+                    file_name=f"Screener_Hasil_{datetime.now().strftime('%Y%m%d_%H%M')}.csv",
                     mime="text/csv",
                     key="dl_tab2"
                 )
@@ -270,7 +344,6 @@ if not df_hasil.empty:
         else: 
             st.warning("Tidak ada data sesuai filter.")
 
-    # ... Tab 3, 4, 5 sisanya sama (tidak saya tulis ulang secara penuh demi menyingkat tempat, cukup pertahankan yang lama karena sudah sesuai)
     with tab3:
         st.markdown("### 📚 Kamus Istilah Kolom")
         st.info("Penjelasan membaca kolom otomatis dari config_web.json")
@@ -284,8 +357,78 @@ if not df_hasil.empty:
         for judul, deskripsi in STRATEGI_SIMULASI.items():
             with st.expander(f"💼 {judul}", expanded=False): st.write(deskripsi)
                 
+        st.markdown("---")
+        st.markdown("#### 🛠️ Analisis Status Pasar Saat Ini")
+        if 'Status Bandar' in df_hasil.columns:
+            dominasi_bandar = len(df_hasil[df_hasil['Status Bandar'] == 'Akumulasi Kuat'])
+            if dominasi_bandar > (len(df_hasil) * 0.1): st.info("🔥 **SIMULASI:** Saat ini banyak saham (>10% pasar) sedang diakumulasi bandar. Fokus pada strategi **Bandarmologi Ride**.")
+            else: st.warning("⚖️ **SIMULASI:** Pasar sedang sepi dari pergerakan bandar masif. Disarankan menggunakan strategi **Value Investing** (cicil saham murah) atau **Buy on Squeeze**.")
+
     with tab5:
         st.markdown("## 🦅 Radar Copet Bandar (Fast Trade)")
-        st.info("Catatan: Tetap gunakan tab ini untuk melihat rangkuman fase cepat. Anda kini bisa validasi temuan di tab ini menggunakan filter 'RVOL' dan 'Karakter Gorengan' di Tab 2 Utama.")
+        st.markdown("<div class='bandar-box'><b>⚠️ PERINGATAN RISIKO TINGGI:</b> Tab ini murni mendeteksi anomali volume dan volatilitas ekstrem pada saham Lapis 3 (Small Cap/Gorengan). Kecepatan eksekusi sangat dibutuhkan!</div>", unsafe_allow_html=True)
+        
+        if 'Tekanan Bandar' not in df_hasil.columns:
+            st.warning("⏳ **Fitur Radar Bandar belum menerima data terbaru.** Harap klik tombol 'Muat Ulang Data Server' di sidebar sebelah kiri.")
+        else:
+            df_lapis3 = df_hasil[df_hasil['Kategori'].str.contains("Small Cap", na=False)]
+            
+            df_markup = df_lapis3[(df_lapis3['Status Bandar'] == 'Akumulasi Kuat') & (df_lapis3['Tekanan Bandar'] == 'Dominan Beli (Hajar Kanan)')].copy()
+            df_senyap = df_lapis3[(df_lapis3['OBV Trend'] == 'Akumulasi (Naik)') & (df_lapis3['Status BB'] == 'Squeeze')].copy()
+            df_guyur = df_lapis3[(df_lapis3['Status Bandar'] == 'Distribusi Kuat') | (df_lapis3['Tekanan Bandar'] == 'Dominan Jual (Guyur)')].copy()
+
+            st.markdown("---")
+            st.markdown("### 🔥 Fase Mark-Up (Sedang Digoreng Naik)")
+            st.caption("Algoritma: Saham Lapis 3 + Volume Akumulasi Kuat + Ditutup dengan Tekanan Beli (Hajar Kanan).")
+            if not df_markup.empty:
+                if "Total Score" in df_markup.columns: df_markup["Total Score"] = df_markup["Total Score"].apply(format_skor)
+                kolom_b = ["Ticker", "Harga (Rp)", "Change (%)", "Status Gap", "Volume", "Vol Breakout", "Tekanan Bandar", "Status Bandar", "OBV Trend", "Status BB", "Total Score"]
+                kolom_b = [c for c in kolom_b if c in df_markup.columns]
+                styler_markup = df_markup.style.format({"Harga (Rp)": format_angka, "Volume": format_angka, "Change (%)": format_pct})
+                subset_m = [c for c in kolom_b if c not in ["Ticker"]]
+                tabel_markup = styler_markup.map(warna_tabel, subset=subset_m) if hasattr(styler_markup, 'map') else styler_markup.applymap(warna_tabel, subset=subset_m)
+                st.dataframe(tabel_markup, use_container_width=True, hide_index=True, column_order=kolom_b)
+                
+                c1, c2 = st.columns([1, 1])
+                c1.download_button("📥 Download Mark-Up (CSV)", df_markup[kolom_b].to_csv(index=False).encode('utf-8'), "Fase_MarkUp.csv", "text/csv", key="dl_markup")
+                c2.code(", ".join(df_markup["Ticker"].tolist()), language="text")
+            else: st.info("Belum ada saham gorengan yang ditarik kuat oleh Bandar hari ini.")
+
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("### 🤫 Fase Akumulasi Senyap (Curi Start)")
+            st.caption("Algoritma: Saham Lapis 3 + Pergerakan Sempit (Squeeze) + Uang Masuk Diam-diam (OBV Naik). Diurutkan berdasarkan Skor Teknikal dan Volume.")
+            if not df_senyap.empty:
+                sort_cols = [c for c in ['Total Score', 'Volume'] if c in df_senyap.columns]
+                if sort_cols: df_senyap = df_senyap.sort_values(by=sort_cols, ascending=[False, False]).reset_index(drop=True)
+                df_senyap.insert(0, 'Prioritas', ['🏆 #1'] + [f'#{i+1}' for i in range(1, len(df_senyap))])
+                if "Total Score" in df_senyap.columns: df_senyap["Total Score"] = df_senyap["Total Score"].apply(format_skor)
+                
+                kolom_senyap = ["Prioritas", "Ticker", "Harga (Rp)", "Change (%)", "Status Gap", "Volume", "Vol Breakout", "Tekanan Bandar", "Status Bandar", "OBV Trend", "Status BB", "Total Score"]
+                kolom_senyap = [c for c in kolom_senyap if c in df_senyap.columns]
+                styler_senyap = df_senyap.style.format({"Harga (Rp)": format_angka, "Volume": format_angka, "Change (%)": format_pct})
+                subset_s = [c for c in kolom_senyap if c not in ["Ticker", "Prioritas"]]
+                tabel_senyap = styler_senyap.map(warna_tabel, subset=subset_s) if hasattr(styler_senyap, 'map') else styler_senyap.applymap(warna_tabel, subset=subset_s)
+                st.dataframe(tabel_senyap, use_container_width=True, hide_index=True, column_order=kolom_senyap)
+                
+                c1, c2 = st.columns([1, 1])
+                c1.download_button("📥 Download Curi Start (CSV)", df_senyap[kolom_senyap].to_csv(index=False).encode('utf-8'), "Fase_CuriStart.csv", "text/csv", key="dl_senyap")
+                c2.code(", ".join(df_senyap["Ticker"].tolist()), language="text")
+            else: st.info("Belum ada saham yang terpantau masuk fase persiapan.")
+
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("### ☠️ Fase Guyuran / Distribusi (HINDARI!)")
+            if not df_guyur.empty:
+                if "Total Score" in df_guyur.columns: df_guyur["Total Score"] = df_guyur["Total Score"].apply(format_skor)
+                kolom_b = ["Ticker", "Harga (Rp)", "Change (%)", "Status Gap", "Volume", "Vol Breakout", "Tekanan Bandar", "Status Bandar", "OBV Trend", "Status BB", "Total Score"]
+                kolom_b = [c for c in kolom_b if c in df_guyur.columns]
+                styler_guyur = df_guyur.style.format({"Harga (Rp)": format_angka, "Volume": format_angka, "Change (%)": format_pct})
+                subset_g = [c for c in kolom_b if c not in ["Ticker"]]
+                tabel_guyur = styler_guyur.map(warna_tabel, subset=subset_g) if hasattr(styler_guyur, 'map') else styler_guyur.applymap(warna_tabel, subset=subset_g)
+                st.dataframe(tabel_guyur, use_container_width=True, hide_index=True, column_order=kolom_b)
+                
+                c1, c2 = st.columns([1, 1])
+                c1.download_button("📥 Download Guyuran (CSV)", df_guyur[kolom_b].to_csv(index=False).encode('utf-8'), "Fase_Guyuran.csv", "text/csv", key="dl_guyur")
+                c2.code(", ".join(df_guyur["Ticker"].tolist()), language="text")
+            else: st.success("Pasar Lapis 3 terpantau bersih dari aksi guyuran berat Bandar hari ini.")
 else:
     st.error("Silakan jalankan `update_data.py` terlebih dahulu di terminal untuk memuat data!")
