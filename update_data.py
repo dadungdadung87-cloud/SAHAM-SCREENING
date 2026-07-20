@@ -92,6 +92,7 @@ def hitung_semua_indikator(df_saham):
     else: pola_candle = "Normal"
 
     ma_20 = df_saham['Close'].rolling(window=20).mean().iloc[-1].item()
+    ma_50 = df_saham['Close'].rolling(window=50).mean().iloc[-1].item() if len(df_saham) >= 50 else ma_20
     vol_ma_20 = df_saham['Volume'].rolling(window=20).mean().iloc[-1].item()
     ma_signal = "Uptrend" if close_today > ma_20 else "Downtrend"
     vol_breakout = "Tembus MA20" if vol_today > vol_ma_20 else "Normal"
@@ -169,10 +170,8 @@ def hitung_semua_indikator(df_saham):
     rsi = int(round(rsi_raw)) if not pd.isna(rsi_raw) else 0
 
     # ====================================================
-    # TAMBAHAN FITUR PRO: VWAP, A/D LINE, VALUE TRANSAKSI
+    # TAMBAHAN 1: VWAP, A/D LINE, VALUE TRANSAKSI
     # ====================================================
-    
-    # 1. VWAP (5 Hari - Jangka Pendek)
     typical_price = (df_saham['High'] + df_saham['Low'] + df_saham['Close']) / 3
     vwap_5 = (typical_price * df_saham['Volume']).rolling(window=5).sum() / (df_saham['Volume'].rolling(window=5).sum() + 1)
     vwap_val = vwap_5.iloc[-1].item()
@@ -180,9 +179,8 @@ def hitung_semua_indikator(df_saham):
     elif close_today < (vwap_val * 0.99): posisi_vwap = "Di Bawah VWAP (Lemah)"
     else: posisi_vwap = "Persis di VWAP"
 
-    # 2. Accumulation/Distribution Line (Smart Money)
     penyebut_ad = df_saham['High'] - df_saham['Low']
-    penyebut_ad = penyebut_ad.replace(0, 0.0001) # Mencegah error pembagian nol
+    penyebut_ad = penyebut_ad.replace(0, 0.0001) 
     mfm = ((df_saham['Close'] - df_saham['Low']) - (df_saham['High'] - df_saham['Close'])) / penyebut_ad
     mfv = mfm * df_saham['Volume']
     ad_line = mfv.cumsum()
@@ -193,12 +191,44 @@ def hitung_semua_indikator(df_saham):
     elif ad_sekarang < ad_5_hari_lalu: smart_money = "Distribusi Pro (Guyuran)"
     else: smart_money = "Netral"
 
-    # 3. Kelas Nilai Transaksi (Avg 5 Hari)
     vol_5_avg = df_saham['Volume'].rolling(window=5).mean().iloc[-1].item()
     val_transaksi = vol_5_avg * close_today
     if val_transaksi > 50_000_000_000: kelas_transaksi = "Sultan (> 50M/hari)"
     elif val_transaksi > 5_000_000_000: kelas_transaksi = "Ritel Aktif (5M - 50M)"
     else: kelas_transaksi = "Gorengan Sepi (< 5M)"
+
+    # ====================================================
+    # TAMBAHAN 2: FITUR PRO BANDAR (RVOL, WYCKOFF, GORENGAN)
+    # ====================================================
+    
+    # RVOL (Relative Volume 10D)
+    vol_avg_10 = df_saham['Volume'].rolling(window=10).mean().iloc[-1].item()
+    if vol_avg_10 > 0:
+        rvol_pct = (vol_today / vol_avg_10) * 100
+        if rvol_pct > 300: rvol_status = "Ledakan Ekstrem (> 300%)"
+        elif rvol_pct > 150: rvol_status = "Anomali Tinggi (150-300%)"
+        elif rvol_pct < 50: rvol_status = "Sepi (< 50%)"
+        else: rvol_status = "Normal (50-150%)"
+    else:
+        rvol_status = "Normal (50-150%)"
+        
+    # Fase Wyckoff Ringan (Siklus Bandar)
+    if close_today > ma_20 and ma_20 > ma_50: siklus = "Mark-Up (Fase Pesta)"
+    elif close_today < ma_20 and ma_20 < ma_50: siklus = "Mark-Down (Fase Runtuh)"
+    elif close_today > ma_20 and ma_20 <= ma_50: siklus = "Accumulation (Kumpul Barang)"
+    elif close_today < ma_20 and ma_20 >= ma_50: siklus = "Distribution (Fase Jualan)"
+    else: siklus = "Sideways"
+
+    # Jejak Karakter Gorengan (20 Hari Terakhir)
+    df_20 = df_saham.tail(20)
+    range_harian = df_20['High'] - df_20['Low'] + 0.0001
+    ekor_atas = df_20['High'] - df_20[['Open', 'Close']].max(axis=1)
+    rasio_ekor = ekor_atas / range_harian
+    tiang_jemuran = (rasio_ekor > 0.5).sum()
+    
+    if tiang_jemuran >= 4: karakter_bandar = "Spesialis Tiang Jemuran (Banting Pucuk)"
+    elif tiang_jemuran == 0: karakter_bandar = "Solid (Jarang Dibanting)"
+    else: karakter_bandar = "Normal"
 
     return {
         "Harga (Rp)": close_today, "Harga MA20": int(ma_20), "Support": int(support_20), "Resistance": int(resist_20),
@@ -208,9 +238,10 @@ def hitung_semua_indikator(df_saham):
         "Status BB": status_bb, "Risiko": risiko,
         "Pola Candle": pola_candle, "Posisi Entry": posisi_entry,
         "Likuiditas": "> 1 Miliar" if (close_today * vol_today) > 1000000000 else "< 1 Miliar",
-        "Posisi VWAP": posisi_vwap,          # DATA BARU
-        "Kekuatan A/D": smart_money,         # DATA BARU
-        "Kelas Transaksi": kelas_transaksi   # DATA BARU
+        "Posisi VWAP": posisi_vwap, "Kekuatan A/D": smart_money, "Kelas Transaksi": kelas_transaksi,
+        "RVOL (Anomali Vol)": rvol_status,   # DATA BARU
+        "Fase Siklus Bandar": siklus,        # DATA BARU
+        "Karakter Gorengan": karakter_bandar # DATA BARU
     }
 
 # ==========================================
@@ -221,7 +252,7 @@ def main():
     with open(LOCK_FILE, "w") as f: f.write("SEDANG PROSES")
 
     try:
-        print("⏳ Memulai pembaruan data saham (Diagnostic Mode)...")
+        print("⏳ Memulai pembaruan data saham (Ultimate Diagnostic Mode)...")
         daftar_saham = load_tickers()
         if not daftar_saham: return
         
@@ -229,9 +260,10 @@ def main():
         tickers_str = " ".join(tickers_jk)
         aman_session = get_safe_session()
         
+        # PERUBAHAN: period="3mo" agar kalkulasi MA50 untuk Wyckoff akurat
         print(f"📥 Mengunduh {len(daftar_saham)} data saham secara bersamaan (Maks 8 jalur)...")
         data_mentah = yf.download(
-            tickers_str, period="2mo", interval="1d", group_by='ticker', threads=8, session=aman_session, progress=False
+            tickers_str, period="3mo", interval="1d", group_by='ticker', threads=8, session=aman_session, progress=False
         )
         
         if data_mentah.empty:
@@ -246,7 +278,7 @@ def main():
                 t_jk = f"{ticker}.JK"
                 if t_jk in data_mentah:
                     df_saham = data_mentah[t_jk].dropna(subset=['Open', 'Close', 'Volume', 'High', 'Low'])
-                    if len(df_saham) >= 26:
+                    if len(df_saham) >= 50: # Pastikan ada data minimal 50 hari
                         ind = hitung_semua_indikator(df_saham)
                         kat, per, pbv = get_fundamental(t_jk)
                         
