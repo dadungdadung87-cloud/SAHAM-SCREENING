@@ -169,9 +169,6 @@ def hitung_semua_indikator(df_saham):
     rsi_raw = (100 - (100 / (1 + rs))).iloc[-1].item()
     rsi = int(round(rsi_raw)) if not pd.isna(rsi_raw) else 0
 
-    # ====================================================
-    # TAMBAHAN 1: VWAP, A/D LINE, VALUE TRANSAKSI
-    # ====================================================
     typical_price = (df_saham['High'] + df_saham['Low'] + df_saham['Close']) / 3
     vwap_5 = (typical_price * df_saham['Volume']).rolling(window=5).sum() / (df_saham['Volume'].rolling(window=5).sum() + 1)
     vwap_val = vwap_5.iloc[-1].item()
@@ -197,9 +194,6 @@ def hitung_semua_indikator(df_saham):
     elif val_transaksi > 5_000_000_000: kelas_transaksi = "Ritel Aktif (5M - 50M)"
     else: kelas_transaksi = "Gorengan Sepi (< 5M)"
 
-    # ====================================================
-    # TAMBAHAN 2: FITUR PRO BANDAR (RVOL, WYCKOFF, GORENGAN)
-    # ====================================================
     vol_avg_10 = df_saham['Volume'].rolling(window=10).mean().iloc[-1].item()
     if vol_avg_10 > 0:
         rvol_pct = (vol_today / vol_avg_10) * 100
@@ -226,9 +220,6 @@ def hitung_semua_indikator(df_saham):
     elif tiang_jemuran == 0: karakter_bandar = "Solid (Jarang Dibanting)"
     else: karakter_bandar = "Normal"
 
-    # ====================================================
-    # TAMBAHAN 3: IDE BARU (ATR, SHAKEOUT, STREAK)
-    # ====================================================
     df_saham['H-L'] = df_saham['High'] - df_saham['Low']
     df_saham['H-PC'] = abs(df_saham['High'] - df_saham['Close'].shift(1))
     df_saham['L-PC'] = abs(df_saham['Low'] - df_saham['Close'].shift(1))
@@ -264,7 +255,24 @@ def hitung_semua_indikator(df_saham):
     elif arah_streak == -1 and streak_count >= 1: info_streak = f"Turun {streak_count} Hari Beruntun"
     else: info_streak = "Sideways / Stagnan"
 
-    # SEMUA DATA GABUNGAN LAMA + BARU
+    # ====================================================
+    # TAMBAHAN 4: OPEN=LOW & RISK REWARD RATIO (BARU)
+    # ====================================================
+    if open_today == low_today and close_today > open_today: status_open = "Open = Low (Bullish Kuat)"
+    elif open_today == high_today and close_today < open_today: status_open = "Open = High (Tekanan Jual)"
+    else: status_open = "Normal"
+
+    potensi_upside = ((resist_20 - close_today) / close_today) * 100 if close_today > 0 else 0
+    risiko_downside = ((close_today - support_20) / close_today) * 100 if close_today > 0 else 0
+    if risiko_downside > 0:
+        rrr_val = potensi_upside / risiko_downside
+        if rrr_val >= 3: status_rrr = "Sangat Menarik (> 1:3)"
+        elif rrr_val >= 1.5: status_rrr = "Ideal (1:2)"
+        elif rrr_val < 1: status_rrr = "Tidak Ideal (< 1:1)"
+        else: status_rrr = "Menengah (1:1)"
+    else:
+        status_rrr = "Di Area Support"
+
     return {
         "Harga (Rp)": close_today, "Harga MA20": int(ma_20), "Support": int(support_20), "Resistance": int(resist_20),
         "Change (%)": change_pct, "Volume": vol_today, "Vol Breakout": vol_breakout, "RSI (14D)": rsi,
@@ -275,7 +283,8 @@ def hitung_semua_indikator(df_saham):
         "Likuiditas": "> 1 Miliar" if (close_today * vol_today) > 1000000000 else "< 1 Miliar",
         "Posisi VWAP": posisi_vwap, "Kekuatan A/D": smart_money, "Kelas Transaksi": kelas_transaksi,
         "RVOL (Anomali Vol)": rvol_status, "Fase Siklus Bandar": siklus, "Karakter Gorengan": karakter_bandar,
-        "Sinyal Cuci Barang": deteksi_shakeout, "Streak Harian": info_streak, "Auto Trading Plan": auto_plan
+        "Sinyal Cuci Barang": deteksi_shakeout, "Streak Harian": info_streak, "Auto Trading Plan": auto_plan,
+        "Status Open": status_open, "Risk/Reward Ratio": status_rrr # DATA BARU
     }
 
 # ==========================================
