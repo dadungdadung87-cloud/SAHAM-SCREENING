@@ -82,7 +82,6 @@ def hitung_semua_indikator(df_saham):
     else:
         tekanan = "Tidak Ada Transaksi"
 
-    # --- TAMBAHAN 1: POLA CANDLESTICK ---
     body_candle = abs(close_today - open_today)
     upper_shadow = high_today - max(open_today, close_today)
     lower_shadow = min(open_today, close_today) - low_today
@@ -93,9 +92,16 @@ def hitung_semua_indikator(df_saham):
     else: pola_candle = "Normal"
 
     ma_20 = df_saham['Close'].rolling(window=20).mean().iloc[-1].item()
+    ma_50 = df_saham['Close'].rolling(window=50).mean().iloc[-1].item()
     vol_ma_20 = df_saham['Volume'].rolling(window=20).mean().iloc[-1].item()
+    
     ma_signal = "Uptrend" if close_today > ma_20 else "Downtrend"
     vol_breakout = "Tembus MA20" if vol_today > vol_ma_20 else "Normal"
+    
+    # --- TAMBAHAN BARU: FASE SIKLUS (MA20 vs MA50) ---
+    if close_today > ma_20 and ma_20 > ma_50: fase_siklus = "Stage 2 (Strong Uptrend)"
+    elif close_today < ma_20 and ma_20 < ma_50: fase_siklus = "Stage 4 (Strong Downtrend)"
+    else: fase_siklus = "Konsolidasi"
     
     ma_5 = df_saham['Close'].rolling(window=5).mean().iloc[-1].item()
     ma_5_prev = df_saham['Close'].rolling(window=5).mean().iloc[-2].item()
@@ -151,11 +157,16 @@ def hitung_semua_indikator(df_saham):
     support_20 = df_saham['Low'].rolling(window=20).min().iloc[-1].item()
     resist_20 = df_saham['High'].rolling(window=20).max().iloc[-1].item()
 
-    # --- TAMBAHAN 2: POSISI ENTRY (JARAK KE SUPPORT) ---
     jarak_support = ((close_today - support_20) / support_20) * 100 if support_20 > 0 else 0
     if jarak_support <= 3.0: posisi_entry = "Dekat Support (Low Risk)"
     elif jarak_support >= 10.0: posisi_entry = "Rawan Pucuk (High Risk)"
     else: posisi_entry = "Area Tengah"
+
+    # --- TAMBAHAN BARU: POTENSI UPSIDE (JARAK KE RESISTANCE) ---
+    jarak_resist = ((resist_20 - close_today) / close_today) * 100 if close_today > 0 else 0
+    if jarak_resist >= 10.0: potensi_upside = "Ruang Lebar (>10%)"
+    elif jarak_resist <= 3.0: potensi_upside = "Mepet Resisten (<3%)"
+    else: potensi_upside = "Area Tengah (3-10%)"
 
     if bandwidth > 15.0: risiko = "Tinggi"
     elif bandwidth > 8.0: risiko = "Sedang"
@@ -173,11 +184,11 @@ def hitung_semua_indikator(df_saham):
     return {
         "Harga (Rp)": close_today, "Harga MA20": int(ma_20), "Support": int(support_20), "Resistance": int(resist_20),
         "Change (%)": change_pct, "Volume": vol_today, "Vol Breakout": vol_breakout, "RSI (14D)": rsi,
-        "Momentum": momentum, "MA Signal": ma_signal, "MA Cross": ma_cross, "MACD": status_macd,
+        "Momentum": momentum, "MA Signal": ma_signal, "Fase Siklus": fase_siklus, "MA Cross": ma_cross, "MACD": status_macd,
         "Status Bandar": status_bandar, "OBV Trend": obv_trend, "Status Gap": status_gap, "Tekanan Bandar": tekanan, 
         "Status BB": status_bb, "Risiko": risiko,
         "Likuiditas": "> 1 Miliar" if (close_today * vol_today) > 1000000000 else "< 1 Miliar",
-        "Pola Candle": pola_candle, "Posisi Entry": posisi_entry # FIELD BARU
+        "Pola Candle": pola_candle, "Posisi Entry": posisi_entry, "Potensi Upside": potensi_upside
     }
 
 # ==========================================
@@ -202,9 +213,10 @@ def main():
         aman_session = get_safe_session()
         
         print(f"📥 Mengunduh {len(daftar_saham)} data saham secara bersamaan (Maks 8 jalur)...")
+        # PERUBAHAN: period diubah menjadi 6mo agar MA50 bisa terkalkulasi dengan benar
         data_mentah = yf.download(
             tickers_str, 
-            period="2mo", 
+            period="6mo", 
             interval="1d", 
             group_by='ticker', 
             threads=8, 
@@ -225,7 +237,7 @@ def main():
                 if t_jk in data_mentah:
                     df_saham = data_mentah[t_jk].dropna(subset=['Open', 'Close', 'Volume', 'High', 'Low'])
                     
-                    if len(df_saham) >= 26:
+                    if len(df_saham) >= 55: # Ditingkatkan ke 55 agar MA50 aman dihitung
                         ind = hitung_semua_indikator(df_saham)
                         kat, per, pbv = get_fundamental(t_jk)
                         
@@ -243,7 +255,6 @@ def main():
 
                         rekomendasi = "BELI" if score >= 7 else "WAIT & SEE"
                         
-                        # --- TAMBAHAN 3: LOGIKA VALUASI INSTAN ---
                         if per > 0 and per < 15 and pbv > 0 and pbv < 1.5: valuasi = "Undervalued (Murah)"
                         elif per > 25 or pbv > 3.0: valuasi = "Overvalued (Mahal)"
                         else: valuasi = "Fair Value (Wajar)"
