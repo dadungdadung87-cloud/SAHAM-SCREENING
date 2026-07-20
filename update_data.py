@@ -200,8 +200,6 @@ def hitung_semua_indikator(df_saham):
     # ====================================================
     # TAMBAHAN 2: FITUR PRO BANDAR (RVOL, WYCKOFF, GORENGAN)
     # ====================================================
-    
-    # RVOL (Relative Volume 10D)
     vol_avg_10 = df_saham['Volume'].rolling(window=10).mean().iloc[-1].item()
     if vol_avg_10 > 0:
         rvol_pct = (vol_today / vol_avg_10) * 100
@@ -212,14 +210,12 @@ def hitung_semua_indikator(df_saham):
     else:
         rvol_status = "Normal (50-150%)"
         
-    # Fase Wyckoff Ringan (Siklus Bandar)
     if close_today > ma_20 and ma_20 > ma_50: siklus = "Mark-Up (Fase Pesta)"
     elif close_today < ma_20 and ma_20 < ma_50: siklus = "Mark-Down (Fase Runtuh)"
     elif close_today > ma_20 and ma_20 <= ma_50: siklus = "Accumulation (Kumpul Barang)"
     elif close_today < ma_20 and ma_20 >= ma_50: siklus = "Distribution (Fase Jualan)"
     else: siklus = "Sideways"
 
-    # Jejak Karakter Gorengan (20 Hari Terakhir)
     df_20 = df_saham.tail(20)
     range_harian = df_20['High'] - df_20['Low'] + 0.0001
     ekor_atas = df_20['High'] - df_20[['Open', 'Close']].max(axis=1)
@@ -230,6 +226,45 @@ def hitung_semua_indikator(df_saham):
     elif tiang_jemuran == 0: karakter_bandar = "Solid (Jarang Dibanting)"
     else: karakter_bandar = "Normal"
 
+    # ====================================================
+    # TAMBAHAN 3: IDE BARU (ATR, SHAKEOUT, STREAK)
+    # ====================================================
+    df_saham['H-L'] = df_saham['High'] - df_saham['Low']
+    df_saham['H-PC'] = abs(df_saham['High'] - df_saham['Close'].shift(1))
+    df_saham['L-PC'] = abs(df_saham['Low'] - df_saham['Close'].shift(1))
+    df_saham['TR'] = df_saham[['H-L', 'H-PC', 'L-PC']].max(axis=1)
+    atr_14 = df_saham['TR'].rolling(window=14).mean().iloc[-1].item()
+    if pd.isna(atr_14) or atr_14 == 0: atr_14 = range_today if range_today > 0 else 1
+
+    target_tp = int(close_today + (atr_14 * 1.5))
+    target_cl = int(close_today - atr_14)
+    auto_plan = f"TP: {target_tp} | CL: {target_cl}"
+
+    if lower_shadow > (body_candle * 2) and lower_shadow > (range_today * 0.5): 
+        deteksi_shakeout = "Jarum Bawah (Sinyal Pantulan Kuat)"
+    else: 
+        deteksi_shakeout = "Normal"
+
+    streak_count = 0
+    arah_streak = 0
+    for i in range(1, min(10, len(df_saham))):
+        c_curr = df_saham['Close'].iloc[-i].item()
+        c_prev = df_saham['Close'].iloc[-(i+1)].item()
+        if i == 1:
+            if c_curr > c_prev: arah_streak = 1
+            elif c_curr < c_prev: arah_streak = -1
+            else: break
+            streak_count = 1
+        else:
+            if arah_streak == 1 and c_curr > c_prev: streak_count += 1
+            elif arah_streak == -1 and c_curr < c_prev: streak_count += 1
+            else: break
+            
+    if arah_streak == 1 and streak_count >= 1: info_streak = f"Naik {streak_count} Hari Beruntun"
+    elif arah_streak == -1 and streak_count >= 1: info_streak = f"Turun {streak_count} Hari Beruntun"
+    else: info_streak = "Sideways / Stagnan"
+
+    # SEMUA DATA GABUNGAN LAMA + BARU
     return {
         "Harga (Rp)": close_today, "Harga MA20": int(ma_20), "Support": int(support_20), "Resistance": int(resist_20),
         "Change (%)": change_pct, "Volume": vol_today, "Vol Breakout": vol_breakout, "RSI (14D)": rsi,
@@ -239,9 +274,8 @@ def hitung_semua_indikator(df_saham):
         "Pola Candle": pola_candle, "Posisi Entry": posisi_entry,
         "Likuiditas": "> 1 Miliar" if (close_today * vol_today) > 1000000000 else "< 1 Miliar",
         "Posisi VWAP": posisi_vwap, "Kekuatan A/D": smart_money, "Kelas Transaksi": kelas_transaksi,
-        "RVOL (Anomali Vol)": rvol_status,   # DATA BARU
-        "Fase Siklus Bandar": siklus,        # DATA BARU
-        "Karakter Gorengan": karakter_bandar # DATA BARU
+        "RVOL (Anomali Vol)": rvol_status, "Fase Siklus Bandar": siklus, "Karakter Gorengan": karakter_bandar,
+        "Sinyal Cuci Barang": deteksi_shakeout, "Streak Harian": info_streak, "Auto Trading Plan": auto_plan
     }
 
 # ==========================================
@@ -260,7 +294,6 @@ def main():
         tickers_str = " ".join(tickers_jk)
         aman_session = get_safe_session()
         
-        # PERUBAHAN: period="3mo" agar kalkulasi MA50 untuk Wyckoff akurat
         print(f"📥 Mengunduh {len(daftar_saham)} data saham secara bersamaan (Maks 8 jalur)...")
         data_mentah = yf.download(
             tickers_str, period="3mo", interval="1d", group_by='ticker', threads=8, session=aman_session, progress=False
@@ -278,7 +311,7 @@ def main():
                 t_jk = f"{ticker}.JK"
                 if t_jk in data_mentah:
                     df_saham = data_mentah[t_jk].dropna(subset=['Open', 'Close', 'Volume', 'High', 'Low'])
-                    if len(df_saham) >= 50: # Pastikan ada data minimal 50 hari
+                    if len(df_saham) >= 50:
                         ind = hitung_semua_indikator(df_saham)
                         kat, per, pbv = get_fundamental(t_jk)
                         
