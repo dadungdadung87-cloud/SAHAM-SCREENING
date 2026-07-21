@@ -34,7 +34,6 @@ FILE_PRESET = "preset_kustom.json"
 FILE_HASIL = "hasil_screener.csv"
 FILE_AKUISISI = "data_akuisisi.csv"
 
-# PENAMBAHAN STRATEGI BSJP DI JSON
 DEFAULT_CONFIG = {
     "MASTER_FILTERS": {
         "Kategori": {"label": "🏢 Kategori Saham", "options": ["Semua", "Big Cap (Lapis 1)", "Mid Cap (Lapis 2)", "Small Cap (Lapis 3)"]},
@@ -78,19 +77,15 @@ DEFAULT_CONFIG = {
         "Fase Siklus Bandar": "Pendekatan Wyckoff, fase akumulasi atau mark-up."
     },
     "STRATEGI": {
-        "1. BSJP (Beli Sore Jual Pagi) ⏰ 15:30": "Aturan: 1) Eksekusi HANYA jam 15:30 - 15:45. 2) Filter Tab 2: Tekanan Bandar = 'Dominan Beli (Hajar Kanan)', Karakter Gorengan = 'Solid (Jarang Dibanting)', Status Bandar = 'Akumulasi Kuat'. 3) Beli di sore hari, set Take Profit otomatis 3-5% untuk esok pagi saat market buka.",
-        "2. HAKA Pagi (Open = Low) ⏰ 09:05": "Aturan: 1) Buka screener pukul 09:05. 2) Filter: Status Open = 'Open = Low', RVOL = 'Ledakan Ekstrem (> 300%)'. 3) Cocokkan Target TP di kolom Auto Trading Plan. Buang cepat jika VWAP tertembus ke bawah.",
-        "3. Buy on Weakness (Tangkap Pisau Jatuh)": "Filter: Streak Harian = 'Turun Beruntun', Sinyal Cuci Barang = 'Jarum Bawah', Kekuatan A/D = 'Akumulasi Pro'. Ini adalah momen ritel panik tapi bandar memborong.",
+        "1. BSJP (Beli Sore Jual Pagi) ⏰ 15:30": "Aturan: 1) Eksekusi HANYA jam 15:30 - 15:45. 2) Pilih preset 'BSJP' di sidebar kiri. 3) Beli di sore hari, set Take Profit otomatis 3-5% untuk esok pagi saat market buka.",
+        "2. HAKA Pagi (Open = Low) ⏰ 09:05": "Aturan: 1) Buka screener pukul 09:05. 2) Filter: Status Open = 'Open = Low', RVOL = 'Ledakan Ekstrem (> 300%)'. 3) Cocokkan Target TP di kolom Auto Trading Plan.",
+        "3. Buy on Weakness (Tangkap Pisau Jatuh)": "Filter: Streak Harian = 'Turun Beruntun', Sinyal Cuci Barang = 'Jarum Bawah', Kekuatan A/D = 'Akumulasi Pro'. Momen ritel panik tapi bandar memborong.",
         "4. Menghindari Guyuran Bandar": "Jika saham naik kencang TAPI Tekanan Bandar 'Dominan Jual', bandar sedang take profit perlahan."
     }
 }
 
 if not os.path.exists(FILE_CONFIG):
     with open(FILE_CONFIG, "w") as f: json.dump(DEFAULT_CONFIG, f, indent=4)
-else:
-    with open(FILE_CONFIG, "r") as f: cek_config = json.load(f)
-    if "BSJP" not in str(cek_config.get("STRATEGI", {})):
-        with open(FILE_CONFIG, "w") as f: json.dump(DEFAULT_CONFIG, f, indent=4)
 
 with open(FILE_CONFIG, "r") as f:
     WEB_CONFIG = json.load(f)
@@ -104,15 +99,24 @@ STRATEGI_SIMULASI = WEB_CONFIG["STRATEGI"]
 # ==========================================
 def muat_preset():
     preset_bawaan = {
-        "⚡ HAKA Sesi Pagi (Open=Low)": {k: "Semua" for k in MASTER_FILTERS},
         "🌙 BSJP (Beli Sore 15:30)": {k: "Semua" for k in MASTER_FILTERS},
+        "⚡ HAKA Sesi Pagi (Open=Low)": {k: "Semua" for k in MASTER_FILTERS},
         "🚀 Gorengan Aktif (High Risk)": {k: "Semua" for k in MASTER_FILTERS},
-        "🎣 Pantulan Reversal Emas": {k: "Semua" for k in MASTER_FILTERS}
+        "🎣 Pantulan Reversal Emas": {k: "Semua" for k in MASTER_FILTERS},
+        "🔥 Bluechip Terakumulasi": {k: "Semua" for k in MASTER_FILTERS}
     }
+    # PRESET BSJP YANG ANDA MINTA:
+    preset_bawaan["🌙 BSJP (Beli Sore 15:30)"].update({
+        "Tekanan Bandar": "Dominan Beli (Hajar Kanan)", 
+        "Karakter Gorengan": "Solid (Jarang Dibanting)", 
+        "Status Bandar": "Akumulasi Kuat", 
+        "MA Signal": "Uptrend",
+        "Rekomendasi": "BELI"
+    })
     preset_bawaan["⚡ HAKA Sesi Pagi (Open=Low)"].update({"Status Open": "Open = Low (Bullish Kuat)", "Risk/Reward Ratio": "Sangat Menarik (> 1:3)"})
-    preset_bawaan["🌙 BSJP (Beli Sore 15:30)"].update({"Tekanan Bandar": "Dominan Beli (Hajar Kanan)", "Karakter Gorengan": "Solid (Jarang Dibanting)", "Status Bandar": "Akumulasi Kuat", "MA Signal": "Uptrend"})
     preset_bawaan["🚀 Gorengan Aktif (High Risk)"].update({"Kategori": "Small Cap (Lapis 3)", "RVOL (Anomali Vol)": "Ledakan Ekstrem (> 300%)", "Posisi VWAP": "Di Atas VWAP (Kuat)"})
     preset_bawaan["🎣 Pantulan Reversal Emas"].update({"Sinyal Cuci Barang": "Jarum Bawah (Sinyal Pantulan Kuat)", "Kekuatan A/D": "Akumulasi Pro (Smart Money)"})
+    preset_bawaan["🔥 Bluechip Terakumulasi"].update({"Status Bandar": "Akumulasi Kuat", "Kategori": "Big Cap (Lapis 1)", "MA Signal": "Uptrend"})
 
     if os.path.exists(FILE_PRESET):
         try:
@@ -150,6 +154,7 @@ if st.sidebar.button("🔄 Muat Ulang Data Server", use_container_width=True):
     st.rerun()
 
 st.sidebar.title("⚙️ Preset Filter Cepat")
+st.sidebar.info("Gunakan **'BSJP (Beli Sore 15:30)'** untuk mencari saham yang mantap dibeli sebelum penutupan bursa!")
 opsi_preset = ["Matikan Preset (Manual)"] + list(daftar_preset_aktif.keys())
 idx_default = opsi_preset.index(st.session_state.preset_selector) if st.session_state.preset_selector in opsi_preset else 0
 st.sidebar.selectbox("🎯 Pilih Preset Aktif:", opsi_preset, index=idx_default, key="preset_selector", on_change=apply_preset)
@@ -263,7 +268,7 @@ if not df_hasil.empty:
         if not df_filtered.empty:
             st.caption(f"Menampilkan **{len(df_filtered)}** saham yang lolos filter dari total **{len(df_hasil)}** saham.")
             
-            # === SOLUSI 1: MODE TAMPILAN (VIEW MODES) AGAR TIDAK KEPANJANGAN ===
+            # MODE TAMPILAN
             st.markdown("<div class='view-mode-container'>", unsafe_allow_html=True)
             mode_tampilan = st.radio(
                 "👁️ Pilih Mode Tampilan Tabel (Agar tidak perlu geser layar):",
@@ -321,14 +326,15 @@ if not df_hasil.empty:
             
             st.dataframe(tabel_akhir, use_container_width=True, hide_index=True)
             
+            # === TOMBOL DOWNLOAD TAB 2 DIKEMBALIKAN & DISESUAIKAN VIEW MODE ===
             st.markdown("---")
             col_dl, col_wl = st.columns([1, 1])
             with col_dl:
-                csv_filter = df_filtered[kolom_semua].to_csv(index=False).encode('utf-8')
+                csv_filter = df_filtered[kolom_ada].to_csv(index=False).encode('utf-8')
                 st.download_button(
-                    label="📥 Download Hasil Filter (Semua Kolom CSV)",
+                    label=f"📥 Download Data Tabel CSV",
                     data=csv_filter,
-                    file_name=f"Screener_Hasil_{datetime.now().strftime('%Y%m%d_%H%M')}.csv",
+                    file_name=f"Screener_View_{datetime.now().strftime('%Y%m%d_%H%M')}.csv",
                     mime="text/csv",
                     key="dl_tab2"
                 )
@@ -369,16 +375,13 @@ if not df_hasil.empty:
             
             df_markup = df_lapis3[(df_lapis3['Status Bandar'] == 'Akumulasi Kuat') & (df_lapis3['Tekanan Bandar'] == 'Dominan Beli (Hajar Kanan)')].copy()
             
-            # === SOLUSI 3: ALGORITMA "CURI START" YANG DIPERBAIKI ===
-            # Logika: Smart Money mengumpulkan saat Squeeze ATAU ada jarum bawah (shakeout) TANPA karakter tiang jemuran
+            # Algoritma "Curi Start" yang dipertajam
             kondisi_senyap = (
                 ((df_lapis3['Kekuatan A/D'] == 'Akumulasi Pro (Smart Money)') & (df_lapis3['Status BB'] == 'Squeeze')) | 
                 (df_lapis3['Sinyal Cuci Barang'] == 'Jarum Bawah (Sinyal Pantulan Kuat)')
             ) & (~df_lapis3['Karakter Gorengan'].str.contains("Tiang Jemuran", na=False))
             
             df_senyap = df_lapis3[kondisi_senyap].copy()
-            # =========================================================
-
             df_guyur = df_lapis3[(df_lapis3['Status Bandar'] == 'Distribusi Kuat') | (df_lapis3['Tekanan Bandar'] == 'Dominan Jual (Guyur)')].copy()
 
             st.markdown("---")
@@ -392,6 +395,11 @@ if not df_hasil.empty:
                 subset_m = [c for c in kolom_b if c not in ["Ticker", "Auto Trading Plan"]]
                 tabel_markup = styler_markup.map(warna_tabel, subset=subset_m) if hasattr(styler_markup, 'map') else styler_markup.applymap(warna_tabel, subset=subset_m)
                 st.dataframe(tabel_markup, use_container_width=True, hide_index=True, column_order=kolom_b)
+                
+                # === TOMBOL DOWNLOAD TAB 5 DIKEMBALIKAN ===
+                c1, c2 = st.columns([1, 1])
+                c1.download_button("📥 Download Mark-Up (CSV)", df_markup[kolom_b].to_csv(index=False).encode('utf-8'), "Fase_MarkUp.csv", "text/csv", key="dl_markup")
+                c2.code(", ".join(df_markup["Ticker"].tolist()), language="text")
             else: st.info("Belum ada saham gorengan yang ditarik kuat oleh Bandar hari ini.")
 
             st.markdown("<br>", unsafe_allow_html=True)
@@ -409,6 +417,11 @@ if not df_hasil.empty:
                 subset_s = [c for c in kolom_senyap if c not in ["Ticker", "Prioritas", "Auto Trading Plan"]]
                 tabel_senyap = styler_senyap.map(warna_tabel, subset=subset_s) if hasattr(styler_senyap, 'map') else styler_senyap.applymap(warna_tabel, subset=subset_s)
                 st.dataframe(tabel_senyap, use_container_width=True, hide_index=True, column_order=kolom_senyap)
+                
+                # === TOMBOL DOWNLOAD TAB 5 DIKEMBALIKAN ===
+                c1, c2 = st.columns([1, 1])
+                c1.download_button("📥 Download Curi Start (CSV)", df_senyap[kolom_senyap].to_csv(index=False).encode('utf-8'), "Fase_CuriStart.csv", "text/csv", key="dl_senyap")
+                c2.code(", ".join(df_senyap["Ticker"].tolist()), language="text")
             else: st.info("Belum ada saham yang terpantau masuk fase persiapan.")
 
             st.markdown("<br>", unsafe_allow_html=True)
@@ -421,6 +434,11 @@ if not df_hasil.empty:
                 subset_g = [c for c in kolom_b if c not in ["Ticker"]]
                 tabel_guyur = styler_guyur.map(warna_tabel, subset=subset_g) if hasattr(styler_guyur, 'map') else styler_guyur.applymap(warna_tabel, subset=subset_g)
                 st.dataframe(tabel_guyur, use_container_width=True, hide_index=True, column_order=kolom_b)
+                
+                # === TOMBOL DOWNLOAD TAB 5 DIKEMBALIKAN ===
+                c1, c2 = st.columns([1, 1])
+                c1.download_button("📥 Download Guyuran (CSV)", df_guyur[kolom_b].to_csv(index=False).encode('utf-8'), "Fase_Guyuran.csv", "text/csv", key="dl_guyur")
+                c2.code(", ".join(df_guyur["Ticker"].tolist()), language="text")
             else: st.success("Pasar Lapis 3 terpantau bersih dari aksi guyuran berat Bandar hari ini.")
 else:
     st.error("Silakan jalankan `update_data.py` terlebih dahulu di terminal untuk memuat data!")
