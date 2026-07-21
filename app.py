@@ -23,6 +23,12 @@ st.markdown("""
     .stTabs [data-baseweb="tab-list"] { gap: 24px; }
     .stTabs [data-baseweb="tab"] { height: 50px; white-space: pre-wrap; background-color: transparent; border-radius: 4px 4px 0px 0px; padding: 10px 16px; font-weight: 600; }
     .view-mode-container { background-color: #0f172a; padding: 10px 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #334155; }
+    
+    /* CSS BARU: Mengatasi text terpotong di dropdown tanpa merubah ukuran font */
+    div[data-baseweb="select"] > div { height: auto; min-height: 38px; }
+    div[data-baseweb="select"] span { white-space: normal !important; word-break: break-word !important; line-height: 1.4 !important; }
+    ul[data-baseweb="menu"] li { white-space: normal !important; word-break: break-word !important; padding-top: 8px !important; padding-bottom: 8px !important; line-height: 1.4 !important; }
+    li[role="option"] { white-space: normal !important; word-wrap: break-word !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -35,7 +41,6 @@ FILE_KAMUS = "kamus_edukasi.json"
 FILE_HASIL = "hasil_screener.csv"
 FILE_AKUISISI = "data_akuisisi.csv"
 
-# Konfigurasi Filter (Tidak lagi menampung Kamus)
 DEFAULT_CONFIG = {
     "MASTER_FILTERS": {
         "Kategori": {"label": "🏢 Kategori Saham", "options": ["Semua", "Big Cap (Lapis 1)", "Mid Cap (Lapis 2)", "Small Cap (Lapis 3)"]},
@@ -84,7 +89,6 @@ else:
 
 with open(FILE_CONFIG, "r") as f: WEB_CONFIG = json.load(f)
 
-# Load Kamus dari file eksternal (Bersih dari app.py)
 KAMUS_EDUKASI = {}
 if os.path.exists(FILE_KAMUS):
     with open(FILE_KAMUS, "r") as f: KAMUS_EDUKASI = json.load(f)
@@ -142,7 +146,6 @@ def load_data_saham():
 # ==========================================
 df_hasil = load_data_saham()
 
-# FITUR BARU: KOTAK CYAN TERAKHIR UPDATE DI SIDEBAR
 if not df_hasil.empty and "Terakhir Update" in df_hasil.columns:
     waktu_update = df_hasil["Terakhir Update"].iloc[0]
     st.sidebar.markdown(f"""
@@ -162,22 +165,58 @@ opsi_preset = ["Matikan Preset (Manual)"] + list(daftar_preset_aktif.keys())
 idx_default = opsi_preset.index(st.session_state.preset_selector) if st.session_state.preset_selector in opsi_preset else 0
 st.sidebar.selectbox("🎯 Pilih Preset Aktif:", opsi_preset, index=idx_default, key="preset_selector", on_change=apply_preset)
 
-with st.sidebar.expander("➕ Buat Preset Sendiri Kustom"):
-    nama_preset_baru = st.text_input("Nama Preset Anda:", placeholder="Contoh: Akumulasi Uang Besar")
-    kustom_input = {k: st.selectbox(f"P-{info['label']}", info['options'], key=f"sidebar_{k}") for k, info in MASTER_FILTERS.items()}
-    if st.button("💾 Simpan Jadi Preset"):
-        if nama_preset_baru.strip():
-            k_lama = {}
-            if os.path.exists(FILE_PRESET):
-                try:
-                    with open(FILE_PRESET, "r") as f: k_lama = json.load(f)
-                except: pass
-            k_lama[nama_preset_baru.strip()] = kustom_input
-            with open(FILE_PRESET, "w") as f: json.dump(k_lama, f, indent=4)
-            for k in MASTER_FILTERS: st.session_state[f"main_{k}"] = kustom_input[k]
-            st.session_state.preset_selector = nama_preset_baru.strip()
-            st.success("Preset Disimpan!")
-            st.rerun()
+# ==========================================
+# FITUR BARU: MANAJEMEN PRESET (EDIT/HAPUS)
+# ==========================================
+kustom_presets = {}
+if os.path.exists(FILE_PRESET):
+    try:
+        with open(FILE_PRESET, "r") as f: kustom_presets = json.load(f)
+    except: pass
+
+with st.sidebar.expander("🛠️ Manajemen Preset Kustom"):
+    tab_edit, tab_hapus = st.tabs(["📝 Buat/Edit", "🗑️ Hapus"])
+
+    with tab_edit:
+        opsi_edit = ["-- Buat Baru --"] + list(kustom_presets.keys())
+        pilih_edit = st.selectbox("Pilih Preset:", opsi_edit, key="select_edit")
+
+        if pilih_edit == "-- Buat Baru --":
+            nama_preset_baru = st.text_input("Nama Preset Baru:", placeholder="Contoh: Strategi X", key="nama_baru")
+            nilai_awal = {k: info['options'][0] for k, info in MASTER_FILTERS.items()}
+        else:
+            nama_preset_baru = st.text_input("Simpan sebagai:", value=pilih_edit, key="nama_edit")
+            nilai_awal = kustom_presets[pilih_edit]
+
+        kustom_input = {}
+        for k, info in MASTER_FILTERS.items():
+            val_awal = nilai_awal.get(k, info['options'][0])
+            idx_awal = info['options'].index(val_awal) if val_awal in info['options'] else 0
+            kustom_input[k] = st.selectbox(f"P-{info['label']}", info['options'], index=idx_awal, key=f"edit_{k}")
+
+        if st.button("💾 Simpan Preset"):
+            if nama_preset_baru.strip():
+                # Hapus nama lama jika user me-rename presetnya
+                if pilih_edit != "-- Buat Baru --" and pilih_edit != nama_preset_baru.strip():
+                    del kustom_presets[pilih_edit]
+                kustom_presets[nama_preset_baru.strip()] = kustom_input
+                with open(FILE_PRESET, "w") as f: json.dump(kustom_presets, f, indent=4)
+                st.session_state.preset_selector = nama_preset_baru.strip()
+                st.success("Preset berhasil disimpan!")
+                st.rerun()
+
+    with tab_hapus:
+        if kustom_presets:
+            pilih_hapus = st.selectbox("Pilih Preset untuk Dihapus:", list(kustom_presets.keys()))
+            if st.button("🗑️ Hapus Preset"):
+                del kustom_presets[pilih_hapus]
+                with open(FILE_PRESET, "w") as f: json.dump(kustom_presets, f, indent=4)
+                if st.session_state.preset_selector == pilih_hapus:
+                    st.session_state.preset_selector = "Matikan Preset (Manual)"
+                st.success("Preset dihapus!")
+                st.rerun()
+        else:
+            st.info("Belum ada preset kustom.")
 
 st.sidebar.markdown("---")
 st.title("⚡ AlgoTrade Screener - IHSG Ultimate")
@@ -286,7 +325,6 @@ if not df_hasil.empty:
             df_tampil = df_filtered.iloc[idx_awal : idx_awal + per_hal].copy()
             if "Total Score" in df_tampil.columns: df_tampil["Total Score"] = df_tampil["Total Score"].apply(format_skor)
             
-            # Kolom Terakhir Update sudah dihapus dari semua list di bawah ini
             kolom_ringkasan = ["Ticker", "Harga (Rp)", "Change (%)", "Rekomendasi", "Status Open", "Posisi VWAP", "Total Score", "Volume", "Auto Trading Plan"]
             kolom_bandar = ["Ticker", "Harga (Rp)", "Change (%)", "Fase Siklus Bandar", "Kekuatan A/D", "Status Bandar", "RVOL (Anomali Vol)", "Karakter Gorengan", "Tekanan Bandar", "OBV Trend"]
             kolom_teknikal = ["Ticker", "Harga (Rp)", "Change (%)", "Auto Trading Plan", "Risk/Reward Ratio", "Sinyal Cuci Barang", "Posisi Entry", "Pola Candle", "MA Signal", "Status BB", "RSI (14D)", "MACD"]
@@ -297,8 +335,8 @@ if not df_hasil.empty:
                 "Support", "Resistance", "Posisi Entry", "Pola Candle", "Change (%)", "Volume", "RVOL (Anomali Vol)", 
                 "Vol Breakout", "Status Gap", "Fase Siklus Bandar", "Karakter Gorengan", "Tekanan Bandar", "Kekuatan A/D", 
                 "Status Bandar", "OBV Trend", "RSI (14D)", "Momentum", "MA Signal", "MA Cross", "MACD", "Status BB", 
-                "Risiko", "Likuiditas", "Total Score", "Rekomendasi", "Status Akuisisi"
-            ]
+                "Risiko", "Likuiditas", "Total Score", "Rekomendasi"
+            ] # Terakhir Update sudah dibuang dari list agar tidak merusak tabel
             
             if "Ringkasan" in mode_tampilan: kolom_pilih = kolom_ringkasan
             elif "Bandarmologi" in mode_tampilan: kolom_pilih = kolom_bandar
@@ -347,12 +385,11 @@ if not df_hasil.empty:
     with tab3:
         st.markdown("### 📚 Kamus Istilah Kolom")
         if not KAMUS_EDUKASI:
-            st.warning(f"⚠️ File '{FILE_KAMUS}' tidak ditemukan. Silakan buat file json tersebut agar kamus muncul.")
+            st.warning(f"⚠️ File '{FILE_KAMUS}' tidak ditemukan. Silakan buat file json tersebut di folder yang sama agar penjelasan muncul.")
         else:
             st.info("Berikut adalah penjelasan untuk membaca semua metrik di Tab Screener:")
             for kolom_nama, penjelasan in KAMUS_EDUKASI.items():
-                if kolom_nama in df_hasil.columns or kolom_nama in ["Status Open", "Risk/Reward Ratio", "Auto Trading Plan", "Streak Harian", "Sinyal Cuci Barang", "Kelas Transaksi"]: 
-                    st.markdown(f"🔹 **{kolom_nama}**: {penjelasan}")
+                st.markdown(f"🔹 **{kolom_nama}**: {penjelasan}")
 
     with tab4:
         st.markdown("### 📈 Strategi & Simulasi Trading Profesional (Termasuk BSJP)")
@@ -378,7 +415,6 @@ if not df_hasil.empty:
             
             df_markup = df_lapis3[(df_lapis3['Status Bandar'] == 'Akumulasi Kuat') & (df_lapis3['Tekanan Bandar'] == 'Dominan Beli (Hajar Kanan)')].copy()
             
-            # === FILTER CURI START SANGAT DIPERKETAT AGAR TIDAK SALAH TEBAK ===
             kondisi_senyap = (
                 (
                     ((df_lapis3['Kekuatan A/D'] == 'Akumulasi Pro (Smart Money)') & (df_lapis3['Status BB'] == 'Squeeze')) | 
