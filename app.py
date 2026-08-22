@@ -25,14 +25,11 @@ def ekstrak_sari_pati_arsip(daftar_ticker_terpilih, df_utama):
     hasil_perasan_ai = {}
 
     for ticker in daftar_ticker_terpilih:
-        # --- 1. SISTEM GPS (Mencari Lokasi Folder) ---
         try:
-            # Mengambil harga acuan dari DataFrame utama web Anda
             harga = df_utama[df_utama['Ticker'] == ticker]['Harga (Rp)'].values[0]
         except:
             harga = 0
 
-        # Penentuan Kamar (Folder)
         if 1 <= harga <= 200:
             nama_folder = "Kelas_1_Gorengan_50_200"
         elif 201 <= harga <= 1000:
@@ -40,36 +37,26 @@ def ekstrak_sari_pati_arsip(daftar_ticker_terpilih, df_utama):
         else:
             nama_folder = "Kelas_3_Bluechip_1001_Plus"
 
-        # Membentuk rute persis di dalam Codespaces Anda
         jalur_file = os.path.join(base_folder, nama_folder, f"{ticker}_arsip.csv")
 
-        # --- 2. MESIN PEMERAS SARI PATI ---
         if os.path.exists(jalur_file):
             try:
-                # Membaca data arsip 5-menitan
                 df_arsip = pd.read_csv(jalur_file)
-                
-                # Memastikan format waktu terbaca
                 df_arsip['Waktu'] = pd.to_datetime(df_arsip['Waktu'])
-                
-                # BATES WAKTU EMAS: Potong ketat di jam 17:30
                 batas_waktu = pd.to_datetime('17:30').time()
                 df_arsip = df_arsip[df_arsip['Waktu'].dt.time <= batas_waktu]
 
                 if not df_arsip.empty:
-                    # Mengambil intisari pergerakan
                     harga_pagi = df_arsip['Harga'].iloc[0]
                     harga_sore = df_arsip['Harga'].iloc[-1]
                     total_vol = df_arsip['Volume'].sum()
                     
-                    # Mencari jejak "Paus" (Ledakan volume terbesar di jam berapa?)
                     idx_ledakan = df_arsip['Volume'].idxmax()
                     jam_ledakan = df_arsip.loc[idx_ledakan, 'Waktu'].strftime('%H:%M')
                     vol_ledakan = df_arsip.loc[idx_ledakan, 'Volume']
 
                     status = "Uptrend" if harga_sore > harga_pagi else ("Downtrend" if harga_sore < harga_pagi else "Sideways")
 
-                    # Merakit 1 kalimat super padat (Token AI sangat hemat!)
                     sari_pati = (
                         f"Tren {status} (Rp {harga_pagi} ke Rp {harga_sore}). "
                         f"Akumulasi agresif terdeteksi pada pukul {jam_ledakan} dengan guyuran volume {vol_ledakan} lot."
@@ -160,7 +147,6 @@ def get_forensic_data(ticker):
         summary_text += f"📅 {date} | Tutup: {close_price} | Vol: {max_vol} | Tekanan: {tekanan_akhir} | Siklus: {siklus} | OBV: {obv} | RVOL: {rvol} | BB: {bb}\n"
     return summary_text
 
-# AI BANDAR (V6)
 def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
     try:
         GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
@@ -218,7 +204,6 @@ def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
         return completion.choices[0].message.content + f"\n\n---\n⚡ *Dianalisa menggunakan mesin: **{model_andalan}** via Groq*"
     except Exception as e: return f"❌ Gagal memproses data dengan Groq. Error: {e}"
 
-# AI FORENSIK BANDAR (V7)
 def analisa_forensik_ai(data_saham_dict, master_filters_keys):
     try:
         GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
@@ -440,7 +425,6 @@ st.markdown("""
 # ==========================================
 FILE_CONFIG = "config_web.json"
 FILE_PRESET = "preset_kustom.json"
-FILE_KAMUS = "Konfigurasi/kamus_edukasi.json"
 FILE_HASIL = "Database/hasil_screener.csv"
 FILE_AKUISISI = "Database/data_akuisisi.csv"
 
@@ -502,12 +486,7 @@ if "Mid Cap (Lapis 2) + Small Cap (Lapis 3)" not in WEB_CONFIG["MASTER_FILTERS"]
     WEB_CONFIG["MASTER_FILTERS"]["Kategori"]["options"] = ["Semua", "Big Cap (Lapis 1)", "Mid Cap (Lapis 2)", "Small Cap (Lapis 3)", "Mid Cap (Lapis 2) + Small Cap (Lapis 3)"]
     with open(FILE_CONFIG, "w") as f: json.dump(WEB_CONFIG, f, indent=4)
 
-KAMUS_EDUKASI = {}
-if os.path.exists(FILE_KAMUS):
-    with open(FILE_KAMUS, "r") as f: KAMUS_EDUKASI = json.load(f)
-
 MASTER_FILTERS = WEB_CONFIG["MASTER_FILTERS"]
-STRATEGI_SIMULASI = WEB_CONFIG["STRATEGI"]
 
 # ==========================================
 # SECTION 3: DATABASE PRESET & LOAD DATA
@@ -689,8 +668,8 @@ def render_strategy_table(df_subset, file_name):
 # DEKLARASI TABS UTAMA
 # ==============================================================================
 if not df_hasil.empty:
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "📊 Market Overview", "📌 Screener Utama", "📖 Kamus Istilah", "💡 Strategi Pakar", "⚙️ Asisten AI Spesial", "💼 Portofolio Bot"
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "📊 Market Overview", "📌 Screener Utama", "⚙️ Asisten AI Spesial", "💼 Portofolio Bot"
     ])
     
     # ==========================================================================
@@ -871,15 +850,10 @@ if not df_hasil.empty:
                 st.caption("Klik icon 'Copy' untuk paste massal ke Tab V6/V7.")
         else: st.warning("Tidak ada data sesuai filter.")
 
+    # ==========================================================================
+    # [TAB 3] ASISTEN AI SPESIAL
+    # ==========================================================================
     with tab3:
-        st.markdown("### 📖 Kamus Edukasi")
-        for k, v in KAMUS_EDUKASI.items(): st.write(f"**{k}**: {v}")
-
-    with tab4:
-        st.markdown("### 💡 Panduan Strategi")
-        for k, v in STRATEGI_SIMULASI.items(): st.write(f"**{k}**: {v}")
-
-    with tab5:
         st.markdown("## 🦅 Radar BSJP & Laboratorium Forensik AI")
         st.markdown("<div class='bandar-box-green'><b>💡 INFO:</b> Gunakan kotak pilihan (Dropdown) di bawah ini untuk beralih antar strategi atau mode AI agar tampilan lebih rapi.</div>", unsafe_allow_html=True)
         
@@ -915,7 +889,7 @@ if not df_hasil.empty:
             cond_v9 = (cond_harga & (df_hasil.get('Valuasi', '') == 'Undervalued (Murah)'))
             df_v9 = df_hasil[cond_v9].copy() if not df_hasil.empty else pd.DataFrame()
 
-            tab_screener, tab_ai = st.tabs(["📌 Tabel Screener", "⚙️ Turnamen AI & Bot"])
+            tab_screener, tab_ai = st.tabs(["🎯 Screener Spesial", "🧠 Asisten AI"])
             
             with tab_screener:
                 pilihan_v = st.selectbox(
@@ -1181,7 +1155,10 @@ if not df_hasil.empty:
                                     if st.button("🔄 Mulai Turnamen Baru"):
                                         st.rerun()
 
-    with tab6:
+    # ==========================================================================
+    # [TAB 4] PORTOFOLIO BOT
+    # ==========================================================================
+    with tab4:
         st.markdown("## 📊 Dashboard Bot Simulator")
         pilihan_arena = st.selectbox("Pilih Arena:", [
             "Rumus 1", "Rumus 2", "Rumus 3", "Rumus 4", "Rumus 5", "Rumus 6", "Rumus 7", "Rumus 8", "Rumus 9"
