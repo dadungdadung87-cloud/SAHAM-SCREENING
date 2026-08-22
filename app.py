@@ -84,176 +84,6 @@ def ekstrak_sari_pati_arsip(daftar_ticker_terpilih, df_utama):
 
     return hasil_perasan_ai
 
-# ==========================================
-# SECTION 1: PENGATURAN UI/UX & API
-# ==========================================
-st.set_page_config(page_title="Screener Saham IHSG", layout="wide", initial_sidebar_state="expanded")
-
-# Konfigurasi API Gemini
-GEMINI_API_KEY = None
-try:
-    GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
-except:
-    pass
-if not GEMINI_API_KEY:
-    try:
-        load_dotenv()
-        GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-    except:
-        pass
-if not GEMINI_API_KEY:
-    GEMINI_API_KEY = None 
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-
-@st.cache_data
-def ambil_daftar_ai():
-    if not GEMINI_API_KEY:
-        return ['❌ API Key Belum Terbaca!']
-    return ['gemma-4-26b-a4b-it']
-
-st.markdown("""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-    .stDataFrame { border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-    h1 { font-weight: 800; background: -webkit-linear-gradient(#38bdf8, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; padding-bottom: 10px; }
-    .metric-container { border-radius: 10px; padding: 15px; text-align: center; border: 1px solid #334155; background-color: #1e293b; color: #f8fafc; margin-bottom: 20px; }
-    .bandar-box { border-left: 5px solid #ef4444; background-color: #2a1111; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-    .bandar-box-green { border-left: 5px solid #22c55e; background-color: #0f291e; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-    .stTabs [data-baseweb="tab-list"] { gap: 24px; }
-    .stTabs [data-baseweb="tab"] { height: 50px; white-space: pre-wrap; background-color: transparent; border-radius: 4px 4px 0px 0px; padding: 10px 16px; font-weight: 600; }
-    .view-mode-container { background-color: #0f172a; padding: 10px 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #334155; }
-    
-    div[data-baseweb="select"] > div { height: auto; min-height: 38px; }
-    div[data-baseweb="select"] span { white-space: normal !important; word-break: break-word !important; line-height: 1.4 !important; }
-    ul[data-baseweb="menu"] li { white-space: normal !important; word-break: break-word !important; padding-top: 8px !important; padding-bottom: 8px !important; line-height: 1.4 !important; }
-    li[role="option"] { white-space: normal !important; word-wrap: break-word !important; }
-    </style>
-""", unsafe_allow_html=True)
-
-# ==========================================
-# SECTION 2: LOAD KONFIGURASI JSON
-# ==========================================
-FILE_CONFIG = "config_web.json"
-FILE_PRESET = "preset_kustom.json"
-FILE_KAMUS = "Konfigurasi/kamus_edukasi.json"
-FILE_HASIL = "Database/hasil_screener.csv"
-FILE_AKUISISI = "Database/data_akuisisi.csv"
-
-DEFAULT_CONFIG = {
-    "MASTER_FILTERS": {
-        "Kategori": {"label": "🏢 Kategori Saham", "options": ["Semua", "Big Cap (Lapis 1)", "Mid Cap (Lapis 2)", "Small Cap (Lapis 3)", "Mid Cap (Lapis 2) + Small Cap (Lapis 3)"]},
-        "Status Open": {"label": "🌅 Sinyal Open", "options": ["Semua", "Open = Low (Bullish Kuat)", "Open = High (Tekanan Jual)", "Normal"]},
-        "Risk/Reward Ratio": {"label": "⚖️ Risk/Reward", "options": ["Semua", "Sangat Menarik (> 1:3)", "Ideal (1:2)", "Menengah (1:1)", "Tidak Ideal (< 1:1)", "Di Area Support"]},
-        "Kelas Transaksi": {"label": "💸 Kelas Transaksi", "options": ["Semua", "Sultan (> 50M/hari)", "Ritel Aktif (5M - 50M)", "Gorengan Sepi (< 5M)"]},
-        "Sinyal Cuci Barang": {"label": "🧹 Sinyal Shakeout", "options": ["Semua", "Jarum Bawah (Sinyal Pantulan Kuat)", "Normal"]},
-        "Valuasi": {"label": "💎 Valuasi Fundamental", "options": ["Semua", "Undervalued (Murah)", "Fair Value (Wajar)", "Overvalued (Mahal)"]},
-        "Posisi VWAP": {"label": "⚖️ Posisi thd VWAP", "options": ["Semua", "Di Atas VWAP (Kuat)", "Di Bawah VWAP (Lemah)", "Persis di VWAP"]},
-        "Fase Siklus Bandar": {"label": "🔄 Siklus Wyckoff", "options": ["Semua", "Accumulation (Kumpul Barang)", "Mark-Up (Fase Pesta)", "Distribution (Fase Jualan)", "Mark-Down (Fase Runtuh)", "Sideways"]},
-        "RVOL (Anomali Vol)": {"label": "🌋 Ledakan Volume", "options": ["Semua", "Ledakan Ekstrem (> 300%)", "Anomali Tinggi (150-300%)", "Normal (50-150%)", "Sepi (< 50%)"]},
-        "Karakter Gorengan": {"label": "🕵️ Karakter Saham", "options": ["Semua", "Spesialis Tiang Jemuran (Banting Pucuk)", "Solid (Jarang Dibanting)", "Normal"]},
-        "Status Bandar": {"label": "🕵️ Status Bandar", "options": ["Semua", "Akumulasi Kuat", "Distribusi Kuat", "Normal"]},
-        "Tekanan Bandar": {"label": "⚔️ Tekanan Harian", "options": ["Semua", "Dominan Beli (Hajar Kanan)", "Dominan Jual (Guyur)", "Seimbang / Adu Mekanik"]},
-        "Kekuatan A/D": {"label": "🧠 Smart Money (A/D)", "options": ["Semua", "Akumulasi Pro (Smart Money)", "Distribusi Pro (Guyuran)", "Netral"]},
-        "OBV Trend": {"label": "🌊 Tren Uang (OBV)", "options": ["Semua", "Akumulasi (Naik)", "Distribusi (Turun)", "Netral"]},
-        "Pola Candle": {"label": "🕯️ Price Action", "options": ["Semua", "Marubozu (Strong Bullish)", "Hammer (Potensi Reversal)", "Doji (Ragu-ragu)", "Normal"]},
-        "Posisi Entry": {"label": "🎯 Jarak ke Support", "options": ["Semua", "Dekat Support (Low Risk)", "Area Tengah", "Rawan Pucuk (High Risk)"]},
-        "Vol Breakout": {"label": "🔊 Volume", "options": ["Semua", "Tembus MA20", "Normal"]},
-        "RSI (14D)": {"label": "📊 RSI (14D)", "options": ["Semua", "> 50 (Bullish)", "<= 50 (Bearish)"]},
-        "MA Signal": {"label": "📈 Tren (MA20)", "options": ["Semua", "Uptrend", "Downtrend"]},
-        "Momentum": {"label": "⚡ Momentum", "options": ["Semua", "Positif", "Negatif"]},
-        "Total Score": {"label": "⭐ Total Score", "options": ["Semua", 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]},
-        "Rekomendasi": {"label": "🎯 Rekomendasi", "options": ["Semua", "BELI", "WAIT & SEE"]},
-        "Likuiditas": {"label": "💧 Likuiditas", "options": ["Semua", "> 1 Miliar", "< 1 Miliar"]},
-        "Status BB": {"label": "🌐 Bollinger Bands", "options": ["Semua", "Squeeze", "Bottom Rebound", "Breakout Upper", "Normal"]},
-        "MA Cross": {"label": "🔀 MA Cross (5/20)", "options": ["Semua", "Golden Cross", "Bullish", "Death Cross", "Bearish"]},
-        "Risiko": {"label": "⚠️ Risiko Volatilitas", "options": ["Semua", "Tinggi", "Sedang", "Rendah"]},
-        "Status Akuisisi": {"label": "🤝 Sentimen Akuisisi", "options": ["Semua", "TIDAK ADA", "RENCANA AKUISISI", "DALAM AKUISISI"]},
-        "MACD": {"label": "📈 MACD", "options": ["Semua", "Strong Bullish", "Bullish MACD", "Strong Bearish", "Bearish MACD"]},
-        "Status Stochastic": {"label": "🌊 Stochastic", "options": ["Semua", "Oversold (Jenuh Jual - Peluang)", "Golden Cross (Awal Bullish)", "Overbought (Jenuh Beli - Rawan)", "Death Cross (Awal Bearish)", "Netral / Sideways"]},
-        "Status Sentimen": {"label": "📰 Sentimen Berita", "options": ["Semua", "Sentimen Positif 📰", "Sentimen Negatif ⚠️", "Netral / Sepi Berita"]},
-        "Prediksi Machine Learning": {"label": "🧠 AI Machine Learning", "options": ["Semua", "🔥 ANOMALI BANDAR (Siap Ledakan)", "⚠️ Anomali (Sudah Terbang)", "Biasa / Mengikuti Pasar"]},
-        "Kondisi Supply": {"label": "🏜️ Supply & Demand", "options": ["Semua", "Supply Kering (Siap Pump) 🏜️", "Supply Banjir (Distribusi) 🌊", "Normal / Sedang Transisi"]},
-        "Status Fibonacci": {"label": "📏 Level Fibonacci", "options": ["Semua", "Golden Rebound Fibo 61.8% (Golden Ratio) 🎯", "Dekat Support Fibo 61.8% (Golden Ratio)", "Golden Rebound Fibo 50.0% 🎯", "Golden Rebound Fibo 38.2% 🎯", "Mengambang (Jauh dari Fibo)"]}
-    },
-    "STRATEGI": {
-        "1. BSJP (Beli Sore Jual Pagi) ⏰ 15:30": "Aturan: 1) Eksekusi HANYA jam 15:30 - 15:45. 2) Pilih preset 'BSJP' di sidebar kiri. 3) Beli di sore hari, set Take Profit otomatis 3-5% untuk esok pagi saat market buka.",
-        "2. HAKA Pagi (Open = Low) ⏰ 09:05": "Aturan: 1) Buka screener pukul 09:05. 2) Filter: Status Open = 'Open = Low', RVOL = 'Ledakan Ekstrem (> 300%)'. 3) Cocokkan Target TP di kolom Auto Trading Plan.",
-        "3. Buy on Weakness (Tangkap Pisau Jatuh)": "Filter: Streak Harian = 'Turun Beruntun', Sinyal Cuci Barang = 'Jarum Bawah', Kekuatan A/D = 'Akumulasi Pro'. Momen ritel panik tapi bandar memborong.",
-        "4. Menghindari Guyuran Bandar": "Jika saham naik kencang TAPI Tekanan Bandar 'Dominan Jual', bandar sedang take profit perlahan."
-    }
-}
-
-if not os.path.exists(FILE_CONFIG):
-    with open(FILE_CONFIG, "w") as f: json.dump(DEFAULT_CONFIG, f, indent=4)
-else:
-    with open(FILE_CONFIG, "r") as f: cek_config = json.load(f)
-    if "Status Fibonacci" not in cek_config.get("MASTER_FILTERS", {}):
-        with open(FILE_CONFIG, "w") as f: json.dump(DEFAULT_CONFIG, f, indent=4)
-
-with open(FILE_CONFIG, "r") as f: WEB_CONFIG = json.load(f)
-
-# Auto-patch jika opsi gabungan belum ada di config JSON lama
-if "Mid Cap (Lapis 2) + Small Cap (Lapis 3)" not in WEB_CONFIG["MASTER_FILTERS"]["Kategori"]["options"]:
-    WEB_CONFIG["MASTER_FILTERS"]["Kategori"]["options"] = ["Semua", "Big Cap (Lapis 1)", "Mid Cap (Lapis 2)", "Small Cap (Lapis 3)", "Mid Cap (Lapis 2) + Small Cap (Lapis 3)"]
-    with open(FILE_CONFIG, "w") as f: json.dump(WEB_CONFIG, f, indent=4)
-
-KAMUS_EDUKASI = {}
-if os.path.exists(FILE_KAMUS):
-    with open(FILE_KAMUS, "r") as f: KAMUS_EDUKASI = json.load(f)
-
-MASTER_FILTERS = WEB_CONFIG["MASTER_FILTERS"]
-STRATEGI_SIMULASI = WEB_CONFIG["STRATEGI"]
-
-# ==========================================
-# SECTION 3: DATABASE PRESET & LOAD DATA
-# ==========================================
-def muat_preset():
-    preset_bawaan = {
-        "🌙 BSJP (Beli Sore 15:30)": {k: "Semua" for k in MASTER_FILTERS},
-        "⚡ HAKA Sesi Pagi (Open=Low)": {k: "Semua" for k in MASTER_FILTERS},
-        "🚀 Gorengan Aktif (High Risk)": {k: "Semua" for k in MASTER_FILTERS},
-        "🎣 Pantulan Reversal Emas": {k: "Semua" for k in MASTER_FILTERS},
-        "🔥 Bluechip Terakumulasi": {k: "Semua" for k in MASTER_FILTERS}
-    }
-    preset_bawaan["🌙 BSJP (Beli Sore 15:30)"].update({"Tekanan Bandar": "Dominan Beli (Hajar Kanan)", "Karakter Gorengan": "Solid (Jarang Dibanting)", "Status Bandar": "Akumulasi Kuat", "MA Signal": "Uptrend", "Rekomendasi": "BELI"})
-    preset_bawaan["⚡ HAKA Sesi Pagi (Open=Low)"].update({"Status Open": "Open = Low (Bullish Kuat)", "Risk/Reward Ratio": "Sangat Menarik (> 1:3)"})
-    preset_bawaan["🚀 Gorengan Aktif (High Risk)"].update({"Kategori": "Small Cap (Lapis 3)", "RVOL (Anomali Vol)": "Ledakan Ekstrem (> 300%)", "Posisi VWAP": "Di Atas VWAP (Kuat)"})
-    preset_bawaan["🎣 Pantulan Reversal Emas"].update({"Sinyal Cuci Barang": "Jarum Bawah (Sinyal Pantulan Kuat)", "Kekuatan A/D": "Akumulasi Pro (Smart Money)"})
-    preset_bawaan["🔥 Bluechip Terakumulasi"].update({"Status Bandar": "Akumulasi Kuat", "Kategori": "Big Cap (Lapis 1)", "MA Signal": "Uptrend"})
-
-    if os.path.exists(FILE_PRESET):
-        try:
-            with open(FILE_PRESET, "r") as f: preset_bawaan.update(json.load(f))
-        except: pass
-    return preset_bawaan
-
-daftar_preset_aktif = muat_preset()
-if "preset_selector" not in st.session_state: st.session_state.preset_selector = "Matikan Preset (Manual)"
-
-def apply_preset():
-    if st.session_state.preset_selector != "Matikan Preset (Manual)":
-        for k, v in daftar_preset_aktif[st.session_state.preset_selector].items():
-            if k in MASTER_FILTERS: st.session_state[f"main_{k}"] = v
-
-def manual_override(): st.session_state.preset_selector = "Matikan Preset (Manual)"
-
-@st.cache_data(ttl=10)
-def load_data_saham():
-    if not os.path.exists(FILE_HASIL): return pd.DataFrame()
-    df = pd.read_csv(FILE_HASIL)
-    if os.path.exists(FILE_AKUISISI):
-        df_akuisisi = pd.read_csv(FILE_AKUISISI)
-        if "Status Akuisisi" in df.columns: df = df.drop(columns=["Status Akuisisi"])
-        df = pd.merge(df, df_akuisisi, on="Ticker", how="left")
-        df["Status Akuisisi"] = df["Status Akuisisi"].fillna("TIDAK ADA")
-    else: df["Status Akuisisi"] = "TIDAK ADA"
-    return df
-
-# ==========================================
-# SECTION 3.5: LOGIKA AI & COMPRESSOR ARSIP
-# ==========================================
 def get_historical_summary(ticker):
     arsip_files = glob.glob("Arsip_Data_Harian/screener_*.csv")
     if not arsip_files: return None
@@ -445,9 +275,6 @@ def analisa_forensik_ai(data_saham_dict, master_filters_keys):
         return completion.choices[0].message.content + f"\n\n---\n🔬 *Lab Forensik AI: **{model_andalan}** via Groq*"
     except Exception as e: return f"❌ Gagal memproses data dengan Groq. Error: {e}"
 
-# ==========================================
-# FUNGSI 1: AI PENYISIHAN (TETAP MENGGUNAKAN LLAMA 3.3)
-# ==========================================
 def ai_penyisihan_turnamen(data_saham_dict, api_key):
     try:
         client = Groq(api_key=api_key)
@@ -464,8 +291,7 @@ def ai_penyisihan_turnamen(data_saham_dict, api_key):
             payload_text += f"\n[{ticker}] Price:{data['harga']} | Vol:{data['volume']} | Broksum:{data['broksum']} | MM:{data['tekanan_bandar']} | Supply:{data['supply']} | OBV:{data['obv']} | Fibo:{data['fibo']}"
 
         prompt = f"""
-        You are a Strict Quantitative Filter for an Indonesian Hedge Fund. 
-        Evaluate these {len(data_saham_dict)} candidate stocks.
+        You are a Strict Quantitative Filter for an Indonesian Hedge Fund. Evaluate these {len(data_saham_dict)} candidate stocks.
         {payload_text}
 
         SLIGHTLY BRUTAL ELIMINATION RULES:
@@ -488,14 +314,10 @@ def ai_penyisihan_turnamen(data_saham_dict, api_key):
     except Exception as e:
         return "ERROR"
 
-# ==========================================
-# FUNGSI 2: AI GRAND FINAL (HYBRID / AUTO-FALLBACK)
-# ==========================================
 def ai_grand_final_top5(data_saham_dict, api_key):
     import re
     try:
         client = Groq(api_key=api_key)
-        
         model_andalan = "llama-3.3-70b-versatile"
         try:
             daftar_model = client.models.list()
@@ -504,46 +326,26 @@ def ai_grand_final_top5(data_saham_dict, api_key):
             if model_deepseek:
                 ds_70b = [m for m in model_deepseek if '70b' in m.lower()]
                 model_andalan = ds_70b[0] if ds_70b else model_deepseek[0]
-        except: 
-            pass
+        except: pass
 
         payload_text = ""
         for ticker, data in data_saham_dict.items():
-            payload_text += f"\n--- {ticker} ---\n"
-            payload_text += f"Harga: Rp {data['harga']} | Vol: {data['volume']}\n"
-            payload_text += f"Broksum: {data['broksum']} | Tekanan: {data['tekanan_bandar']} | Supply: {data['supply']}\n"
-            payload_text += f"Teknikal: OBV: {data['obv']} | Fibo: {data['fibo']} | VWAP: {data['vwap']} | Candle: {data['pola_candle']}\n"
+            payload_text += f"\n--- {ticker} ---\n Harga: {data['harga']} | Vol: {data['volume']} | Broksum: {data['broksum']} | Tekanan: {data['tekanan_bandar']} | Supply: {data['supply']} | OBV: {data['obv']} | Fibo: {data['fibo']} | VWAP: {data['vwap']} | Candle: {data['pola_candle']}\n"
 
         prompt = f"""
-        You are the Chief Investment Officer of a Top-Tier Indonesian Hedge Fund.
-        I am giving you {len(data_saham_dict)} Elite Semi-Finalist stocks. They have all survived a strict elimination phase and possess signs of stealth accumulation.
-        
-        DATA SEMI-FINALIS:
+        You are the CIO of a Top-Tier Indonesian Hedge Fund. Evaluate these Elite Semi-Finalist stocks:
         {payload_text}
-
-        YOUR GRAND FINALE MISSION:
-        1. Deeply compare and contrast all these surviving stocks.
-        2. Rank and select EXACTLY the TOP 5 BEST STOCKS with the absolute highest probability of exploding tomorrow (Gap Up/ARA). (If there are fewer than 5 stocks provided, rank all of them).
-        
-        STRICT OUTPUT RULES:
-        - YOU MUST WRITE YOUR ENTIRE RESPONSE IN INDONESIAN (BAHASA INDONESIA).
-        - Start directly with a Markdown table: [Peringkat, Ticker, Skor Potensi (0-100%), Trigger Utama Ledakan].
-        - Below the table, provide a brutally honest, highly detailed explanation of WHY these stocks made it to the Top 5. Detail the specific broker activities (Broksum) and technical confluences (Fibo, Supply).
-        - Provide a concise Trading Plan (Buy Area, Target Price, Cut Loss) for the Top 3 stocks on your list.
+        MISSION: Select EXACTLY the TOP 5 BEST STOCKS with the highest probability of Gap Up tomorrow.
+        RULES: Indonesian Language. Markdown table [Peringkat, Ticker, Skor, Trigger]. Detailed explanation and Trading Plan below.
         """
-        
         completion = client.chat.completions.create(
             model=model_andalan, messages=[{"role": "user", "content": prompt}],
             temperature=0.3, max_tokens=4000, top_p=1, stream=False,
         )
-        
         raw_content = completion.choices[0].message.content
         clean_content = re.sub(r'<think>.*?</think>', '', raw_content, flags=re.DOTALL).strip()
-        
         return clean_content + f"\n\n---\n🏆 *Grand Final AI: **{model_andalan}** via Groq*"
-    except Exception as e:
-        return f"❌ Gagal memproses Grand Final. Error: {e}"
-
+    except Exception as e: return f"❌ Gagal memproses Grand Final. Error: {e}"
 
 def ai_grand_final(data_saham_dict, api_key):
     try:
@@ -587,26 +389,129 @@ def ai_grand_final(data_saham_dict, api_key):
         return f"❌ Gagal memproses Grand Final. Error: {e}"
 
 # ==========================================
-# SECTION 4: HEADER & SIDEBAR
+# SECTION 1: PENGATURAN UI/UX & API
 # ==========================================
-df_hasil = load_data_saham()
+st.set_page_config(page_title="Screener Saham IHSG", layout="wide", initial_sidebar_state="expanded")
 
-if not df_hasil.empty and "Terakhir Update" in df_hasil.columns:
-    waktu_update = df_hasil["Terakhir Update"].iloc[0]
-    st.sidebar.markdown(f"""
-        <div style="border: 2px solid #06b6d4; padding: 10px; border-radius: 4px; text-align: center; margin-bottom: 15px; background-color: #0f172a; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-            <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">Waktu Terakhir Update:</span><br>
-            <strong style="color: #06b6d4; font-size: 14px;">{waktu_update}</strong>
-        </div>
-    """, unsafe_allow_html=True)
+GEMINI_API_KEY = None
+try:
+    GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
+except:
+    pass
+if not GEMINI_API_KEY:
+    try:
+        load_dotenv()
+        GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+    except:
+        pass
+if not GEMINI_API_KEY:
+    GEMINI_API_KEY = None 
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
 
-if st.sidebar.button("🔃 Muat Ulang Data Server", use_container_width=True):
-    st.cache_data.clear()
-    st.rerun()
+@st.cache_data
+def ambil_daftar_ai():
+    if not GEMINI_API_KEY:
+        return ['❌ API Key Belum Terbaca!']
+    return ['gemma-4-26b-a4b-it']
 
-st.sidebar.title("⚙️ Preset Filter Cepat")
-st.sidebar.info("Gunakan **'BSJP (Beli Sore 15:30)'** untuk mencari saham yang mantap dibeli sebelum penutupan bursa!")
+st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+    .stDataFrame { border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+    h1 { font-weight: 800; background: -webkit-linear-gradient(#38bdf8, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; padding-bottom: 10px; }
+    .metric-container { border-radius: 10px; padding: 15px; text-align: center; border: 1px solid #334155; background-color: #1e293b; color: #f8fafc; margin-bottom: 20px; }
+    .bandar-box { border-left: 5px solid #ef4444; background-color: #2a1111; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+    .bandar-box-green { border-left: 5px solid #22c55e; background-color: #0f291e; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+    .stTabs [data-baseweb="tab-list"] { gap: 24px; }
+    .stTabs [data-baseweb="tab"] { height: 50px; white-space: pre-wrap; background-color: transparent; border-radius: 4px 4px 0px 0px; padding: 10px 16px; font-weight: 600; }
+    .view-mode-container { background-color: #0f172a; padding: 10px 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #334155; }
+    
+    div[data-baseweb="select"] > div { height: auto; min-height: 38px; }
+    div[data-baseweb="select"] span { white-space: normal !important; word-break: break-word !important; line-height: 1.4 !important; }
+    ul[data-baseweb="menu"] li { white-space: normal !important; word-break: break-word !important; padding-top: 8px !important; padding-bottom: 8px !important; line-height: 1.4 !important; }
+    li[role="option"] { white-space: normal !important; word-wrap: break-word !important; }
+    </style>
+""", unsafe_allow_html=True)
 
+# ==========================================
+# SECTION 2: LOAD KONFIGURASI JSON
+# ==========================================
+FILE_CONFIG = "config_web.json"
+FILE_PRESET = "preset_kustom.json"
+FILE_KAMUS = "Konfigurasi/kamus_edukasi.json"
+FILE_HASIL = "Database/hasil_screener.csv"
+FILE_AKUISISI = "Database/data_akuisisi.csv"
+
+DEFAULT_CONFIG = {
+    "MASTER_FILTERS": {
+        "Kategori": {"label": "🏢 Kategori Saham", "options": ["Semua", "Big Cap (Lapis 1)", "Mid Cap (Lapis 2)", "Small Cap (Lapis 3)", "Mid Cap (Lapis 2) + Small Cap (Lapis 3)"]},
+        "Status Open": {"label": "🌅 Sinyal Open", "options": ["Semua", "Open = Low (Bullish Kuat)", "Open = High (Tekanan Jual)", "Normal"]},
+        "Risk/Reward Ratio": {"label": "⚖️ Risk/Reward", "options": ["Semua", "Sangat Menarik (> 1:3)", "Ideal (1:2)", "Menengah (1:1)", "Tidak Ideal (< 1:1)", "Di Area Support"]},
+        "Kelas Transaksi": {"label": "💸 Kelas Transaksi", "options": ["Semua", "Sultan (> 50M/hari)", "Ritel Aktif (5M - 50M)", "Gorengan Sepi (< 5M)"]},
+        "Sinyal Cuci Barang": {"label": "🧹 Sinyal Shakeout", "options": ["Semua", "Jarum Bawah (Sinyal Pantulan Kuat)", "Normal"]},
+        "Valuasi": {"label": "💎 Valuasi Fundamental", "options": ["Semua", "Undervalued (Murah)", "Fair Value (Wajar)", "Overvalued (Mahal)"]},
+        "Posisi VWAP": {"label": "⚖️ Posisi thd VWAP", "options": ["Semua", "Di Atas VWAP (Kuat)", "Di Bawah VWAP (Lemah)", "Persis di VWAP"]},
+        "Fase Siklus Bandar": {"label": "🔄 Siklus Wyckoff", "options": ["Semua", "Accumulation (Kumpul Barang)", "Mark-Up (Fase Pesta)", "Distribution (Fase Jualan)", "Mark-Down (Fase Runtuh)", "Sideways"]},
+        "RVOL (Anomali Vol)": {"label": "🌋 Ledakan Volume", "options": ["Semua", "Ledakan Ekstrem (> 300%)", "Anomali Tinggi (150-300%)", "Normal (50-150%)", "Sepi (< 50%)"]},
+        "Karakter Gorengan": {"label": "🕵️ Karakter Saham", "options": ["Semua", "Spesialis Tiang Jemuran (Banting Pucuk)", "Solid (Jarang Dibanting)", "Normal"]},
+        "Status Bandar": {"label": "🕵️ Status Bandar", "options": ["Semua", "Akumulasi Kuat", "Distribusi Kuat", "Normal"]},
+        "Tekanan Bandar": {"label": "⚔️ Tekanan Harian", "options": ["Semua", "Dominan Beli (Hajar Kanan)", "Dominan Jual (Guyur)", "Seimbang / Adu Mekanik"]},
+        "Kekuatan A/D": {"label": "🧠 Smart Money (A/D)", "options": ["Semua", "Akumulasi Pro (Smart Money)", "Distribusi Pro (Guyuran)", "Netral"]},
+        "OBV Trend": {"label": "🌊 Tren Uang (OBV)", "options": ["Semua", "Akumulasi (Naik)", "Distribusi (Turun)", "Netral"]},
+        "Pola Candle": {"label": "🕯️ Price Action", "options": ["Semua", "Marubozu (Strong Bullish)", "Hammer (Potensi Reversal)", "Doji (Ragu-ragu)", "Normal"]},
+        "Posisi Entry": {"label": "🎯 Jarak ke Support", "options": ["Semua", "Dekat Support (Low Risk)", "Area Tengah", "Rawan Pucuk (High Risk)"]},
+        "Vol Breakout": {"label": "🔊 Volume", "options": ["Semua", "Tembus MA20", "Normal"]},
+        "RSI (14D)": {"label": "📊 RSI (14D)", "options": ["Semua", "> 50 (Bullish)", "<= 50 (Bearish)"]},
+        "MA Signal": {"label": "📈 Tren (MA20)", "options": ["Semua", "Uptrend", "Downtrend"]},
+        "Momentum": {"label": "⚡ Momentum", "options": ["Semua", "Positif", "Negatif"]},
+        "Total Score": {"label": "⭐ Total Score", "options": ["Semua", 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]},
+        "Rekomendasi": {"label": "🎯 Rekomendasi", "options": ["Semua", "BELI", "WAIT & SEE"]},
+        "Likuiditas": {"label": "💧 Likuiditas", "options": ["Semua", "> 1 Miliar", "< 1 Miliar"]},
+        "Status BB": {"label": "🌐 Bollinger Bands", "options": ["Semua", "Squeeze", "Bottom Rebound", "Breakout Upper", "Normal"]},
+        "MA Cross": {"label": "🔀 MA Cross (5/20)", "options": ["Semua", "Golden Cross", "Bullish", "Death Cross", "Bearish"]},
+        "Risiko": {"label": "⚠️ Risiko Volatilitas", "options": ["Semua", "Tinggi", "Sedang", "Rendah"]},
+        "Status Akuisisi": {"label": "🤝 Sentimen Akuisisi", "options": ["Semua", "TIDAK ADA", "RENCANA AKUISISI", "DALAM AKUISISI"]},
+        "MACD": {"label": "📈 MACD", "options": ["Semua", "Strong Bullish", "Bullish MACD", "Strong Bearish", "Bearish MACD"]},
+        "Status Stochastic": {"label": "🌊 Stochastic", "options": ["Semua", "Oversold (Jenuh Jual - Peluang)", "Golden Cross (Awal Bullish)", "Overbought (Jenuh Beli - Rawan)", "Death Cross (Awal Bearish)", "Netral / Sideways"]},
+        "Status Sentimen": {"label": "📰 Sentimen Berita", "options": ["Semua", "Sentimen Positif 📰", "Sentimen Negatif ⚠️", "Netral / Sepi Berita"]},
+        "Prediksi Machine Learning": {"label": "🧠 AI Machine Learning", "options": ["Semua", "🔥 ANOMALI BANDAR (Siap Ledakan)", "⚠️ Anomali (Sudah Terbang)", "Biasa / Mengikuti Pasar"]},
+        "Kondisi Supply": {"label": "🏜️ Supply & Demand", "options": ["Semua", "Supply Kering (Siap Pump) 🏜️", "Supply Banjir (Distribusi) 🌊", "Normal / Sedang Transisi"]},
+        "Status Fibonacci": {"label": "📏 Level Fibonacci", "options": ["Semua", "Golden Rebound Fibo 61.8% (Golden Ratio) 🎯", "Dekat Support Fibo 61.8% (Golden Ratio)", "Golden Rebound Fibo 50.0% 🎯", "Golden Rebound Fibo 38.2% 🎯", "Mengambang (Jauh dari Fibo)"]}
+    },
+    "STRATEGI": {
+        "1. BSJP (Beli Sore Jual Pagi) ⏰ 15:30": "Aturan: 1) Eksekusi HANYA jam 15:30 - 15:45. 2) Pilih preset 'BSJP' di sidebar kiri. 3) Beli di sore hari, set Take Profit otomatis 3-5% untuk esok pagi saat market buka.",
+        "2. HAKA Pagi (Open = Low) ⏰ 09:05": "Aturan: 1) Buka screener pukul 09:05. 2) Filter: Status Open = 'Open = Low', RVOL = 'Ledakan Ekstrem (> 300%)'. 3) Cocokkan Target TP di kolom Auto Trading Plan.",
+        "3. Buy on Weakness (Tangkap Pisau Jatuh)": "Filter: Streak Harian = 'Turun Beruntun', Sinyal Cuci Barang = 'Jarum Bawah', Kekuatan A/D = 'Akumulasi Pro'. Momen ritel panik tapi bandar memborong.",
+        "4. Menghindari Guyuran Bandar": "Jika saham naik kencang TAPI Tekanan Bandar 'Dominan Jual', bandar sedang take profit perlahan."
+    }
+}
+
+if not os.path.exists(FILE_CONFIG):
+    with open(FILE_CONFIG, "w") as f: json.dump(DEFAULT_CONFIG, f, indent=4)
+else:
+    with open(FILE_CONFIG, "r") as f: cek_config = json.load(f)
+    if "Status Fibonacci" not in cek_config.get("MASTER_FILTERS", {}):
+        with open(FILE_CONFIG, "w") as f: json.dump(DEFAULT_CONFIG, f, indent=4)
+
+with open(FILE_CONFIG, "r") as f: WEB_CONFIG = json.load(f)
+
+# Auto-patch jika opsi gabungan belum ada di config JSON lama
+if "Mid Cap (Lapis 2) + Small Cap (Lapis 3)" not in WEB_CONFIG["MASTER_FILTERS"]["Kategori"]["options"]:
+    WEB_CONFIG["MASTER_FILTERS"]["Kategori"]["options"] = ["Semua", "Big Cap (Lapis 1)", "Mid Cap (Lapis 2)", "Small Cap (Lapis 3)", "Mid Cap (Lapis 2) + Small Cap (Lapis 3)"]
+    with open(FILE_CONFIG, "w") as f: json.dump(WEB_CONFIG, f, indent=4)
+
+KAMUS_EDUKASI = {}
+if os.path.exists(FILE_KAMUS):
+    with open(FILE_KAMUS, "r") as f: KAMUS_EDUKASI = json.load(f)
+
+MASTER_FILTERS = WEB_CONFIG["MASTER_FILTERS"]
+STRATEGI_SIMULASI = WEB_CONFIG["STRATEGI"]
+
+# ==========================================
+# SECTION 3: DATABASE PRESET & LOAD DATA
+# ==========================================
 def muat_preset():
     preset_bawaan = {
         "🌙 BSJP (Beli Sore 15:30)": {k: "Semua" for k in MASTER_FILTERS},
@@ -636,6 +541,39 @@ def apply_preset():
             if k in MASTER_FILTERS: st.session_state[f"main_{k}"] = v
 
 def manual_override(): st.session_state.preset_selector = "Matikan Preset (Manual)"
+
+@st.cache_data(ttl=10)
+def load_data_saham():
+    if not os.path.exists(FILE_HASIL): return pd.DataFrame()
+    df = pd.read_csv(FILE_HASIL)
+    if os.path.exists(FILE_AKUISISI):
+        df_akuisisi = pd.read_csv(FILE_AKUISISI)
+        if "Status Akuisisi" in df.columns: df = df.drop(columns=["Status Akuisisi"])
+        df = pd.merge(df, df_akuisisi, on="Ticker", how="left")
+        df["Status Akuisisi"] = df["Status Akuisisi"].fillna("TIDAK ADA")
+    else: df["Status Akuisisi"] = "TIDAK ADA"
+    return df
+
+df_hasil = load_data_saham()
+
+# ==========================================
+# HEADER & SIDEBAR
+# ==========================================
+if not df_hasil.empty and "Terakhir Update" in df_hasil.columns:
+    waktu_update = df_hasil["Terakhir Update"].iloc[0]
+    st.sidebar.markdown(f"""
+        <div style="border: 2px solid #06b6d4; padding: 10px; border-radius: 4px; text-align: center; margin-bottom: 15px; background-color: #0f172a; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+            <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">Waktu Terakhir Update:</span><br>
+            <strong style="color: #06b6d4; font-size: 14px;">{waktu_update}</strong>
+        </div>
+    """, unsafe_allow_html=True)
+
+if st.sidebar.button("🔃 Muat Ulang Data Server", use_container_width=True):
+    st.cache_data.clear()
+    st.rerun()
+
+st.sidebar.title("⚙️ Preset Filter Cepat")
+st.sidebar.info("Gunakan **'BSJP (Beli Sore 15:30)'** untuk mencari saham yang mantap dibeli sebelum penutupan bursa!")
 
 opsi_preset = ["Matikan Preset (Manual)"] + list(daftar_preset_aktif.keys())
 idx_default = opsi_preset.index(st.session_state.preset_selector) if st.session_state.preset_selector in opsi_preset else 0
@@ -692,12 +630,11 @@ st.markdown("---")
 # SECTION 5: FUNGSI PEWARNAAN
 # ==========================================
 def format_skor(s): return "⭐" * int(s) if pd.notna(s) and int(s) > 0 else "-"
-def format_pct(v): return f"{'▲ ' if v > 0 else '▼ '}{v:+.2f}%" if v != 0 else "0.00%"
+def format_pct(v): return f"{'▲ ' if v > 0 else '▼ '}{v:+.2f}%" if pd.notna(v) and v != 0 else "0.00%"
 def format_mom(v): return "▲ Positif" if v == "Positif" else ("▼ Negatif" if v == "Negatif" else v)
 def format_desimal(v): return f"{v:.2f}" if pd.notna(v) and v != 0 else "-"
 def format_angka(v): return f"{int(v):,}".replace(",", ".") if pd.notna(v) else "-"
 
-# FORMATTER CERDAS UNTUK TAB 1
 def format_singkat_vol(v):
     if pd.isna(v): return "-"
     if v >= 1_000_000: return f"{v/1_000_000:.2f} M Lot"
@@ -748,19 +685,17 @@ def render_strategy_table(df_subset, file_name):
             st.caption("Klik icon 'Copy' untuk paste ke Tab AI.")
     else: st.info("🔍 Belum ada pergerakan saham yang memenuhi kriteria strategi ini pada sesi saat ini.")
 
-# ==========================================
-# SECTION 6: RENDER TABS
-# ==========================================
+# ==============================================================================
+# DEKLARASI TABS UTAMA
+# ==============================================================================
 if not df_hasil.empty:
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-    "📊 Market Overview", 
-    "🎯 Screener Utama", 
-    "🔎 Cek Saham Spesifik", 
-    "🚨 Radar Bandar", 
-    "🤖 Screener Spesial", 
-    "💼 Portofolio AI"
-])
+        "📊 Market Overview", "📌 Screener Utama", "📖 Kamus Istilah", "💡 Strategi Pakar", "⚙️ Asisten AI Spesial", "💼 Portofolio Bot"
+    ])
     
+    # ==========================================================================
+    # [TAB 1] MARKET OVERVIEW
+    # ==========================================================================
     with tab1:
         st.markdown("### 📊 Ringkasan Pasar IHSG")
         
@@ -822,6 +757,9 @@ if not df_hasil.empty:
                 df_val = df_hasil.nlargest(10, 'Turnover')
                 render_top_table(df_val, ['Ticker', 'Harga (Rp)', 'Turnover', 'Change (%)'], {'Harga (Rp)': format_angka, 'Turnover': format_singkat_rp, 'Change (%)': format_pct})
 
+    # ==========================================================================
+    # [TAB 2] SCREENER UTAMA
+    # ==========================================================================
     with tab2:
         def reset_semua_filter():
             for k, info in MASTER_FILTERS.items():
@@ -977,7 +915,7 @@ if not df_hasil.empty:
             cond_v9 = (cond_harga & (df_hasil.get('Valuasi', '') == 'Undervalued (Murah)'))
             df_v9 = df_hasil[cond_v9].copy() if not df_hasil.empty else pd.DataFrame()
 
-            tab_screener, tab_ai = st.tabs(["🎯 Screener Spesial", "🧠 Asisten AI"])
+            tab_screener, tab_ai = st.tabs(["📌 Tabel Screener", "⚙️ Turnamen AI & Bot"])
             
             with tab_screener:
                 pilihan_v = st.selectbox(
@@ -1229,7 +1167,6 @@ if not df_hasil.empty:
                                             'pola_candle': data_saham.get('Pola Candle', 'Normal')
                                         }
                                         
-                                    # Panggil fungsi yang benar dari mesin_ai
                                     hasil_grand_final = ai_grand_final_top5(data_final, GROQ_API_KEY)
                                     
                                     st.success("🎉 **TURNAMEN SELESAI!**")
