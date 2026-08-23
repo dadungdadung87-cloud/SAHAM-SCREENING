@@ -8,7 +8,6 @@ import glob
 import time
 import re
 from datetime import datetime
-import plotly.express as px
 
 # IMPORT UNTUK AI OPENROUTER
 from openai import OpenAI
