@@ -8,12 +8,23 @@ import glob
 import time
 import re
 from datetime import datetime
-import plotly.express as px
+try:
+    # Plotly bersifat opsional untuk lingkungan pengembangan yang tidak
+    # memasang dependency visualisasi.
+    import plotly.express as px  # type: ignore[import-not-found]
+except ImportError:
+    px = None
 
 # IMPORT UNTUK AI GEMINI & OPENROUTER
 import google.generativeai as genai
 from openai import OpenAI
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv  # type: ignore[import-not-found]
+except ImportError:
+    # python-dotenv bersifat opsional; Streamlit secrets dan environment
+    # variables tetap dapat digunakan tanpa paket ini.
+    def load_dotenv(*args, **kwargs):
+        return False
 
 # ==========================================
 # 🧠 SISTEM ARSIP CERDAS (DATA HARIAN)
@@ -146,7 +157,15 @@ def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
             model=model_andalan, messages=[{"role": "user", "content": prompt}],
             temperature=0.3, max_tokens=3000, top_p=1, stream=False,
         )
-        return completion.choices[0].message.content + f"\n\n---\n⚡ *Dianalisa otomatis menggunakan mesin pencari model gratis terbaik via OpenRouter*"
+        
+        # Penangkapan hasil dan model yang dipakai (Anti Error NoneType)
+        hasil_mentah = completion.choices[0].message.content
+        model_terpakai = completion.model
+        
+        if not hasil_mentah:
+            return f"⚠️ Server AI (Model: {model_terpakai}) gagal memberikan jawaban. Silakan coba lagi."
+            
+        return hasil_mentah + f"\n\n---\n⚡ *Dianalisa otomatis menggunakan mesin: **{model_terpakai}** via OpenRouter*"
     except Exception as e: return f"❌ Gagal memproses data dengan OpenRouter menggunakan auto-model. Error: {e}"
 
 # AI FORENSIK BANDAR (V7)
@@ -195,7 +214,15 @@ def analisa_forensik_ai(data_saham_dict, master_filters_keys):
             model=model_andalan, messages=[{"role": "user", "content": prompt}],
             temperature=0.2, max_tokens=3000, top_p=1, stream=False,
         )
-        return completion.choices[0].message.content + f"\n\n---\n🔬 *Lab Forensik AI menggunakan auto-model gratis via OpenRouter*"
+        
+        # Penangkapan hasil dan model yang dipakai (Anti Error NoneType)
+        hasil_mentah = completion.choices[0].message.content
+        model_terpakai = completion.model
+        
+        if not hasil_mentah:
+            return f"⚠️ Server AI (Model: {model_terpakai}) gagal memberikan jawaban. Silakan coba lagi."
+            
+        return hasil_mentah + f"\n\n---\n🔬 *Lab Forensik AI menggunakan: **{model_terpakai}** via OpenRouter*"
     except Exception as e: return f"❌ Gagal memproses data dengan OpenRouter. Error: {e}"
 
 def ai_penyisihan_turnamen(data_saham_dict, api_key):
@@ -228,9 +255,13 @@ def ai_penyisihan_turnamen(data_saham_dict, api_key):
             model=model_andalan, messages=[{"role": "user", "content": prompt}],
             temperature=0.1, max_tokens=150, top_p=1, stream=False,
         )
-        return completion.choices[0].message.content
+        
+        hasil_mentah = completion.choices[0].message.content
+        if not hasil_mentah: return "SKIP_GRUP"
+        
+        return hasil_mentah
     except Exception as e:
-        return f"ERROR: Menggunakan model {model_andalan}. Pesan: {e}"
+        return f"ERROR"
 
 def ai_grand_final_top5(data_saham_dict, api_key):
     import re
@@ -259,10 +290,13 @@ def ai_grand_final_top5(data_saham_dict, api_key):
             model=model_andalan, messages=[{"role": "user", "content": prompt}],
             temperature=0.3, max_tokens=3000, top_p=1, stream=False,
         )
-        raw_content = completion.choices[0].message.content
+        
+        raw_content = completion.choices[0].message.content or ""
+        model_terpakai = completion.model
+        
         clean_content = re.sub(r'<think>.*?</think>', '', raw_content, flags=re.DOTALL).strip()
-        return clean_content, model_andalan
-    except Exception as e: raise Exception(f"Gagal memproses Grand Final. Model: {model_andalan}. Error: {e}")
+        return clean_content, model_terpakai
+    except Exception as e: raise Exception(f"Error AI: {e}")
 
 # ==========================================
 # PENGATURAN UI/UX & API
@@ -1005,33 +1039,37 @@ if not df_hasil.empty:
                                             'pola_candle': data_saham.get('Pola Candle', 'Normal')
                                         }
                                         
-                                    hasil_mentah, model_dipakai = ai_grand_final_top5(data_final, OPENROUTER_API_KEY)
-                                    
-                                    awal = hasil_mentah.find('[')
-                                    akhir = hasil_mentah.rfind(']')
-                                    
-                                    if awal != -1 and akhir != -1:
-                                        bersih = hasil_mentah[awal:akhir+1]
-                                        try:
-                                            hasil_json = json.loads(bersih)
-                                            df_tampil = pd.DataFrame(hasil_json)
-                                            
-                                            st.success(f"🎉 **TURNAMEN SELESAI!**")
-                                            st.balloons()
-                                            
-                                            with st.container():
-                                                st.markdown("---")
-                                                st.table(df_tampil)
-                                                st.markdown("---")
-                                            
-                                            if 'Target_TP' in df_tampil.columns and 'Target_CL' in df_tampil.columns:
-                                                df_sinyal = df_tampil[['Ticker', 'Target_TP', 'Target_CL']]
-                                                df_sinyal.to_csv(st.session_state.file_ekspor, index=False)
-                                                st.info(f"🤖 Sinyal dikirim ke Bot Simulator! Cek Tab 4.")
-                                        except Exception as json_err:
-                                            st.error(f"Gagal memproses JSON. Menampilkan hasil raw:\n\n{hasil_mentah}")
-                                    else:
-                                        st.error(f"Format JSON tidak ditemukan dalam respon AI. Raw:\n\n{hasil_mentah}")
+                                    try:
+                                        hasil_mentah, model_dipakai = ai_grand_final_top5(data_final, OPENROUTER_API_KEY)
+                                        
+                                        awal = hasil_mentah.find('[')
+                                        akhir = hasil_mentah.rfind(']')
+                                        
+                                        if awal != -1 and akhir != -1:
+                                            bersih = hasil_mentah[awal:akhir+1]
+                                            try:
+                                                hasil_json = json.loads(bersih)
+                                                df_tampil = pd.DataFrame(hasil_json)
+                                                
+                                                st.success(f"🎉 **TURNAMEN SELESAI!** (Model: {model_dipakai})")
+                                                st.balloons()
+                                                
+                                                with st.container():
+                                                    st.markdown("---")
+                                                    st.table(df_tampil)
+                                                    st.markdown("---")
+                                                
+                                                if 'Target_TP' in df_tampil.columns and 'Target_CL' in df_tampil.columns:
+                                                    df_sinyal = df_tampil[['Ticker', 'Target_TP', 'Target_CL']]
+                                                    df_sinyal.to_csv(st.session_state.file_ekspor, index=False)
+                                                    st.info(f"🤖 Sinyal dikirim ke Bot Simulator! Cek Tab 4.")
+                                            except Exception as json_err:
+                                                st.error(f"Gagal memproses JSON. Menampilkan hasil raw:\n\n{hasil_mentah}")
+                                        else:
+                                            st.error(f"Format JSON tidak ditemukan dalam respon AI. Raw:\n\n{hasil_mentah}")
+
+                                    except Exception as ai_err:
+                                        st.error(str(ai_err))
 
                                     st.session_state.radar_aktif = False
                                     if st.button("🔄 Mulai Turnamen Baru"):
