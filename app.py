@@ -106,8 +106,8 @@ def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
         OPENROUTER_API_KEY = None
     if not OPENROUTER_API_KEY: return "❌ Kunci API OpenRouter belum dipasang!"
 
-    # MENGUNCI MODEL GRATIS DARI OPENROUTER
-    model_andalan = "meta-llama/llama-3.1-8b-instruct:free"
+    # MENGGUNAKAN JALUR AUTO-FREE DARI OPENROUTER
+    model_andalan = "openrouter/free" 
 
     try:
         client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
@@ -146,8 +146,8 @@ def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
             model=model_andalan, messages=[{"role": "user", "content": prompt}],
             temperature=0.3, max_tokens=3000, top_p=1, stream=False,
         )
-        return completion.choices[0].message.content + f"\n\n---\n⚡ *Dianalisa menggunakan mesin: **{model_andalan}** via OpenRouter*"
-    except Exception as e: return f"❌ Gagal memproses data dengan OpenRouter. Error: {e}"
+        return completion.choices[0].message.content + f"\n\n---\n⚡ *Dianalisa otomatis menggunakan mesin pencari model gratis terbaik via OpenRouter*"
+    except Exception as e: return f"❌ Gagal memproses data dengan OpenRouter menggunakan auto-model. Error: {e}"
 
 # AI FORENSIK BANDAR (V7)
 def analisa_forensik_ai(data_saham_dict, master_filters_keys):
@@ -157,7 +157,8 @@ def analisa_forensik_ai(data_saham_dict, master_filters_keys):
         OPENROUTER_API_KEY = None
     if not OPENROUTER_API_KEY: return "❌ Kunci API OpenRouter belum dipasang!"
 
-    model_andalan = "meta-llama/llama-3.3-70b-instruct:free" 
+    # MENGGUNAKAN JALUR AUTO-FREE DARI OPENROUTER
+    model_andalan = "openrouter/free" 
 
     try:
         client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
@@ -194,11 +195,12 @@ def analisa_forensik_ai(data_saham_dict, master_filters_keys):
             model=model_andalan, messages=[{"role": "user", "content": prompt}],
             temperature=0.2, max_tokens=3000, top_p=1, stream=False,
         )
-        return completion.choices[0].message.content + f"\n\n---\n🔬 *Lab Forensik AI: **{model_andalan}** via OpenRouter*"
+        return completion.choices[0].message.content + f"\n\n---\n🔬 *Lab Forensik AI menggunakan auto-model gratis via OpenRouter*"
     except Exception as e: return f"❌ Gagal memproses data dengan OpenRouter. Error: {e}"
 
 def ai_penyisihan_turnamen(data_saham_dict, api_key):
-    model_andalan = "meta-llama/llama-3.3-70b-instruct:free"
+    # MENGGUNAKAN JALUR AUTO-FREE DARI OPENROUTER
+    model_andalan = "openrouter/free"
 
     try:
         client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
@@ -228,11 +230,12 @@ def ai_penyisihan_turnamen(data_saham_dict, api_key):
         )
         return completion.choices[0].message.content
     except Exception as e:
-        return f"ERROR: {e}"
+        return f"ERROR: Menggunakan model {model_andalan}. Pesan: {e}"
 
 def ai_grand_final_top5(data_saham_dict, api_key):
     import re
-    model_andalan = "meta-llama/llama-3.3-70b-instruct:free"
+    # MENGGUNAKAN JALUR AUTO-FREE DARI OPENROUTER
+    model_andalan = "openrouter/free"
 
     try:
         client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
@@ -259,7 +262,7 @@ def ai_grand_final_top5(data_saham_dict, api_key):
         raw_content = completion.choices[0].message.content
         clean_content = re.sub(r'<think>.*?</think>', '', raw_content, flags=re.DOTALL).strip()
         return clean_content, model_andalan
-    except Exception as e: raise Exception(f"Gagal memproses Grand Final. Error: {e}")
+    except Exception as e: raise Exception(f"Gagal memproses Grand Final. Model: {model_andalan}. Error: {e}")
 
 # ==========================================
 # PENGATURAN UI/UX & API
@@ -329,9 +332,14 @@ DEFAULT_CONFIG = {
 
 if not os.path.exists(FILE_CONFIG):
     with open(FILE_CONFIG, "w") as f: json.dump(DEFAULT_CONFIG, f, indent=4)
+else:
+    with open(FILE_CONFIG, "r") as f: cek_config = json.load(f)
+    if "Status Fibonacci" not in cek_config.get("MASTER_FILTERS", {}):
+        with open(FILE_CONFIG, "w") as f: json.dump(DEFAULT_CONFIG, f, indent=4)
 
 with open(FILE_CONFIG, "r") as f: WEB_CONFIG = json.load(f)
 
+# Auto-patch jika opsi gabungan belum ada di config JSON lama
 if "Mid Cap (Lapis 2) + Small Cap (Lapis 3)" not in WEB_CONFIG["MASTER_FILTERS"]["Kategori"]["options"]:
     WEB_CONFIG["MASTER_FILTERS"]["Kategori"]["options"] = ["Semua", "Big Cap (Lapis 1)", "Mid Cap (Lapis 2)", "Small Cap (Lapis 3)", "Mid Cap (Lapis 2) + Small Cap (Lapis 3)"]
     with open(FILE_CONFIG, "w") as f: json.dump(WEB_CONFIG, f, indent=4)
@@ -469,13 +477,11 @@ def format_pct(v): return f"{'▲ ' if v > 0 else '▼ '}{v:+.2f}%" if pd.notna(
 def format_mom(v): return "▲ Positif" if v == "Positif" else ("▼ Negatif" if v == "Negatif" else v)
 def format_desimal(v): return f"{v:.2f}" if pd.notna(v) and v != 0 else "-"
 def format_angka(v): return f"{int(v):,}".replace(",", ".") if pd.notna(v) else "-"
-
 def format_singkat_vol(v):
     if pd.isna(v): return "-"
     if v >= 1_000_000: return f"{v/1_000_000:.2f} M Lot"
     elif v >= 1_000: return f"{v/1_000:.2f} K Lot"
     return f"{v:.0f} Lot"
-
 def format_singkat_rp(v):
     if pd.isna(v): return "-"
     if v >= 1_000_000_000_000: return f"Rp {v/1_000_000_000_000:.2f} T"
@@ -521,7 +527,7 @@ def render_strategy_table(df_subset, file_name):
     else: st.info("🔍 Belum ada pergerakan saham yang memenuhi kriteria strategi ini pada sesi saat ini.")
 
 # ==============================================================================
-# RENDER 4 TABS UTAMA (VERSI BERSIH)
+# RENDER 4 TABS UTAMA (VERSI BERSIH 100%)
 # ==============================================================================
 if not df_hasil.empty:
     tab1, tab2, tab3, tab4 = st.tabs([
@@ -706,7 +712,7 @@ if not df_hasil.empty:
             with col_wl:
                 st.markdown("**📋 Salin Daftar Saham:**")
                 st.code("\n".join(df_filtered["Ticker"].tolist()), language="text")
-                st.caption("Klik icon 'Copy' untuk paste massal ke Tab AI.")
+                st.caption("Klik icon 'Copy' untuk paste massal ke Tab 3/4.")
         else: st.warning("Tidak ada data sesuai filter.")
 
     # ==========================================================================
