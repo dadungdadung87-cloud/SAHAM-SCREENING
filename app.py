@@ -107,7 +107,7 @@ def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
     if not OPENROUTER_API_KEY: return "❌ Kunci API OpenRouter belum dipasang!"
 
     # MENGUNCI MODEL GRATIS DARI OPENROUTER
-    model_andalan = "meta-llama/llama-3.3-70b-instruct:free" 
+    model_andalan = "meta-llama/llama-3.1-8b-instruct:free"
 
     try:
         client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
