@@ -8,23 +8,10 @@ import glob
 import time
 import re
 from datetime import datetime
-try:
-    # Plotly bersifat opsional untuk lingkungan pengembangan yang tidak
-    # memasang dependency visualisasi.
-    import plotly.express as px  # type: ignore[import-not-found]
-except ImportError:
-    px = None
+import plotly.express as px
 
-# IMPORT UNTUK AI GEMINI & OPENROUTER
-import google.generativeai as genai
+# IMPORT UNTUK AI OPENROUTER
 from openai import OpenAI
-try:
-    from dotenv import load_dotenv  # type: ignore[import-not-found]
-except ImportError:
-    # python-dotenv bersifat opsional; Streamlit secrets dan environment
-    # variables tetap dapat digunakan tanpa paket ini.
-    def load_dotenv(*args, **kwargs):
-        return False
 
 # ==========================================
 # 🧠 SISTEM ARSIP CERDAS (DATA HARIAN)
@@ -112,7 +99,7 @@ def get_forensic_data(ticker):
 # AI BANDAR (V6)
 def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
     try:
-        OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY", os.getenv("OPENROUTER_API_KEY"))
+        OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY", os.environ.get("OPENROUTER_API_KEY"))
     except:
         OPENROUTER_API_KEY = None
     if not OPENROUTER_API_KEY: return "❌ Kunci API OpenRouter belum dipasang!"
@@ -158,7 +145,6 @@ def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
             temperature=0.3, max_tokens=3000, top_p=1, stream=False,
         )
         
-        # Penangkapan hasil dan model yang dipakai (Anti Error NoneType)
         hasil_mentah = completion.choices[0].message.content
         model_terpakai = completion.model
         
@@ -171,7 +157,7 @@ def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
 # AI FORENSIK BANDAR (V7)
 def analisa_forensik_ai(data_saham_dict, master_filters_keys):
     try:
-        OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY", os.getenv("OPENROUTER_API_KEY"))
+        OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY", os.environ.get("OPENROUTER_API_KEY"))
     except:
         OPENROUTER_API_KEY = None
     if not OPENROUTER_API_KEY: return "❌ Kunci API OpenRouter belum dipasang!"
@@ -215,7 +201,6 @@ def analisa_forensik_ai(data_saham_dict, master_filters_keys):
             temperature=0.2, max_tokens=3000, top_p=1, stream=False,
         )
         
-        # Penangkapan hasil dan model yang dipakai (Anti Error NoneType)
         hasil_mentah = completion.choices[0].message.content
         model_terpakai = completion.model
         
@@ -296,7 +281,7 @@ def ai_grand_final_top5(data_saham_dict, api_key):
         
         clean_content = re.sub(r'<think>.*?</think>', '', raw_content, flags=re.DOTALL).strip()
         return clean_content, model_terpakai
-    except Exception as e: raise Exception(f"Error AI: {e}")
+    except Exception as e: raise Exception(f"Gagal memproses Grand Final. Error: {e}")
 
 # ==========================================
 # PENGATURAN UI/UX & API
@@ -511,11 +496,13 @@ def format_pct(v): return f"{'▲ ' if v > 0 else '▼ '}{v:+.2f}%" if pd.notna(
 def format_mom(v): return "▲ Positif" if v == "Positif" else ("▼ Negatif" if v == "Negatif" else v)
 def format_desimal(v): return f"{v:.2f}" if pd.notna(v) and v != 0 else "-"
 def format_angka(v): return f"{int(v):,}".replace(",", ".") if pd.notna(v) else "-"
+
 def format_singkat_vol(v):
     if pd.isna(v): return "-"
     if v >= 1_000_000: return f"{v/1_000_000:.2f} M Lot"
     elif v >= 1_000: return f"{v/1_000:.2f} K Lot"
     return f"{v:.0f} Lot"
+
 def format_singkat_rp(v):
     if pd.isna(v): return "-"
     if v >= 1_000_000_000_000: return f"Rp {v/1_000_000_000_000:.2f} T"
@@ -746,7 +733,7 @@ if not df_hasil.empty:
             with col_wl:
                 st.markdown("**📋 Salin Daftar Saham:**")
                 st.code("\n".join(df_filtered["Ticker"].tolist()), language="text")
-                st.caption("Klik icon 'Copy' untuk paste massal ke Tab 3/4.")
+                st.caption("Klik icon 'Copy' untuk paste massal ke Tab AI.")
         else: st.warning("Tidak ada data sesuai filter.")
 
     # ==========================================================================
@@ -925,7 +912,7 @@ if not df_hasil.empty:
                         st.session_state.semi_finalists = []
                         st.session_state.file_ekspor = "Database/sinyal_ai_rumus_1.csv"
 
-                    OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY", os.getenv("OPENROUTER_API_KEY"))
+                    OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY", os.environ.get("OPENROUTER_API_KEY"))
                     
                     if not st.session_state.radar_aktif:
                         input_v8 = st.text_area("📋 Paste Daftar Saham (Pisahkan dengan Enter/Spasi):", placeholder="Contoh:\nVISI\nPANI\nDMAS", height=200, key="input_pemburu_ara")
