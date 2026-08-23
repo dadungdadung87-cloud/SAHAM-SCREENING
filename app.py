@@ -97,6 +97,8 @@ def get_forensic_data(ticker):
 # ==========================================
 # 🤖 OTAK KECERDASAN BUATAN (AI FUNCTIONS)
 # ==========================================
+
+# AI BANDAR (V6)
 def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
     try:
         GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
@@ -104,19 +106,11 @@ def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
         GROQ_API_KEY = None
     if not GROQ_API_KEY: return "❌ Kunci API Groq belum dipasang!"
 
+    # DIKUNCI MATI KE MODEL TERBAIK GROQ SAAT INI (TIDAK MENEBAK OTOMATIS LAGI)
+    model_andalan = "llama-3.3-70b-versatile" 
+
     try:
         client = Groq(api_key=GROQ_API_KEY)
-        model_andalan = "llama-3.3-70b-versatile" 
-        try:
-            daftar_model = client.models.list()
-            semua_model = [m.id for m in daftar_model.data]
-            model_70b = [m for m in semua_model if '70b' in m.lower() and 'specdec' not in m.lower()]
-            if model_70b: model_andalan = model_70b[0] 
-            else:
-                model_llama = [m for m in semua_model if 'llama' in m.lower() and 'specdec' not in m.lower()]
-                if model_llama: model_andalan = model_llama[0]
-        except: pass 
-
         payload_text = ""
         for ticker, data in data_saham_dict.items():
             payload_text += f"\n--- STOCK: {ticker} ---\n"
@@ -152,8 +146,10 @@ def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
             temperature=0.3, max_tokens=3000, top_p=1, stream=False,
         )
         return completion.choices[0].message.content + f"\n\n---\n⚡ *Dianalisa menggunakan mesin: **{model_andalan}** via Groq*"
-    except Exception as e: return f"❌ Gagal memproses data dengan Groq. Error: {e}"
+    except Exception as e: 
+        return f"❌ Gagal memproses data dengan Groq menggunakan model **{model_andalan}**. Error: {e}"
 
+# AI FORENSIK BANDAR (V7)
 def analisa_forensik_ai(data_saham_dict, master_filters_keys):
     try:
         GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
@@ -161,19 +157,11 @@ def analisa_forensik_ai(data_saham_dict, master_filters_keys):
         GROQ_API_KEY = None
     if not GROQ_API_KEY: return "❌ Kunci API Groq belum dipasang!"
 
+    # DIKUNCI MATI
+    model_andalan = "llama-3.3-70b-versatile" 
+
     try:
         client = Groq(api_key=GROQ_API_KEY)
-        model_andalan = "llama-3.3-70b-versatile" 
-        try:
-            daftar_model = client.models.list()
-            semua_model = [m.id for m in daftar_model.data]
-            model_70b = [m for m in semua_model if '70b' in m.lower() and 'specdec' not in m.lower()]
-            if model_70b: model_andalan = model_70b[0] 
-            else:
-                model_llama = [m for m in semua_model if 'llama' in m.lower() and 'specdec' not in m.lower()]
-                if model_llama: model_andalan = model_llama[0]
-        except: pass 
-
         payload_text = ""
         for ticker, data in data_saham_dict.items():
             payload_text += f"\n--- STOCK: {ticker} ---\n"
@@ -208,19 +196,15 @@ def analisa_forensik_ai(data_saham_dict, master_filters_keys):
             temperature=0.2, max_tokens=3000, top_p=1, stream=False,
         )
         return completion.choices[0].message.content + f"\n\n---\n🔬 *Lab Forensik AI: **{model_andalan}** via Groq*"
-    except Exception as e: return f"❌ Gagal memproses data dengan Groq. Error: {e}"
+    except Exception as e: 
+        return f"❌ Gagal memproses data dengan Groq menggunakan model **{model_andalan}**. Error: {e}"
 
 def ai_penyisihan_turnamen(data_saham_dict, api_key):
+    # DIKUNCI MATI
+    model_andalan = "llama-3.3-70b-versatile"
+
     try:
         client = Groq(api_key=api_key)
-        model_andalan = "llama-3.3-70b-versatile"
-        try:
-            daftar_model = client.models.list()
-            semua_model = [m.id for m in daftar_model.data]
-            model_70b = [m for m in semua_model if '70b' in m.lower() and '3.1' not in m.lower() and 'deepseek' not in m.lower() and 'specdec' not in m.lower()]
-            if model_70b: model_andalan = model_70b[0] 
-        except: pass
-
         payload_text = ""
         for ticker, data in data_saham_dict.items():
             payload_text += f"\n[{ticker}] Price:{data['harga']} | Vol:{data['volume']} | Broksum:{data['broksum']} | MM:{data['tekanan_bandar']} | Supply:{data['supply']} | OBV:{data['obv']} | Fibo:{data['fibo']}"
@@ -247,22 +231,15 @@ def ai_penyisihan_turnamen(data_saham_dict, api_key):
         )
         return completion.choices[0].message.content
     except Exception as e:
-        return "ERROR"
+        return f"ERROR: Gagal menggunakan model **{model_andalan}**. Error: {e}"
 
 def ai_grand_final_top5(data_saham_dict, api_key):
     import re
+    # DIKUNCI MATI
+    model_andalan = "llama-3.3-70b-versatile"
+
     try:
         client = Groq(api_key=api_key)
-        model_andalan = "llama-3.3-70b-versatile"
-        try:
-            daftar_model = client.models.list()
-            semua_model = [m.id for m in daftar_model.data]
-            model_deepseek = [m for m in semua_model if 'deepseek' in m.lower()]
-            if model_deepseek:
-                ds_70b = [m for m in model_deepseek if '70b' in m.lower() and 'specdec' not in m.lower()]
-                model_andalan = ds_70b[0] if ds_70b else model_deepseek[0]
-        except: pass
-
         payload_text = ""
         for ticker, data in data_saham_dict.items():
             payload_text += f"\n--- {ticker} ---\n Harga: {data['harga']} | Vol: {data['volume']} | Broksum: {data['broksum']} | Tekanan: {data['tekanan_bandar']} | Supply: {data['supply']} | OBV: {data['obv']} | Fibo: {data['fibo']} | VWAP: {data['vwap']} | Candle: {data['pola_candle']}\n"
@@ -270,23 +247,18 @@ def ai_grand_final_top5(data_saham_dict, api_key):
         prompt = f"""
         You are the CIO of a Top-Tier Indonesian Hedge Fund. Evaluate these Elite Semi-Finalist stocks:
         {payload_text}
-        
-        MISSION: Select EXACTLY the TOP 5 BEST STOCKS with the absolute highest probability of Gap Up tomorrow.
-        
-        STRICT RULE:
-        You MUST output ONLY a valid JSON array of objects. Format EXACTLY like this without any markdown or extra text:
-        [
-          {{"Peringkat": 1, "Ticker": "GOTO", "Alasan": "Akumulasi masif", "Target_TP": 60, "Target_CL": 50}}
-        ]
+        MISSION: Select EXACTLY the TOP 5 BEST STOCKS with the highest probability of Gap Up tomorrow.
+        RULES: Indonesian Language. Markdown table [Peringkat, Ticker, Skor, Trigger]. Detailed explanation and Trading Plan below.
         """
         completion = client.chat.completions.create(
             model=model_andalan, messages=[{"role": "user", "content": prompt}],
-            temperature=0.2, max_tokens=2500, top_p=1, stream=False,
+            temperature=0.3, max_tokens=4000, top_p=1, stream=False,
         )
         raw_content = completion.choices[0].message.content
         clean_content = re.sub(r'<think>.*?</think>', '', raw_content, flags=re.DOTALL).strip()
-        return clean_content, model_andalan
-    except Exception as e: raise Exception(f"Gagal memproses Grand Final. Error: {e}")
+        return clean_content + f"\n\n---\n🏆 *Grand Final AI: **{model_andalan}** via Groq*"
+    except Exception as e: 
+        return f"❌ Gagal memproses Grand Final menggunakan model **{model_andalan}**. Error: {e}"
 
 # ==========================================
 # PENGATURAN UI/UX & API
@@ -561,7 +533,7 @@ def render_strategy_table(df_subset, file_name):
     else: st.info("🔍 Belum ada pergerakan saham yang memenuhi kriteria strategi ini pada sesi saat ini.")
 
 # ==============================================================================
-# RENDER 4 TABS UTAMA (VERSI BERSIH 100%)
+# RENDER 4 TABS UTAMA
 # ==============================================================================
 if not df_hasil.empty:
     tab1, tab2, tab3, tab4 = st.tabs([
@@ -746,7 +718,7 @@ if not df_hasil.empty:
             with col_wl:
                 st.markdown("**📋 Salin Daftar Saham:**")
                 st.code("\n".join(df_filtered["Ticker"].tolist()), language="text")
-                st.caption("Klik icon 'Copy' untuk paste massal ke Tab 3/4.")
+                st.caption("Klik icon 'Copy' untuk paste massal ke Tab AI.")
         else: st.warning("Tidak ada data sesuai filter.")
 
     # ==========================================================================
@@ -873,7 +845,7 @@ if not df_hasil.empty:
                                         'skor': data_saham.get('Total Score', 0),
                                         'histori': teks_ringkasan if teks_ringkasan else "Arsip belum tersedia."
                                     }
-                                hasil_ai = analisa_bandar_ai_multisaham(data_kompilasi, 'gemma-4-26b-a4b-it')
+                                hasil_ai = analisa_bandar_ai_multisaham(data_kompilasi, 'pilihan_ai')
                                 st.info(hasil_ai)
 
                 elif "Forensik Bandar" in pilihan_ai:
@@ -913,11 +885,8 @@ if not df_hasil.empty:
                                     st.info(hasil_ai)
 
                 elif "Pemburu ARA" in pilihan_ai:
-                    import re
-                    import time
-                    
                     st.subheader("🎯 Turnamen AI (Spesialis Akumulasi Siluman)")
-                    st.markdown("Paste ratusan (bahkan 900+) saham di sini. Mesin akan melakukan kualifikasi brutal (5 saham/menit) secara estafet. Saham yang lolos akan dikumpulkan untuk diadu di **Grand Final Top 5** pada akhir putaran.")
+                    st.markdown("Paste ratusan (bahkan 900+) saham di sini. Mesin akan melakukan kualifikasi brutal (5 saham/menit) secara estafet.")
                     
                     if 'radar_aktif' not in st.session_state:
                         st.session_state.radar_aktif = False
