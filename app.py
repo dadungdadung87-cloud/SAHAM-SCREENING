@@ -10,9 +10,9 @@ import re
 from datetime import datetime
 import plotly.express as px
 
-# IMPORT UNTUK AI GEMINI & GROQ
+# IMPORT UNTUK AI GEMINI & OPENROUTER
 import google.generativeai as genai
-from groq import Groq
+from openai import OpenAI
 from dotenv import load_dotenv
 
 # ==========================================
@@ -95,22 +95,23 @@ def get_forensic_data(ticker):
     return summary_text
 
 # ==========================================
-# 🤖 OTAK KECERDASAN BUATAN (AI FUNCTIONS)
+# 🤖 OTAK KECERDASAN BUATAN (OPENROUTER)
 # ==========================================
 
 # AI BANDAR (V6)
 def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
     try:
-        GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+        OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY", os.getenv("OPENROUTER_API_KEY"))
     except:
-        GROQ_API_KEY = None
-    if not GROQ_API_KEY: return "❌ Kunci API Groq belum dipasang!"
+        OPENROUTER_API_KEY = None
+    if not OPENROUTER_API_KEY: return "❌ Kunci API OpenRouter belum dipasang!"
 
-    # DIKUNCI MATI KE MODEL TERBAIK GROQ SAAT INI (TIDAK MENEBAK OTOMATIS LAGI)
-    model_andalan = "llama-3.3-70b-versatile" 
+    # MENGUNCI MODEL GRATIS DARI OPENROUTER
+    model_andalan = "meta-llama/llama-3.3-70b-instruct:free" 
 
     try:
-        client = Groq(api_key=GROQ_API_KEY)
+        client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
+        
         payload_text = ""
         for ticker, data in data_saham_dict.items():
             payload_text += f"\n--- STOCK: {ticker} ---\n"
@@ -119,7 +120,7 @@ def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
             payload_text += f"Broker Summary: {data['broksum']}\n"
             payload_text += f"Wyckoff Phase: {data['status']}\n"
             payload_text += f"Technical Score: {data['skor']}/10\n"
-            payload_text += f"Historical Trace (Intraday):\n{data['histori']}\n"
+            payload_text += f"Historical Trace (Daily):\n{data['histori']}\n"
 
         prompt = f"""
         You are the mastermind of an elite Indonesian stock market syndicate (Mega Bandar). 
@@ -145,23 +146,21 @@ def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
             model=model_andalan, messages=[{"role": "user", "content": prompt}],
             temperature=0.3, max_tokens=3000, top_p=1, stream=False,
         )
-        return completion.choices[0].message.content + f"\n\n---\n⚡ *Dianalisa menggunakan mesin: **{model_andalan}** via Groq*"
-    except Exception as e: 
-        return f"❌ Gagal memproses data dengan Groq menggunakan model **{model_andalan}**. Error: {e}"
+        return completion.choices[0].message.content + f"\n\n---\n⚡ *Dianalisa menggunakan mesin: **{model_andalan}** via OpenRouter*"
+    except Exception as e: return f"❌ Gagal memproses data dengan OpenRouter. Error: {e}"
 
 # AI FORENSIK BANDAR (V7)
 def analisa_forensik_ai(data_saham_dict, master_filters_keys):
     try:
-        GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+        OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY", os.getenv("OPENROUTER_API_KEY"))
     except:
-        GROQ_API_KEY = None
-    if not GROQ_API_KEY: return "❌ Kunci API Groq belum dipasang!"
+        OPENROUTER_API_KEY = None
+    if not OPENROUTER_API_KEY: return "❌ Kunci API OpenRouter belum dipasang!"
 
-    # DIKUNCI MATI
-    model_andalan = "llama-3.3-70b-versatile" 
+    model_andalan = "meta-llama/llama-3.3-70b-instruct:free" 
 
     try:
-        client = Groq(api_key=GROQ_API_KEY)
+        client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
         payload_text = ""
         for ticker, data in data_saham_dict.items():
             payload_text += f"\n--- STOCK: {ticker} ---\n"
@@ -195,16 +194,14 @@ def analisa_forensik_ai(data_saham_dict, master_filters_keys):
             model=model_andalan, messages=[{"role": "user", "content": prompt}],
             temperature=0.2, max_tokens=3000, top_p=1, stream=False,
         )
-        return completion.choices[0].message.content + f"\n\n---\n🔬 *Lab Forensik AI: **{model_andalan}** via Groq*"
-    except Exception as e: 
-        return f"❌ Gagal memproses data dengan Groq menggunakan model **{model_andalan}**. Error: {e}"
+        return completion.choices[0].message.content + f"\n\n---\n🔬 *Lab Forensik AI: **{model_andalan}** via OpenRouter*"
+    except Exception as e: return f"❌ Gagal memproses data dengan OpenRouter. Error: {e}"
 
 def ai_penyisihan_turnamen(data_saham_dict, api_key):
-    # DIKUNCI MATI
-    model_andalan = "llama-3.3-70b-versatile"
+    model_andalan = "meta-llama/llama-3.3-70b-instruct:free"
 
     try:
-        client = Groq(api_key=api_key)
+        client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
         payload_text = ""
         for ticker, data in data_saham_dict.items():
             payload_text += f"\n[{ticker}] Price:{data['harga']} | Vol:{data['volume']} | Broksum:{data['broksum']} | MM:{data['tekanan_bandar']} | Supply:{data['supply']} | OBV:{data['obv']} | Fibo:{data['fibo']}"
@@ -231,15 +228,14 @@ def ai_penyisihan_turnamen(data_saham_dict, api_key):
         )
         return completion.choices[0].message.content
     except Exception as e:
-        return f"ERROR: Gagal menggunakan model **{model_andalan}**. Error: {e}"
+        return f"ERROR: {e}"
 
 def ai_grand_final_top5(data_saham_dict, api_key):
     import re
-    # DIKUNCI MATI
-    model_andalan = "llama-3.3-70b-versatile"
+    model_andalan = "meta-llama/llama-3.3-70b-instruct:free"
 
     try:
-        client = Groq(api_key=api_key)
+        client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
         payload_text = ""
         for ticker, data in data_saham_dict.items():
             payload_text += f"\n--- {ticker} ---\n Harga: {data['harga']} | Vol: {data['volume']} | Broksum: {data['broksum']} | Tekanan: {data['tekanan_bandar']} | Supply: {data['supply']} | OBV: {data['obv']} | Fibo: {data['fibo']} | VWAP: {data['vwap']} | Candle: {data['pola_candle']}\n"
@@ -247,33 +243,28 @@ def ai_grand_final_top5(data_saham_dict, api_key):
         prompt = f"""
         You are the CIO of a Top-Tier Indonesian Hedge Fund. Evaluate these Elite Semi-Finalist stocks:
         {payload_text}
-        MISSION: Select EXACTLY the TOP 5 BEST STOCKS with the highest probability of Gap Up tomorrow.
-        RULES: Indonesian Language. Markdown table [Peringkat, Ticker, Skor, Trigger]. Detailed explanation and Trading Plan below.
+        
+        MISSION: Select EXACTLY the TOP 5 BEST STOCKS with the absolute highest probability of Gap Up tomorrow.
+        
+        STRICT RULE:
+        You MUST output ONLY a valid JSON array of objects. Format EXACTLY like this without any markdown or extra text:
+        [
+          {{"Peringkat": 1, "Ticker": "GOTO", "Alasan": "Akumulasi masif", "Target_TP": 60, "Target_CL": 50}}
+        ]
         """
         completion = client.chat.completions.create(
             model=model_andalan, messages=[{"role": "user", "content": prompt}],
-            temperature=0.3, max_tokens=4000, top_p=1, stream=False,
+            temperature=0.3, max_tokens=3000, top_p=1, stream=False,
         )
         raw_content = completion.choices[0].message.content
         clean_content = re.sub(r'<think>.*?</think>', '', raw_content, flags=re.DOTALL).strip()
-        return clean_content + f"\n\n---\n🏆 *Grand Final AI: **{model_andalan}** via Groq*"
-    except Exception as e: 
-        return f"❌ Gagal memproses Grand Final menggunakan model **{model_andalan}**. Error: {e}"
+        return clean_content, model_andalan
+    except Exception as e: raise Exception(f"Gagal memproses Grand Final. Error: {e}")
 
 # ==========================================
 # PENGATURAN UI/UX & API
 # ==========================================
 st.set_page_config(page_title="Screener Saham IHSG", layout="wide", initial_sidebar_state="expanded")
-
-GEMINI_API_KEY = None
-try: GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY")
-except: pass
-if not GEMINI_API_KEY:
-    try:
-        load_dotenv()
-        GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-    except: pass
-if GEMINI_API_KEY: genai.configure(api_key=GEMINI_API_KEY)
 
 st.markdown("""
     <style>
@@ -338,14 +329,9 @@ DEFAULT_CONFIG = {
 
 if not os.path.exists(FILE_CONFIG):
     with open(FILE_CONFIG, "w") as f: json.dump(DEFAULT_CONFIG, f, indent=4)
-else:
-    with open(FILE_CONFIG, "r") as f: cek_config = json.load(f)
-    if "Status Fibonacci" not in cek_config.get("MASTER_FILTERS", {}):
-        with open(FILE_CONFIG, "w") as f: json.dump(DEFAULT_CONFIG, f, indent=4)
 
 with open(FILE_CONFIG, "r") as f: WEB_CONFIG = json.load(f)
 
-# Auto-patch jika opsi gabungan belum ada di config JSON lama
 if "Mid Cap (Lapis 2) + Small Cap (Lapis 3)" not in WEB_CONFIG["MASTER_FILTERS"]["Kategori"]["options"]:
     WEB_CONFIG["MASTER_FILTERS"]["Kategori"]["options"] = ["Semua", "Big Cap (Lapis 1)", "Mid Cap (Lapis 2)", "Small Cap (Lapis 3)", "Mid Cap (Lapis 2) + Small Cap (Lapis 3)"]
     with open(FILE_CONFIG, "w") as f: json.dump(WEB_CONFIG, f, indent=4)
@@ -483,11 +469,13 @@ def format_pct(v): return f"{'▲ ' if v > 0 else '▼ '}{v:+.2f}%" if pd.notna(
 def format_mom(v): return "▲ Positif" if v == "Positif" else ("▼ Negatif" if v == "Negatif" else v)
 def format_desimal(v): return f"{v:.2f}" if pd.notna(v) and v != 0 else "-"
 def format_angka(v): return f"{int(v):,}".replace(",", ".") if pd.notna(v) else "-"
+
 def format_singkat_vol(v):
     if pd.isna(v): return "-"
     if v >= 1_000_000: return f"{v/1_000_000:.2f} M Lot"
     elif v >= 1_000: return f"{v/1_000:.2f} K Lot"
     return f"{v:.0f} Lot"
+
 def format_singkat_rp(v):
     if pd.isna(v): return "-"
     if v >= 1_000_000_000_000: return f"Rp {v/1_000_000_000_000:.2f} T"
@@ -533,7 +521,7 @@ def render_strategy_table(df_subset, file_name):
     else: st.info("🔍 Belum ada pergerakan saham yang memenuhi kriteria strategi ini pada sesi saat ini.")
 
 # ==============================================================================
-# RENDER 4 TABS UTAMA
+# RENDER 4 TABS UTAMA (VERSI BERSIH)
 # ==============================================================================
 if not df_hasil.empty:
     tab1, tab2, tab3, tab4 = st.tabs([
@@ -897,15 +885,15 @@ if not df_hasil.empty:
                         st.session_state.semi_finalists = []
                         st.session_state.file_ekspor = "Database/sinyal_ai_rumus_1.csv"
 
-                    GROQ_API_KEY = st.secrets.get("GROQ_API_KEY", None)
+                    OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY", os.getenv("OPENROUTER_API_KEY"))
                     
                     if not st.session_state.radar_aktif:
                         input_v8 = st.text_area("📋 Paste Daftar Saham (Pisahkan dengan Enter/Spasi):", placeholder="Contoh:\nVISI\nPANI\nDMAS", height=200, key="input_pemburu_ara")
                         pilihan_arena_ekspor = st.selectbox("Simpan Sinyal Final Ke Arena Bot:", ["Rumus 1", "Rumus 2", "Rumus 3", "Rumus 4", "Rumus 5", "Rumus 6", "Rumus 7", "Rumus 8", "Rumus 9"])
                         
                         if st.button("🚀 Mulai Turnamen Otomatis"):
-                            if not GROQ_API_KEY:
-                                st.error("❌ Kunci API Groq belum dipasang!")
+                            if not OPENROUTER_API_KEY:
+                                st.error("❌ Kunci API OpenRouter belum dipasang!")
                             else:
                                 saham_bersih = [s.strip().upper() for s in re.split(r'[,\s\n]+', input_v8) if s.strip()]
                                 saham_unik = list(dict.fromkeys(saham_bersih))
@@ -954,7 +942,7 @@ if not df_hasil.empty:
                                     'fibo': data_saham.get('Status Fibonacci', 'Normal')
                                 }
                                 
-                            hasil_kualifikasi = ai_penyisihan_turnamen(data_grup, GROQ_API_KEY)
+                            hasil_kualifikasi = ai_penyisihan_turnamen(data_grup, OPENROUTER_API_KEY)
                             
                             if "SKIP_GRUP" not in hasil_kualifikasi and "ERROR" not in hasil_kualifikasi:
                                 lolos = [s.strip().upper() for s in hasil_kualifikasi.replace('`', '').split(',')]
@@ -971,8 +959,8 @@ if not df_hasil.empty:
 
                             if st.session_state.radar_index < total:
                                 placeholder_timer = st.empty()
-                                for i in range(60, 0, -1):
-                                    placeholder_timer.warning(f"⏳ Jeda API (Rate Limit): Lanjut ke Grup {idx + 2} dalam **{i} detik**.")
+                                for i in range(15, 0, -1):
+                                    placeholder_timer.warning(f"⏳ Lanjut ke Grup {idx + 2} dalam **{i} detik**.")
                                     time.sleep(1)
                                 st.rerun()
                             else:
@@ -1011,9 +999,8 @@ if not df_hasil.empty:
                                             'pola_candle': data_saham.get('Pola Candle', 'Normal')
                                         }
                                         
-                                    hasil_mentah, model_dipakai = ai_grand_final_top5(data_final, GROQ_API_KEY)
+                                    hasil_mentah, model_dipakai = ai_grand_final_top5(data_final, OPENROUTER_API_KEY)
                                     
-                                    # PENGAMBILAN JSON AMAN & OTOMATIS SAVE KE BOT
                                     awal = hasil_mentah.find('[')
                                     akhir = hasil_mentah.rfind(']')
                                     
