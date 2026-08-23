@@ -5,6 +5,7 @@ import numpy as np
 import os
 import json
 import glob
+import time
 import re
 from datetime import datetime
 import plotly.express as px
@@ -15,63 +16,8 @@ from groq import Groq
 from dotenv import load_dotenv
 
 # ==========================================
-# 🧠 SISTEM ARSIP CERDAS: GPS & PEMERAS DATA
+# 🧠 SISTEM ARSIP CERDAS (DATA HARIAN)
 # ==========================================
-def ekstrak_sari_pati_arsip(daftar_ticker_terpilih, df_utama):
-    """
-    Fungsi ini mencari lokasi file arsip berdasarkan harga saham (GPS),
-    lalu memeras ribuan baris data 5-menitan menjadi teks pendek untuk AI.
-    """
-    base_folder = "Arsip_Data_Saham"
-    hasil_perasan_ai = {}
-
-    for ticker in daftar_ticker_terpilih:
-        try:
-            harga = df_utama[df_utama['Ticker'] == ticker]['Harga (Rp)'].values[0]
-        except:
-            harga = 0
-
-        if 1 <= harga <= 200:
-            nama_folder = "Kelas_1_Gorengan_50_200"
-        elif 201 <= harga <= 1000:
-            nama_folder = "Kelas_2_Midcap_201_1000"
-        else:
-            nama_folder = "Kelas_3_Bluechip_1001_Plus"
-
-        jalur_file = os.path.join(base_folder, nama_folder, f"{ticker}_arsip.csv")
-
-        if os.path.exists(jalur_file):
-            try:
-                df_arsip = pd.read_csv(jalur_file)
-                df_arsip['Waktu'] = pd.to_datetime(df_arsip['Waktu'])
-                batas_waktu = pd.to_datetime('17:30').time()
-                df_arsip = df_arsip[df_arsip['Waktu'].dt.time <= batas_waktu]
-
-                if not df_arsip.empty:
-                    harga_pagi = df_arsip['Harga'].iloc[0]
-                    harga_sore = df_arsip['Harga'].iloc[-1]
-                    total_vol = df_arsip['Volume'].sum()
-                    
-                    idx_ledakan = df_arsip['Volume'].idxmax()
-                    jam_ledakan = df_arsip.loc[idx_ledakan, 'Waktu'].strftime('%H:%M')
-                    vol_ledakan = df_arsip.loc[idx_ledakan, 'Volume']
-
-                    status = "Uptrend" if harga_sore > harga_pagi else ("Downtrend" if harga_sore < harga_pagi else "Sideways")
-
-                    sari_pati = (
-                        f"Tren {status} (Rp {harga_pagi} ke Rp {harga_sore}). "
-                        f"Akumulasi agresif terdeteksi pada pukul {jam_ledakan} dengan guyuran volume {vol_ledakan} lot."
-                    )
-                    hasil_perasan_ai[ticker] = sari_pati
-                else:
-                    hasil_perasan_ai[ticker] = "Data transaksi kosong sebelum pukul 17:30."
-            except Exception as e:
-                hasil_perasan_ai[ticker] = f"Error kompresi data: {e}"
-        else:
-            hasil_perasan_ai[ticker] = "Arsip 5-menit belum terbentuk."
-
-    return hasil_perasan_ai
-
 def get_historical_summary(ticker):
     arsip_files = glob.glob("Arsip_Data_Harian/screener_*.csv")
     if not arsip_files: return None
@@ -94,14 +40,14 @@ def get_historical_summary(ticker):
     df_history = pd.concat(df_list, ignore_index=True)
     df_history = df_history.sort_values(by=["Tanggal", "Waktu Update"])
     
-    summary_text = f"REKAM JEJAK ARSIP INTRADAY SAHAM {ticker}:\n\n"
+    summary_text = f"REKAM JEJAK ARSIP HARIAN SAHAM {ticker}:\n\n"
     for date, group in df_history.groupby("Tanggal"):
         open_price = group.iloc[0]["Harga (Rp)"]
         close_price = group.iloc[-1]["Harga (Rp)"]
         max_vol = group["Volume"].max()
         tekanan_akhir = group.iloc[-1]["Tekanan Bandar"]
         siklus = group.iloc[-1]["Fase Siklus Bandar"]
-        summary_text += f"📅 {date} | Buka: {open_price} | Tutup: {close_price} | Max Vol Harian: {max_vol} | Tekanan Akhir: {tekanan_akhir} | Siklus Wyckoff: {siklus}\n"
+        summary_text += f"📅 {date} | Buka: {open_price} | Tutup: {close_price} | Max Vol: {max_vol} | Tekanan Akhir: {tekanan_akhir} | Siklus: {siklus}\n"
     return summary_text
 
 def get_forensic_data(ticker):
@@ -148,23 +94,25 @@ def get_forensic_data(ticker):
         summary_text += f"📅 {date} | Tutup: {close_price} | Vol: {max_vol} | Tekanan: {tekanan_akhir} | Siklus: {siklus} | OBV: {obv} | RVOL: {rvol} | BB: {bb}\n"
     return summary_text
 
+# ==========================================
+# 🤖 OTAK KECERDASAN BUATAN (AI FUNCTIONS)
+# ==========================================
 def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
-    try:
-        GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
-    except:
-        GROQ_API_KEY = None
+    try: GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+    except: GROQ_API_KEY = None
     if not GROQ_API_KEY: return "❌ Kunci API Groq belum dipasang!"
 
     try:
         client = Groq(api_key=GROQ_API_KEY)
-        model_andalan = "llama-3.1-70b-versatile" 
+        model_andalan = "llama-3.3-70b-versatile" 
         try:
             daftar_model = client.models.list()
             semua_model = [m.id for m in daftar_model.data]
-            model_70b = [m for m in semua_model if '70b' in m.lower()]
+            # Mencegah terpilihnya model specdec yang dilimit 512 token
+            model_70b = [m for m in semua_model if '70b' in m.lower() and 'specdec' not in m.lower()]
             if model_70b: model_andalan = model_70b[0] 
             else:
-                model_llama = [m for m in semua_model if 'llama' in m.lower()]
+                model_llama = [m for m in semua_model if 'llama' in m.lower() and 'specdec' not in m.lower()]
                 if model_llama: model_andalan = model_llama[0]
         except: pass 
 
@@ -176,7 +124,7 @@ def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
             payload_text += f"Broker Summary: {data['broksum']}\n"
             payload_text += f"Wyckoff Phase: {data['status']}\n"
             payload_text += f"Technical Score: {data['skor']}/10\n"
-            payload_text += f"Historical Trace (Intraday):\n{data['histori']}\n"
+            payload_text += f"Historical Trace (Daily):\n{data['histori']}\n"
 
         prompt = f"""
         You are the mastermind of an elite Indonesian stock market syndicate (Mega Bandar). 
@@ -206,23 +154,18 @@ def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
     except Exception as e: return f"❌ Gagal memproses data dengan Groq. Error: {e}"
 
 def analisa_forensik_ai(data_saham_dict, master_filters_keys):
-    try:
-        GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
-    except:
-        GROQ_API_KEY = None
+    try: GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+    except: GROQ_API_KEY = None
     if not GROQ_API_KEY: return "❌ Kunci API Groq belum dipasang!"
 
     try:
         client = Groq(api_key=GROQ_API_KEY)
-        model_andalan = "llama-3.1-70b-versatile" 
+        model_andalan = "llama-3.3-70b-versatile" 
         try:
             daftar_model = client.models.list()
             semua_model = [m.id for m in daftar_model.data]
-            model_70b = [m for m in semua_model if '70b' in m.lower()]
+            model_70b = [m for m in semua_model if '70b' in m.lower() and 'specdec' not in m.lower()]
             if model_70b: model_andalan = model_70b[0] 
-            else:
-                model_llama = [m for m in semua_model if 'llama' in m.lower()]
-                if model_llama: model_andalan = model_llama[0]
         except: pass 
 
         payload_text = ""
@@ -268,7 +211,7 @@ def ai_penyisihan_turnamen(data_saham_dict, api_key):
         try:
             daftar_model = client.models.list()
             semua_model = [m.id for m in daftar_model.data]
-            model_70b = [m for m in semua_model if '70b' in m.lower() and '3.1' not in m.lower() and 'deepseek' not in m.lower()]
+            model_70b = [m for m in semua_model if '70b' in m.lower() and 'deepseek' not in m.lower() and 'specdec' not in m.lower()]
             if model_70b: model_andalan = model_70b[0] 
         except: pass
 
@@ -294,14 +237,12 @@ def ai_penyisihan_turnamen(data_saham_dict, api_key):
         
         completion = client.chat.completions.create(
             model=model_andalan, messages=[{"role": "user", "content": prompt}],
-            temperature=0.1, max_tokens=100, top_p=1, stream=False,
+            temperature=0.1, max_tokens=150, top_p=1, stream=False,
         )
         return completion.choices[0].message.content
-    except Exception as e:
-        return "ERROR"
+    except Exception as e: return "ERROR"
 
 def ai_grand_final_top5(data_saham_dict, api_key):
-    import re
     try:
         client = Groq(api_key=api_key)
         model_andalan = "llama-3.3-70b-versatile"
@@ -310,7 +251,7 @@ def ai_grand_final_top5(data_saham_dict, api_key):
             semua_model = [m.id for m in daftar_model.data]
             model_deepseek = [m for m in semua_model if 'deepseek' in m.lower()]
             if model_deepseek:
-                ds_70b = [m for m in model_deepseek if '70b' in m.lower()]
+                ds_70b = [m for m in model_deepseek if '70b' in m.lower() and 'specdec' not in m.lower()]
                 model_andalan = ds_70b[0] if ds_70b else model_deepseek[0]
         except: pass
 
@@ -321,85 +262,38 @@ def ai_grand_final_top5(data_saham_dict, api_key):
         prompt = f"""
         You are the CIO of a Top-Tier Indonesian Hedge Fund. Evaluate these Elite Semi-Finalist stocks:
         {payload_text}
-        MISSION: Select EXACTLY the TOP 5 BEST STOCKS with the highest probability of Gap Up tomorrow.
-        RULES: Indonesian Language. Markdown table [Peringkat, Ticker, Skor, Trigger]. Detailed explanation and Trading Plan below.
+        
+        MISSION: Select EXACTLY the TOP 5 BEST STOCKS with the absolute highest probability of Gap Up tomorrow.
+        
+        STRICT RULE:
+        You MUST output ONLY a valid JSON array of objects. Format EXACTLY like this without any markdown or extra text:
+        [
+          {{"Peringkat": 1, "Ticker": "GOTO", "Alasan": "Akumulasi masif", "Target_TP": 60, "Target_CL": 50}}
+        ]
         """
         completion = client.chat.completions.create(
             model=model_andalan, messages=[{"role": "user", "content": prompt}],
-            temperature=0.3, max_tokens=4000, top_p=1, stream=False,
+            temperature=0.2, max_tokens=2500, top_p=1, stream=False,
         )
         raw_content = completion.choices[0].message.content
         clean_content = re.sub(r'<think>.*?</think>', '', raw_content, flags=re.DOTALL).strip()
-        return clean_content + f"\n\n---\n🏆 *Grand Final AI: **{model_andalan}** via Groq*"
-    except Exception as e: return f"❌ Gagal memproses Grand Final. Error: {e}"
-
-def ai_grand_final(data_saham_dict, api_key):
-    try:
-        client = Groq(api_key=api_key)
-        model_andalan = "llama-3.1-70b-versatile"
-        
-        payload_text = ""
-        for ticker, data in data_saham_dict.items():
-            payload_text += f"\n--- STOCK TICKER: {ticker} ---\n"
-            payload_text += f"Price: Rp {data['harga']} (Change: {data['change']}%, Volume: {data['volume']})\n"
-            payload_text += f"Order Flow: Broksum: {data['broksum']} | MM Pressure: {data['tekanan_bandar']} | Smart Money A/D: {data['ad']} | OBV Trend: {data['obv']}\n"
-            payload_text += f"Supply & Anomalies: Supply Condition: {data['supply']} | RVOL: {data['rvol']} | Shakeout Signal: {data['shakeout']}\n"
-            payload_text += f"Technical: Fibonacci: {data['fibo']} | VWAP: {data['vwap']} | RSI: {data['rsi']} | Stoch: {data['stochastic']} | MACD: {data['macd']} | BB: {data['bb']} | MA Cross: {data['ma_cross']}\n"
-            payload_text += f"Profile: Wyckoff Phase: {data['siklus']} | Candlestick: {data['pola_candle']} | Market Cap: {data['kategori']}\n"
-
-        prompt = f"""
-        You are the Chief Quantitative Strategist for a Top-Tier Indonesian Hedge Fund.
-        I am handing you a highly curated list of {len(data_saham_dict)} elite candidate stocks. These stocks have already survived a brutal algorithmic elimination process. They are confirmed to be undergoing "Stealth Accumulation" (flat price, hidden massive buying).
-
-        Data for the elite candidates:
-        {payload_text}
-
-        YOUR FINAL DIRECTIVE (GRAND FINALE):
-        1. Deep Confluence Analysis: Synthesize all variables. Look for the ultimate setup: Smart Money Accumulation (A/D) + Bullish Technicals (Fibo bounces, Golden Crosses, or Squeeze) + Dry Supply.
-        2. Select EXACTLY the TOP 5 stocks with the absolute highest, most explosive probability of a massive breakout (Gap Up / ARA) tomorrow. 
-        3. If there are fewer than 5 stocks provided, analyze all of them.
-
-        STRICT OUTPUT RULES:
-        - YOU MUST WRITE YOUR ENTIRE RESPONSE IN INDONESIAN (BAHASA INDONESIA).
-        - Start with a Markdown table: [Peringkat, Ticker, Skor Ledakan (0-100%), Trigger Utama Ledakan].
-        - Below the table, provide a brutally honest, highly detailed explanation of WHY these Top 5 were chosen over the others. Detail the specific broker activities and technical confluences.
-        - Conclude with a strict, realistic Trading Plan (Buy Area, Target Price > 10%, Cut Loss).
-        """
-        
-        completion = client.chat.completions.create(
-            model=model_andalan, messages=[{"role": "user", "content": prompt}],
-            temperature=0.2, max_tokens=3000, top_p=1, stream=False,
-        )
-        return completion.choices[0].message.content + f"\n\n---\n🏆 *AI Grand Final (Top 5): **{model_andalan}** via Groq*"
-    except Exception as e:
-        return f"❌ Gagal memproses Grand Final. Error: {e}"
+        return clean_content, model_andalan
+    except Exception as e: raise Exception(f"Gagal memproses Grand Final. Error: {e}")
 
 # ==========================================
-# SECTION 1: PENGATURAN UI/UX & API
+# PENGATURAN UI/UX & API
 # ==========================================
 st.set_page_config(page_title="Screener Saham IHSG", layout="wide", initial_sidebar_state="expanded")
 
 GEMINI_API_KEY = None
-try:
-    GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
-except:
-    pass
+try: GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY")
+except: pass
 if not GEMINI_API_KEY:
     try:
         load_dotenv()
         GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-    except:
-        pass
-if not GEMINI_API_KEY:
-    GEMINI_API_KEY = None 
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-
-@st.cache_data
-def ambil_daftar_ai():
-    if not GEMINI_API_KEY:
-        return ['❌ API Key Belum Terbaca!']
-    return ['gemma-4-26b-a4b-it']
+    except: pass
+if GEMINI_API_KEY: genai.configure(api_key=GEMINI_API_KEY)
 
 st.markdown("""
     <style>
@@ -411,18 +305,13 @@ st.markdown("""
     .bandar-box { border-left: 5px solid #ef4444; background-color: #2a1111; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
     .bandar-box-green { border-left: 5px solid #22c55e; background-color: #0f291e; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
     .stTabs [data-baseweb="tab-list"] { gap: 24px; }
-    .stTabs [data-baseweb="tab"] { height: 50px; white-space: pre-wrap; background-color: transparent; border-radius: 4px 4px 0px 0px; padding: 10px 16px; font-weight: 600; }
+    .stTabs [data-baseweb="tab"] { height: 50px; font-weight: 600; }
     .view-mode-container { background-color: #0f172a; padding: 10px 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #334155; }
-    
-    div[data-baseweb="select"] > div { height: auto; min-height: 38px; }
-    div[data-baseweb="select"] span { white-space: normal !important; word-break: break-word !important; line-height: 1.4 !important; }
-    ul[data-baseweb="menu"] li { white-space: normal !important; word-break: break-word !important; padding-top: 8px !important; padding-bottom: 8px !important; line-height: 1.4 !important; }
-    li[role="option"] { white-space: normal !important; word-wrap: break-word !important; }
     </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# SECTION 2: LOAD KONFIGURASI JSON
+# LOAD KONFIGURASI JSON
 # ==========================================
 FILE_CONFIG = "config_web.json"
 FILE_PRESET = "preset_kustom.json"
@@ -464,25 +353,14 @@ DEFAULT_CONFIG = {
         "Prediksi Machine Learning": {"label": "🧠 AI Machine Learning", "options": ["Semua", "🔥 ANOMALI BANDAR (Siap Ledakan)", "⚠️ Anomali (Sudah Terbang)", "Biasa / Mengikuti Pasar"]},
         "Kondisi Supply": {"label": "🏜️ Supply & Demand", "options": ["Semua", "Supply Kering (Siap Pump) 🏜️", "Supply Banjir (Distribusi) 🌊", "Normal / Sedang Transisi"]},
         "Status Fibonacci": {"label": "📏 Level Fibonacci", "options": ["Semua", "Golden Rebound Fibo 61.8% (Golden Ratio) 🎯", "Dekat Support Fibo 61.8% (Golden Ratio)", "Golden Rebound Fibo 50.0% 🎯", "Golden Rebound Fibo 38.2% 🎯", "Mengambang (Jauh dari Fibo)"]}
-    },
-    "STRATEGI": {
-        "1. BSJP (Beli Sore Jual Pagi) ⏰ 15:30": "Aturan: 1) Eksekusi HANYA jam 15:30 - 15:45. 2) Pilih preset 'BSJP' di sidebar kiri. 3) Beli di sore hari, set Take Profit otomatis 3-5% untuk esok pagi saat market buka.",
-        "2. HAKA Pagi (Open = Low) ⏰ 09:05": "Aturan: 1) Buka screener pukul 09:05. 2) Filter: Status Open = 'Open = Low', RVOL = 'Ledakan Ekstrem (> 300%)'. 3) Cocokkan Target TP di kolom Auto Trading Plan.",
-        "3. Buy on Weakness (Tangkap Pisau Jatuh)": "Filter: Streak Harian = 'Turun Beruntun', Sinyal Cuci Barang = 'Jarum Bawah', Kekuatan A/D = 'Akumulasi Pro'. Momen ritel panik tapi bandar memborong.",
-        "4. Menghindari Guyuran Bandar": "Jika saham naik kencang TAPI Tekanan Bandar 'Dominan Jual', bandar sedang take profit perlahan."
     }
 }
 
 if not os.path.exists(FILE_CONFIG):
     with open(FILE_CONFIG, "w") as f: json.dump(DEFAULT_CONFIG, f, indent=4)
-else:
-    with open(FILE_CONFIG, "r") as f: cek_config = json.load(f)
-    if "Status Fibonacci" not in cek_config.get("MASTER_FILTERS", {}):
-        with open(FILE_CONFIG, "w") as f: json.dump(DEFAULT_CONFIG, f, indent=4)
 
 with open(FILE_CONFIG, "r") as f: WEB_CONFIG = json.load(f)
 
-# Auto-patch jika opsi gabungan belum ada di config JSON lama
 if "Mid Cap (Lapis 2) + Small Cap (Lapis 3)" not in WEB_CONFIG["MASTER_FILTERS"]["Kategori"]["options"]:
     WEB_CONFIG["MASTER_FILTERS"]["Kategori"]["options"] = ["Semua", "Big Cap (Lapis 1)", "Mid Cap (Lapis 2)", "Small Cap (Lapis 3)", "Mid Cap (Lapis 2) + Small Cap (Lapis 3)"]
     with open(FILE_CONFIG, "w") as f: json.dump(WEB_CONFIG, f, indent=4)
@@ -490,7 +368,7 @@ if "Mid Cap (Lapis 2) + Small Cap (Lapis 3)" not in WEB_CONFIG["MASTER_FILTERS"]
 MASTER_FILTERS = WEB_CONFIG["MASTER_FILTERS"]
 
 # ==========================================
-# SECTION 3: DATABASE PRESET & LOAD DATA
+# DATABASE PRESET & LOAD DATA
 # ==========================================
 def muat_preset():
     preset_bawaan = {
@@ -548,7 +426,13 @@ if not df_hasil.empty and "Terakhir Update" in df_hasil.columns:
         </div>
     """, unsafe_allow_html=True)
 
-if st.sidebar.button("🔃 Muat Ulang Data Server", use_container_width=True):
+if st.sidebar.button("🔃 Sync & Muat Ulang Data Server", use_container_width=True):
+    with st.spinner("Menarik data terbaru dari GitHub Server..."):
+        try:
+            os.system("git pull origin main") 
+            time.sleep(2) 
+        except Exception as e:
+            st.sidebar.error(f"Gagal Sync: {e}")
     st.cache_data.clear()
     st.rerun()
 
@@ -607,20 +491,18 @@ st.markdown("Detektor Jejak Bandar, Anomali Volume, & Strategi BSJP.")
 st.markdown("---")
 
 # ==========================================
-# SECTION 5: FUNGSI PEWARNAAN
+# FUNGSI PEWARNAAN & FORMATTER TABEL
 # ==========================================
 def format_skor(s): return "⭐" * int(s) if pd.notna(s) and int(s) > 0 else "-"
 def format_pct(v): return f"{'▲ ' if v > 0 else '▼ '}{v:+.2f}%" if pd.notna(v) and v != 0 else "0.00%"
 def format_mom(v): return "▲ Positif" if v == "Positif" else ("▼ Negatif" if v == "Negatif" else v)
 def format_desimal(v): return f"{v:.2f}" if pd.notna(v) and v != 0 else "-"
 def format_angka(v): return f"{int(v):,}".replace(",", ".") if pd.notna(v) else "-"
-
 def format_singkat_vol(v):
     if pd.isna(v): return "-"
     if v >= 1_000_000: return f"{v/1_000_000:.2f} M Lot"
     elif v >= 1_000: return f"{v/1_000:.2f} K Lot"
     return f"{v:.0f} Lot"
-
 def format_singkat_rp(v):
     if pd.isna(v): return "-"
     if v >= 1_000_000_000_000: return f"Rp {v/1_000_000_000_000:.2f} T"
@@ -666,15 +548,18 @@ def render_strategy_table(df_subset, file_name):
     else: st.info("🔍 Belum ada pergerakan saham yang memenuhi kriteria strategi ini pada sesi saat ini.")
 
 # ==============================================================================
-# DEKLARASI TABS UTAMA
+# RENDER 4 TABS UTAMA (VERSI BERSIH)
 # ==============================================================================
 if not df_hasil.empty:
     tab1, tab2, tab3, tab4 = st.tabs([
-        "📊 Market Overview", "📌 Screener Utama", "⚙️ Asisten AI Spesial", "💼 Portofolio Bot"
+        "📊 Market Overview", 
+        "📌 Screener Utama", 
+        "🤖 Asisten AI Spesial", 
+        "💼 Portofolio Bot"
     ])
     
     # ==========================================================================
-    # [TAB 1] MARKET OVERVIEW
+    # [TAB 1] MARKET OVERVIEW (STYLE STOCKBIT)
     # ==========================================================================
     with tab1:
         st.markdown("### 📊 Ringkasan Pasar IHSG")
@@ -852,7 +737,7 @@ if not df_hasil.empty:
         else: st.warning("Tidak ada data sesuai filter.")
 
     # ==========================================================================
-    # [TAB 3] ASISTEN AI SPESIAL
+    # [TAB 3] ASISTEN AI SPESIAL (TURNAMEN)
     # ==========================================================================
     with tab3:
         st.markdown("## 🦅 Radar BSJP & Laboratorium Forensik AI")
@@ -975,7 +860,7 @@ if not df_hasil.empty:
                                         'skor': data_saham.get('Total Score', 0),
                                         'histori': teks_ringkasan if teks_ringkasan else "Arsip belum tersedia."
                                     }
-                                hasil_ai = analisa_bandar_ai_multisaham(data_kompilasi, 'gemma-4-26b-a4b-it')
+                                hasil_ai = analisa_bandar_ai_multisaham(data_kompilasi, 'pilihan_ai')
                                 st.info(hasil_ai)
 
                 elif "Forensik Bandar" in pilihan_ai:
@@ -1015,11 +900,8 @@ if not df_hasil.empty:
                                     st.info(hasil_ai)
 
                 elif "Pemburu ARA" in pilihan_ai:
-                    import re
-                    import time
-                    
                     st.subheader("🎯 Turnamen AI (Spesialis Akumulasi Siluman)")
-                    st.markdown("Paste ratusan (bahkan 900+) saham di sini. Mesin akan melakukan kualifikasi brutal (5 saham/menit) secara estafet. Saham yang lolos akan dikumpulkan untuk diadu di **Grand Final Top 5** pada akhir putaran.")
+                    st.markdown("Paste ratusan (bahkan 900+) saham di sini. Mesin akan melakukan kualifikasi brutal (5 saham/menit) secara estafet.")
                     
                     if 'radar_aktif' not in st.session_state:
                         st.session_state.radar_aktif = False
@@ -1028,11 +910,13 @@ if not df_hasil.empty:
                         st.session_state.radar_index = 0
                         st.session_state.total_grup = 0
                         st.session_state.semi_finalists = []
+                        st.session_state.file_ekspor = "Database/sinyal_ai_rumus_1.csv"
 
                     GROQ_API_KEY = st.secrets.get("GROQ_API_KEY", None)
                     
                     if not st.session_state.radar_aktif:
                         input_v8 = st.text_area("📋 Paste Daftar Saham (Pisahkan dengan Enter/Spasi):", placeholder="Contoh:\nVISI\nPANI\nDMAS", height=200, key="input_pemburu_ara")
+                        pilihan_arena_ekspor = st.selectbox("Simpan Sinyal Final Ke Arena Bot:", ["Rumus 1", "Rumus 2", "Rumus 3", "Rumus 4", "Rumus 5", "Rumus 6", "Rumus 7", "Rumus 8", "Rumus 9"])
                         
                         if st.button("🚀 Mulai Turnamen Otomatis"):
                             if not GROQ_API_KEY:
@@ -1053,10 +937,10 @@ if not df_hasil.empty:
                                     st.session_state.radar_index = 0
                                     st.session_state.semi_finalists = []
                                     st.session_state.radar_tahap = 1
+                                    st.session_state.file_ekspor = f"Database/sinyal_ai_rumus_{pilihan_arena_ekspor.split(' ')[1]}.csv"
                                     st.session_state.radar_aktif = True
                                     
                                     st.rerun()
-
                     else:
                         st.warning("⚠️ **JANGAN ME-REFRESH BROWSER!** Mesin sedang menjalankan turnamen.")
                         if st.button("🛑 Hentikan Turnamen Darurat"):
@@ -1142,16 +1026,35 @@ if not df_hasil.empty:
                                             'pola_candle': data_saham.get('Pola Candle', 'Normal')
                                         }
                                         
-                                    hasil_grand_final = ai_grand_final_top5(data_final, GROQ_API_KEY)
+                                    hasil_mentah, model_dipakai = ai_grand_final_top5(data_final, GROQ_API_KEY)
                                     
-                                    st.success("🎉 **TURNAMEN SELESAI!**")
-                                    st.balloons()
+                                    # PENGAMBILAN JSON AMAN & OTOMATIS SAVE KE BOT
+                                    awal = hasil_mentah.find('[')
+                                    akhir = hasil_mentah.rfind(']')
                                     
-                                    with st.container():
-                                        st.markdown("---")
-                                        st.markdown(hasil_grand_final)
-                                        st.markdown("---")
-                                    
+                                    if awal != -1 and akhir != -1:
+                                        bersih = hasil_mentah[awal:akhir+1]
+                                        try:
+                                            hasil_json = json.loads(bersih)
+                                            df_tampil = pd.DataFrame(hasil_json)
+                                            
+                                            st.success(f"🎉 **TURNAMEN SELESAI!**")
+                                            st.balloons()
+                                            
+                                            with st.container():
+                                                st.markdown("---")
+                                                st.table(df_tampil)
+                                                st.markdown("---")
+                                            
+                                            if 'Target_TP' in df_tampil.columns and 'Target_CL' in df_tampil.columns:
+                                                df_sinyal = df_tampil[['Ticker', 'Target_TP', 'Target_CL']]
+                                                df_sinyal.to_csv(st.session_state.file_ekspor, index=False)
+                                                st.info(f"🤖 Sinyal dikirim ke Bot Simulator! Cek Tab 4.")
+                                        except Exception as json_err:
+                                            st.error(f"Gagal memproses JSON. Menampilkan hasil raw:\n\n{hasil_mentah}")
+                                    else:
+                                        st.error(f"Format JSON tidak ditemukan dalam respon AI. Raw:\n\n{hasil_mentah}")
+
                                     st.session_state.radar_aktif = False
                                     if st.button("🔄 Mulai Turnamen Baru"):
                                         st.rerun()
