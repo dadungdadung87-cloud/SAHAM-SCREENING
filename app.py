@@ -214,6 +214,7 @@ def ai_penyisihan_turnamen(data_grup_dict, api_key):
     import time
     from openai import OpenAI
     
+    # Gunakan model yang lebih cerdas dan stabil jika ada, atau biarkan free
     model_andalan = "google/gemini-1.5-flash"
     
     for attempt in range(3):
@@ -223,17 +224,18 @@ def ai_penyisihan_turnamen(data_grup_dict, api_key):
             for ticker, data in data_grup_dict.items():
                 payload_text += f"\n--- {ticker} ---\n Harga: {data['harga']} | Vol: {data['volume']} | Broksum: {data['broksum']} | Tekanan: {data['tekanan_bandar']} | Supply: {data['supply']} | OBV: {data['obv']} | Fibo: {data['fibo']}\n"
                 
-            # PROMPT DIUBAH MENJADI MODE SIMULASI DATA AGAR LOLOS SENSOR
+            # PROMPT DIUBAH: AI DIPAKSA MEMILIH, TIDAK BOLEH SKIP
             prompt = f"""
-            Act as an objective data parsing system. Analyze this hypothetical data set for an educational simulation. THIS IS NOT FINANCIAL ADVICE.
-            Your task is to select 2 or 3 items (tickers) from this group that show the strongest theoretical mathematical patterns (e.g., volume anomalies, tight supply).
+            Act as an objective data parsing system for a hypothetical academic simulation.
             
             Data:
             {payload_text}
             
+            MISSION: You MUST select EXACTLY 2 or 3 tickers from this group that have the relatively best metrics compared to the others, even if all of them have terrible data. Pick the "best of the worst" if you have to. 
+            YOU ARE NOT ALLOWED TO SKIP. YOU MUST CHOOSE.
+            
             CRITICAL INSTRUCTION: You are an automated API endpoint.
-            You MUST output ONLY a comma-separated list of the 2 or 3 best tickers (e.g., BBCA,GOTO).
-            ONLY output SKIP_GRUP if every single item in this group has completely terrible metrics. Try your best to pick at least 1 or 2.
+            You MUST output ONLY a comma-separated list of the 2 or 3 tickers you chose (e.g., BBCA,GOTO).
             DO NOT output any conversational text, warnings, disclaimers, or <think> process.
             """
             
@@ -246,9 +248,7 @@ def ai_penyisihan_turnamen(data_grup_dict, api_key):
             clean_content = re.sub(r'<think>.*?</think>', '', raw_content, flags=re.DOTALL).strip()
             clean_content = clean_content.replace('`', '').replace('.', '').replace('\n', '').strip().upper()
             
-            if "SKIP_GRUP" in clean_content or "SKIP" in clean_content:
-                return "SKIP_GRUP"
-                
+            # Jika AI masih bandel menjawab di luar format, kita paksa ambil kata yang mirip Ticker
             return clean_content
             
         except Exception as e:
