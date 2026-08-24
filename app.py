@@ -746,71 +746,81 @@ if not df_hasil.empty:
         if 'Tekanan Bandar' not in df_hasil.columns:
             st.warning("⏳ **Fitur Radar belum menerima data terbaru.** Harap jalankan 'update_data.py'.")
         else:
-            cond_harga = (df_hasil.get('Harga (Rp)', 0) >= 50) & (df_hasil.get('Harga (Rp)', 0) <= 200)
+            # --- SYARAT MUTLAK: WAJIB SQUEEZE ---
+            cond_squeeze = (df_hasil.get('Status BB', '') == 'Squeeze')
 
-            cond_v1 = (cond_harga & (df_hasil.get('Vol Breakout', '') == 'Tembus MA20'))
+            # RUMUS 1 : Squeeze + Supply Kering
+            cond_v1 = (cond_squeeze & df_hasil.get('Kondisi Supply', '').astype(str).str.contains('Supply Kering', na=False))
             df_v1 = df_hasil[cond_v1].copy() if not df_hasil.empty else pd.DataFrame()
 
-            cond_v2 = (cond_harga & (df_hasil.get('Status Stochastic', '') == 'Oversold (Jenuh Jual - Peluang)'))
+            # RUMUS 2 : Squeeze + Anomali Bandar
+            cond_v2 = (cond_squeeze & df_hasil.get('Prediksi Machine Learning', '').astype(str).str.contains('ANOMALI BANDAR', na=False))
             df_v2 = df_hasil[cond_v2].copy() if not df_hasil.empty else pd.DataFrame()
 
-            cond_v3 = (cond_harga & (df_hasil.get('Kondisi Supply', '') == 'Supply Kering (Siap Pump) 🏜️'))
+            # RUMUS 3 : Squeeze + Golden Rebound Fibo 61.8%
+            cond_v3 = (cond_squeeze & df_hasil.get('Status Fibonacci', '').astype(str).str.contains('61.8%', na=False))
             df_v3 = df_hasil[cond_v3].copy() if not df_hasil.empty else pd.DataFrame()
 
-            cond_v4 = (cond_harga & (df_hasil.get('Status Fibonacci', '') == 'Golden Rebound Fibo 61.8% (Golden Ratio) 🎯'))
+            # RUMUS 4 : Squeeze + Golden Cross
+            cond_v4 = (cond_squeeze & (df_hasil.get('MA Cross', '') == 'Golden Cross'))
             df_v4 = df_hasil[cond_v4].copy() if not df_hasil.empty else pd.DataFrame()
 
-            cond_v5 = (cond_harga & (df_hasil.get('Prediksi Machine Learning', '') == '🔥 ANOMALI BANDAR (Siap Ledakan)'))
+            # RUMUS 5 : Squeeze + Hammer
+            cond_v5 = (cond_squeeze & (df_hasil.get('Pola Candle', '') == 'Hammer (Potensi Reversal)'))
             df_v5 = df_hasil[cond_v5].copy() if not df_hasil.empty else pd.DataFrame()
 
-            cond_v6 = (cond_harga & (df_hasil.get('Posisi Entry', '') == 'Dekat Support (Low Risk)'))
+            # RUMUS 6 : Squeeze + Akumulasi Kuat
+            cond_v6 = (cond_squeeze & (df_hasil.get('Status Bandar', '') == 'Akumulasi Kuat'))
             df_v6 = df_hasil[cond_v6].copy() if not df_hasil.empty else pd.DataFrame()
 
-            cond_v7 = (cond_harga & (df_hasil.get('Kekuatan A/D', '') == 'Akumulasi Pro (Smart Money)'))
+            # RUMUS 7 : Squeeze + Solid (Jarang Dibanting)
+            cond_v7 = (cond_squeeze & (df_hasil.get('Karakter Gorengan', '') == 'Solid (Jarang Dibanting)'))
             df_v7 = df_hasil[cond_v7].copy() if not df_hasil.empty else pd.DataFrame()
 
-            cond_v8 = (cond_harga & (df_hasil.get('Fase Siklus Bandar', '') == 'Accumulation (Kumpul Barang)'))
+            # RUMUS 8 : Squeeze + Accumulation (Wyckoff)
+            cond_v8 = (cond_squeeze & (df_hasil.get('Fase Siklus Bandar', '') == 'Accumulation (Kumpul Barang)'))
             df_v8 = df_hasil[cond_v8].copy() if not df_hasil.empty else pd.DataFrame()
 
-            cond_v9 = (cond_harga & (df_hasil.get('Valuasi', '') == 'Undervalued (Murah)'))
+            # RUMUS 9 : Squeeze + Risk/Reward Menarik
+            cond_v9 = (cond_squeeze & (df_hasil.get('Risk/Reward Ratio', '') == 'Sangat Menarik (> 1:3)'))
             df_v9 = df_hasil[cond_v9].copy() if not df_hasil.empty else pd.DataFrame()
 
             tab_screener, tab_ai = st.tabs(["🎯 Screener Spesial", "🧠 Asisten AI"])
             
             with tab_screener:
                 pilihan_v = st.selectbox(
-                    "Pilih Rumus Screener:",
+                    "Pilih Rumus Screener (Wajib Squeeze):",
                     [
-                        "Rumus 1 (Harga 50-200 + Tembus MA20)", 
-                        "Rumus 2 (Harga 50-200 + Oversold)", 
-                        "Rumus 3 (Harga 50-200 + Supply Kering)", 
-                        "Rumus 4 (Harga 50-200 + Golden Fibo 61.8%)", 
-                        "Rumus 5 (Harga 50-200 + Anomali Bandar)",
-                        "Rumus 6 (Harga 50-200 + Dekat Support)",
-                        "Rumus 7 (Harga 50-200 + Akumulasi Pro)",
-                        "Rumus 8 (Harga 50-200 + Accumulation Wyckoff)",
-                        "Rumus 9 (Harga 50-200 + Undervalued)"
+                        "RUMUS 1 : Squeeze + Supply Kering (Siap Pump) 🏜️", 
+                        "RUMUS 2 : Squeeze + 🔥 ANOMALI BANDAR (Siap Ledakan)", 
+                        "RUMUS 3 : Squeeze + Golden Rebound Fibo 61.8% (Golden Ratio) 🎯", 
+                        "RUMUS 4 : Squeeze + Golden Cross", 
+                        "RUMUS 5 : Squeeze + Hammer (Potensi Reversal)",
+                        "RUMUS 6 : Squeeze + 🕵️ Status Bandar ( Akumulasi Kuat )",
+                        "RUMUS 7 : Squeeze + Solid (Jarang Dibanting)",
+                        "RUMUS 8 : Squeeze + 🔄 Siklus Wyckoff ( Accumulation (Kumpul Barang) )",
+                        "RUMUS 9 : Squeeze + Sangat Menarik (> 1:3)"
                     ]
                 )
                 
                 st.markdown("---")
-                if "Rumus 1" in pilihan_v:
+                if "RUMUS 1" in pilihan_v:
                     render_strategy_table(df_v1, "Screener_Rumus_1")
-                elif "Rumus 2" in pilihan_v:
+                elif "RUMUS 2" in pilihan_v:
                     render_strategy_table(df_v2, "Screener_Rumus_2")
-                elif "Rumus 3" in pilihan_v:
+                elif "RUMUS 3" in pilihan_v:
                     render_strategy_table(df_v3, "Screener_Rumus_3")
-                elif "Rumus 4" in pilihan_v:
+                elif "RUMUS 4" in pilihan_v:
                     render_strategy_table(df_v4, "Screener_Rumus_4")
-                elif "Rumus 5" in pilihan_v:
+                elif "RUMUS 5" in pilihan_v:
                     render_strategy_table(df_v5, "Screener_Rumus_5")
-                elif "Rumus 6" in pilihan_v:
+                elif "RUMUS 6" in pilihan_v:
                     render_strategy_table(df_v6, "Screener_Rumus_6")
-                elif "Rumus 7" in pilihan_v:
+                elif "RUMUS 7" in pilihan_v:
                     render_strategy_table(df_v7, "Screener_Rumus_7")
-                elif "Rumus 8" in pilihan_v:
+                elif "RUMUS 8" in pilihan_v:
                     render_strategy_table(df_v8, "Screener_Rumus_8")
-                elif "Rumus 9" in pilihan_v:
+                elif "RUMUS 9" in pilihan_v:
                     render_strategy_table(df_v9, "Screener_Rumus_9")
 
             with tab_ai:
