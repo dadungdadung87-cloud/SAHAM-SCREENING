@@ -253,7 +253,7 @@ def ai_grand_final_top5(data_saham_dict, api_key):
     model_andalan = "openrouter/free"
 
     try:
-        client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
+        client = OpenAI(base_url="[https://openrouter.ai/api/v1](https://openrouter.ai/api/v1)", api_key=api_key)
         payload_text = ""
         for ticker, data in data_saham_dict.items():
             payload_text += f"\n--- {ticker} ---\n Harga: {data['harga']} | Vol: {data['volume']} | Broksum: {data['broksum']} | Tekanan: {data['tekanan_bandar']} | Supply: {data['supply']} | OBV: {data['obv']} | Fibo: {data['fibo']} | VWAP: {data['vwap']} | Candle: {data['pola_candle']}\n"
@@ -264,12 +264,18 @@ def ai_grand_final_top5(data_saham_dict, api_key):
         
         MISSION: Select EXACTLY the TOP 5 BEST STOCKS with the absolute highest probability of Gap Up tomorrow.
         
-        STRICT RULE:
-        You MUST output ONLY a valid JSON array of objects. Format EXACTLY like this without any markdown or extra text:
+        CRITICAL INSTRUCTION: You are an automated API endpoint. 
+        You MUST output ONLY a raw, valid JSON array containing the top 5 stocks.
+        DO NOT output any conversational text, explanations, greetings, or notes before or after the JSON.
+        DO NOT wrap your response in markdown code blocks (DO NOT use ```json or ```).
+        Your response must start exactly with '[' and end exactly with ']'.
+        
+        Format EXACTLY like this:
         [
           {{"Peringkat": 1, "Ticker": "GOTO", "Alasan": "Akumulasi masif", "Target_TP": 60, "Target_CL": 50}}
         ]
         """
+        
         completion = client.chat.completions.create(
             model=model_andalan, messages=[{"role": "user", "content": prompt}],
             temperature=0.3, max_tokens=3000, top_p=1, stream=False,
@@ -278,9 +284,12 @@ def ai_grand_final_top5(data_saham_dict, api_key):
         raw_content = completion.choices[0].message.content or ""
         model_terpakai = completion.model
         
+        # Pembersihan tag <think> jika OpenRouter menggunakan model DeepSeek R1
         clean_content = re.sub(r'<think>.*?</think>', '', raw_content, flags=re.DOTALL).strip()
+        
         return clean_content, model_terpakai
-    except Exception as e: raise Exception(f"Gagal memproses Grand Final. Error: {e}")
+    except Exception as e: 
+        raise Exception(f"Gagal memproses Grand Final. Error: {e}")
 
 # ==========================================
 # PENGATURAN UI/UX & API
@@ -1039,11 +1048,20 @@ if not df_hasil.empty:
                                     try:
                                         hasil_mentah, model_dipakai = ai_grand_final_top5(data_final, OPENROUTER_API_KEY)
                                         
-                                        awal = hasil_mentah.find('[')
-                                        akhir = hasil_mentah.rfind(']')
+                                        # ========================================================
+                                        # PEMURNI JSON OTOMATIS (Regex Cleaner)
+                                        # ========================================================
+                                        import re
+                                        import json
                                         
-                                        if awal != -1 and akhir != -1:
-                                            bersih = hasil_mentah[awal:akhir+1]
+                                        # Hapus backticks markdown jika AI menyertakannya
+                                        teks_bersih = hasil_mentah.replace('```json', '').replace('```', '').strip()
+                                        
+                                        # Gunakan Regex untuk menciduk paksa pola JSON (List of Dicts)
+                                        pencarian_json = re.search(r'\[\s*\{.*?\}\s*\]', teks_bersih, re.DOTALL)
+                                        
+                                        if pencarian_json:
+                                            bersih = pencarian_json.group(0)
                                             try:
                                                 hasil_json = json.loads(bersih)
                                                 df_tampil = pd.DataFrame(hasil_json)
@@ -1060,10 +1078,11 @@ if not df_hasil.empty:
                                                     df_sinyal = df_tampil[['Ticker', 'Target_TP', 'Target_CL']]
                                                     df_sinyal.to_csv(st.session_state.file_ekspor, index=False)
                                                     st.info(f"🤖 Sinyal dikirim ke Bot Simulator! Cek Tab 4.")
-                                            except Exception as json_err:
-                                                st.error(f"Gagal memproses JSON. Menampilkan hasil raw:\n\n{hasil_mentah}")
+                                                    
+                                            except json.JSONDecodeError as json_err:
+                                                st.error(f"Gagal membaca format data setelah disaring. Error: {json_err}\n\nTeks tersaring:\n{bersih}")
                                         else:
-                                            st.error(f"Format JSON tidak ditemukan dalam respon AI. Raw:\n\n{hasil_mentah}")
+                                            st.error(f"Format JSON List [] tidak ditemukan dalam respon AI. Pastikan Prompt menginstruksikan format JSON murni.\n\nRespon Asli AI:\n{hasil_mentah}")
 
                                     except Exception as ai_err:
                                         st.error(str(ai_err))
