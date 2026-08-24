@@ -214,7 +214,7 @@ def ai_penyisihan_turnamen(data_grup_dict, api_key):
     import time
     from openai import OpenAI
     
-    model_andalan = "google/gemma-4-31b-it:free"
+    model_andalan = "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
     
     # Ambil daftar saham asli yang sedang bertanding di grup ini
     saham_grup_ini = list(data_grup_dict.keys())
@@ -279,7 +279,7 @@ def ai_grand_final_top5(data_saham_dict, api_key):
     import pandas as pd
     import json
     
-    model_andalan = "google/gemma-4-31b-it:free"
+    model_andalan = "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
 
     for attempt in range(3):
         try:
