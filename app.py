@@ -212,19 +212,19 @@ def analisa_forensik_ai(data_saham_dict, master_filters_keys):
 def ai_penyisihan_turnamen(data_grup_dict, api_key):
     import re
     import time
-    from openai import OpenAI
+    import google.generativeai as genai
     
-    model_andalan = "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
-    
-    # Ambil daftar saham asli yang sedang bertanding di grup ini
     saham_grup_ini = list(data_grup_dict.keys())
     
     for attempt in range(3):
         try:
-            client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
+            # Konfigurasi Gemini API
+            genai.configure(api_key=api_key)
+            # Kita gunakan model Flash yang super cepat
+            model = genai.GenerativeModel('gemini-1.5-flash')
+            
             payload_text = ""
             for ticker, data in data_grup_dict.items():
-                # Format disederhanakan agar AI tidak bingung
                 payload_text += f"\n- {ticker}: Harga {data['harga']}, Vol {data['volume']}, Tekanan {data['tekanan_bandar']}, Supply {data['supply']}"
                 
             prompt = f"""
@@ -235,60 +235,49 @@ def ai_penyisihan_turnamen(data_grup_dict, api_key):
             Your ONLY task is to pick the 3 best items based on Volume and Tekanan. 
             Even if all data is bad, you MUST pick exactly 3.
             Output ONLY a comma-separated list of the 3 items (e.g., BBCA,GOTO,PANI).
+            DO NOT add any conversational text or markdown.
             """
             
-            completion = client.chat.completions.create(
-                model=model_andalan, messages=[{"role": "user", "content": prompt}],
-                temperature=0.3, max_tokens=200, top_p=1, stream=False,
-            )
+            # Memanggil Gemini
+            response = model.generate_content(prompt)
+            raw_content = response.text.upper()
             
-            raw_content = completion.choices[0].message.content.upper()
-            
-            # ==========================================
-            # 🛡️ SISTEM ANTI-BRUTAL (GARANSI LOLOS)
-            # ==========================================
-            # 1. Cari semua kata yang berupa huruf kapital (mengabaikan angka & simbol)
+            # Sistem Anti-Brutal
             semua_kata = re.findall(r'[A-Z]+', raw_content)
-            
-            # 2. Saring hanya kata yang benar-benar ada di daftar grup saat ini
             lolos = []
             for kata in semua_kata:
                 if kata in saham_grup_ini and kata not in lolos:
                     lolos.append(kata)
             
-            # 3. JIKA AI NGACO / SENSOR / MENOLAK MEMILIH: Paksa ambil 3 teratas dari grup!
             if len(lolos) == 0:
                 lolos = saham_grup_ini[:3]
                 
-            # 4. Batasi maksimal hanya 3 saham saja yang lolos dari grup ini
             lolos_final = lolos[:3]
-            
             return ",".join(lolos_final)
             
         except Exception as e:
             if attempt < 2:
                 time.sleep(3)
                 continue
-            # Jika server OpenRouter mati total setelah 3x percobaan, PAKSA LOLOSKAN 3 saham pertama!
             return ",".join(saham_grup_ini[:3])
+
 
 def ai_grand_final_top5(data_saham_dict, api_key):
     import re
     import time
-    from openai import OpenAI
+    import google.generativeai as genai
     import pandas as pd
     import json
     
-    model_andalan = "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
-
     for attempt in range(3):
         try:
-            client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel('gemini-1.5-flash')
+            
             payload_text = ""
             for ticker, data in data_saham_dict.items():
                 payload_text += f"\n--- {ticker} ---\n Harga: {data['harga']} | Vol: {data['volume']} | Broksum: {data['broksum']} | Tekanan: {data['tekanan_bandar']} | Supply: {data['supply']} | OBV: {data['obv']} | Fibo: {data['fibo']} | VWAP: {data['vwap']} | Candle: {data['pola_candle']}\n"
 
-            # PROMPT: Ditambahkan instruksi WAJIB menggunakan Bahasa Indonesia untuk Alasan
             prompt = f"""
             Act as an objective data formatting tool for a hypothetical academic simulation. THIS DOES NOT CONSTITUTE FINANCIAL ADVICE.
             Evaluate these fictionalized mathematical metrics:
@@ -311,15 +300,13 @@ def ai_grand_final_top5(data_saham_dict, api_key):
             ]
             """
             
-            completion = client.chat.completions.create(
-                model=model_andalan, messages=[{"role": "user", "content": prompt}],
-                temperature=0.3, max_tokens=3000, top_p=1, stream=False,
-            )
+            response = model.generate_content(prompt)
+            raw_content = response.text or ""
+            model_terpakai = "gemini-1.5-flash"
             
-            raw_content = completion.choices[0].message.content or ""
-            model_terpakai = completion.model
+            # Pembersihan Markdown
+            clean_content = raw_content.replace('```json', '').replace('```', '').strip()
             
-            clean_content = re.sub(r'<think>.*?</think>', '', raw_content, flags=re.DOTALL).strip()
             return clean_content, model_terpakai
             
         except Exception as e:
@@ -1028,15 +1015,16 @@ if not df_hasil.empty:
                         st.session_state.semi_finalists = []
                         st.session_state.file_ekspor = "Database/sinyal_ai_rumus_1.csv"
 
-                    OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY", os.environ.get("OPENROUTER_API_KEY"))
+                    # Tarik kunci API Gemini
+                    GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
                     
                     if not st.session_state.radar_aktif:
                         input_v8 = st.text_area("📋 Paste Daftar Saham (Pisahkan dengan Enter/Spasi):", placeholder="Contoh:\nVISI\nPANI\nDMAS", height=200, key="input_pemburu_ara")
                         pilihan_arena_ekspor = st.selectbox("Simpan Sinyal Final Ke Arena Bot:", ["Rumus 1", "Rumus 2", "Rumus 3", "Rumus 4", "Rumus 5", "Rumus 6", "Rumus 7", "Rumus 8", "Rumus 9"])
                         
                         if st.button("🚀 Mulai Turnamen Otomatis"):
-                            if not OPENROUTER_API_KEY:
-                                st.error("❌ Kunci API OpenRouter belum dipasang!")
+                            if not GEMINI_API_KEY:
+                                st.error("❌ Kunci API GEMINI belum dipasang di Secrets!")
                             else:
                                 saham_bersih = [s.strip().upper() for s in re.split(r'[,\s\n]+', input_v8) if s.strip()]
                                 saham_unik = list(dict.fromkeys(saham_bersih))
@@ -1085,7 +1073,7 @@ if not df_hasil.empty:
                                     'fibo': data_saham.get('Status Fibonacci', 'Normal')
                                 }
                                 
-                            hasil_kualifikasi = ai_penyisihan_turnamen(data_grup, OPENROUTER_API_KEY)
+                            hasil_kualifikasi = ai_penyisihan_turnamen(data_grup, GEMINI_API_KEY)
                             
                             if "SKIP_GRUP" not in hasil_kualifikasi and "ERROR" not in hasil_kualifikasi:
                                 lolos = [s.strip().upper() for s in hasil_kualifikasi.replace('`', '').split(',')]
@@ -1143,7 +1131,7 @@ if not df_hasil.empty:
                                         }
                                         
                                     try:
-                                        hasil_mentah, model_dipakai = ai_grand_final_top5(data_final, OPENROUTER_API_KEY)
+                                        hasil_mentah, model_dipakai = ai_grand_final_top5(data_final, GEMINI_API_KEY)
                                         
                                         # ========================================================
                                         # PEMURNI JSON OTOMATIS (Regex Cleaner)
