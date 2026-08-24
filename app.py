@@ -104,7 +104,7 @@ def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
     if not OPENROUTER_API_KEY: return "❌ Kunci API OpenRouter belum dipasang!"
 
     # MENGGUNAKAN JALUR AUTO-FREE DARI OPENROUTER
-    model_andalan = "google/gemini-1.5-flash" 
+    model_andalan = "openrouter/free" 
 
     try:
         client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
@@ -162,7 +162,7 @@ def analisa_forensik_ai(data_saham_dict, master_filters_keys):
     if not OPENROUTER_API_KEY: return "❌ Kunci API OpenRouter belum dipasang!"
 
     # MENGGUNAKAN JALUR AUTO-FREE DARI OPENROUTER
-    model_andalan = "google/gemini-1.5-flash" 
+    model_andalan = "openrouter/free" 
 
     try:
         client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
@@ -214,7 +214,7 @@ def ai_penyisihan_turnamen(data_grup_dict, api_key):
     import time
     from openai import OpenAI
     
-    model_andalan = "google/gemini-1.5-flash"
+    model_andalan = "meta-llama/llama-3.1-8b-instruct:free"
     
     # Ambil daftar saham asli yang sedang bertanding di grup ini
     saham_grup_ini = list(data_grup_dict.keys())
@@ -279,7 +279,7 @@ def ai_grand_final_top5(data_saham_dict, api_key):
     import pandas as pd
     import json
     
-    model_andalan = "google/gemini-1.5-flash"
+    model_andalan = "meta-llama/llama-3.1-8b-instruct:free"
 
     for attempt in range(3):
         try:
