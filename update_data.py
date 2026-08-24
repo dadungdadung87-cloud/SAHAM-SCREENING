@@ -148,6 +148,10 @@ def get_broksum_aman(ticker):
 
 # PENYADAP SENTIMEN BERITA GOOGLE NEWS
 def cek_sentimen_berita(ticker, session):
+    # TAMBAHKAN BARIS INI: Mesin akan langsung pulang tanpa ngecek Google
+    return "Netral / Sepi Berita" 
+    
+    # === KODE DI BAWAH INI TIDAK AKAN DIEKSEKUSI LAGI ===
     url = f"https://news.google.com/rss/search?q={ticker}+saham&hl=id&gl=ID&ceid=ID:id"
     try:
         resp = session.get(url, timeout=3)
