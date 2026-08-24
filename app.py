@@ -104,7 +104,7 @@ def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
     if not OPENROUTER_API_KEY: return "❌ Kunci API OpenRouter belum dipasang!"
 
     # MENGGUNAKAN JALUR AUTO-FREE DARI OPENROUTER
-    model_andalan = "openrouter/free" 
+    model_andalan = "google/gemini-1.5-flash" 
 
     try:
         client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
@@ -162,7 +162,7 @@ def analisa_forensik_ai(data_saham_dict, master_filters_keys):
     if not OPENROUTER_API_KEY: return "❌ Kunci API OpenRouter belum dipasang!"
 
     # MENGGUNAKAN JALUR AUTO-FREE DARI OPENROUTER
-    model_andalan = "openrouter/free" 
+    model_andalan = "google/gemini-1.5-flash" 
 
     try:
         client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
@@ -214,7 +214,7 @@ def ai_penyisihan_turnamen(data_grup_dict, api_key):
     import time
     from openai import OpenAI
     
-    model_andalan = "openrouter/free"
+    model_andalan = "google/gemini-1.5-flash"
     
     for attempt in range(3):
         try:
@@ -261,8 +261,10 @@ def ai_grand_final_top5(data_saham_dict, api_key):
     import re
     import time
     from openai import OpenAI
+    import pandas as pd
+    import json
     
-    model_andalan = "openrouter/free"
+    model_andalan = "google/gemini-1.5-flash"
 
     for attempt in range(3):
         try:
@@ -271,7 +273,7 @@ def ai_grand_final_top5(data_saham_dict, api_key):
             for ticker, data in data_saham_dict.items():
                 payload_text += f"\n--- {ticker} ---\n Harga: {data['harga']} | Vol: {data['volume']} | Broksum: {data['broksum']} | Tekanan: {data['tekanan_bandar']} | Supply: {data['supply']} | OBV: {data['obv']} | Fibo: {data['fibo']} | VWAP: {data['vwap']} | Candle: {data['pola_candle']}\n"
 
-            # PROMPT DIUBAH MENJADI MODE SIMULASI EDUKASI AGAR LOLOS SENSOR
+            # PROMPT: Ditambahkan instruksi WAJIB menggunakan Bahasa Indonesia untuk Alasan
             prompt = f"""
             Act as an objective data formatting tool for a hypothetical academic simulation. THIS DOES NOT CONSTITUTE FINANCIAL ADVICE.
             Evaluate these fictionalized mathematical metrics:
@@ -286,9 +288,11 @@ def ai_grand_final_top5(data_saham_dict, api_key):
             DO NOT wrap your response in markdown code blocks (DO NOT use ```json or ```).
             Your response must start exactly with '[' and end exactly with ']'.
             
+            VERY IMPORTANT: The text inside the "Alasan" key MUST be written in fluent Bahasa Indonesia.
+            
             Format EXACTLY like this:
             [
-              {{"Peringkat": 1, "Ticker": "GOTO", "Alasan": "High theoretical volume accumulation", "Target_TP": 60, "Target_CL": 50}}
+              {{"Peringkat": 1, "Ticker": "GOTO", "Alasan": "Akumulasi volume sangat tinggi dengan tekanan beli dominan", "Target_TP": 60, "Target_CL": 50}}
             ]
             """
             
@@ -307,7 +311,7 @@ def ai_grand_final_top5(data_saham_dict, api_key):
             if attempt < 2: 
                 time.sleep(4)
                 continue
-            raise Exception(f"Connection Error setelah 3x percobaan ulang. Error: {e}")
+            raise Exception(f"Connection Error setelah 3x percobaan. Error: {e}")
 
 # ==========================================
 # PENGATURAN UI/UX & API
@@ -1088,8 +1092,24 @@ if not df_hasil.empty:
                                                 st.balloons()
                                                 
                                                 with st.container():
-                                                    st.markdown("---")
-                                                    st.table(df_tampil)
+                                                    st.markdown("### 🏆 Hasil Keputusan Grand Final AI")
+                                                    
+                                                    # Atur kolom Peringkat menjadi index agar rapi (angka 0,1,2,3 di kiri hilang)
+                                                    if "Peringkat" in df_tampil.columns:
+                                                        df_tampil.set_index("Peringkat", inplace=True)
+                                                    
+                                                    # Gunakan data_editor / dataframe dengan tampilan kustom
+                                                    import streamlit as st
+                                                    st.dataframe(
+                                                        df_tampil,
+                                                        use_container_width=True,
+                                                        column_config={
+                                                            "Ticker": st.column_config.TextColumn("Kode Saham", width="small"),
+                                                            "Alasan": st.column_config.TextColumn("🧠 Alasan Analisis AI", width="large"),
+                                                            "Target_TP": st.column_config.NumberColumn("🎯 Target TP (Rp)", format="%d"),
+                                                            "Target_CL": st.column_config.NumberColumn("✂️ Target CL (Rp)", format="%d")
+                                                        }
+                                                    )
                                                     st.markdown("---")
                                                 
                                                 if 'Target_TP' in df_tampil.columns and 'Target_CL' in df_tampil.columns:
