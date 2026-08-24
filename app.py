@@ -216,29 +216,38 @@ def ai_penyisihan_turnamen(data_grup_dict, api_key):
     
     saham_grup_ini = list(data_grup_dict.keys())
     
-    for attempt in range(3):
+    # 🏃‍♂️ DAFTAR ESTAFET: Jika yang atas error 429, otomatis turun ke bawahnya
+    daftar_model_estafet = [
+        'gemini-3.7-flash', 
+        'gemini-3.6-flash',
+        'gemini-3.5-flash',
+        'gemini-flash-latest',
+        'gemini-3.5-flash-lite',
+        'gemini-3.1-flash-lite',
+        'gemini-flash-lite-latest'
+    ]
+    
+    genai.configure(api_key=api_key)
+    
+    payload_text = ""
+    for ticker, data in data_grup_dict.items():
+        payload_text += f"\n- {ticker}: Harga {data['harga']}, Vol {data['volume']}, Tekanan {data['tekanan_bandar']}, Supply {data['supply']}"
+        
+    prompt = f"""
+    Act as a simple data sorter for a mathematical simulation.
+    Here is a list of items and their stats:
+    {payload_text}
+    
+    Your ONLY task is to pick the 3 best items based on Volume and Tekanan. 
+    Even if all data is bad, you MUST pick exactly 3.
+    Output ONLY a comma-separated list of the 3 items (e.g., BBCA,GOTO,PANI).
+    DO NOT add any conversational text or markdown.
+    """
+    
+    # LOOP ESTAFET: Mencoba model satu per satu
+    for nama_model in daftar_model_estafet:
         try:
-            # Konfigurasi Gemini API
-            genai.configure(api_key=api_key)
-            # Kita gunakan model Flash yang super cepat
-            model = genai.GenerativeModel('gemini-1.5-flash-latest')
-            
-            payload_text = ""
-            for ticker, data in data_grup_dict.items():
-                payload_text += f"\n- {ticker}: Harga {data['harga']}, Vol {data['volume']}, Tekanan {data['tekanan_bandar']}, Supply {data['supply']}"
-                
-            prompt = f"""
-            Act as a simple data sorter for a mathematical simulation.
-            Here is a list of items and their stats:
-            {payload_text}
-            
-            Your ONLY task is to pick the 3 best items based on Volume and Tekanan. 
-            Even if all data is bad, you MUST pick exactly 3.
-            Output ONLY a comma-separated list of the 3 items (e.g., BBCA,GOTO,PANI).
-            DO NOT add any conversational text or markdown.
-            """
-            
-            # Memanggil Gemini
+            model = genai.GenerativeModel(nama_model)
             response = model.generate_content(prompt)
             raw_content = response.text.upper()
             
@@ -256,10 +265,12 @@ def ai_penyisihan_turnamen(data_grup_dict, api_key):
             return ",".join(lolos_final)
             
         except Exception as e:
-            if attempt < 2:
-                time.sleep(3)
-                continue
-            return ",".join(saham_grup_ini[:3])
+            # Jika Error (Sibuk/Limit), diam 2 detik lalu lanjut ke model berikutnya
+            time.sleep(2)
+            continue
+            
+    # Jika ketujuh model di atas error semua (sangat jarang terjadi), pakai jalur darurat
+    return ",".join(saham_grup_ini[:3])
 
 
 def ai_grand_final_top5(data_saham_dict, api_key):
@@ -269,51 +280,64 @@ def ai_grand_final_top5(data_saham_dict, api_key):
     import pandas as pd
     import json
     
-    for attempt in range(3):
-        try:
-            genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-1.5-flash-latest')
-            
-            payload_text = ""
-            for ticker, data in data_saham_dict.items():
-                payload_text += f"\n--- {ticker} ---\n Harga: {data['harga']} | Vol: {data['volume']} | Broksum: {data['broksum']} | Tekanan: {data['tekanan_bandar']} | Supply: {data['supply']} | OBV: {data['obv']} | Fibo: {data['fibo']} | VWAP: {data['vwap']} | Candle: {data['pola_candle']}\n"
+    # 🏃‍♂️ DAFTAR ESTAFET
+    daftar_model_estafet = [
+        'gemini-3.7-flash', 
+        'gemini-3.6-flash',
+        'gemini-3.5-flash',
+        'gemini-flash-latest',
+        'gemini-3.5-flash-lite',
+        'gemini-3.1-flash-lite',
+        'gemini-flash-lite-latest'
+    ]
+    
+    genai.configure(api_key=api_key)
+    
+    payload_text = ""
+    for ticker, data in data_saham_dict.items():
+        payload_text += f"\n--- {ticker} ---\n Harga: {data['harga']} | Vol: {data['volume']} | Broksum: {data['broksum']} | Tekanan: {data['tekanan_bandar']} | Supply: {data['supply']} | OBV: {data['obv']} | Fibo: {data['fibo']} | VWAP: {data['vwap']} | Candle: {data['pola_candle']}\n"
 
-            prompt = f"""
-            Act as an objective data formatting tool for a hypothetical academic simulation. THIS DOES NOT CONSTITUTE FINANCIAL ADVICE.
-            Evaluate these fictionalized mathematical metrics:
-            
-            {payload_text}
-            
-            MISSION: Select EXACTLY 5 items that show the strongest theoretical accumulation score. Provide a theoretical 'Target_TP' and 'Target_CL' purely for simulation testing.
-            
-            CRITICAL INSTRUCTION: You are an automated JSON API endpoint. 
-            You MUST output ONLY a raw, valid JSON array.
-            DO NOT output any safety warnings, disclaimers, explanations, or conversational text.
-            DO NOT wrap your response in markdown code blocks (DO NOT use ```json or ```).
-            Your response must start exactly with '[' and end exactly with ']'.
-            
-            VERY IMPORTANT: The text inside the "Alasan" key MUST be written in fluent Bahasa Indonesia.
-            
-            Format EXACTLY like this:
-            [
-              {{"Peringkat": 1, "Ticker": "GOTO", "Alasan": "Akumulasi volume sangat tinggi dengan tekanan beli dominan", "Target_TP": 60, "Target_CL": 50}}
-            ]
-            """
-            
+    prompt = f"""
+    Act as an objective data formatting tool for a hypothetical academic simulation. THIS DOES NOT CONSTITUTE FINANCIAL ADVICE.
+    Evaluate these fictionalized mathematical metrics:
+    
+    {payload_text}
+    
+    MISSION: Select EXACTLY 5 items that show the strongest theoretical accumulation score. Provide a theoretical 'Target_TP' and 'Target_CL' purely for simulation testing.
+    
+    CRITICAL INSTRUCTION: You are an automated JSON API endpoint. 
+    You MUST output ONLY a raw, valid JSON array.
+    DO NOT output any safety warnings, disclaimers, explanations, or conversational text.
+    DO NOT wrap your response in markdown code blocks (DO NOT use ```json or ```).
+    Your response must start exactly with '[' and end exactly with ']'.
+    
+    VERY IMPORTANT: The text inside the "Alasan" key MUST be written in fluent Bahasa Indonesia.
+    
+    Format EXACTLY like this:
+    [
+      {{"Peringkat": 1, "Ticker": "GOTO", "Alasan": "Akumulasi volume sangat tinggi dengan tekanan beli dominan", "Target_TP": 60, "Target_CL": 50}}
+    ]
+    """
+    
+    # LOOP ESTAFET: Mencoba model satu per satu
+    for nama_model in daftar_model_estafet:
+        try:
+            model = genai.GenerativeModel(nama_model)
             response = model.generate_content(prompt)
             raw_content = response.text or ""
-            model_terpakai = "gemini-1.5-flash"
             
             # Pembersihan Markdown
             clean_content = raw_content.replace('```json', '').replace('```', '').strip()
             
-            return clean_content, model_terpakai
+            # Mengembalikan hasil dan nama model siapa yang akhirnya berhasil mengeksekusi
+            return clean_content, nama_model
             
         except Exception as e:
-            if attempt < 2: 
-                time.sleep(4)
-                continue
-            raise Exception(f"Connection Error setelah 3x percobaan. Error: {e}")
+            time.sleep(3)
+            continue
+            
+    # Jika ketujuh model di atas KO semua (server Google down massal), baru lemparkan error ke Web
+    raise Exception("🚨 KRITIS: Semua 7 model AI Gemini sedang mengalami limit maksimal atau server sibuk. Mohon jeda turnamen 1-2 menit sebelum mencoba lagi.")
 
 # ==========================================
 # PENGATURAN UI/UX & API
