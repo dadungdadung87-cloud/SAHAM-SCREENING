@@ -1024,7 +1024,7 @@ if not df_hasil.empty:
 
                 elif "Pemburu ARA" in pilihan_ai:
                     st.subheader("🎯 Turnamen AI (Spesialis Akumulasi Siluman)")
-                    st.markdown("Paste ratusan (bahkan 900+) saham di sini. Mesin akan melakukan kualifikasi brutal (5 saham/menit) secara estafet.")
+                    st.markdown("Pilih arena rumus di bawah ini. Mesin akan otomatis menarik saham yang lolos, lalu melakukan kualifikasi brutal (5 saham/menit) secara estafet.")
                     
                     if 'radar_aktif' not in st.session_state:
                         st.session_state.radar_aktif = False
@@ -1035,12 +1035,24 @@ if not df_hasil.empty:
                         st.session_state.semi_finalists = []
                         st.session_state.file_ekspor = "Database/sinyal_ai_rumus_1.csv"
 
-                    # Tarik kunci API Gemini
                     GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
                     
                     if not st.session_state.radar_aktif:
-                        input_v8 = st.text_area("📋 Paste Daftar Saham (Pisahkan dengan Enter/Spasi):", placeholder="Contoh:\nVISI\nPANI\nDMAS", height=200, key="input_pemburu_ara")
-                        pilihan_arena_ekspor = st.selectbox("Simpan Sinyal Final Ke Arena Bot:", ["Rumus 1", "Rumus 2", "Rumus 3", "Rumus 4", "Rumus 5", "Rumus 6", "Rumus 7", "Rumus 8", "Rumus 9"])
+                        # 1. PINDAHKAN DROPDOWN KE ATAS
+                        pilihan_arena_ekspor = st.selectbox("📂 1. Pilih Sumber Data & Simpan Sinyal Ke Arena Bot:", ["Rumus 1", "Rumus 2", "Rumus 3", "Rumus 4", "Rumus 5", "Rumus 6", "Rumus 7", "Rumus 8", "Rumus 9"])
+                        
+                        # 2. SISTEM SEDOT DATA OTOMATIS
+                        peta_rumus = {
+                            "Rumus 1": df_v1, "Rumus 2": df_v2, "Rumus 3": df_v3, 
+                            "Rumus 4": df_v4, "Rumus 5": df_v5, "Rumus 6": df_v6, 
+                            "Rumus 7": df_v7, "Rumus 8": df_v8, "Rumus 9": df_v9
+                        }
+                        df_terpilih = peta_rumus[pilihan_arena_ekspor]
+                        saham_otomatis = "\n".join(df_terpilih['Ticker'].tolist()) if not df_terpilih.empty else ""
+                        
+                        # 3. KOTAK TEKS OTOMATIS TERISI
+                        st.markdown(f"**Terdapat {len(df_terpilih)} saham yang ditarik dari {pilihan_arena_ekspor}:**")
+                        input_v8 = st.text_area("📋 2. Daftar Saham Turnamen (Bisa diedit manual jika perlu):", value=saham_otomatis, height=200, key=f"input_pemburu_ara_{pilihan_arena_ekspor}")
                         
                         if st.button("🚀 Mulai Turnamen Otomatis"):
                             if not GEMINI_API_KEY:
