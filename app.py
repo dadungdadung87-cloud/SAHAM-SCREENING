@@ -221,7 +221,7 @@ def ai_penyisihan_turnamen(data_grup_dict, api_key):
             # Konfigurasi Gemini API
             genai.configure(api_key=api_key)
             # Kita gunakan model Flash yang super cepat
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            model = genai.GenerativeModel('gemini-1.5-flash-latest')
             
             payload_text = ""
             for ticker, data in data_grup_dict.items():
@@ -272,7 +272,7 @@ def ai_grand_final_top5(data_saham_dict, api_key):
     for attempt in range(3):
         try:
             genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            model = genai.GenerativeModel('gemini-1.5-flash-latest')
             
             payload_text = ""
             for ticker, data in data_saham_dict.items():
