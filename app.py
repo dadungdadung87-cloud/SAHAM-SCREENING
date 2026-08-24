@@ -1235,14 +1235,16 @@ if not df_hasil.empty:
             with st.spinner("Bot sedang membaca sinyal dan mengeksekusi pembelian..."):
                 import subprocess
                 import time
+                import sys  # <-- Kita butuh ini untuk mencari jalur Python yang benar
+                
                 try:
-                    # Menjalankan skrip bot dan menangkap output log-nya
-                    proses_bot = subprocess.run(["python", "bot_simulator.py"], capture_output=True, text=True)
+                    # GANTI "python" menjadi sys.executable
+                    proses_bot = subprocess.run([sys.executable, "bot_simulator.py"], capture_output=True, text=True)
                     
                     # Jika bot gagal (exit code bukan 0)
                     if proses_bot.returncode != 0:
                         st.error("❌ Bot gagal dijalankan. Berikut adalah log error dari sistem:")
-                        st.code(proses_bot.stderr, language="bash") # Ini akan memunculkan tulisan merah penyebab aslinya
+                        st.code(proses_bot.stderr, language="bash")
                     else:
                         st.success("✅ Bot selesai berbelanja! Memuat ulang halaman...")
                         time.sleep(2)
