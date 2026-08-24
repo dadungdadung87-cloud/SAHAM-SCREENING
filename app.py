@@ -920,40 +920,111 @@ if not df_hasil.empty:
                                 st.info(hasil_ai)
 
                 elif "Forensik Bandar" in pilihan_ai:
-                    st.subheader("🔎 Forensik Bandar (Bongkar DNA Top Gainer)")
-                    st.markdown("Paste saham-saham yang **HARI INI ARA ATAU NAIK >10%**. AI akan memutar mundur waktu ke H-3, membongkar polanya, dan menciptakan racikan *Screener* untuk Anda!")
-                    input_forensik = st.text_area("📋 Paste Daftar Saham ARA/Top Gainer Hari Ini:", placeholder="Contoh:\nVISI\nBBHI\nPANI", height=200, key="input_forensik")
+                    st.subheader("🔬 Laboratorium Penguji Model AI (Auto-Tester)")
+                    st.markdown("Masukkan beberapa kode saham dari hasil Screener. Mesin akan menguji belasan model AI gratis dari OpenRouter satu per satu untuk mencari mana yang paling aktif, pintar, dan patuh format untuk web Anda.")
                     
-                    if st.button("🔬 Mulai Proses Forensik"):
-                        saham_bersih = [s.strip().upper() for s in re.split(r'[,\s\n]+', input_forensik) if s.strip()]
-                        saham_unik = list(dict.fromkeys(saham_bersih))
-                        saham_valid = [s for s in saham_unik if s in df_hasil['Ticker'].values]
-                        
-                        if not saham_valid:
-                            st.error("❌ Kode saham tidak ditemukan di database hari ini.")
+                    input_tester = st.text_area("📋 Paste Daftar Saham Uji Coba (Minimal 3 Saham):", placeholder="Contoh:\nVISI\nBBHI\nPANI", height=150, key="input_tester")
+                    
+                    if st.button("🚀 Mulai Uji Coba Massal Model AI"):
+                        OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY", os.environ.get("OPENROUTER_API_KEY"))
+                        if not OPENROUTER_API_KEY:
+                            st.error("❌ Kunci API OpenRouter belum dipasang!")
                         else:
-                            if len(saham_valid) > 15:
-                                st.warning("⚠️ Untuk analisa mendalam H-3, kami membatasi max 15 saham agar AI lebih fokus.")
-                                saham_valid = saham_valid[:15]
+                            saham_bersih = [s.strip().upper() for s in re.split(r'[,\s\n]+', input_tester) if s.strip()]
+                            saham_unik = list(dict.fromkeys(saham_bersih))
+                            saham_valid = [s for s in saham_unik if s in df_hasil['Ticker'].values]
+                            
+                            if len(saham_valid) < 2:
+                                st.error("❌ Masukkan minimal 2 kode saham yang valid di database hari ini.")
+                            else:
+                                # DAFTAR KANDIDAT MODEL GRATIS OPENROUTER
+                                daftar_model_gratis = [
+                                    "meta-llama/llama-3.1-8b-instruct:free",
+                                    "meta-llama/llama-3-8b-instruct:free",
+                                    "google/gemma-2-9b-it:free",
+                                    "google/gemma-7b-it:free",
+                                    "qwen/qwen-2-7b-instruct:free",
+                                    "qwen/qwen-2.5-7b-instruct:free",
+                                    "microsoft/phi-3-mini-128k-instruct:free",
+                                    "microsoft/phi-3-medium-128k-instruct:free",
+                                    "mistralai/mistral-7b-instruct:free",
+                                    "huggingfaceh4/zephyr-7b-beta:free",
+                                    "openchat/openchat-7b:free",
+                                    "undi95/toppy-m-7b:free",
+                                    "gryphe/mythomax-l2-13b:free",
+                                    "cognitivecomputations/dolphin-mixtral-8x7b:free",
+                                    "nousresearch/hermes-2-pro-llama-3-8b:free",
+                                    "cohere/north-mini-code:free",
+                                    "cohere/command-r-plus-08-2024:free"
+                                ]
                                 
-                            with st.spinner(f"Memutar mesin waktu ke H-3 untuk {len(saham_valid)} saham. Mencari DNA Bandar..."):
-                                data_kompilasi = {}
+                                st.info(f"Dimulai! Menguji {len(daftar_model_gratis)} model AI berbeda. Ini mungkin memakan waktu beberapa menit...")
+                                progress_bar = st.progress(0)
+                                status_text = st.empty()
+                                
+                                # Menyiapkan data saham untuk tes
+                                payload_text = ""
                                 for ticker in saham_valid:
                                     data_saham = df_hasil[df_hasil['Ticker'] == ticker].iloc[0]
-                                    teks_histori = get_forensic_data(ticker)
-                                    if teks_histori and "belum tersedia" not in teks_histori:
-                                        data_kompilasi[ticker] = {
-                                            'broksum': data_saham.get('Broksum', 'Tidak Ada'),
-                                            'histori': teks_histori
-                                        }
+                                    payload_text += f"\n- {ticker}: Harga {data_saham.get('Harga (Rp)', 0)}, Vol {data_saham.get('Volume', 0)}"
+
+                                prompt_test = f"""
+                                Act as a strict data parser. Read this data:
+                                {payload_text}
                                 
-                                if not data_kompilasi:
-                                    st.error("❌ Data arsip masa lalu (H-3) tidak ditemukan untuk saham-saham ini.")
-                                else:
-                                    daftar_kategori_web = ", ".join(MASTER_FILTERS.keys())
-                                    hasil_ai = analisa_forensik_ai(data_kompilasi, daftar_kategori_web)
-                                    st.success("✅ DNA Berhasil Dibongkar!")
-                                    st.info(hasil_ai)
+                                You MUST pick exactly 1 best ticker. 
+                                Output ONLY the ticker name (e.g., BBCA). DO NOT output any other text or explanation.
+                                """
+                                
+                                from openai import OpenAI
+                                client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
+                                
+                                hasil_rekap = []
+                                
+                                for i, model_id in enumerate(daftar_model_gratis):
+                                    status_text.text(f"⏳ Sedang menguji: {model_id} ({i+1}/{len(daftar_model_gratis)})")
+                                    
+                                    try:
+                                        completion = client.chat.completions.create(
+                                            model=model_id, 
+                                            messages=[{"role": "user", "content": prompt_test}],
+                                            temperature=0.1, 
+                                            max_tokens=50, 
+                                            stream=False,
+                                        )
+                                        raw_content = completion.choices[0].message.content or ""
+                                        
+                                        # Evaluasi apakah AI ini patuh format (menjawab pendek, bukan pidato)
+                                        if len(raw_content.strip()) < 15 and raw_content.strip().upper() in saham_valid:
+                                            status = "✅ Lulus & Patuh"
+                                        else:
+                                            status = f"⚠️ Aktif tapi Bawel (Jawab: {raw_content.strip()[:30]}...)"
+                                            
+                                        hasil_rekap.append({"Nama Model": model_id, "Status": status})
+                                        
+                                    except Exception as e:
+                                        pesan_error = str(e)
+                                        if "404" in pesan_error:
+                                            alasan = "❌ Gagal (Tidak Tersedia Gratis)"
+                                        elif "400" in pesan_error:
+                                            alasan = "❌ Gagal (ID Model Ditolak)"
+                                        else:
+                                            alasan = "❌ Gagal (Koneksi Putus)"
+                                            
+                                        hasil_rekap.append({"Nama Model": model_id, "Status": alasan})
+                                    
+                                    # Update progress & jeda 2 detik agar tidak diblokir server
+                                    progress_bar.progress((i + 1) / len(daftar_model_gratis))
+                                    time.sleep(2)
+                                
+                                status_text.success("🎉 Uji Coba Selesai!")
+                                
+                                # Tampilkan Hasil
+                                df_rekap = pd.DataFrame(hasil_rekap)
+                                st.markdown("### 🏆 Hasil Uji Coba Model AI Hari Ini")
+                                st.dataframe(df_rekap, use_container_width=True)
+                                
+                                st.info("💡 **TUGAS SELANJUTNYA:** Salin nama-nama model yang berstatus '✅ Lulus & Patuh', lalu berikan daftarnya kepada AI Asisten Anda untuk dianalisis!")
 
                 elif "Pemburu ARA" in pilihan_ai:
                     st.subheader("🎯 Turnamen AI (Spesialis Akumulasi Siluman)")
