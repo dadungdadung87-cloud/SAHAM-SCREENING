@@ -907,15 +907,15 @@ if not df_hasil.empty:
                                 st.info(hasil_ai)
 
                 elif "Forensik Bandar" in pilihan_ai:
-                    st.subheader("📡 Radar Pencari Model AI Aktif (Live Server)")
-                    st.markdown("Mesin ini akan membobol katalog OpenRouter untuk mencari **semua model gratis yang aktif detik ini**, lalu mengujinya satu per satu menggunakan saham yang Anda masukkan.")
+                    st.subheader("📡 Radar Pencari Model Gemini Aktif (Live Server)")
+                    st.markdown("Mesin ini akan bertanya langsung ke server Google AI Studio untuk mencari **semua nama model Gemini yang valid dan mendukung fitur Generate Content** untuk API Key Anda, lalu mengujinya satu per satu.")
                     
-                    input_tester = st.text_area("📋 Paste Daftar Saham Uji Coba (Minimal 3 Saham):", placeholder="Contoh:\nVISI\nBBHI\nPANI", height=150, key="input_tester")
+                    input_tester = st.text_area("📋 Paste Daftar Saham Uji Coba (Minimal 3 Saham):", placeholder="Contoh:\nVISI\nBBHI\nPANI", height=150, key="input_tester_gemini")
                     
-                    if st.button("🚀 Tarik Daftar Server & Mulai Uji Coba"):
-                        OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY", os.environ.get("OPENROUTER_API_KEY"))
-                        if not OPENROUTER_API_KEY:
-                            st.error("❌ Kunci API OpenRouter belum dipasang!")
+                    if st.button("🚀 Tarik Daftar Server Google & Mulai Uji Coba"):
+                        GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
+                        if not GEMINI_API_KEY:
+                            st.error("❌ Kunci API GEMINI belum dipasang di Secrets!")
                         else:
                             saham_bersih = [s.strip().upper() for s in re.split(r'[,\s\n]+', input_tester) if s.strip()]
                             saham_unik = list(dict.fromkeys(saham_bersih))
@@ -924,83 +924,79 @@ if not df_hasil.empty:
                             if len(saham_valid) < 2:
                                 st.error("❌ Masukkan minimal 2 kode saham yang valid di database hari ini.")
                             else:
-                                st.info("🔄 Langkah 1: Meminta katalog model gratis terbaru langsung dari pusat data OpenRouter...")
+                                st.info("🔄 Langkah 1: Meminta katalog model langsung dari server Google AI...")
                                 
-                                import requests
-                                daftar_model_gratis = []
+                                import google.generativeai as genai
+                                import time
+                                import pandas as pd
+                                
+                                daftar_model_aktif = []
                                 try:
-                                    headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}"}
-                                    resp = requests.get("https://openrouter.ai/api/v1/models", headers=headers)
-                                    if resp.status_code == 200:
-                                        semua_model = resp.json().get("data", [])
-                                        # Menyaring HANYA model yang namanya berakhiran :free
-                                        daftar_model_gratis = [m["id"] for m in semua_model if str(m.get("id", "")).endswith(":free")]
+                                    genai.configure(api_key=GEMINI_API_KEY)
+                                    # Menarik semua model yang mendukung text generation
+                                    for m in genai.list_models():
+                                        if 'generateContent' in m.supported_generation_methods:
+                                            # Nama model dari Google biasanya berformat 'models/nama-model'
+                                            daftar_model_aktif.append(m.name)
                                 except Exception as e:
-                                    st.error(f"Gagal menarik data dari server OpenRouter. Error: {e}")
+                                    st.error(f"Gagal menarik data dari server Google. Error: {e}")
                                 
-                                if not daftar_model_gratis:
-                                    st.warning("⚠️ Server OpenRouter tidak merespons daftar gratis. Menggunakan jalur darurat (openrouter/free).")
-                                    daftar_model_gratis = ["openrouter/free"]
-                                
-                                st.success(f"✅ Ditemukan {len(daftar_model_gratis)} model gratis yang sedang online! Memulai pengujian...")
-                                
-                                progress_bar = st.progress(0)
-                                status_text = st.empty()
-                                
-                                payload_text = ""
-                                for ticker in saham_valid:
-                                    data_saham = df_hasil[df_hasil['Ticker'] == ticker].iloc[0]
-                                    payload_text += f"\n- {ticker}: Harga {data_saham.get('Harga (Rp)', 0)}, Vol {data_saham.get('Volume', 0)}"
+                                if not daftar_model_aktif:
+                                    st.warning("⚠️ Tidak ada model yang ditemukan untuk API Key ini.")
+                                else:
+                                    st.success(f"✅ Ditemukan {len(daftar_model_aktif)} model Gemini yang online untuk Anda! Memulai pengujian...")
+                                    
+                                    progress_bar = st.progress(0)
+                                    status_text = st.empty()
+                                    
+                                    payload_text = ""
+                                    for ticker in saham_valid:
+                                        data_saham = df_hasil[df_hasil['Ticker'] == ticker].iloc[0]
+                                        payload_text += f"\n- {ticker}: Harga {data_saham.get('Harga (Rp)', 0)}, Vol {data_saham.get('Volume', 0)}"
 
-                                # PROMPT diubah agar model "Bawel" bisa dipaksa patuh
-                                prompt_test = f"""
-                                CRITICAL INSTRUCTION: You are an automated data filter. 
-                                Read this data:
-                                {payload_text}
-                                
-                                MISSION: Pick EXACTLY 1 best ticker based on volume.
-                                STRICT RULE: Output ONLY the 4-letter ticker code (e.g., BBCA). DO NOT add any other words, punctuation, explanations, or formatting.
-                                """
-                                
-                                from openai import OpenAI
-                                client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
-                                
-                                hasil_rekap = []
-                                
-                                for i, model_id in enumerate(daftar_model_gratis):
-                                    status_text.text(f"⏳ Sedang menguji: {model_id} ({i+1}/{len(daftar_model_gratis)})")
+                                    prompt_test = f"""
+                                    CRITICAL INSTRUCTION: You are an automated data filter. 
+                                    Read this data:
+                                    {payload_text}
                                     
-                                    try:
-                                        completion = client.chat.completions.create(
-                                            model=model_id, 
-                                            messages=[{"role": "user", "content": prompt_test}],
-                                            temperature=0.1, 
-                                            max_tokens=20, 
-                                            stream=False,
-                                        )
-                                        raw_content = completion.choices[0].message.content or ""
-                                        bersih = raw_content.replace('`', '').replace('.', '').replace('\n', '').strip().upper()
+                                    MISSION: Pick EXACTLY 1 best ticker based on volume.
+                                    STRICT RULE: Output ONLY the 4-letter ticker code (e.g., BBCA). DO NOT add any other words, punctuation, explanations, or formatting.
+                                    """
+                                    
+                                    hasil_rekap = []
+                                    
+                                    for i, nama_model in enumerate(daftar_model_aktif):
+                                        # Karena nama model formatnya 'models/gemini-xxx', kita hilangkan 'models/' agar bersih
+                                        model_id_bersih = nama_model.replace("models/", "")
+                                        status_text.text(f"⏳ Sedang menguji: {model_id_bersih} ({i+1}/{len(daftar_model_aktif)})")
                                         
-                                        if bersih in saham_valid:
-                                            status = "✅ Lulus & Patuh (Sangat Cocok!)"
-                                        else:
-                                            status = f"⚠️ Aktif tapi Bawel (Jawab: {raw_content.strip()[:25]}...)"
+                                        try:
+                                            model_uji = genai.GenerativeModel(model_id_bersih)
+                                            response = model_uji.generate_content(prompt_test)
+                                            raw_content = response.text or ""
+                                            bersih = raw_content.replace('`', '').replace('.', '').replace('\n', '').strip().upper()
                                             
-                                        hasil_rekap.append({"Nama Model": model_id, "Status": status})
+                                            if bersih in saham_valid:
+                                                status = "✅ Lulus & Patuh (Sangat Cocok!)"
+                                            else:
+                                                status = f"⚠️ Aktif tapi Bawel (Jawab: {raw_content.strip()[:25]}...)"
+                                                
+                                            hasil_rekap.append({"Nama Model": model_id_bersih, "Status": status})
+                                            
+                                        except Exception as e:
+                                            pesan_error = str(e)
+                                            hasil_rekap.append({"Nama Model": model_id_bersih, "Status": f"❌ Gagal: {pesan_error[:30]}..."})
                                         
-                                    except Exception as e:
-                                        hasil_rekap.append({"Nama Model": model_id, "Status": "❌ Gagal Terkoneksi"})
+                                        progress_bar.progress((i + 1) / len(daftar_model_aktif))
+                                        time.sleep(2) # Jeda agar tidak kena rate limit
                                     
-                                    progress_bar.progress((i + 1) / len(daftar_model_gratis))
-                                    time.sleep(2) # Jeda agar tidak diblokir OpenRouter
-                                
-                                status_text.success("🎉 Pengecekan Server Selesai!")
-                                
-                                df_rekap = pd.DataFrame(hasil_rekap)
-                                st.markdown("### 🏆 Hasil Uji Coba Model AI (Live Server)")
-                                st.dataframe(df_rekap, use_container_width=True)
-                                
-                                st.info("💡 **INFO:** Model dengan status '✅ Lulus & Patuh' adalah model yang siap digunakan untuk skrip Turnamen Anda!")
+                                    status_text.success("🎉 Pengecekan Server Google Selesai!")
+                                    
+                                    df_rekap = pd.DataFrame(hasil_rekap)
+                                    st.markdown("### 🏆 Hasil Uji Coba Model Gemini (Live Server)")
+                                    st.dataframe(df_rekap, use_container_width=True)
+                                    
+                                    st.info("💡 **TUGAS ANDA:** Salin nama model yang berstatus '✅ Lulus & Patuh', dan kita gunakan nama pasti itu untuk skrip turnamen!")
 
                 elif "Pemburu ARA" in pilihan_ai:
                     st.subheader("🎯 Turnamen AI (Spesialis Akumulasi Siluman)")
