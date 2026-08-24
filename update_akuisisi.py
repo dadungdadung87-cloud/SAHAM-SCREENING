@@ -1,6 +1,8 @@
-import feedparser
 import pandas as pd
 import os
+from urllib.parse import quote_plus
+from urllib.request import urlopen
+from xml.etree import ElementTree
 
 def load_keywords(filename):
     """Memuat daftar kata kunci dari file txt."""

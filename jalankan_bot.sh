@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Masuk ke folder repositori
-cd /home/kaltaraid/Documents/ANALISA-SAHAM/
+cd /home/kaltaraid/Documents/SAHAM-SCREENING/
 
 # 1. Jalankan skrip Python untuk update data bursa
 /usr/bin/python update_data.py
