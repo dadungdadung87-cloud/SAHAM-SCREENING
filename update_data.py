@@ -545,18 +545,32 @@ def main():
         print("⚡ Memproses teknikal, fundamental, berita & broksum secara Paralel (Safe Mode)...")
         
         def proses_saham(ticker):
-            time.sleep(random.uniform(0.1, 0.5)) 
-            
+            # HAPUS time.sleep dari sini agar mesin bisa ngebut maksimal!
             try:
                 t_jk = f"{ticker}.JK"
                 if t_jk in data_mentah:
                     df_saham = data_mentah[t_jk].dropna(subset=['Open', 'Close', 'Volume', 'High', 'Low'])
                     if len(df_saham) >= 50:
+                        
+                        # --- 1. FILTER SAHAM ZOMBIE (Trik Super Cepat) ---
+                        vol_today = int(df_saham['Volume'].iloc[-1].item())
+                        harga_today = df_saham['Close'].iloc[-1].item()
+                        
+                        # Jika hari ini tidak ada transaksi sama sekali, LANGSUNG SKIP (Hemat 70% waktu!)
+                        if vol_today == 0:
+                            return None
+
                         ind = hitung_semua_indikator(df_saham, ticker, aman_session)
                         kat, per, pbv = get_fundamental(t_jk)
                         
-                        # Sadap Broksum Stockbit
-                        broksum_info = get_broksum_aman(ticker)
+                        # --- 2. FILTER BROKSUM PINTAR ---
+                        # Hanya curi data bandar jika transaksinya lebih dari Rp 1 Miliar hari ini
+                        val_transaksi = vol_today * harga_today
+                        if val_transaksi > 1000000000:
+                            time.sleep(random.uniform(0.1, 0.2)) # Jeda tipis khusus saham aktif agar Stockbit aman
+                            broksum_info = get_broksum_aman(ticker)
+                        else:
+                            broksum_info = "Transaksi Sepi (Skip Broksum)"
                         
                         score = 0
                         if ind["Vol Breakout"] == "Tembus MA20": score += 1
@@ -580,7 +594,7 @@ def main():
                         data_akhir = {
                             "Waktu Update": waktu_sekarang, 
                             "Ticker": ticker, 
-                            "Broksum": broksum_info,  # <--- KOLOM BROKSUM TERPASANG
+                            "Broksum": broksum_info,
                             "Kategori": kat, 
                             "Valuasi": valuasi, 
                             "PER (x)": per, 
