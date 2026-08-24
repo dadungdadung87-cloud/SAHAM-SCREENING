@@ -65,7 +65,6 @@ def jalankan_bot():
         df_history = pd.read_csv(file_hist)
         
         porto_baru = []
-        ada_transaksi = False
         
         # ==========================================
         # FASE A: MODE JUAL (PANTAU TP / CL / JUAL PAKSA H+1)
@@ -131,7 +130,6 @@ def jalankan_bot():
                 }
                 df_history = pd.concat([df_history, pd.DataFrame([catatan_baru])], ignore_index=True)
                 print(f"💰 [RUMUS {i}] JUAL H+1: {ticker} @ Rp {harga_jual} | Status: {status_jual} | PnL: {profit_pct:.2f}%")
-                ada_transaksi = True
             else:
                 porto_baru.append(posisi)
 
@@ -177,15 +175,16 @@ def jalankan_bot():
                     df_porto = pd.concat([df_porto, pd.DataFrame([posisi_baru])], ignore_index=True)
                     saldo_sekarang -= total_modal_dikeluarkan
                     print(f"🛒 [RUMUS {i}] BELI SORE/MALAM: {ticker} @ Rp {harga_beli} | {jumlah_lot} Lot")
-                    ada_transaksi = True
 
             # Kertas belanja WAJIB dihapus agar besok tidak dibeli lagi dobel
-            os.remove(file_sinyal)
+            try:
+                os.remove(file_sinyal)
+            except:
+                pass
 
-        # 4. SIMPAN PERUBAHAN KE DATABASE JIKA ADA TRANSAKSI
-        if ada_transaksi:
-            df_porto.to_csv(file_porto, index=False)
-            df_history.to_csv(file_hist, index=False)
+        # 4. SIMPAN PERUBAHAN KE DATABASE SECARA AMAN (Tanpa syarat ada_transaksi)
+        df_porto.to_csv(file_porto, index=False)
+        df_history.to_csv(file_hist, index=False)
 
     print("✅ Inspeksi 9 Arena (Mode BSJP) selesai.")
 
