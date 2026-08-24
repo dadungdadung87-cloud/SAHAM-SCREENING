@@ -415,7 +415,8 @@ df_hasil = load_data_saham()
 # HEADER & SIDEBAR
 # ==========================================
 if not df_hasil.empty and "Terakhir Update" in df_hasil.columns:
-    waktu_update = df_hasil["Terakhir Update"].iloc[0]
+    # Mengambil waktu dari CSV dan menegaskan bahwa ini jam laptop (WIB)
+    waktu_update = str(df_hasil["Terakhir Update"].iloc[0]) + " WIB"
     st.sidebar.markdown(f"""
         <div style="border: 2px solid #06b6d4; padding: 10px; border-radius: 4px; text-align: center; margin-bottom: 15px; background-color: #0f172a; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
             <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">Waktu Terakhir Update:</span><br>

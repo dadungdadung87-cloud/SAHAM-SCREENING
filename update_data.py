@@ -13,7 +13,7 @@ from datetime import datetime
 # FUNGSI PENATA KAMAR (AUTO-ROUTING) - 3 FOLDER
 # ==========================================
 def simpan_arsip_ke_folder_kelas(ticker, harga_rp, volume, waktu_obj):
-    base_folder = "Arsip_Data_Saham"
+    base_folder = "Arsip_Data_Harian"  # <--- UBAH NAMA FOLDERNYA DI SINI
     
     # 1. Tentukan Kamar berdasarkan Harga
     if 1 <= harga_rp <= 200:
@@ -666,9 +666,12 @@ def main():
                         waktu_obj=now
                     )
                 
-                # 1b. Simpan Backup Harian (HANYA SENIN - JUMAT)
-                df_hasil.to_csv(file_arsip_harian, index=False)
-                print(f"✅ Selesai! Data Web diperbarui & Diarsipkan ke sistem 3 Folder (Arsip_Data_Saham).")
+                # 1b. Simpan Backup Harian (HANYA SENIN - JUMAT) dengan metode Append
+                import os
+                file_exists = os.path.isfile(file_arsip_harian)
+                df_hasil.to_csv(file_arsip_harian, mode='a', header=not file_exists, index=False)
+                
+                print(f"✅ Selesai! Data Web diperbarui & Diarsipkan ke sistem 3 Folder (Arsip_Data_Harian).")
                 
             # Jika hari Sabtu atau Minggu
             elif hari_ini >= 5:
