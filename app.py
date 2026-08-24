@@ -1236,13 +1236,19 @@ if not df_hasil.empty:
                 import subprocess
                 import time
                 try:
-                    # Menjalankan skrip bot secara paksa dari dalam web
-                    subprocess.run(["python", "bot_simulator.py"], check=True)
-                    st.success("✅ Bot selesai berbelanja! Memuat ulang halaman...")
-                    time.sleep(2)
-                    st.rerun()
+                    # Menjalankan skrip bot dan menangkap output log-nya
+                    proses_bot = subprocess.run(["python", "bot_simulator.py"], capture_output=True, text=True)
+                    
+                    # Jika bot gagal (exit code bukan 0)
+                    if proses_bot.returncode != 0:
+                        st.error("❌ Bot gagal dijalankan. Berikut adalah log error dari sistem:")
+                        st.code(proses_bot.stderr, language="bash") # Ini akan memunculkan tulisan merah penyebab aslinya
+                    else:
+                        st.success("✅ Bot selesai berbelanja! Memuat ulang halaman...")
+                        time.sleep(2)
+                        st.rerun()
                 except Exception as e:
-                    st.error(f"Gagal menjalankan bot: {e}")
+                    st.error(f"Sistem web gagal memanggil file bot: {e}")
         
         st.markdown("---")
     with tab4:
