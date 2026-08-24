@@ -211,95 +211,103 @@ def analisa_forensik_ai(data_saham_dict, master_filters_keys):
 
 def ai_penyisihan_turnamen(data_grup_dict, api_key):
     import re
+    import time
     from openai import OpenAI
     
     model_andalan = "openrouter/free"
     
-    try:
-        client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
-        payload_text = ""
-        for ticker, data in data_grup_dict.items():
-            payload_text += f"\n--- {ticker} ---\n Harga: {data['harga']} | Vol: {data['volume']} | Broksum: {data['broksum']} | Tekanan: {data['tekanan_bandar']} | Supply: {data['supply']} | OBV: {data['obv']} | Fibo: {data['fibo']}\n"
+    # Beri toleransi 3 kali percobaan jika server OpenRouter sedang sibuk/putus
+    for attempt in range(3):
+        try:
+            client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
+            payload_text = ""
+            for ticker, data in data_grup_dict.items():
+                payload_text += f"\n--- {ticker} ---\n Harga: {data['harga']} | Vol: {data['volume']} | Broksum: {data['broksum']} | Tekanan: {data['tekanan_bandar']} | Supply: {data['supply']} | OBV: {data['obv']} | Fibo: {data['fibo']}\n"
+                
+            prompt = f"""
+            You are a quantitative screener for an Indonesian Hedge Fund.
+            Evaluate this group of stocks. Your task is to select the TOP 2 or 3 BEST stocks from this group, even if they are not perfect. 
+            Look for relative strength, accumulation, or good technicals.
             
-        prompt = f"""
-        You are a brutal and strict quantitative screener for an Indonesian Hedge Fund.
-        Evaluate this group of stocks and select ONLY the ones that show high potential for a markup/pump tomorrow (accumulation, supply squeeze, strong momentum).
-        
-        Data:
-        {payload_text}
-        
-        CRITICAL INSTRUCTION: You are an automated API endpoint.
-        You MUST output ONLY a comma-separated list of the BEST tickers (e.g., BBCA,GOTO,PANI).
-        If absolutely NONE of the stocks are good enough, output EXACTLY the word: SKIP_GRUP
-        DO NOT output any conversational text, explanations, greetings, or notes before or after the tickers.
-        DO NOT use markdown formatting.
-        """
-        
-        completion = client.chat.completions.create(
-            model=model_andalan, messages=[{"role": "user", "content": prompt}],
-            temperature=0.2, max_tokens=1000, top_p=1, stream=False,
-        )
-        
-        raw_content = completion.choices[0].message.content or ""
-        
-        # 1. Bersihkan tag <think> jika AI memakai DeepSeek R1
-        clean_content = re.sub(r'<think>.*?</think>', '', raw_content, flags=re.DOTALL).strip()
-        
-        # 2. Hapus titik atau kata-kata basa-basi sisa yang tertinggal
-        clean_content = clean_content.replace('`', '').replace('.', '').replace('\n', '').strip().upper()
-        
-        # 3. Jika AI masih bandel menjawab kalimat panjang, paksa deteksi apakah ada SKIP_GRUP
-        if "SKIP_GRUP" in clean_content or "SKIP" in clean_content:
-            return "SKIP_GRUP"
+            Data:
+            {payload_text}
             
-        return clean_content
-        
-    except Exception as e:
-        return f"ERROR: {str(e)}"
+            CRITICAL INSTRUCTION: You are an automated API endpoint.
+            You MUST output ONLY a comma-separated list of the 2 or 3 best tickers (e.g., BBCA,GOTO).
+            ONLY output SKIP_GRUP if every single stock in this group is completely terrible and zero potential. Try your best to pick at least 1 or 2.
+            DO NOT output any conversational text, explanations, greetings, or <think> process.
+            DO NOT use markdown formatting.
+            """
+            
+            completion = client.chat.completions.create(
+                model=model_andalan, messages=[{"role": "user", "content": prompt}],
+                temperature=0.3, max_tokens=1000, top_p=1, stream=False,
+            )
+            
+            raw_content = completion.choices[0].message.content or ""
+            clean_content = re.sub(r'<think>.*?</think>', '', raw_content, flags=re.DOTALL).strip()
+            clean_content = clean_content.replace('`', '').replace('.', '').replace('\n', '').strip().upper()
+            
+            if "SKIP_GRUP" in clean_content or "SKIP" in clean_content:
+                return "SKIP_GRUP"
+                
+            return clean_content
+            
+        except Exception as e:
+            if attempt < 2:  # Jika baru gagal 1-2 kali, tunggu 3 detik lalu coba lagi
+                time.sleep(3)
+                continue
+            return f"ERROR: Connection Failed setelah 3x percobaan. Detail: {str(e)}"
 
 def ai_grand_final_top5(data_saham_dict, api_key):
     import re
-    # MENGGUNAKAN JALUR AUTO-FREE DARI OPENROUTER
+    import time
+    from openai import OpenAI
+    
     model_andalan = "openrouter/free"
 
-    try:
-        client = OpenAI(base_url="[https://openrouter.ai/api/v1](https://openrouter.ai/api/v1)", api_key=api_key)
-        payload_text = ""
-        for ticker, data in data_saham_dict.items():
-            payload_text += f"\n--- {ticker} ---\n Harga: {data['harga']} | Vol: {data['volume']} | Broksum: {data['broksum']} | Tekanan: {data['tekanan_bandar']} | Supply: {data['supply']} | OBV: {data['obv']} | Fibo: {data['fibo']} | VWAP: {data['vwap']} | Candle: {data['pola_candle']}\n"
+    # Beri toleransi 3 kali percobaan jika server OpenRouter sedang sibuk/putus
+    for attempt in range(3):
+        try:
+            client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
+            payload_text = ""
+            for ticker, data in data_saham_dict.items():
+                payload_text += f"\n--- {ticker} ---\n Harga: {data['harga']} | Vol: {data['volume']} | Broksum: {data['broksum']} | Tekanan: {data['tekanan_bandar']} | Supply: {data['supply']} | OBV: {data['obv']} | Fibo: {data['fibo']} | VWAP: {data['vwap']} | Candle: {data['pola_candle']}\n"
 
-        prompt = f"""
-        You are the CIO of a Top-Tier Indonesian Hedge Fund. Evaluate these Elite Semi-Finalist stocks:
-        {payload_text}
-        
-        MISSION: Select EXACTLY the TOP 5 BEST STOCKS with the absolute highest probability of Gap Up tomorrow.
-        
-        CRITICAL INSTRUCTION: You are an automated API endpoint. 
-        You MUST output ONLY a raw, valid JSON array containing the top 5 stocks.
-        DO NOT output any conversational text, explanations, greetings, or notes before or after the JSON.
-        DO NOT wrap your response in markdown code blocks (DO NOT use ```json or ```).
-        Your response must start exactly with '[' and end exactly with ']'.
-        
-        Format EXACTLY like this:
-        [
-          {{"Peringkat": 1, "Ticker": "GOTO", "Alasan": "Akumulasi masif", "Target_TP": 60, "Target_CL": 50}}
-        ]
-        """
-        
-        completion = client.chat.completions.create(
-            model=model_andalan, messages=[{"role": "user", "content": prompt}],
-            temperature=0.3, max_tokens=3000, top_p=1, stream=False,
-        )
-        
-        raw_content = completion.choices[0].message.content or ""
-        model_terpakai = completion.model
-        
-        # Pembersihan tag <think> jika OpenRouter menggunakan model DeepSeek R1
-        clean_content = re.sub(r'<think>.*?</think>', '', raw_content, flags=re.DOTALL).strip()
-        
-        return clean_content, model_terpakai
-    except Exception as e: 
-        raise Exception(f"Gagal memproses Grand Final. Error: {e}")
+            prompt = f"""
+            You are the CIO of a Top-Tier Indonesian Hedge Fund. Evaluate these Elite Semi-Finalist stocks:
+            {payload_text}
+            
+            MISSION: Select EXACTLY the TOP 5 BEST STOCKS with the absolute highest probability of Gap Up tomorrow.
+            
+            CRITICAL INSTRUCTION: You are an automated API endpoint. 
+            You MUST output ONLY a raw, valid JSON array containing the top 5 stocks.
+            DO NOT output any conversational text, explanations, greetings, or notes before or after the JSON.
+            DO NOT wrap your response in markdown code blocks (DO NOT use ```json or ```).
+            Your response must start exactly with '[' and end exactly with ']'.
+            
+            Format EXACTLY like this:
+            [
+              {{"Peringkat": 1, "Ticker": "GOTO", "Alasan": "Akumulasi masif", "Target_TP": 60, "Target_CL": 50}}
+            ]
+            """
+            
+            completion = client.chat.completions.create(
+                model=model_andalan, messages=[{"role": "user", "content": prompt}],
+                temperature=0.3, max_tokens=3000, top_p=1, stream=False,
+            )
+            
+            raw_content = completion.choices[0].message.content or ""
+            model_terpakai = completion.model
+            
+            clean_content = re.sub(r'<think>.*?</think>', '', raw_content, flags=re.DOTALL).strip()
+            return clean_content, model_terpakai
+            
+        except Exception as e:
+            if attempt < 2:  # Jika baru gagal 1-2 kali, tunggu 4 detik lalu coba lagi
+                time.sleep(4)
+                continue
+            raise Exception(f"Connection Error setelah 3x percobaan ulang. OpenRouter Server sibuk. Error: {e}")
 
 # ==========================================
 # PENGATURAN UI/UX & API
