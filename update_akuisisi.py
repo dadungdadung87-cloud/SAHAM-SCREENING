@@ -3,6 +3,7 @@ import os
 from urllib.parse import quote_plus
 from urllib.request import urlopen
 from xml.etree import ElementTree
+import feedparser
 
 def load_keywords(filename):
     """Memuat daftar kata kunci dari file txt."""
