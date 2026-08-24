@@ -3,24 +3,31 @@
 # Masuk ke folder repositori
 cd /home/kaltaraid/Documents/SAHAM-SCREENING/
 
-# 1. Jalankan skrip Python untuk update data bursa
-/usr/bin/python update_data.py
+echo "⏳ Memulai pembaruan data saham..."
 
-# 2. JALANKAN BOT SIMULATOR (Berjalan otomatis setelah data ditarik)
-/usr/bin/python bot_simulator.py
+# 1. Jalankan skrip Python WAJIB menggunakan .venv agar paket/modul terbaca
+./.venv/bin/python update_data.py
+
+# 2. JALANKAN BOT SIMULATOR (Menggunakan .venv juga)
+./.venv/bin/python bot_simulator.py
 
 # ==========================================
 # FITUR SAPU OTOMATIS (MAX 50 HARI)
-# Menghapus file .csv di folder arsip yang umurnya lebih dari 50 hari
-find Arsip_Data_Saham/ -name "*.csv" -type f -mtime +50 -delete
+# Menggunakan nama folder yang benar: Arsip_Data_Harian
+find Arsip_Data_Harian/ -name "*.csv" -type f -mtime +50 -delete
 # ==========================================
 
+echo "📤 Mengupload ke GitHub..."
+
+# Tarik data dulu agar tidak tabrakan (diverged)
+git pull origin main --no-rebase
+
+# Masukkan SEMUA file di dalam folder Database dan Arsip (Jauh lebih praktis & aman)
+git add Database/*.csv
+git add Arsip_Data_Harian/*.csv
+
 # Simpan dan kirim ke GitHub
-git pull origin main
-git add hasil_screener.csv
-git add Arsip_Data_Saham/
-git add portofolio_virtual.csv
-git add history_trade.csv
-git add sinyal_ai.csv
 git commit -m "Auto-update data, arsip, dan bot simulator" || echo "Tidak ada perubahan"
-git push
+git push origin main
+
+echo "✅ Proses 100% Selesai!"
