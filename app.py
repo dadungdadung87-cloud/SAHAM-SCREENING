@@ -209,43 +209,53 @@ def analisa_forensik_ai(data_saham_dict, master_filters_keys):
         return hasil_mentah + f"\n\n---\n🔬 *Lab Forensik AI menggunakan: **{model_terpakai}** via OpenRouter*"
     except Exception as e: return f"❌ Gagal memproses data dengan OpenRouter. Error: {e}"
 
-def ai_penyisihan_turnamen(data_saham_dict, api_key):
-    # MENGGUNAKAN JALUR AUTO-FREE DARI OPENROUTER
+def ai_penyisihan_turnamen(data_grup_dict, api_key):
+    import re
+    from openai import OpenAI
+    
     model_andalan = "openrouter/free"
-
+    
     try:
         client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
         payload_text = ""
-        for ticker, data in data_saham_dict.items():
-            payload_text += f"\n[{ticker}] Price:{data['harga']} | Vol:{data['volume']} | Broksum:{data['broksum']} | MM:{data['tekanan_bandar']} | Supply:{data['supply']} | OBV:{data['obv']} | Fibo:{data['fibo']}"
-
+        for ticker, data in data_grup_dict.items():
+            payload_text += f"\n--- {ticker} ---\n Harga: {data['harga']} | Vol: {data['volume']} | Broksum: {data['broksum']} | Tekanan: {data['tekanan_bandar']} | Supply: {data['supply']} | OBV: {data['obv']} | Fibo: {data['fibo']}\n"
+            
         prompt = f"""
-        You are a Strict Quantitative Filter for an Indonesian Hedge Fund. Evaluate these {len(data_saham_dict)} candidate stocks.
-        {payload_text}
-
-        SLIGHTLY BRUTAL ELIMINATION RULES:
-        1. ELIMINATE stocks if Volume is extremely low or dead (Illiquid).
-        2. ELIMINATE stocks if Broksum clearly indicates massive Distribution (Dist / Guyuran) without any redeeming technical factors.
-        3. KEEP the stock ONLY if it shows "Stealth Accumulation" clues: Broksum is (Acc), OR Supply is drying up (Supply Kering), OR OBV is trending Up, OR it is bouncing off a strong Fibonacci support.
+        You are a brutal and strict quantitative screener for an Indonesian Hedge Fund.
+        Evaluate this group of stocks and select ONLY the ones that show high potential for a markup/pump tomorrow (accumulation, supply squeeze, strong momentum).
         
-        OUTPUT INSTRUCTION:
-        Do NOT provide any analysis, tables, or conversational text. 
-        ONLY return a comma-separated list of the Ticker symbols that SURVIVE this elimination. 
-        If absolutely NO stock survives, output exactly the word: SKIP_GRUP
-        Example output: BBCA, ASII, GOTO
+        Data:
+        {payload_text}
+        
+        CRITICAL INSTRUCTION: You are an automated API endpoint.
+        You MUST output ONLY a comma-separated list of the BEST tickers (e.g., BBCA,GOTO,PANI).
+        If absolutely NONE of the stocks are good enough, output EXACTLY the word: SKIP_GRUP
+        DO NOT output any conversational text, explanations, greetings, or notes before or after the tickers.
+        DO NOT use markdown formatting.
         """
         
         completion = client.chat.completions.create(
             model=model_andalan, messages=[{"role": "user", "content": prompt}],
-            temperature=0.1, max_tokens=150, top_p=1, stream=False,
+            temperature=0.2, max_tokens=1000, top_p=1, stream=False,
         )
         
-        hasil_mentah = completion.choices[0].message.content
-        if not hasil_mentah: return "SKIP_GRUP"
+        raw_content = completion.choices[0].message.content or ""
         
-        return hasil_mentah
+        # 1. Bersihkan tag <think> jika AI memakai DeepSeek R1
+        clean_content = re.sub(r'<think>.*?</think>', '', raw_content, flags=re.DOTALL).strip()
+        
+        # 2. Hapus titik atau kata-kata basa-basi sisa yang tertinggal
+        clean_content = clean_content.replace('`', '').replace('.', '').replace('\n', '').strip().upper()
+        
+        # 3. Jika AI masih bandel menjawab kalimat panjang, paksa deteksi apakah ada SKIP_GRUP
+        if "SKIP_GRUP" in clean_content or "SKIP" in clean_content:
+            return "SKIP_GRUP"
+            
+        return clean_content
+        
     except Exception as e:
-        return f"ERROR"
+        return f"ERROR: {str(e)}"
 
 def ai_grand_final_top5(data_saham_dict, api_key):
     import re
