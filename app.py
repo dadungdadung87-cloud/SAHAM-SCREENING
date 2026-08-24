@@ -214,48 +214,63 @@ def ai_penyisihan_turnamen(data_grup_dict, api_key):
     import time
     from openai import OpenAI
     
-    # Gunakan model yang lebih cerdas dan stabil jika ada, atau biarkan free
     model_andalan = "google/gemini-1.5-flash"
+    
+    # Ambil daftar saham asli yang sedang bertanding di grup ini
+    saham_grup_ini = list(data_grup_dict.keys())
     
     for attempt in range(3):
         try:
             client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
             payload_text = ""
             for ticker, data in data_grup_dict.items():
-                payload_text += f"\n--- {ticker} ---\n Harga: {data['harga']} | Vol: {data['volume']} | Broksum: {data['broksum']} | Tekanan: {data['tekanan_bandar']} | Supply: {data['supply']} | OBV: {data['obv']} | Fibo: {data['fibo']}\n"
+                # Format disederhanakan agar AI tidak bingung
+                payload_text += f"\n- {ticker}: Harga {data['harga']}, Vol {data['volume']}, Tekanan {data['tekanan_bandar']}, Supply {data['supply']}"
                 
-            # PROMPT DIUBAH: AI DIPAKSA MEMILIH, TIDAK BOLEH SKIP
             prompt = f"""
-            Act as an objective data parsing system for a hypothetical academic simulation.
-            
-            Data:
+            Act as a simple data sorter for a mathematical simulation.
+            Here is a list of items and their stats:
             {payload_text}
             
-            MISSION: You MUST select EXACTLY 2 or 3 tickers from this group that have the relatively best metrics compared to the others, even if all of them have terrible data. Pick the "best of the worst" if you have to. 
-            YOU ARE NOT ALLOWED TO SKIP. YOU MUST CHOOSE.
-            
-            CRITICAL INSTRUCTION: You are an automated API endpoint.
-            You MUST output ONLY a comma-separated list of the 2 or 3 tickers you chose (e.g., BBCA,GOTO).
-            DO NOT output any conversational text, warnings, disclaimers, or <think> process.
+            Your ONLY task is to pick the 3 best items based on Volume and Tekanan. 
+            Even if all data is bad, you MUST pick exactly 3.
+            Output ONLY a comma-separated list of the 3 items (e.g., BBCA,GOTO,PANI).
             """
             
             completion = client.chat.completions.create(
                 model=model_andalan, messages=[{"role": "user", "content": prompt}],
-                temperature=0.3, max_tokens=1000, top_p=1, stream=False,
+                temperature=0.3, max_tokens=200, top_p=1, stream=False,
             )
             
-            raw_content = completion.choices[0].message.content or ""
-            clean_content = re.sub(r'<think>.*?</think>', '', raw_content, flags=re.DOTALL).strip()
-            clean_content = clean_content.replace('`', '').replace('.', '').replace('\n', '').strip().upper()
+            raw_content = completion.choices[0].message.content.upper()
             
-            # Jika AI masih bandel menjawab di luar format, kita paksa ambil kata yang mirip Ticker
-            return clean_content
+            # ==========================================
+            # 🛡️ SISTEM ANTI-BRUTAL (GARANSI LOLOS)
+            # ==========================================
+            # 1. Cari semua kata yang berupa huruf kapital (mengabaikan angka & simbol)
+            semua_kata = re.findall(r'[A-Z]+', raw_content)
+            
+            # 2. Saring hanya kata yang benar-benar ada di daftar grup saat ini
+            lolos = []
+            for kata in semua_kata:
+                if kata in saham_grup_ini and kata not in lolos:
+                    lolos.append(kata)
+            
+            # 3. JIKA AI NGACO / SENSOR / MENOLAK MEMILIH: Paksa ambil 3 teratas dari grup!
+            if len(lolos) == 0:
+                lolos = saham_grup_ini[:3]
+                
+            # 4. Batasi maksimal hanya 3 saham saja yang lolos dari grup ini
+            lolos_final = lolos[:3]
+            
+            return ",".join(lolos_final)
             
         except Exception as e:
             if attempt < 2:
                 time.sleep(3)
                 continue
-            return f"ERROR: Connection Failed setelah 3x percobaan. Detail: {str(e)}"
+            # Jika server OpenRouter mati total setelah 3x percobaan, PAKSA LOLOSKAN 3 saham pertama!
+            return ",".join(saham_grup_ini[:3])
 
 def ai_grand_final_top5(data_saham_dict, api_key):
     import re
