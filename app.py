@@ -214,7 +214,7 @@ def ai_penyisihan_turnamen(data_grup_dict, api_key):
     import time
     from openai import OpenAI
     
-    model_andalan = "meta-llama/llama-3.1-8b-instruct:free"
+    model_andalan = "google/gemma-4-31b-it:free"
     
     # Ambil daftar saham asli yang sedang bertanding di grup ini
     saham_grup_ini = list(data_grup_dict.keys())
@@ -279,7 +279,7 @@ def ai_grand_final_top5(data_saham_dict, api_key):
     import pandas as pd
     import json
     
-    model_andalan = "meta-llama/llama-3.1-8b-instruct:free"
+    model_andalan = "google/gemma-4-31b-it:free"
 
     for attempt in range(3):
         try:
@@ -1204,9 +1204,27 @@ if not df_hasil.empty:
                                     if st.button("🔄 Mulai Turnamen Baru"):
                                         st.rerun()
 
-    # ==========================================================================
-    # [TAB 4] PORTOFOLIO BOT
-    # ==========================================================================
+    # ==========================================
+    # TAB 4: PORTOFOLIO & BOT
+    # ==========================================
+    with tab4:
+        st.markdown("## 🤖 Monitor Bot Simulator")
+        
+        # --- TOMBOL PEMICU BOT ---
+        if st.button("🛒 Eksekusi Pembelian Bot Sekarang!", type="primary", use_container_width=True):
+            with st.spinner("Bot sedang membaca sinyal dan mengeksekusi pembelian..."):
+                import subprocess
+                import time
+                try:
+                    # Menjalankan skrip bot secara paksa dari dalam web
+                    subprocess.run(["python", "bot_simulator.py"], check=True)
+                    st.success("✅ Bot selesai berbelanja! Memuat ulang halaman...")
+                    time.sleep(2)
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Gagal menjalankan bot: {e}")
+        
+        st.markdown("---")
     with tab4:
         st.markdown("## 📊 Dashboard Bot Simulator")
         pilihan_arena = st.selectbox("Pilih Arena:", [
