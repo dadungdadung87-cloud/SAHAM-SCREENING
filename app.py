@@ -920,12 +920,12 @@ if not df_hasil.empty:
                                 st.info(hasil_ai)
 
                 elif "Forensik Bandar" in pilihan_ai:
-                    st.subheader("🔬 Laboratorium Penguji Model AI (Auto-Tester)")
-                    st.markdown("Masukkan beberapa kode saham dari hasil Screener. Mesin akan menguji belasan model AI gratis dari OpenRouter satu per satu untuk mencari mana yang paling aktif, pintar, dan patuh format untuk web Anda.")
+                    st.subheader("📡 Radar Pencari Model AI Aktif (Live Server)")
+                    st.markdown("Mesin ini akan membobol katalog OpenRouter untuk mencari **semua model gratis yang aktif detik ini**, lalu mengujinya satu per satu menggunakan saham yang Anda masukkan.")
                     
                     input_tester = st.text_area("📋 Paste Daftar Saham Uji Coba (Minimal 3 Saham):", placeholder="Contoh:\nVISI\nBBHI\nPANI", height=150, key="input_tester")
                     
-                    if st.button("🚀 Mulai Uji Coba Massal Model AI"):
+                    if st.button("🚀 Tarik Daftar Server & Mulai Uji Coba"):
                         OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY", os.environ.get("OPENROUTER_API_KEY"))
                         if not OPENROUTER_API_KEY:
                             st.error("❌ Kunci API OpenRouter belum dipasang!")
@@ -937,43 +937,42 @@ if not df_hasil.empty:
                             if len(saham_valid) < 2:
                                 st.error("❌ Masukkan minimal 2 kode saham yang valid di database hari ini.")
                             else:
-                                # DAFTAR KANDIDAT MODEL GRATIS OPENROUTER
-                                daftar_model_gratis = [
-                                    "meta-llama/llama-3.1-8b-instruct:free",
-                                    "meta-llama/llama-3-8b-instruct:free",
-                                    "google/gemma-2-9b-it:free",
-                                    "google/gemma-7b-it:free",
-                                    "qwen/qwen-2-7b-instruct:free",
-                                    "qwen/qwen-2.5-7b-instruct:free",
-                                    "microsoft/phi-3-mini-128k-instruct:free",
-                                    "microsoft/phi-3-medium-128k-instruct:free",
-                                    "mistralai/mistral-7b-instruct:free",
-                                    "huggingfaceh4/zephyr-7b-beta:free",
-                                    "openchat/openchat-7b:free",
-                                    "undi95/toppy-m-7b:free",
-                                    "gryphe/mythomax-l2-13b:free",
-                                    "cognitivecomputations/dolphin-mixtral-8x7b:free",
-                                    "nousresearch/hermes-2-pro-llama-3-8b:free",
-                                    "cohere/north-mini-code:free",
-                                    "cohere/command-r-plus-08-2024:free"
-                                ]
+                                st.info("🔄 Langkah 1: Meminta katalog model gratis terbaru langsung dari pusat data OpenRouter...")
                                 
-                                st.info(f"Dimulai! Menguji {len(daftar_model_gratis)} model AI berbeda. Ini mungkin memakan waktu beberapa menit...")
+                                import requests
+                                daftar_model_gratis = []
+                                try:
+                                    headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}"}
+                                    resp = requests.get("https://openrouter.ai/api/v1/models", headers=headers)
+                                    if resp.status_code == 200:
+                                        semua_model = resp.json().get("data", [])
+                                        # Menyaring HANYA model yang namanya berakhiran :free
+                                        daftar_model_gratis = [m["id"] for m in semua_model if str(m.get("id", "")).endswith(":free")]
+                                except Exception as e:
+                                    st.error(f"Gagal menarik data dari server OpenRouter. Error: {e}")
+                                
+                                if not daftar_model_gratis:
+                                    st.warning("⚠️ Server OpenRouter tidak merespons daftar gratis. Menggunakan jalur darurat (openrouter/free).")
+                                    daftar_model_gratis = ["openrouter/free"]
+                                
+                                st.success(f"✅ Ditemukan {len(daftar_model_gratis)} model gratis yang sedang online! Memulai pengujian...")
+                                
                                 progress_bar = st.progress(0)
                                 status_text = st.empty()
                                 
-                                # Menyiapkan data saham untuk tes
                                 payload_text = ""
                                 for ticker in saham_valid:
                                     data_saham = df_hasil[df_hasil['Ticker'] == ticker].iloc[0]
                                     payload_text += f"\n- {ticker}: Harga {data_saham.get('Harga (Rp)', 0)}, Vol {data_saham.get('Volume', 0)}"
 
+                                # PROMPT diubah agar model "Bawel" bisa dipaksa patuh
                                 prompt_test = f"""
-                                Act as a strict data parser. Read this data:
+                                CRITICAL INSTRUCTION: You are an automated data filter. 
+                                Read this data:
                                 {payload_text}
                                 
-                                You MUST pick exactly 1 best ticker. 
-                                Output ONLY the ticker name (e.g., BBCA). DO NOT output any other text or explanation.
+                                MISSION: Pick EXACTLY 1 best ticker based on volume.
+                                STRICT RULE: Output ONLY the 4-letter ticker code (e.g., BBCA). DO NOT add any other words, punctuation, explanations, or formatting.
                                 """
                                 
                                 from openai import OpenAI
@@ -989,42 +988,32 @@ if not df_hasil.empty:
                                             model=model_id, 
                                             messages=[{"role": "user", "content": prompt_test}],
                                             temperature=0.1, 
-                                            max_tokens=50, 
+                                            max_tokens=20, 
                                             stream=False,
                                         )
                                         raw_content = completion.choices[0].message.content or ""
+                                        bersih = raw_content.replace('`', '').replace('.', '').replace('\n', '').strip().upper()
                                         
-                                        # Evaluasi apakah AI ini patuh format (menjawab pendek, bukan pidato)
-                                        if len(raw_content.strip()) < 15 and raw_content.strip().upper() in saham_valid:
-                                            status = "✅ Lulus & Patuh"
+                                        if bersih in saham_valid:
+                                            status = "✅ Lulus & Patuh (Sangat Cocok!)"
                                         else:
-                                            status = f"⚠️ Aktif tapi Bawel (Jawab: {raw_content.strip()[:30]}...)"
+                                            status = f"⚠️ Aktif tapi Bawel (Jawab: {raw_content.strip()[:25]}...)"
                                             
                                         hasil_rekap.append({"Nama Model": model_id, "Status": status})
                                         
                                     except Exception as e:
-                                        pesan_error = str(e)
-                                        if "404" in pesan_error:
-                                            alasan = "❌ Gagal (Tidak Tersedia Gratis)"
-                                        elif "400" in pesan_error:
-                                            alasan = "❌ Gagal (ID Model Ditolak)"
-                                        else:
-                                            alasan = "❌ Gagal (Koneksi Putus)"
-                                            
-                                        hasil_rekap.append({"Nama Model": model_id, "Status": alasan})
+                                        hasil_rekap.append({"Nama Model": model_id, "Status": "❌ Gagal Terkoneksi"})
                                     
-                                    # Update progress & jeda 2 detik agar tidak diblokir server
                                     progress_bar.progress((i + 1) / len(daftar_model_gratis))
-                                    time.sleep(2)
+                                    time.sleep(2) # Jeda agar tidak diblokir OpenRouter
                                 
-                                status_text.success("🎉 Uji Coba Selesai!")
+                                status_text.success("🎉 Pengecekan Server Selesai!")
                                 
-                                # Tampilkan Hasil
                                 df_rekap = pd.DataFrame(hasil_rekap)
-                                st.markdown("### 🏆 Hasil Uji Coba Model AI Hari Ini")
+                                st.markdown("### 🏆 Hasil Uji Coba Model AI (Live Server)")
                                 st.dataframe(df_rekap, use_container_width=True)
                                 
-                                st.info("💡 **TUGAS SELANJUTNYA:** Salin nama-nama model yang berstatus '✅ Lulus & Patuh', lalu berikan daftarnya kepada AI Asisten Anda untuk dianalisis!")
+                                st.info("💡 **INFO:** Model dengan status '✅ Lulus & Patuh' adalah model yang siap digunakan untuk skrip Turnamen Anda!")
 
                 elif "Pemburu ARA" in pilihan_ai:
                     st.subheader("🎯 Turnamen AI (Spesialis Akumulasi Siluman)")
