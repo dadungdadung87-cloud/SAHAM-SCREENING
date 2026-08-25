@@ -3,6 +3,36 @@ import os
 from datetime import datetime
 
 # ==========================================
+# 🛠️ FUNGSI AUTO-SAVE KE GITHUB
+# ==========================================
+def auto_save_github():
+    import subprocess
+    from datetime import datetime
+    
+    print("\n🔄 Memulai proses pencadangan (Auto-Save) permanen ke GitHub...")
+    try:
+        # 1. Daftarkan hanya file CSV di dalam folder Database agar rapi
+        subprocess.run(["git", "add", "Database/*.csv"], check=True)
+        
+        # 2. Buat pesan log otomatis berdasarkan waktu saat ini
+        waktu_sekarang = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        pesan_komit = f"🤖 Bot Update Portofolio: {waktu_sekarang}"
+        
+        # 3. Eksekusi Commit (tangkap output untuk mencegah error jika tidak ada perubahan)
+        commit_process = subprocess.run(["git", "commit", "-m", pesan_komit], capture_output=True, text=True)
+        
+        if "nothing to commit" in commit_process.stdout or "nothing to commit" in commit_process.stderr:
+            print("✅ Data aman. Tidak ada transaksi baru yang perlu disimpan hari ini.")
+            return
+
+        # 4. Tembakkan ke server GitHub utama
+        subprocess.run(["git", "push", "origin", "main"], check=True)
+        print("🚀 Pencadangan berhasil! Data portofolio Anda kini abadi.")
+        
+    except Exception as e:
+        print(f"❌ Gagal melakukan Auto-Save ke GitHub. Log Error: {e}")
+
+# ==========================================
 # ⚙️ KONFIGURASI BOT SIMULATOR BSJP (9 ARENA)
 # ==========================================
 MODAL_AWAL = 100000000.0  # Rp 100 Juta per Rumus
@@ -187,6 +217,9 @@ def jalankan_bot():
         df_history.to_csv(file_hist, index=False)
 
     print("✅ Inspeksi 9 Arena (Mode BSJP) selesai.")
+    
+    # Panggil fungsi penyimpanan abadi
+    auto_save_github()
 
 if __name__ == "__main__":
     jalankan_bot()
