@@ -1077,6 +1077,121 @@ if not df_hasil.empty:
                                     st.session_state.radar_aktif = True
                                     
                                     st.rerun()
+
+                        # ==============================================================
+                        # 🛸 TOMBOL AUTO-PILOT (SAPU JAGAT RUMUS 1 SAMPAI 9)
+                        # ==============================================================
+                        st.markdown("---")
+                        st.markdown("### 🛸 Mode Auto-Pilot (Super AI)")
+                        st.markdown("Sekali klik, mesin akan menelusuri, mengekstrak, dan mengeksekusi turnamen untuk Rumus 1 hingga Rumus 9 secara bergantian tanpa henti.")
+                        
+                        if st.button("🛸 Jalankan Auto-Pilot (Semua Rumus 1-9)", type="primary"):
+                            if not GEMINI_API_KEY:
+                                st.error("❌ Kunci API GEMINI belum dipasang!")
+                            else:
+                                import json
+                                import re
+                                import time
+                                import pandas as pd
+                                
+                                # Mengumpulkan semua DataFrame rumus ke dalam satu peta
+                                daftar_rumus = {
+                                    1: df_v1, 2: df_v2, 3: df_v3, 
+                                    4: df_v4, 5: df_v5, 6: df_v6, 
+                                    7: df_v7, 8: df_v8, 9: df_v9
+                                }
+                                
+                                progress_keseluruhan = st.progress(0)
+                                status_autopilot = st.empty()
+                                
+                                # Looping dari Rumus 1 sampai 9
+                                for i in range(1, 10):
+                                    df_target = daftar_rumus[i]
+                                    progress_keseluruhan.progress((i - 1) / 9.0)
+                                    
+                                    if len(df_target) < 3:
+                                        status_autopilot.warning(f"⏭️ Rumus {i} dilewati (Saham kurang dari 3).")
+                                        time.sleep(1.5)
+                                        continue
+                                    
+                                    saham_valid = df_target['Ticker'].tolist()
+                                    status_autopilot.info(f"🔄 **Menyapu Rumus {i}**... (Membedah {len(saham_valid)} saham)")
+                                    
+                                    # --- FASE 1: PENYISIHAN ---
+                                    batch_size = 10
+                                    groups = [saham_valid[idx:idx + batch_size] for idx in range(0, len(saham_valid), batch_size)]
+                                    semi_finalists = []
+                                    
+                                    for idx_grp, group_sekarang in enumerate(groups):
+                                        status_autopilot.info(f"🔄 Rumus {i} - Babak Penyisihan Grup {idx_grp+1} dari {len(groups)}...")
+                                        data_grup = {}
+                                        for ticker in group_sekarang:
+                                            data_saham = df_hasil[df_hasil['Ticker'] == ticker].iloc[0]
+                                            data_grup[ticker] = {
+                                                'harga': data_saham.get('Harga (Rp)', 0),
+                                                'volume': data_saham.get('Volume', 0),
+                                                'broksum': data_saham.get('Broksum', 'Tidak Ada'),
+                                                'tekanan_bandar': data_saham.get('Tekanan Bandar', 'Normal'),
+                                                'supply': data_saham.get('Kondisi Supply', 'Normal'),
+                                                'obv': data_saham.get('OBV Trend', 'Normal'),
+                                                'fibo': data_saham.get('Status Fibonacci', 'Normal')
+                                            }
+                                            
+                                        hasil_kual = ai_penyisihan_turnamen(data_grup, GEMINI_API_KEY)
+                                        if hasil_kual:
+                                            lolos = [s.strip().upper() for s in hasil_kual.replace('`', '').split(',')]
+                                            lolos_valid = [s for s in lolos if s in group_sekarang]
+                                            semi_finalists.extend(lolos_valid)
+                                            
+                                    # --- FASE 2: GRAND FINAL ---
+                                    if not semi_finalists:
+                                        st.warning(f"⏭️ Rumus {i} gagal di penyisihan (Tidak ada yang memenuhi standar).")
+                                        continue
+                                        
+                                    if len(semi_finalists) > 35:
+                                        df_semi = df_hasil[df_hasil['Ticker'].isin(semi_finalists)].sort_values(by=['Total Score', 'Volume'], ascending=[False, False])
+                                        semi_finalists = df_semi['Ticker'].head(35).tolist()
+                                    
+                                    status_autopilot.warning(f"🧠 Rumus {i} - AI Meracik Grand Final dari {len(semi_finalists)} saham kandidat...")
+                                    data_final = {}
+                                    for ticker in semi_finalists:
+                                        data_saham = df_hasil[df_hasil['Ticker'] == ticker].iloc[0]
+                                        data_final[ticker] = {
+                                            'harga': data_saham.get('Harga (Rp)', 0),
+                                            'volume': data_saham.get('Volume', 0),
+                                            'broksum': data_saham.get('Broksum', 'Tidak Ada'),
+                                            'tekanan_bandar': data_saham.get('Tekanan Bandar', 'Normal'),
+                                            'supply': data_saham.get('Kondisi Supply', 'Normal'),
+                                            'obv': data_saham.get('OBV Trend', 'Normal'),
+                                            'fibo': data_saham.get('Status Fibonacci', 'Normal'),
+                                            'vwap': data_saham.get('Posisi VWAP', 'Normal'),
+                                            'pola_candle': data_saham.get('Pola Candle', 'Normal')
+                                        }
+                                    
+                                    try:
+                                        hasil_mentah, model_dipakai = ai_grand_final_top5(data_final, GEMINI_API_KEY)
+                                        teks_bersih = hasil_mentah.replace('```json', '').replace('```', '').strip()
+                                        pencarian_json = re.search(r'\[\s*\{.*?\}\s*\]', teks_bersih, re.DOTALL)
+                                        
+                                        if pencarian_json:
+                                            bersih = pencarian_json.group(0)
+                                            hasil_json = json.loads(bersih)
+                                            df_tampil = pd.DataFrame(hasil_json)
+                                            if 'Target_TP' in df_tampil.columns and 'Target_CL' in df_tampil.columns:
+                                                df_sinyal = df_tampil[['Ticker', 'Target_TP', 'Target_CL']]
+                                                df_sinyal.to_csv(f"Database/sinyal_ai_rumus_{i}.csv", index=False)
+                                                st.success(f"✅ Rumus {i} Selesai! Sinyal diamankan ke sistem bot.")
+                                        else:
+                                            st.error(f"❌ Rumus {i} Gagal mencetak sinyal (Format tabel JSON terputus).")
+                                    except Exception as e:
+                                        st.error(f"❌ Error pada Rumus {i}: {e}")
+                                    
+                                    # Mengambil nafas agar server Gemini tidak kebanjiran request
+                                    time.sleep(3)
+                                
+                                progress_keseluruhan.progress(1.0)
+                                status_autopilot.success("🎉 MISSION ACCOMPLISHED! SEMUA RUMUS BERHASIL DI-SCREENING!")
+                                st.balloons()            
                     else:
                         st.warning("⚠️ **JANGAN ME-REFRESH BROWSER!** Mesin sedang menjalankan turnamen.")
                         if st.button("🛑 Hentikan Turnamen Darurat"):
