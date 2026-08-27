@@ -10,46 +10,6 @@ from urllib3.util.retry import Retry
 from datetime import datetime
 
 # ==========================================
-# FUNGSI PENATA KAMAR (AUTO-ROUTING) - 3 FOLDER
-# ==========================================
-def simpan_arsip_ke_folder_kelas(ticker, harga_rp, volume, waktu_obj):
-    base_folder = "Arsip_Data_Harian"  # <--- UBAH NAMA FOLDERNYA DI SINI
-    
-    # 1. Tentukan Kamar berdasarkan Harga
-    if 1 <= harga_rp <= 200:
-        nama_folder = "Kelas_1_Gorengan_50_200"
-    elif 201 <= harga_rp <= 1000:
-        nama_folder = "Kelas_2_Midcap_201_1000"
-    else:
-        nama_folder = "Kelas_3_Bluechip_1001_Plus"
-        
-    jalur_lengkap = os.path.join(base_folder, nama_folder)
-    
-    # Buat folder jika belum ada
-    if not os.path.exists(jalur_lengkap):
-        os.makedirs(jalur_lengkap)
-        
-    jalur_file = os.path.join(jalur_lengkap, f"{ticker}_arsip.csv")
-    
-    # Fitur Auto-Reset: Jika ini adalah hari baru, hapus arsip kemarin agar tidak menumpuk!
-    tanggal_sekarang = waktu_obj.strftime("%Y-%m-%d")
-    if os.path.exists(jalur_file):
-        file_date = datetime.fromtimestamp(os.path.getmtime(jalur_file)).strftime('%Y-%m-%d')
-        if file_date != tanggal_sekarang:
-            os.remove(jalur_file)
-            
-    # Buat format mini agar sangat ringan dibaca AI
-    df_mini = pd.DataFrame({
-        "Waktu": [waktu_obj.strftime("%Y-%m-%d %H:%M")],
-        "Harga": [harga_rp],
-        "Volume": [volume]
-    })
-    
-    # Simpan/Tambahkan ke dalam file
-    file_exists = os.path.isfile(jalur_file)
-    df_mini.to_csv(jalur_file, mode='a', header=not file_exists, index=False)
-
-# ==========================================
 # SECTION 1: KONFIGURASI & TOKEN CURIAN BROKSUM
 # ==========================================
 FILE_SAHAM = "Konfigurasi/saham.txt"
@@ -656,15 +616,6 @@ def main():
             
             # Jika hari kerja (Senin-Jumat) DAN antara jam 09:00 - 17:00
             if hari_ini < 5 and 9 <= jam_sekarang < 17:
-                print("🗂️ Memecah data historis 5-menitan ke dalam 3 Folder Kelas...")
-                # Looping untuk memecah data per saham ke foldernya masing-masing
-                for _, row in df_hasil.iterrows():
-                    simpan_arsip_ke_folder_kelas(
-                        ticker=row['Ticker'], 
-                        harga_rp=row['Harga (Rp)'], 
-                        volume=row['Volume'], 
-                        waktu_obj=now
-                    )
                 
                 # 1b. Simpan Backup Harian (HANYA SENIN - JUMAT) dengan metode Append
                 file_exists = os.path.isfile(file_arsip_harian)
