@@ -667,7 +667,6 @@ def main():
                     )
                 
                 # 1b. Simpan Backup Harian (HANYA SENIN - JUMAT) dengan metode Append
-                import os
                 file_exists = os.path.isfile(file_arsip_harian)
                 df_hasil.to_csv(file_arsip_harian, mode='a', header=not file_exists, index=False)
                 
