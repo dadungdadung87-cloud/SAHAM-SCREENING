@@ -1340,109 +1340,132 @@ if not df_hasil.empty:
                                         st.rerun()
 
     # ==========================================
-    # TAB 4: PORTOFOLIO & BOT
-    # ==========================================
-    with tab4:
-        st.markdown("## 🤖 Monitor Bot Simulator")
-        
-        # --- TOMBOL PEMICU BOT ---
-        if st.button("🛒 Eksekusi Pembelian Bot Sekarang!", type="primary", use_container_width=True):
-            with st.spinner("Bot sedang membaca sinyal dan mengeksekusi pembelian..."):
-                import subprocess
-                import time
-                import sys  # <-- Kita butuh ini untuk mencari jalur Python yang benar
-                
-                try:
-                    # GANTI "python" menjadi sys.executable
-                    proses_bot = subprocess.run([sys.executable, "bot_simulator.py"], capture_output=True, text=True)
+        # TAB 4: PORTOFOLIO & BOT
+        # ==========================================
+        with tab4:
+            st.markdown("## 🤖 Monitor Bot Simulator")
+            
+            # --- TOMBOL PEMICU BOT ---
+            if st.button("🛒 Eksekusi Pembelian Bot Sekarang!", type="primary", use_container_width=True):
+                with st.spinner("Bot sedang membaca sinyal dan mengeksekusi pembelian..."):
+                    import subprocess
+                    import time
+                    import sys  # Memastikan menggunakan jalur Python web
                     
-                    # Jika bot gagal (exit code bukan 0)
-                    if proses_bot.returncode != 0:
-                        st.error("❌ Bot gagal dijalankan. Berikut adalah log error dari sistem:")
-                        st.code(proses_bot.stderr, language="bash")
+                    try:
+                        proses_bot = subprocess.run([sys.executable, "bot_simulator.py"], capture_output=True, text=True)
+                        
+                        if proses_bot.returncode != 0:
+                            st.error("❌ Bot gagal dijalankan. Berikut adalah log error dari sistem:")
+                            st.code(proses_bot.stderr, language="bash")
+                        else:
+                            st.success("✅ Bot selesai berbelanja! Memuat ulang halaman...")
+                            time.sleep(2)
+                            st.rerun()
+                    except Exception as e:
+                        st.error(f"Sistem web gagal memanggil file bot: {e}")
+            
+            st.markdown("---")
+            
+            # =========================================================
+            # 📊 LAPORAN PERFORMA (SISTEM BRANKAS 3 LAPIS)
+            # =========================================================
+            st.markdown("## 📊 Dashboard Performa AI (Live)")
+            
+            # Opsi interaktif untuk memilih rumus mana yang ingin diintip
+            pilihan_arena = st.selectbox("📂 Pilih Arena untuk diinspeksi:", [f"Rumus {i}" for i in range(1, 10)])
+            nomor_rumus = pilihan_arena.split(" ")[1]
+
+            # Path File dengan NAMA BARU (Sistem Lapis)
+            FILE_SINYAL = f"Database/sinyal_ai_rumus_{nomor_rumus}.csv"
+            file_porto = f"Database/portofolio_aktif_rumus_{nomor_rumus}.csv"
+            file_hist = f"Database/histori_transaksi_rumus_{nomor_rumus}.csv"
+
+            MODAL_AWAL = 100000000.0 # Rp 100 Juta
+            
+            # Deteksi dan baca file dengan aman
+            df_porto = pd.read_csv(file_porto) if os.path.exists(file_porto) else pd.DataFrame()
+            df_hist = pd.read_csv(file_hist) if os.path.exists(file_hist) else pd.DataFrame()
+
+            # ---------------------------------------------------------
+            # 🏆 LAPIS 3: PAPAN SKOR WINRATE & SALDO KAS
+            # ---------------------------------------------------------
+            total_profit_rp = df_hist['Total_Return_Rp'].sum() if not df_hist.empty and 'Total_Return_Rp' in df_hist.columns else 0
+            modal_terpakai = df_porto['Total_Modal'].sum() if not df_porto.empty and 'Total_Modal' in df_porto.columns else 0
+            
+            # Dana Kas (Menganggur) = Modal Awal + Total Untung/Rugi Histori - Modal Saham Aktif
+            saldo_saat_ini = MODAL_AWAL + total_profit_rp - modal_terpakai
+            total_aset = saldo_saat_ini + modal_terpakai
+            
+            # Kalkulasi Winrate
+            total_trade = len(df_hist)
+            if total_trade > 0 and 'Return_%' in df_hist.columns:
+                win_trade = len(df_hist[df_hist['Return_%'] > 0])
+                winrate = (win_trade / total_trade) * 100
+            else:
+                winrate = 0.0
+
+            # Tampilan 4 Kolom Metrik yang Elegan
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.metric(label="💰 Total Aset (Kas + Saham)", value=f"Rp {total_aset:,.0f}".replace(",", "."))
+            with col2:
+                st.metric(label="💵 Dana Kas Tersedia", value=f"Rp {saldo_saat_ini:,.0f}".replace(",", "."))
+            with col3:
+                st.metric(label="📈 Realized Profit/Loss", value=f"Rp {total_profit_rp:,.0f}".replace(",", "."), delta=f"Rp {total_profit_rp:,.0f}".replace(",", "."))
+            with col4:
+                st.metric(label="🎯 Winrate AI", value=f"{winrate:.1f}%", delta=f"{total_trade} Selesai", delta_color="off")
+
+            st.markdown("---")
+            
+            # ---------------------------------------------------------
+            # MENUNJUKKAN 3 TABEL (ANTREAN, AKTIF, HISTORI)
+            # ---------------------------------------------------------
+            sub1, sub2, sub3 = st.tabs(["📝 Sinyal Antrean", "🟢 Lapis 1: Portofolio Aktif", "📚 Lapis 2: Histori Transaksi"])
+            
+            with sub1:
+                if os.path.exists(FILE_SINYAL):
+                    df_sinyal = pd.read_csv(FILE_SINYAL)
+                    st.success("🔥 Sinyal AI (Kertas Belanja) telah diterima! Bot akan mengeksekusi pembelian pada jam bursa.")
+                    st.dataframe(df_sinyal, use_container_width=True, hide_index=True)
+                else:
+                    st.info(f"KOSONG. Belum ada sinyal masuk untuk {pilihan_arena}, atau bot sudah membelinya dan membakar kertas belanja.")
+            
+            with sub2:
+                if not df_porto.empty:
+                    df_porto_tampil = df_porto.copy()
+                    df_porto_tampil['Harga_Beli'] = df_porto_tampil['Harga_Beli'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
+                    df_porto_tampil['Target_TP'] = df_porto_tampil['Target_TP'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
+                    df_porto_tampil['Target_CL'] = df_porto_tampil['Target_CL'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
+                    df_porto_tampil['Total_Modal'] = df_porto_tampil['Total_Modal'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
+                    st.dataframe(df_porto_tampil, use_container_width=True, hide_index=True)
+                else:
+                    st.info("📦 Gudang kosong. Belum ada saham yang dibeli atau semua sudah terjual (Masuk ke Lapis 2).")
+            
+            with sub3:
+                if not df_hist.empty:
+                    # Fungsi untuk mewarnai profit hijau/merah
+                    def warnai_profit(val):
+                        if isinstance(val, (int, float)):
+                            color = '#166534' if val > 0 else '#991b1b' if val < 0 else ''
+                            return f'background-color: {color}'
+                        return ''
+                        
+                    # Urutkan dari transaksi yang paling baru dijual
+                    if 'Tanggal_Jual' in df_hist.columns:
+                        df_hist_tampil = df_hist.sort_values(by='Tanggal_Jual', ascending=False).reset_index(drop=True)
                     else:
-                        st.success("✅ Bot selesai berbelanja! Memuat ulang halaman...")
-                        time.sleep(2)
-                        st.rerun()
-                except Exception as e:
-                    st.error(f"Sistem web gagal memanggil file bot: {e}")
-        
-        st.markdown("---")
-    with tab4:
-        st.markdown("## 📊 Dashboard Bot Simulator")
-        pilihan_arena = st.selectbox("Pilih Arena:", [
-            "Rumus 1", "Rumus 2", "Rumus 3", "Rumus 4", "Rumus 5", "Rumus 6", "Rumus 7", "Rumus 8", "Rumus 9"
-        ])
-        nomor_rumus = pilihan_arena.split(" ")[1]
-        
-        FILE_SINYAL = f"Database/sinyal_ai_rumus_{nomor_rumus}.csv"
-        FILE_PORTO = f"Database/portofolio_virtual_rumus_{nomor_rumus}.csv"
-        FILE_HIST = f"Database/history_trade_rumus_{nomor_rumus}.csv"
-        MODAL_AWAL = 100000000.0
-
-        df_porto = pd.read_csv(FILE_PORTO) if os.path.exists(FILE_PORTO) else pd.DataFrame()
-        df_hist = pd.read_csv(FILE_HIST) if os.path.exists(FILE_HIST) else pd.DataFrame()
-
-        modal_terpakai = df_porto['Total_Modal'].sum() if not df_porto.empty else 0
-        saldo_kas = MODAL_AWAL - modal_terpakai
-        
-        total_realized_profit = df_hist['Total_Return_Rp'].sum() if not df_hist.empty else 0
-        total_aset = saldo_kas + modal_terpakai + total_realized_profit
-        
-        total_trade = len(df_hist)
-        if total_trade > 0:
-            win_count = len(df_hist[df_hist['Return_%'] > 0])
-            win_rate = (win_count / total_trade) * 100
-        else:
-            win_rate = 0.0
-
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.metric(label="💰 Total Aset (Rp)", value=f"{total_aset:,.0f}".replace(",", "."))
-        with col2:
-            st.metric(label="💵 Kas Tersedia (Rp)", value=f"{saldo_kas:,.0f}".replace(",", "."))
-        with col3:
-            st.metric(label="📈 Realized Profit (Rp)", value=f"{total_realized_profit:,.0f}".replace(",", "."), delta=f"{total_realized_profit:,.0f}")
-        with col4:
-            st.metric(label="🎯 Win Rate AI", value=f"{win_rate:.1f}%", delta=f"{total_trade} Transaksi Selesai", delta_color="off")
-
-        st.markdown("---")
-        
-        sub1, sub2, sub3 = st.tabs(["📌 Antrean (Watchlist)", "🟢 Portofolio Aktif", "📚 Riwayat Transaksi (Closed)"])
-        with sub1:
-            if os.path.exists(FILE_SINYAL):
-                df_sinyal = pd.read_csv(FILE_SINYAL)
-                st.success("🔥 Sinyal AI telah diterima! Bot akan mengeksekusi pembelian pada jam bursa.")
-                st.dataframe(df_sinyal, use_container_width=True, hide_index=True)
-            else:
-                st.info(f"KOSONG. Belum ada sinyal masuk untuk {pilihan_arena}, atau bot sudah mengeksekusi dan membakar kertas belanja.")
-        with sub2:
-            if not df_porto.empty:
-                df_porto_tampil = df_porto.copy()
-                df_porto_tampil['Harga_Beli'] = df_porto_tampil['Harga_Beli'].apply(lambda x: f"Rp {x:,.0f}")
-                df_porto_tampil['Target_TP'] = df_porto_tampil['Target_TP'].apply(lambda x: f"Rp {x:,.0f}")
-                df_porto_tampil['Target_CL'] = df_porto_tampil['Target_CL'].apply(lambda x: f"Rp {x:,.0f}")
-                df_porto_tampil['Total_Modal'] = df_porto_tampil['Total_Modal'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
-                st.dataframe(df_porto_tampil, use_container_width=True, hide_index=True)
-            else:
-                st.info(f"Buku portofolio {pilihan_arena} kosong.")
-        with sub3:
-            if not df_hist.empty:
-                def warnai_profit(val):
-                    if isinstance(val, (int, float)):
-                        color = '#166534' if val > 0 else '#991b1b' if val < 0 else ''
-                        return f'background-color: {color}'
-                    return ''
-                df_hist_tampil = df_hist.sort_values(by='Tanggal_Jual', ascending=False).reset_index(drop=True)
-                st.dataframe(
-                    df_hist_tampil.style.applymap(warnai_profit, subset=['Total_Return_Rp', 'Return_%']).format({
-                        'Harga_Beli': "Rp {:,.0f}",
-                        'Harga_Jual': "Rp {:,.0f}",
-                        'Total_Return_Rp': "Rp {:,.0f}",
-                        'Return_%': "{:.2f}%"
-                    }),
-                    use_container_width=True,
-                    hide_index=True
-                )
-            else:
-                st.info(f"Belum ada riwayat penjualan saham untuk {pilihan_arena}.")
+                        df_hist_tampil = df_hist.copy()
+                        
+                    st.dataframe(
+                        df_hist_tampil.style.applymap(warnai_profit, subset=['Total_Return_Rp', 'Return_%']).format({
+                            'Harga_Beli': "Rp {:,.0f}",
+                            'Harga_Jual': "Rp {:,.0f}",
+                            'Total_Return_Rp': "Rp {:,.0f}",
+                            'Return_%': "{:.2f}%"
+                        }),
+                        use_container_width=True,
+                        hide_index=True
+                    )
+                else:
+                    st.info(f"📭 Belum ada riwayat penjualan saham untuk {pilihan_arena}.")
