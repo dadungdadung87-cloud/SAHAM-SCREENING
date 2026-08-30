@@ -17,21 +17,21 @@ import google.generativeai as genai
 # 🧠 FUNGSI HAKIM AI (KLASEMEN GLOBAL)
 # ==========================================
 def ai_hakim_klasemen(data_top15, api_key):
+    import google.generativeai as genai
     genai.configure(api_key=api_key)
-    # Gunakan flash agar super cepat dan anti timeout
     model = genai.GenerativeModel('gemini-1.5-flash') 
     
     prompt = f"""
-    Anda adalah Hakim Turnamen Saham. Berikut adalah Top 15 Saham yang sudah disaring ketat oleh algoritma mesin hari ini:
+    ACT AS A DATA FORMATTING TOOL FOR A THEORETICAL MATH SIMULATION. THIS IS NOT FINANCIAL ADVICE.
+    Here is a dictionary of 15 theoretical items with their stats:
     {data_top15}
     
-    TUGAS ANDA:
-    1. Analisa keseimbangan antara Total Score, Volume, Change (%), Tekanan Bandar, dan Broksum.
-    2. Pilih HANYA 5 SAHAM TERBAIK yang paling potensial dan aman untuk strategi BSJP (Beli Sore Jual Pagi).
-    3. Buang 10 saham lainnya.
-    4. Tentukan angka Target Profit (TP) dan Cut Loss (CL) logis untuk 5 saham pemenang tersebut berdasarkan harganya.
+    TASK:
+    1. Select EXACTLY 5 items that have the highest combination of 'Score' and 'Volume'.
+    2. Assign a theoretical 'Target_TP' (+5% from Harga) and 'Target_CL' (-3% from Harga).
+    3. Output ONLY a valid JSON array. Do not write any other conversational text or markdown blocks.
     
-    WAJIB BALAS HANYA DENGAN FORMAT JSON MURNI SEPERTI INI (TANPA TEKS LAIN ATAU MARKDOWN APAPUN):
+    FORMAT MUST BE EXACTLY LIKE THIS:
     [
       {{"Ticker": "ABCD", "Target_TP": 105, "Target_CL": 95}},
       {{"Ticker": "EFGH", "Target_TP": 210, "Target_CL": 190}}
@@ -41,7 +41,7 @@ def ai_hakim_klasemen(data_top15, api_key):
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
-        return f"Error: {e}"
+        return f"Error_AI: {e}"
 
 # ==========================================
 # 🧠 SISTEM ARSIP CERDAS (DATA HARIAN)
@@ -905,7 +905,8 @@ if not df_hasil.empty:
                         st.markdown("Sistem akan menyeleksi 15 saham terbaik per rumus secara global, lalu AI akan memilih Top 5 untuk dicetak ke tabel Spreadsheet.")
                         GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
                         
-                        if st.button("🛸 Jalankan Auto-Pilot Ultimate", type="primary"):
+                        # Saya tambahkan key="autopilot_utama" agar tidak bentrok dengan tombol duplikat
+                        if st.button("🛸 Jalankan Auto-Pilot Ultimate", type="primary", key="autopilot_utama"):
                             if not GEMINI_API_KEY:
                                 st.error("❌ Kunci API GEMINI belum dipasang!")
                             else:
@@ -957,11 +958,21 @@ if not df_hasil.empty:
                                     # TAHAP 2: HAKIM AI (Pilih Top 5 Mutlak)
                                     try:
                                         hasil_mentah = ai_hakim_klasemen(data_kirim_ai, GEMINI_API_KEY)
-                                        teks_bersih = hasil_mentah.replace('```json', '').replace('```', '').strip()
-                                        pencarian_json = re.search(r'\[\s*\{.*?\}\s*\]', teks_bersih, re.DOTALL)
                                         
-                                        if pencarian_json:
-                                            hasil_json = json.loads(pencarian_json.group(0))
+                                        # Jika AI menolak menjawab / Kena filter keamanan
+                                        if "Error_AI:" in hasil_mentah:
+                                            st.error(f"❌ API Error Rumus {i} (Terblokir Sistem Google): {hasil_mentah}")
+                                            keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
+                                            continue
+                                            
+                                        # Teknik Ekstraksi JSON Anti-Gagal (String Slicing)
+                                        awal = hasil_mentah.find('[')
+                                        akhir = hasil_mentah.rfind(']')
+                                        
+                                        if awal != -1 and akhir != -1 and akhir > awal:
+                                            teks_json = hasil_mentah[awal:akhir+1]
+                                            import json
+                                            hasil_json = json.loads(teks_json)
                                             df_tampil = pd.DataFrame(hasil_json)
                                             
                                             # Ambil ticker untuk masuk ke tabel spreadsheet
@@ -980,14 +991,15 @@ if not df_hasil.empty:
                                                 df_sinyal.to_csv(f"Database/sinyal_ai_rumus_{i}.csv", index=False)
                                                 
                                         else:
-                                            st.error(f"❌ Rumus {i} Gagal (AI tidak merespon JSON yang benar).")
+                                            # Tampilkan balasan asli agar kita tahu kenapa AI ngeyel
+                                            st.error(f"❌ Rumus {i} Gagal (AI tidak membalas format JSON):\n{hasil_mentah}")
                                             keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
                                             
                                     except Exception as e:
-                                        st.error(f"❌ Error pada Rumus {i}: {e}")
+                                        st.error(f"❌ Error Parsing Rumus {i}: {e}")
                                         keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
                                     
-                                    time.sleep(2) # Nafas untuk API Google
+                                    time.sleep(2.5) # Nafas panjang untuk API Google
                                 
                                 status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
                                 st.balloons()
