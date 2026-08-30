@@ -897,42 +897,144 @@ if not df_hasil.empty:
                 
                 if "AI Bandar" in pilihan_ai:
                     st.subheader("🤖 AI Bandar (Persiapan BSJP Besok)")
-                    st.markdown("Paste saham yang MASIH MERAH / SIDEWAYS. AI akan mencari siapa yang siap terbang besok.")
-                    input_saham_massal = st.text_area("📋 Paste Daftar Saham (Pisahkan dengan Enter/Spasi):", placeholder="Contoh:\nDMAS\nINDF", height=200, key="input_ai_bandar")
                     
-                    if st.button("🔮 Mulai Eksekusi AI Bandar"):
-                        saham_bersih = [s.strip().upper() for s in re.split(r'[,\s\n]+', input_saham_massal) if s.strip()]
-                        saham_unik = list(dict.fromkeys(saham_bersih))
-                        saham_valid = [s for s in saham_unik if s in df_hasil['Ticker'].values]
+                    # MEMBAGI AI BANDAR MENJADI 2 TAB AGAR RAPI
+                    tab_otomatis, tab_manual = st.tabs(["🛸 Auto-Pilot 9 Rumus (Spreadsheet)", "✍️ Mode Manual (Paste Saham)"])
+                    
+                    with tab_otomatis:
+                        st.markdown("Sistem akan menyeleksi 15 saham terbaik per rumus secara global, lalu AI akan memilih Top 5 untuk dicetak ke tabel Spreadsheet.")
+                        GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
                         
-                        df_valid = df_hasil[df_hasil['Ticker'].isin(saham_valid)].copy()
-                        if 'Change (%)' in df_valid.columns:
-                            df_valid = df_valid[df_valid['Change (%)'] <= 5.0]
-                            saham_valid = df_valid['Ticker'].tolist()
+                        if st.button("🛸 Jalankan Auto-Pilot Ultimate", type="primary"):
+                            if not GEMINI_API_KEY:
+                                st.error("❌ Kunci API GEMINI belum dipasang!")
+                            else:
+                                daftar_rumus = {
+                                    1: df_v1, 2: df_v2, 3: df_v3, 
+                                    4: df_v4, 5: df_v5, 6: df_v6, 
+                                    7: df_v7, 8: df_v8, 9: df_v9
+                                }
+                                
+                                progress_bar = st.progress(0)
+                                status_teks = st.empty()
+                                
+                                # Siapkan keranjang untuk membuat tabel spreadsheet di akhir
+                                keranjang_spreadsheet = {f"RUMUS {i}": [] for i in range(1, 10)}
+                                
+                                for i in range(1, 10):
+                                    df_target = daftar_rumus[i]
+                                    progress_bar.progress(i / 9.0)
+                                    
+                                    if len(df_target) == 0:
+                                        status_teks.warning(f"⏭️ Rumus {i} kosong. Dilewati.")
+                                        time.sleep(1)
+                                        continue
+                                        
+                                    status_teks.info(f"🔄 **Algojo Python bekerja pada Rumus {i}**... (Mengekstrak data global)")
+                                    
+                                    saham_valid = df_target['Ticker'].tolist()
+                                    df_seleksi = df_hasil[df_hasil['Ticker'].isin(saham_valid)].copy()
+                                    
+                                    df_seleksi['Score_Num'] = pd.to_numeric(df_seleksi['Total Score'], errors='coerce').fillna(0)
+                                    
+                                    # TAHAP 1: KLASEMEN GLOBAL (Pilih Top 15 berdasarkan Data Keras)
+                                    df_sorted = df_seleksi.sort_values(by=['Score_Num', 'Volume', 'Change (%)'], ascending=[False, False, False])
+                                    top_15 = df_sorted.head(15)
+                                    
+                                    data_kirim_ai = {}
+                                    for _, row in top_15.iterrows():
+                                        data_kirim_ai[row['Ticker']] = {
+                                            'Harga': row.get('Harga (Rp)', 0),
+                                            'Volume': row.get('Volume', 0),
+                                            'Score': row.get('Score_Num', 0),
+                                            'Change_Pct': row.get('Change (%)', 0),
+                                            'Tekanan_Bandar': row.get('Tekanan Bandar', 'Normal'),
+                                            'Broksum': row.get('Broksum', 'Normal')
+                                        }
+                                        
+                                    status_teks.warning(f"🧠 Rumus {i} - Sidang Grand Final AI... (Menyaring 5 Jawara dari Top 15)")
+                                    
+                                    # TAHAP 2: HAKIM AI (Pilih Top 5 Mutlak)
+                                    try:
+                                        hasil_mentah = ai_hakim_klasemen(data_kirim_ai, GEMINI_API_KEY)
+                                        teks_bersih = hasil_mentah.replace('```json', '').replace('```', '').strip()
+                                        pencarian_json = re.search(r'\[\s*\{.*?\}\s*\]', teks_bersih, re.DOTALL)
+                                        
+                                        if pencarian_json:
+                                            hasil_json = json.loads(pencarian_json.group(0))
+                                            df_tampil = pd.DataFrame(hasil_json)
+                                            
+                                            # Ambil ticker untuk masuk ke tabel spreadsheet
+                                            if 'Ticker' in df_tampil.columns:
+                                                jawara_tickers = df_tampil['Ticker'].tolist()
+                                            else:
+                                                jawara_tickers = []
+                                                
+                                            # Batasi maksimal 5, jika kurang tambahkan string kosong "" agar tabel rata
+                                            jawara_tickers = (jawara_tickers + ["", "", "", "", ""])[:5] 
+                                            keranjang_spreadsheet[f"RUMUS {i}"] = jawara_tickers
+                                            
+                                            # Simpan sinyal untuk dieksekusi bot malam ini
+                                            if 'Target_TP' in df_tampil.columns and 'Target_CL' in df_tampil.columns:
+                                                df_sinyal = df_tampil[['Ticker', 'Target_TP', 'Target_CL']]
+                                                df_sinyal.to_csv(f"Database/sinyal_ai_rumus_{i}.csv", index=False)
+                                                
+                                        else:
+                                            st.error(f"❌ Rumus {i} Gagal (AI tidak merespon JSON yang benar).")
+                                            keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
+                                            
+                                    except Exception as e:
+                                        st.error(f"❌ Error pada Rumus {i}: {e}")
+                                        keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
+                                    
+                                    time.sleep(2) # Nafas untuk API Google
+                                
+                                status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
+                                st.balloons()
+                                
+                                # TAHAP 3: CETAK TABEL SPREADSHEET (Siap Copy-Paste)
+                                st.markdown("### 📋 Tabel Master Portofolio (Siap Salin)")
+                                df_spreadsheet = pd.DataFrame(keranjang_spreadsheet)
+                                
+                                st.data_editor(df_spreadsheet, use_container_width=True, hide_index=True)
 
-                        if not saham_valid:
-                            st.error("❌ Saham yang Anda masukkan sudah terbang terlalu tinggi (>5%). Gunakan AI Bandar untuk mencari saham yang masih di bawah!")
-                        else:
-                            if len(saham_valid) > 19:
-                                st.info("🤖 Menyaring 19 saham terbaik untuk mencegah limit AI...")
-                                df_valid = df_valid.sort_values(by=['Total Score', 'Volume'], ascending=[False, False])
-                                saham_valid = df_valid['Ticker'].head(19).tolist()
+                    with tab_manual:
+                        st.markdown("Paste saham yang MASIH MERAH / SIDEWAYS. AI akan mencari siapa yang siap terbang besok.")
+                        input_saham_massal = st.text_area("📋 Paste Daftar Saham (Pisahkan dengan Enter/Spasi):", placeholder="Contoh:\nDMAS\nINDF", height=200, key="input_ai_bandar")
+                        
+                        if st.button("🔮 Mulai Eksekusi AI Bandar"):
+                            saham_bersih = [s.strip().upper() for s in re.split(r'[,\s\n]+', input_saham_massal) if s.strip()]
+                            saham_unik = list(dict.fromkeys(saham_bersih))
+                            saham_valid = [s for s in saham_unik if s in df_hasil['Ticker'].values]
                             
-                            with st.spinner(f"Menganalisa {len(saham_valid)} saham untuk BSJP besok..."):
-                                data_kompilasi = {}
-                                for ticker in saham_valid:
-                                    data_saham = df_hasil[df_hasil['Ticker'] == ticker].iloc[0]
-                                    teks_ringkasan = get_historical_summary(ticker)
-                                    data_kompilasi[ticker] = {
-                                        'harga': data_saham.get('Harga (Rp)', 0),
-                                        'change': data_saham.get('Change (%)', 0), 
-                                        'broksum': data_saham.get('Broksum', 'Tidak Ada'),
-                                        'status': data_saham.get('Fase Siklus Bandar', 'Normal'),
-                                        'skor': data_saham.get('Total Score', 0),
-                                        'histori': teks_ringkasan if teks_ringkasan else "Arsip belum tersedia."
-                                    }
-                                hasil_ai = analisa_bandar_ai_multisaham(data_kompilasi, 'pilihan_ai')
-                                st.info(hasil_ai)
+                            df_valid = df_hasil[df_hasil['Ticker'].isin(saham_valid)].copy()
+                            if 'Change (%)' in df_valid.columns:
+                                df_valid = df_valid[df_valid['Change (%)'] <= 5.0]
+                                saham_valid = df_valid['Ticker'].tolist()
+
+                            if not saham_valid:
+                                st.error("❌ Saham yang Anda masukkan sudah terbang terlalu tinggi (>5%). Gunakan AI Bandar untuk mencari saham yang masih di bawah!")
+                            else:
+                                if len(saham_valid) > 19:
+                                    st.info("🤖 Menyaring 19 saham terbaik untuk mencegah limit AI...")
+                                    df_valid = df_valid.sort_values(by=['Total Score', 'Volume'], ascending=[False, False])
+                                    saham_valid = df_valid['Ticker'].head(19).tolist()
+                                
+                                with st.spinner(f"Menganalisa {len(saham_valid)} saham untuk BSJP besok..."):
+                                    data_kompilasi = {}
+                                    for ticker in saham_valid:
+                                        data_saham = df_hasil[df_hasil['Ticker'] == ticker].iloc[0]
+                                        teks_ringkasan = get_historical_summary(ticker)
+                                        data_kompilasi[ticker] = {
+                                            'harga': data_saham.get('Harga (Rp)', 0),
+                                            'change': data_saham.get('Change (%)', 0), 
+                                            'broksum': data_saham.get('Broksum', 'Tidak Ada'),
+                                            'status': data_saham.get('Fase Siklus Bandar', 'Normal'),
+                                            'skor': data_saham.get('Total Score', 0),
+                                            'histori': teks_ringkasan if teks_ringkasan else "Arsip belum tersedia."
+                                        }
+                                    hasil_ai = analisa_bandar_ai_multisaham(data_kompilasi, 'pilihan_ai')
+                                    st.info(hasil_ai)
 
                 elif "Forensik Bandar" in pilihan_ai:
                     st.subheader("📡 Radar Pencari Model Gemini Aktif (Live Server)")
@@ -1020,9 +1122,8 @@ if not df_hasil.empty:
                                     st.info("💡 **TUGAS ANDA:** Salin nama model yang berstatus '✅ Lulus & Patuh', dan kita gunakan nama pasti itu untuk skrip turnamen!")
 
                 elif "Pemburu ARA" in pilihan_ai:
-                    st.subheader("🎯 Turnamen AI (Spesialis Akumulasi Siluman)")
-                    
-                    GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
+                    st.subheader("🎯 Pemburu ARA (Sistem Kualifikasi Lama)")
+                    st.info("💡 **Fitur Auto-Pilot 9 Rumus (Klasemen Global) telah dipindahkan ke menu '🤖 AI Bandar'.** Silakan buka menu tersebut untuk menggunakan mode pencetak Tabel Spreadsheet secara otomatis!")
 
                     # ==============================================================
                     # 🛸 TOMBOL AUTO-PILOT ULTIMATE (KLASEMEN GLOBAL)
