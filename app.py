@@ -990,24 +990,28 @@ if not df_hasil.empty:
                                             continue
                                             
                                         import json
-                                        import ast
+                                        import re
                                         
-                                        # Cari posisi kurung buka dan tutup
+                                        # PISAU BEDAH: Cari karakter '[' pertama dan ']' terakhir. Buang semua teks di luar itu!
                                         awal = hasil_mentah.find('[')
                                         akhir = hasil_mentah.rfind(']')
                                         
                                         if awal != -1 and akhir != -1 and akhir > awal:
                                             teks_ekstrak = hasil_mentah[awal:akhir+1]
                                             
-                                            # Sistem Lapis Baja: Jika JSON biasa gagal, paksa baca dengan AST Python
                                             try:
+                                                # Coba baca secara normal
                                                 hasil_json = json.loads(teks_ekstrak)
                                             except json.JSONDecodeError:
                                                 try:
-                                                    hasil_json = ast.literal_eval(teks_ekstrak)
+                                                    # Jika gagal, bersihkan kutip satu menjadi kutip ganda (sering salah dari AI)
+                                                    teks_bersih = teks_ekstrak.replace("'", '"')
+                                                    # Bersihkan spasi/enter berlebih
+                                                    teks_bersih = re.sub(r',\s*]', ']', teks_bersih) # Hapus trailing comma
+                                                    hasil_json = json.loads(teks_bersih)
                                                 except Exception as e_ast:
-                                                    st.error(f"❌ Rumus {i} gagal diubah ke tabel. Format dari AI cacat.")
-                                                    st.code(teks_ekstrak, language="json") # Menampilkan apa isi teks rusaknya
+                                                    st.error(f"❌ Rumus {i} dilewati: AI membalas dengan struktur tabel yang rusak permanen.")
+                                                    st.code(teks_ekstrak, language="json")
                                                     keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
                                                     continue
                                                     
@@ -1023,11 +1027,12 @@ if not df_hasil.empty:
                                                 df_tampil[['Ticker', 'Target_TP', 'Target_CL']].to_csv(f"Database/sinyal_ai_rumus_{i}.csv", index=False)
                                                 
                                         else:
-                                            st.error(f"❌ Rumus {i} dilewati: AI tidak mencetak kurung tabel [].\nBalasan AI: {hasil_mentah[:100]}...")
+                                            st.error(f"❌ Rumus {i} dilewati: AI gagal memberikan format tabel [].")
+                                            st.code(hasil_mentah, language="text")
                                             keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
                                             
                                     except Exception as e:
-                                        st.error(f"❌ Error Sistem Rumus {i}: {e}")
+                                        st.error(f"❌ Error Sistem Mesin pada Rumus {i}: {e}")
                                         keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
                                     
                                     time.sleep(2.5) # Nafas panjang untuk API Google
