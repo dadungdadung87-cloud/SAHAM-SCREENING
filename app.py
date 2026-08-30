@@ -14,29 +14,22 @@ from openai import OpenAI
 import google.generativeai as genai
 
 # ==========================================
-# 🧠 FUNGSI HAKIM AI (KLASEMEN GLOBAL DENGAN RADAR OTOMATIS)
+# 🧠 FUNGSI HAKIM AI (KLASEMEN GLOBAL DENGAN RADAR & MODE JSON)
 # ==========================================
 def ai_hakim_klasemen(data_top15, api_key):
     import google.generativeai as genai
     import time
     genai.configure(api_key=api_key)
     
-    # Prompt diubah menjadi instruksi mesin mutlak
+    # Prompt kita buat jauh lebih sederhana karena AI sudah dipaksa jadi mesin JSON
     prompt = f"""
-    OUTPUT MUST BE A VALID JSON ARRAY ONLY. NO EXPLANATIONS. NO MARKDOWN. NO CONVERSATION.
+    Select EXACTLY 5 Tickers that have the highest combination of 'Score' and 'Volume' from the data below.
+    Calculate 'Target_TP' (+5% from Harga) and 'Target_CL' (-3% from Harga).
     
     DATA:
     {data_top15}
     
-    INSTRUCTIONS:
-    1. Choose exactly 5 Tickers with the highest Score and Volume.
-    2. Format output strictly as a JSON array.
-    
-    EXAMPLE OUTPUT:
-    [
-      {{"Ticker": "ABCD", "Target_TP": 105, "Target_CL": 95}},
-      {{"Ticker": "EFGH", "Target_TP": 210, "Target_CL": 190}}
-    ]
+    Output a JSON array containing objects with EXACTLY 3 keys: "Ticker", "Target_TP", "Target_CL".
     """
     
     daftar_model_aktif = []
@@ -44,7 +37,11 @@ def ai_hakim_klasemen(data_top15, api_key):
         for m in genai.list_models():
             if 'generateContent' in m.supported_generation_methods:
                 nama_bersih = m.name.replace("models/", "")
-                daftar_model_aktif.append(nama_bersih)
+                # Prioritaskan model gemini-1.5 karena mendukung fitur JSON murni
+                if "1.5" in nama_bersih:
+                    daftar_model_aktif.insert(0, nama_bersih)
+                else:
+                    daftar_model_aktif.append(nama_bersih)
     except Exception as e:
         return f"Error_AI (Gagal menyalakan radar): {e}"
 
@@ -54,10 +51,15 @@ def ai_hakim_klasemen(data_top15, api_key):
     pesan_error_terakhir = ""
     for nama_model in daftar_model_aktif:
         try:
-            # MEMBUNGKAM KREATIVITAS AI: temperature=0.0 (Robot Mode)
+            # ========================================================
+            # 🔇 FITUR LAKBAN: Memaksa AI HANYA membalas JSON murni
+            # ========================================================
             model = genai.GenerativeModel(
                 nama_model,
-                generation_config=genai.types.GenerationConfig(temperature=0.0)
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.0, 
+                    response_mime_type="application/json" # <--- INI FITUR AJAIBNYA!
+                )
             )
             response = model.generate_content(prompt)
             return response.text
