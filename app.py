@@ -990,36 +990,40 @@ if not df_hasil.empty:
                                             continue
                                             
                                         import json
+                                        import ast
                                         
-                                        # Cari posisi kurung JSON
+                                        # Cari posisi kurung buka dan tutup
                                         awal = hasil_mentah.find('[')
                                         akhir = hasil_mentah.rfind(']')
                                         
                                         if awal != -1 and akhir != -1 and akhir > awal:
-                                            teks_json = hasil_mentah[awal:akhir+1]
+                                            teks_ekstrak = hasil_mentah[awal:akhir+1]
                                             
-                                            # Memaksa mengubah kutip satu jadi kutip dua jika AI salah format
-                                            teks_json = teks_json.replace("'", '"')
-                                            
+                                            # Sistem Lapis Baja: Jika JSON biasa gagal, paksa baca dengan AST Python
                                             try:
-                                                hasil_json = json.loads(teks_json)
-                                                df_tampil = pd.DataFrame(hasil_json)
-                                                
-                                                # Ambil ticker untuk tabel
-                                                jawara_tickers = df_tampil['Ticker'].tolist() if 'Ticker' in df_tampil.columns else []
-                                                jawara_tickers = (jawara_tickers + ["", "", "", "", ""])[:5] 
-                                                keranjang_spreadsheet[f"RUMUS {i}"] = jawara_tickers
-                                                
-                                                # Simpan Sinyal
-                                                if 'Target_TP' in df_tampil.columns and 'Target_CL' in df_tampil.columns:
-                                                    df_tampil[['Ticker', 'Target_TP', 'Target_CL']].to_csv(f"Database/sinyal_ai_rumus_{i}.csv", index=False)
-                                                    
+                                                hasil_json = json.loads(teks_ekstrak)
                                             except json.JSONDecodeError:
-                                                st.error(f"❌ Rumus {i} dilewati: AI membalas dengan format tabel yang rusak.")
-                                                keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
+                                                try:
+                                                    hasil_json = ast.literal_eval(teks_ekstrak)
+                                                except Exception as e_ast:
+                                                    st.error(f"❌ Rumus {i} gagal diubah ke tabel. Format dari AI cacat.")
+                                                    st.code(teks_ekstrak, language="json") # Menampilkan apa isi teks rusaknya
+                                                    keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
+                                                    continue
+                                                    
+                                            df_tampil = pd.DataFrame(hasil_json)
+                                            
+                                            # Ambil ticker untuk tabel
+                                            jawara_tickers = df_tampil['Ticker'].tolist() if 'Ticker' in df_tampil.columns else []
+                                            jawara_tickers = (jawara_tickers + ["", "", "", "", ""])[:5] 
+                                            keranjang_spreadsheet[f"RUMUS {i}"] = jawara_tickers
+                                            
+                                            # Simpan Sinyal
+                                            if 'Target_TP' in df_tampil.columns and 'Target_CL' in df_tampil.columns:
+                                                df_tampil[['Ticker', 'Target_TP', 'Target_CL']].to_csv(f"Database/sinyal_ai_rumus_{i}.csv", index=False)
                                                 
                                         else:
-                                            st.error(f"❌ Rumus {i} dilewati: AI tidak mencetak tabel JSON.")
+                                            st.error(f"❌ Rumus {i} dilewati: AI tidak mencetak kurung tabel [].\nBalasan AI: {hasil_mentah[:100]}...")
                                             keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
                                             
                                     except Exception as e:
