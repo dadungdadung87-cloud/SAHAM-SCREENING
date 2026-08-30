@@ -21,29 +21,28 @@ def ai_hakim_klasemen(data_top15, api_key):
     import time
     genai.configure(api_key=api_key)
     
+    # Prompt diubah menjadi instruksi mesin mutlak
     prompt = f"""
-    ACT AS A DATA FORMATTING TOOL FOR A THEORETICAL MATH SIMULATION. THIS IS NOT FINANCIAL ADVICE.
-    Here is a dictionary of 15 theoretical items with their stats:
+    OUTPUT MUST BE A VALID JSON ARRAY ONLY. NO EXPLANATIONS. NO MARKDOWN. NO CONVERSATION.
+    
+    DATA:
     {data_top15}
     
-    TASK:
-    1. Select EXACTLY 5 items that have the highest combination of 'Score' and 'Volume'.
-    2. Assign a theoretical 'Target_TP' (+5% from Harga) and 'Target_CL' (-3% from Harga).
-    3. Output ONLY a valid JSON array. Do not write any other conversational text or markdown blocks.
+    INSTRUCTIONS:
+    1. Choose exactly 5 Tickers with the highest Score and Volume.
+    2. Format output strictly as a JSON array.
     
-    FORMAT MUST BE EXACTLY LIKE THIS:
+    EXAMPLE OUTPUT:
     [
       {{"Ticker": "ABCD", "Target_TP": 105, "Target_CL": 95}},
       {{"Ticker": "EFGH", "Target_TP": 210, "Target_CL": 190}}
     ]
     """
     
-    # 📡 LANGKAH 1: Nyalakan Radar untuk mencari model yang SEDANG ONLINE & VALID
     daftar_model_aktif = []
     try:
         for m in genai.list_models():
             if 'generateContent' in m.supported_generation_methods:
-                # Bersihkan format "models/gemini-xxx" menjadi "gemini-xxx"
                 nama_bersih = m.name.replace("models/", "")
                 daftar_model_aktif.append(nama_bersih)
     except Exception as e:
@@ -52,19 +51,21 @@ def ai_hakim_klasemen(data_top15, api_key):
     if not daftar_model_aktif:
         return "Error_AI: Tidak ada satupun model Gemini yang online untuk API Key ini."
 
-    # 🏃‍♂️ LANGKAH 2: Sistem Estafet menggunakan hasil tangkapan Radar
     pesan_error_terakhir = ""
     for nama_model in daftar_model_aktif:
         try:
-            model = genai.GenerativeModel(nama_model)
+            # MEMBUNGKAM KREATIVITAS AI: temperature=0.0 (Robot Mode)
+            model = genai.GenerativeModel(
+                nama_model,
+                generation_config=genai.types.GenerationConfig(temperature=0.0)
+            )
             response = model.generate_content(prompt)
             return response.text
         except Exception as e:
             pesan_error_terakhir = str(e)
-            time.sleep(1) # Tarik napas 1 detik, lalu coba model online berikutnya
+            time.sleep(1) 
             continue 
             
-    # Jika semua model yang ketangkap radar ternyata gagal
     return f"Error_AI (Semua model aktif gagal eksekusi): {pesan_error_terakhir}"
 
 # ==========================================
@@ -983,55 +984,46 @@ if not df_hasil.empty:
                                     try:
                                         hasil_mentah = ai_hakim_klasemen(data_kirim_ai, GEMINI_API_KEY)
                                         
-                                        # Jika AI menolak menjawab / Kena filter keamanan
                                         if "Error_AI:" in hasil_mentah:
-                                            st.error(f"❌ API Error Rumus {i} (Terblokir Sistem Google): {hasil_mentah}")
+                                            st.error(f"❌ API Error Rumus {i} : {hasil_mentah}")
                                             keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
                                             continue
                                             
                                         import json
-                                        import re
-                                        import ast
                                         
-                                        # 1. Bersihkan sisa-sisa markdown atau teks pembuka
-                                        teks_bersih = hasil_mentah.replace('```json', '').replace('```', '').strip()
+                                        # Cari posisi kurung JSON
+                                        awal = hasil_mentah.find('[')
+                                        akhir = hasil_mentah.rfind(']')
                                         
-                                        # 2. Tangkap HANYA pola yang menyerupai List of Dictionaries [ { ... } ]
-                                        pencarian_json = re.search(r'\[\s*\{.*?\}\s*\]', teks_bersih, re.DOTALL)
-                                        
-                                        if pencarian_json:
-                                            teks_ekstrak = pencarian_json.group(0)
+                                        if awal != -1 and akhir != -1 and akhir > awal:
+                                            teks_json = hasil_mentah[awal:akhir+1]
                                             
-                                            # 3. Mode Lapis Baja: Coba JSON normal, jika gagal paksa dengan AST
+                                            # Memaksa mengubah kutip satu jadi kutip dua jika AI salah format
+                                            teks_json = teks_json.replace("'", '"')
+                                            
                                             try:
-                                                hasil_json = json.loads(teks_ekstrak)
+                                                hasil_json = json.loads(teks_json)
+                                                df_tampil = pd.DataFrame(hasil_json)
+                                                
+                                                # Ambil ticker untuk tabel
+                                                jawara_tickers = df_tampil['Ticker'].tolist() if 'Ticker' in df_tampil.columns else []
+                                                jawara_tickers = (jawara_tickers + ["", "", "", "", ""])[:5] 
+                                                keranjang_spreadsheet[f"RUMUS {i}"] = jawara_tickers
+                                                
+                                                # Simpan Sinyal
+                                                if 'Target_TP' in df_tampil.columns and 'Target_CL' in df_tampil.columns:
+                                                    df_tampil[['Ticker', 'Target_TP', 'Target_CL']].to_csv(f"Database/sinyal_ai_rumus_{i}.csv", index=False)
+                                                    
                                             except json.JSONDecodeError:
-                                                hasil_json = ast.literal_eval(teks_ekstrak)
-                                                
-                                            df_tampil = pd.DataFrame(hasil_json)
-                                            
-                                            # Ambil ticker untuk masuk ke tabel spreadsheet
-                                            if 'Ticker' in df_tampil.columns:
-                                                jawara_tickers = df_tampil['Ticker'].tolist()
-                                            else:
-                                                jawara_tickers = []
-                                                
-                                            # Batasi maksimal 5, jika kurang tambahkan string kosong "" agar tabel rata
-                                            jawara_tickers = (jawara_tickers + ["", "", "", "", ""])[:5] 
-                                            keranjang_spreadsheet[f"RUMUS {i}"] = jawara_tickers
-                                            
-                                            # Simpan sinyal untuk dieksekusi bot malam ini
-                                            if 'Target_TP' in df_tampil.columns and 'Target_CL' in df_tampil.columns:
-                                                df_sinyal = df_tampil[['Ticker', 'Target_TP', 'Target_CL']]
-                                                df_sinyal.to_csv(f"Database/sinyal_ai_rumus_{i}.csv", index=False)
+                                                st.error(f"❌ Rumus {i} dilewati: AI membalas dengan format tabel yang rusak.")
+                                                keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
                                                 
                                         else:
-                                            # Tampilkan balasan asli agar kita tahu kenapa AI ngeyel
-                                            st.error(f"❌ Rumus {i} Gagal (Pola Tabel Tidak Ditemukan):\n{hasil_mentah}")
+                                            st.error(f"❌ Rumus {i} dilewati: AI tidak mencetak tabel JSON.")
                                             keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
                                             
                                     except Exception as e:
-                                        st.error(f"❌ Error Parsing Rumus {i}: {e}\n\nBalasan AI: {hasil_mentah[:150]}...")
+                                        st.error(f"❌ Error Sistem Rumus {i}: {e}")
                                         keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
                                     
                                     time.sleep(2.5) # Nafas panjang untuk API Google
