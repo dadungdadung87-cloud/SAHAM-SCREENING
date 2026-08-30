@@ -14,12 +14,12 @@ from openai import OpenAI
 import google.generativeai as genai
 
 # ==========================================
-# 🧠 FUNGSI HAKIM AI (KLASEMEN GLOBAL)
+# 🧠 FUNGSI HAKIM AI (KLASEMEN GLOBAL DENGAN RADAR OTOMATIS)
 # ==========================================
 def ai_hakim_klasemen(data_top15, api_key):
     import google.generativeai as genai
+    import time
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash') 
     
     prompt = f"""
     ACT AS A DATA FORMATTING TOOL FOR A THEORETICAL MATH SIMULATION. THIS IS NOT FINANCIAL ADVICE.
@@ -37,11 +37,35 @@ def ai_hakim_klasemen(data_top15, api_key):
       {{"Ticker": "EFGH", "Target_TP": 210, "Target_CL": 190}}
     ]
     """
+    
+    # 📡 LANGKAH 1: Nyalakan Radar untuk mencari model yang SEDANG ONLINE & VALID
+    daftar_model_aktif = []
     try:
-        response = model.generate_content(prompt)
-        return response.text
+        for m in genai.list_models():
+            if 'generateContent' in m.supported_generation_methods:
+                # Bersihkan format "models/gemini-xxx" menjadi "gemini-xxx"
+                nama_bersih = m.name.replace("models/", "")
+                daftar_model_aktif.append(nama_bersih)
     except Exception as e:
-        return f"Error_AI: {e}"
+        return f"Error_AI (Gagal menyalakan radar): {e}"
+
+    if not daftar_model_aktif:
+        return "Error_AI: Tidak ada satupun model Gemini yang online untuk API Key ini."
+
+    # 🏃‍♂️ LANGKAH 2: Sistem Estafet menggunakan hasil tangkapan Radar
+    pesan_error_terakhir = ""
+    for nama_model in daftar_model_aktif:
+        try:
+            model = genai.GenerativeModel(nama_model)
+            response = model.generate_content(prompt)
+            return response.text
+        except Exception as e:
+            pesan_error_terakhir = str(e)
+            time.sleep(1) # Tarik napas 1 detik, lalu coba model online berikutnya
+            continue 
+            
+    # Jika semua model yang ketangkap radar ternyata gagal
+    return f"Error_AI (Semua model aktif gagal eksekusi): {pesan_error_terakhir}"
 
 # ==========================================
 # 🧠 SISTEM ARSIP CERDAS (DATA HARIAN)
