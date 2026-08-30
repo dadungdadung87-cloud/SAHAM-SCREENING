@@ -989,14 +989,25 @@ if not df_hasil.empty:
                                             keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
                                             continue
                                             
-                                        # Teknik Ekstraksi JSON Anti-Gagal (String Slicing)
-                                        awal = hasil_mentah.find('[')
-                                        akhir = hasil_mentah.rfind(']')
+                                        import json
+                                        import re
+                                        import ast
                                         
-                                        if awal != -1 and akhir != -1 and akhir > awal:
-                                            teks_json = hasil_mentah[awal:akhir+1]
-                                            import json
-                                            hasil_json = json.loads(teks_json)
+                                        # 1. Bersihkan sisa-sisa markdown atau teks pembuka
+                                        teks_bersih = hasil_mentah.replace('```json', '').replace('```', '').strip()
+                                        
+                                        # 2. Tangkap HANYA pola yang menyerupai List of Dictionaries [ { ... } ]
+                                        pencarian_json = re.search(r'\[\s*\{.*?\}\s*\]', teks_bersih, re.DOTALL)
+                                        
+                                        if pencarian_json:
+                                            teks_ekstrak = pencarian_json.group(0)
+                                            
+                                            # 3. Mode Lapis Baja: Coba JSON normal, jika gagal paksa dengan AST
+                                            try:
+                                                hasil_json = json.loads(teks_ekstrak)
+                                            except json.JSONDecodeError:
+                                                hasil_json = ast.literal_eval(teks_ekstrak)
+                                                
                                             df_tampil = pd.DataFrame(hasil_json)
                                             
                                             # Ambil ticker untuk masuk ke tabel spreadsheet
@@ -1016,11 +1027,11 @@ if not df_hasil.empty:
                                                 
                                         else:
                                             # Tampilkan balasan asli agar kita tahu kenapa AI ngeyel
-                                            st.error(f"❌ Rumus {i} Gagal (AI tidak membalas format JSON):\n{hasil_mentah}")
+                                            st.error(f"❌ Rumus {i} Gagal (Pola Tabel Tidak Ditemukan):\n{hasil_mentah}")
                                             keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
                                             
                                     except Exception as e:
-                                        st.error(f"❌ Error Parsing Rumus {i}: {e}")
+                                        st.error(f"❌ Error Parsing Rumus {i}: {e}\n\nBalasan AI: {hasil_mentah[:150]}...")
                                         keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
                                     
                                     time.sleep(2.5) # Nafas panjang untuk API Google
