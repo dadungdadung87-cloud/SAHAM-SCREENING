@@ -994,25 +994,32 @@ if not df_hasil.empty:
                                         import json
                                         import re
                                         
-                                        # PISAU BEDAH: Cari karakter '[' pertama dan ']' terakhir. Buang semua teks di luar itu!
-                                        awal = hasil_mentah.find('[')
-                                        akhir = hasil_mentah.rfind(']')
+                                        # ========================================================
+                                        # PENYEDOT DEBU REGEX: Cari objek JSON murni (List of Dictionaries)
+                                        # ========================================================
+                                        # Regex ini akan mencari pola yang dimulai dengan '[', diakhiri ']', 
+                                        # dan memiliki format {"Ticker": ..., "Target_TP": ..., "Target_CL": ...} di dalamnya.
+                                        pola_json = re.search(r'\[\s*\{.*?\}\s*\]', hasil_mentah, re.DOTALL)
                                         
-                                        if awal != -1 and akhir != -1 and akhir > awal:
-                                            teks_ekstrak = hasil_mentah[awal:akhir+1]
+                                        if pola_json:
+                                            teks_ekstrak = pola_json.group(0)
+                                            
+                                            # Jika ternyata Regex menangkap bagian cerita AI (misal karena AI membuat contoh di atas),
+                                            # kita cek apakah ada pola JSON KEDUA yang lebih bersih di bawahnya (menggunakan findall)
+                                            semua_pola = re.findall(r'\[\s*\{.*?\}\s*\]', hasil_mentah, re.DOTALL)
+                                            if len(semua_pola) > 1:
+                                                # Ambil pola yang terakhit, karena biasanya itu adalah hasil akhirnya (setelah AI selesai berpikir)
+                                                teks_ekstrak = semua_pola[-1]
                                             
                                             try:
-                                                # Coba baca secara normal
                                                 hasil_json = json.loads(teks_ekstrak)
                                             except json.JSONDecodeError:
                                                 try:
-                                                    # Jika gagal, bersihkan kutip satu menjadi kutip ganda (sering salah dari AI)
                                                     teks_bersih = teks_ekstrak.replace("'", '"')
-                                                    # Bersihkan spasi/enter berlebih
-                                                    teks_bersih = re.sub(r',\s*]', ']', teks_bersih) # Hapus trailing comma
+                                                    teks_bersih = re.sub(r',\s*]', ']', teks_bersih) 
                                                     hasil_json = json.loads(teks_bersih)
                                                 except Exception as e_ast:
-                                                    st.error(f"❌ Rumus {i} dilewati: AI membalas dengan struktur tabel yang rusak permanen.")
+                                                    st.error(f"❌ Rumus {i} dilewati: Struktur tabel masih rusak setelah dibersihkan.")
                                                     st.code(teks_ekstrak, language="json")
                                                     keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
                                                     continue
