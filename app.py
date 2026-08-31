@@ -930,10 +930,12 @@ if not df_hasil.empty:
                     
                     with tab_otomatis:
                         st.markdown("Sistem akan menyeleksi 15 saham terbaik per rumus secara global, lalu AI akan memilih Top 5 untuk dicetak ke tabel Spreadsheet.")
-                        GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
                         
-                        # Saya tambahkan key="autopilot_utama" agar tidak bentrok dengan tombol duplikat
                         if st.button("🛸 Jalankan Auto-Pilot Ultimate", type="primary", key="autopilot_utama"):
+                            
+                            # PASTIKAN BARIS INI ADA TEPAT DI BAWAH "if st.button"
+                            GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
+                            
                             if not GEMINI_API_KEY:
                                 st.error("❌ Kunci API GEMINI belum dipasang!")
                             else:
@@ -995,35 +997,31 @@ if not df_hasil.empty:
                                         import re
                                         
                                         # ========================================================
-                                        # PENYEDOT DEBU REGEX: Cari objek JSON murni (List of Dictionaries)
+                                        # PENYEDOT DEBU V2 (Sistem Coba-Baca dari Bawah)
                                         # ========================================================
-                                        # Regex ini akan mencari pola yang dimulai dengan '[', diakhiri ']', 
-                                        # dan memiliki format {"Ticker": ..., "Target_TP": ..., "Target_CL": ...} di dalamnya.
-                                        pola_json = re.search(r'\[\s*\{.*?\}\s*\]', hasil_mentah, re.DOTALL)
+                                        # Cari SEMUA teks yang diapit kurung siku [...]
+                                        semua_blok_kurung = re.findall(r'\[.*?\]', hasil_mentah, re.DOTALL)
                                         
-                                        if pola_json:
-                                            teks_ekstrak = pola_json.group(0)
-                                            
-                                            # Jika ternyata Regex menangkap bagian cerita AI (misal karena AI membuat contoh di atas),
-                                            # kita cek apakah ada pola JSON KEDUA yang lebih bersih di bawahnya (menggunakan findall)
-                                            semua_pola = re.findall(r'\[\s*\{.*?\}\s*\]', hasil_mentah, re.DOTALL)
-                                            if len(semua_pola) > 1:
-                                                # Ambil pola yang terakhit, karena biasanya itu adalah hasil akhirnya (setelah AI selesai berpikir)
-                                                teks_ekstrak = semua_pola[-1]
-                                            
+                                        hasil_json = None
+                                        
+                                        # Coba baca dari blok yang paling bawah (hasil akhir AI) ke atas
+                                        for blok in reversed(semua_blok_kurung):
                                             try:
-                                                hasil_json = json.loads(teks_ekstrak)
-                                            except json.JSONDecodeError:
-                                                try:
-                                                    teks_bersih = teks_ekstrak.replace("'", '"')
-                                                    teks_bersih = re.sub(r',\s*]', ']', teks_bersih) 
-                                                    hasil_json = json.loads(teks_bersih)
-                                                except Exception as e_ast:
-                                                    st.error(f"❌ Rumus {i} dilewati: Struktur tabel masih rusak setelah dibersihkan.")
-                                                    st.code(teks_ekstrak, language="json")
-                                                    keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
-                                                    continue
-                                                    
+                                                # Bersihkan tanda kutip nyeleneh dan koma berlebih
+                                                blok_bersih = blok.replace("'", '"')
+                                                blok_bersih = re.sub(r',\s*\]', ']', blok_bersih) 
+                                                
+                                                # Coba ubah teks menjadi tabel asli
+                                                hasil_json = json.loads(blok_bersih)
+                                                
+                                                if isinstance(hasil_json, list):
+                                                    break # Berhasil menemukan tabel utuh! Hentikan pencarian.
+                                                else:
+                                                    hasil_json = None
+                                            except:
+                                                continue # Jika gagal (karena ada titik-titik '...'), lanjut coba blok lain
+                                                
+                                        if hasil_json is not None:
                                             df_tampil = pd.DataFrame(hasil_json)
                                             
                                             # Ambil ticker untuk tabel
@@ -1036,7 +1034,7 @@ if not df_hasil.empty:
                                                 df_tampil[['Ticker', 'Target_TP', 'Target_CL']].to_csv(f"Database/sinyal_ai_rumus_{i}.csv", index=False)
                                                 
                                         else:
-                                            st.error(f"❌ Rumus {i} dilewati: AI gagal memberikan format tabel [].")
+                                            st.error(f"❌ Rumus {i} dilewati: Tidak ada format tabel yang utuh.")
                                             st.code(hasil_mentah, language="text")
                                             keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
                                             
