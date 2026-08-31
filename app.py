@@ -9,8 +9,66 @@ import time
 import re
 from datetime import datetime
 
-# IMPORT UNTUK AI OPENROUTER
+# IMPORT UNTUK AI OPENROUTER & GOOGLE
 from openai import OpenAI
+import google.generativeai as genai
+
+# ==========================================
+# 🧠 FUNGSI HAKIM AI (KLASEMEN GLOBAL DENGAN RADAR & MODE JSON)
+# ==========================================
+def ai_hakim_klasemen(data_top15, api_key):
+    import google.generativeai as genai
+    import time
+    genai.configure(api_key=api_key)
+    
+    # Prompt kita buat jauh lebih sederhana karena AI sudah dipaksa jadi mesin JSON
+    prompt = f"""
+    Select EXACTLY 5 Tickers that have the highest combination of 'Score' and 'Volume' from the data below.
+    Calculate 'Target_TP' (+5% from Harga) and 'Target_CL' (-3% from Harga).
+    
+    DATA:
+    {data_top15}
+    
+    Output a JSON array containing objects with EXACTLY 3 keys: "Ticker", "Target_TP", "Target_CL".
+    """
+    
+    daftar_model_aktif = []
+    try:
+        for m in genai.list_models():
+            if 'generateContent' in m.supported_generation_methods:
+                nama_bersih = m.name.replace("models/", "")
+                # Prioritaskan model gemini-1.5 karena mendukung fitur JSON murni
+                if "1.5" in nama_bersih:
+                    daftar_model_aktif.insert(0, nama_bersih)
+                else:
+                    daftar_model_aktif.append(nama_bersih)
+    except Exception as e:
+        return f"Error_AI (Gagal menyalakan radar): {e}"
+
+    if not daftar_model_aktif:
+        return "Error_AI: Tidak ada satupun model Gemini yang online untuk API Key ini."
+
+    pesan_error_terakhir = ""
+    for nama_model in daftar_model_aktif:
+        try:
+            # ========================================================
+            # 🔇 FITUR LAKBAN: Memaksa AI HANYA membalas JSON murni
+            # ========================================================
+            model = genai.GenerativeModel(
+                nama_model,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.0, 
+                    response_mime_type="application/json" # <--- INI FITUR AJAIBNYA!
+                )
+            )
+            response = model.generate_content(prompt)
+            return response.text
+        except Exception as e:
+            pesan_error_terakhir = str(e)
+            time.sleep(1) 
+            continue 
+            
+    return f"Error_AI (Semua model aktif gagal eksekusi): {pesan_error_terakhir}"
 
 # ==========================================
 # 🧠 SISTEM ARSIP CERDAS (DATA HARIAN)
@@ -103,7 +161,6 @@ def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
         OPENROUTER_API_KEY = None
     if not OPENROUTER_API_KEY: return "❌ Kunci API OpenRouter belum dipasang!"
 
-    # MENGGUNAKAN JALUR AUTO-FREE DARI OPENROUTER
     model_andalan = "openrouter/free" 
 
     try:
@@ -161,7 +218,6 @@ def analisa_forensik_ai(data_saham_dict, master_filters_keys):
         OPENROUTER_API_KEY = None
     if not OPENROUTER_API_KEY: return "❌ Kunci API OpenRouter belum dipasang!"
 
-    # MENGGUNAKAN JALUR AUTO-FREE DARI OPENROUTER
     model_andalan = "openrouter/free" 
 
     try:
@@ -210,13 +266,7 @@ def analisa_forensik_ai(data_saham_dict, master_filters_keys):
     except Exception as e: return f"❌ Gagal memproses data dengan OpenRouter. Error: {e}"
 
 def ai_penyisihan_turnamen(data_grup_dict, api_key):
-    import re
-    import time
-    import google.generativeai as genai
-    
     saham_grup_ini = list(data_grup_dict.keys())
-    
-    # 🏃‍♂️ DAFTAR ESTAFET: Jika yang atas error 429, otomatis turun ke bawahnya
     daftar_model_estafet = [
         'gemini-3.7-flash', 
         'gemini-3.6-flash',
@@ -226,9 +276,7 @@ def ai_penyisihan_turnamen(data_grup_dict, api_key):
         'gemini-3.1-flash-lite',
         'gemini-flash-lite-latest'
     ]
-    
     genai.configure(api_key=api_key)
-    
     payload_text = ""
     for ticker, data in data_grup_dict.items():
         payload_text += f"\n- {ticker}: Harga {data['harga']}, Vol {data['volume']}, Tekanan {data['tekanan_bandar']}, Supply {data['supply']}"
@@ -244,14 +292,12 @@ def ai_penyisihan_turnamen(data_grup_dict, api_key):
     DO NOT add any conversational text or markdown.
     """
     
-    # LOOP ESTAFET: Mencoba model satu per satu
     for nama_model in daftar_model_estafet:
         try:
             model = genai.GenerativeModel(nama_model)
             response = model.generate_content(prompt)
             raw_content = response.text.upper()
             
-            # Sistem Anti-Brutal
             semua_kata = re.findall(r'[A-Z]+', raw_content)
             lolos = []
             for kata in semua_kata:
@@ -265,22 +311,14 @@ def ai_penyisihan_turnamen(data_grup_dict, api_key):
             return ",".join(lolos_final)
             
         except Exception as e:
-            # Jika Error (Sibuk/Limit), diam 2 detik lalu lanjut ke model berikutnya
             time.sleep(2)
             continue
             
-    # Jika ketujuh model di atas error semua (sangat jarang terjadi), pakai jalur darurat
     return ",".join(saham_grup_ini[:3])
 
 
 def ai_grand_final_top5(data_saham_dict, api_key):
-    import re
-    import time
-    import google.generativeai as genai
-    import pandas as pd
     import json
-    
-    # 🏃‍♂️ DAFTAR ESTAFET
     daftar_model_estafet = [
         'gemini-3.7-flash', 
         'gemini-3.6-flash',
@@ -290,7 +328,6 @@ def ai_grand_final_top5(data_saham_dict, api_key):
         'gemini-3.1-flash-lite',
         'gemini-flash-lite-latest'
     ]
-    
     genai.configure(api_key=api_key)
     
     payload_text = ""
@@ -319,24 +356,19 @@ def ai_grand_final_top5(data_saham_dict, api_key):
     ]
     """
     
-    # LOOP ESTAFET: Mencoba model satu per satu
     for nama_model in daftar_model_estafet:
         try:
             model = genai.GenerativeModel(nama_model)
             response = model.generate_content(prompt)
             raw_content = response.text or ""
             
-            # Pembersihan Markdown
             clean_content = raw_content.replace('```json', '').replace('```', '').strip()
-            
-            # Mengembalikan hasil dan nama model siapa yang akhirnya berhasil mengeksekusi
             return clean_content, nama_model
             
         except Exception as e:
             time.sleep(3)
             continue
             
-    # Jika ketujuh model di atas KO semua (server Google down massal), baru lemparkan error ke Web
     raise Exception("🚨 KRITIS: Semua 7 model AI Gemini sedang mengalami limit maksimal atau server sibuk. Mohon jeda turnamen 1-2 menit sebelum mencoba lagi.")
 
 # ==========================================
@@ -414,7 +446,7 @@ else:
 
 with open(FILE_CONFIG, "r") as f: WEB_CONFIG = json.load(f)
 
-# Auto-patch jika opsi gabungan belum ada di config JSON lama
+# Auto-patch
 if "Mid Cap (Lapis 2) + Small Cap (Lapis 3)" not in WEB_CONFIG["MASTER_FILTERS"]["Kategori"]["options"]:
     WEB_CONFIG["MASTER_FILTERS"]["Kategori"]["options"] = ["Semua", "Big Cap (Lapis 1)", "Mid Cap (Lapis 2)", "Small Cap (Lapis 3)", "Mid Cap (Lapis 2) + Small Cap (Lapis 3)"]
     with open(FILE_CONFIG, "w") as f: json.dump(WEB_CONFIG, f, indent=4)
@@ -472,7 +504,6 @@ df_hasil = load_data_saham()
 # HEADER & SIDEBAR
 # ==========================================
 if not df_hasil.empty and "Terakhir Update" in df_hasil.columns:
-    # Mengambil waktu dari CSV dan menegaskan bahwa ini jam laptop (WIB)
     waktu_update = str(df_hasil["Terakhir Update"].iloc[0]) + " WIB"
     st.sidebar.markdown(f"""
         <div style="border: 2px solid #06b6d4; padding: 10px; border-radius: 4px; text-align: center; margin-bottom: 15px; background-color: #0f172a; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
@@ -893,42 +924,174 @@ if not df_hasil.empty:
                 
                 if "AI Bandar" in pilihan_ai:
                     st.subheader("🤖 AI Bandar (Persiapan BSJP Besok)")
-                    st.markdown("Paste saham yang MASIH MERAH / SIDEWAYS. AI akan mencari siapa yang siap terbang besok.")
-                    input_saham_massal = st.text_area("📋 Paste Daftar Saham (Pisahkan dengan Enter/Spasi):", placeholder="Contoh:\nDMAS\nINDF", height=200, key="input_ai_bandar")
                     
-                    if st.button("🔮 Mulai Eksekusi AI Bandar"):
-                        saham_bersih = [s.strip().upper() for s in re.split(r'[,\s\n]+', input_saham_massal) if s.strip()]
-                        saham_unik = list(dict.fromkeys(saham_bersih))
-                        saham_valid = [s for s in saham_unik if s in df_hasil['Ticker'].values]
+                    # MEMBAGI AI BANDAR MENJADI 2 TAB AGAR RAPI
+                    tab_otomatis, tab_manual = st.tabs(["🛸 Auto-Pilot 9 Rumus (Spreadsheet)", "✍️ Mode Manual (Paste Saham)"])
+                    
+                    with tab_otomatis:
+                        st.markdown("Sistem akan menyeleksi 15 saham terbaik per rumus secara global, lalu AI akan memilih Top 5 untuk dicetak ke tabel Spreadsheet.")
+                        GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
                         
-                        df_valid = df_hasil[df_hasil['Ticker'].isin(saham_valid)].copy()
-                        if 'Change (%)' in df_valid.columns:
-                            df_valid = df_valid[df_valid['Change (%)'] <= 5.0]
-                            saham_valid = df_valid['Ticker'].tolist()
+                        # Saya tambahkan key="autopilot_utama" agar tidak bentrok dengan tombol duplikat
+                        if st.button("🛸 Jalankan Auto-Pilot Ultimate", type="primary", key="autopilot_utama"):
+                            if not GEMINI_API_KEY:
+                                st.error("❌ Kunci API GEMINI belum dipasang!")
+                            else:
+                                daftar_rumus = {
+                                    1: df_v1, 2: df_v2, 3: df_v3, 
+                                    4: df_v4, 5: df_v5, 6: df_v6, 
+                                    7: df_v7, 8: df_v8, 9: df_v9
+                                }
+                                
+                                progress_bar = st.progress(0)
+                                status_teks = st.empty()
+                                
+                                # Siapkan keranjang untuk membuat tabel spreadsheet di akhir
+                                keranjang_spreadsheet = {f"RUMUS {i}": [] for i in range(1, 10)}
+                                
+                                for i in range(1, 10):
+                                    df_target = daftar_rumus[i]
+                                    progress_bar.progress(i / 9.0)
+                                    
+                                    if len(df_target) == 0:
+                                        status_teks.warning(f"⏭️ Rumus {i} kosong. Dilewati.")
+                                        time.sleep(1)
+                                        continue
+                                        
+                                    status_teks.info(f"🔄 **Algojo Python bekerja pada Rumus {i}**... (Mengekstrak data global)")
+                                    
+                                    saham_valid = df_target['Ticker'].tolist()
+                                    df_seleksi = df_hasil[df_hasil['Ticker'].isin(saham_valid)].copy()
+                                    
+                                    df_seleksi['Score_Num'] = pd.to_numeric(df_seleksi['Total Score'], errors='coerce').fillna(0)
+                                    
+                                    # TAHAP 1: KLASEMEN GLOBAL (Pilih Top 15 berdasarkan Data Keras)
+                                    df_sorted = df_seleksi.sort_values(by=['Score_Num', 'Volume', 'Change (%)'], ascending=[False, False, False])
+                                    top_15 = df_sorted.head(15)
+                                    
+                                    data_kirim_ai = {}
+                                    for _, row in top_15.iterrows():
+                                        data_kirim_ai[row['Ticker']] = {
+                                            'Harga': row.get('Harga (Rp)', 0),
+                                            'Volume': row.get('Volume', 0),
+                                            'Score': row.get('Score_Num', 0),
+                                            'Change_Pct': row.get('Change (%)', 0),
+                                            'Tekanan_Bandar': row.get('Tekanan Bandar', 'Normal'),
+                                            'Broksum': row.get('Broksum', 'Normal')
+                                        }
+                                        
+                                    status_teks.warning(f"🧠 Rumus {i} - Sidang Grand Final AI... (Menyaring 5 Jawara dari Top 15)")
+                                    
+                                    # TAHAP 2: HAKIM AI (Pilih Top 5 Mutlak)
+                                    try:
+                                        hasil_mentah = ai_hakim_klasemen(data_kirim_ai, GEMINI_API_KEY)
+                                        
+                                        if "Error_AI:" in hasil_mentah:
+                                            st.error(f"❌ API Error Rumus {i} : {hasil_mentah}")
+                                            keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
+                                            continue
+                                            
+                                        import json
+                                        import re
+                                        
+                                        # ========================================================
+                                        # PENYEDOT DEBU REGEX: Cari objek JSON murni (List of Dictionaries)
+                                        # ========================================================
+                                        # Regex ini akan mencari pola yang dimulai dengan '[', diakhiri ']', 
+                                        # dan memiliki format {"Ticker": ..., "Target_TP": ..., "Target_CL": ...} di dalamnya.
+                                        pola_json = re.search(r'\[\s*\{.*?\}\s*\]', hasil_mentah, re.DOTALL)
+                                        
+                                        if pola_json:
+                                            teks_ekstrak = pola_json.group(0)
+                                            
+                                            # Jika ternyata Regex menangkap bagian cerita AI (misal karena AI membuat contoh di atas),
+                                            # kita cek apakah ada pola JSON KEDUA yang lebih bersih di bawahnya (menggunakan findall)
+                                            semua_pola = re.findall(r'\[\s*\{.*?\}\s*\]', hasil_mentah, re.DOTALL)
+                                            if len(semua_pola) > 1:
+                                                # Ambil pola yang terakhit, karena biasanya itu adalah hasil akhirnya (setelah AI selesai berpikir)
+                                                teks_ekstrak = semua_pola[-1]
+                                            
+                                            try:
+                                                hasil_json = json.loads(teks_ekstrak)
+                                            except json.JSONDecodeError:
+                                                try:
+                                                    teks_bersih = teks_ekstrak.replace("'", '"')
+                                                    teks_bersih = re.sub(r',\s*]', ']', teks_bersih) 
+                                                    hasil_json = json.loads(teks_bersih)
+                                                except Exception as e_ast:
+                                                    st.error(f"❌ Rumus {i} dilewati: Struktur tabel masih rusak setelah dibersihkan.")
+                                                    st.code(teks_ekstrak, language="json")
+                                                    keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
+                                                    continue
+                                                    
+                                            df_tampil = pd.DataFrame(hasil_json)
+                                            
+                                            # Ambil ticker untuk tabel
+                                            jawara_tickers = df_tampil['Ticker'].tolist() if 'Ticker' in df_tampil.columns else []
+                                            jawara_tickers = (jawara_tickers + ["", "", "", "", ""])[:5] 
+                                            keranjang_spreadsheet[f"RUMUS {i}"] = jawara_tickers
+                                            
+                                            # Simpan Sinyal
+                                            if 'Target_TP' in df_tampil.columns and 'Target_CL' in df_tampil.columns:
+                                                df_tampil[['Ticker', 'Target_TP', 'Target_CL']].to_csv(f"Database/sinyal_ai_rumus_{i}.csv", index=False)
+                                                
+                                        else:
+                                            st.error(f"❌ Rumus {i} dilewati: AI gagal memberikan format tabel [].")
+                                            st.code(hasil_mentah, language="text")
+                                            keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
+                                            
+                                    except Exception as e:
+                                        st.error(f"❌ Error Sistem Mesin pada Rumus {i}: {e}")
+                                        keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
+                                    
+                                    time.sleep(2.5) # Nafas panjang untuk API Google
+                                
+                                status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
+                                st.balloons()
+                                
+                                # TAHAP 3: CETAK TABEL SPREADSHEET (Siap Copy-Paste)
+                                st.markdown("### 📋 Tabel Master Portofolio (Siap Salin)")
+                                df_spreadsheet = pd.DataFrame(keranjang_spreadsheet)
+                                
+                                st.data_editor(df_spreadsheet, use_container_width=True, hide_index=True)
 
-                        if not saham_valid:
-                            st.error("❌ Saham yang Anda masukkan sudah terbang terlalu tinggi (>5%). Gunakan AI Bandar untuk mencari saham yang masih di bawah!")
-                        else:
-                            if len(saham_valid) > 19:
-                                st.info("🤖 Menyaring 19 saham terbaik untuk mencegah limit AI...")
-                                df_valid = df_valid.sort_values(by=['Total Score', 'Volume'], ascending=[False, False])
-                                saham_valid = df_valid['Ticker'].head(19).tolist()
+                    with tab_manual:
+                        st.markdown("Paste saham yang MASIH MERAH / SIDEWAYS. AI akan mencari siapa yang siap terbang besok.")
+                        input_saham_massal = st.text_area("📋 Paste Daftar Saham (Pisahkan dengan Enter/Spasi):", placeholder="Contoh:\nDMAS\nINDF", height=200, key="input_ai_bandar")
+                        
+                        if st.button("🔮 Mulai Eksekusi AI Bandar"):
+                            saham_bersih = [s.strip().upper() for s in re.split(r'[,\s\n]+', input_saham_massal) if s.strip()]
+                            saham_unik = list(dict.fromkeys(saham_bersih))
+                            saham_valid = [s for s in saham_unik if s in df_hasil['Ticker'].values]
                             
-                            with st.spinner(f"Menganalisa {len(saham_valid)} saham untuk BSJP besok..."):
-                                data_kompilasi = {}
-                                for ticker in saham_valid:
-                                    data_saham = df_hasil[df_hasil['Ticker'] == ticker].iloc[0]
-                                    teks_ringkasan = get_historical_summary(ticker)
-                                    data_kompilasi[ticker] = {
-                                        'harga': data_saham.get('Harga (Rp)', 0),
-                                        'change': data_saham.get('Change (%)', 0), 
-                                        'broksum': data_saham.get('Broksum', 'Tidak Ada'),
-                                        'status': data_saham.get('Fase Siklus Bandar', 'Normal'),
-                                        'skor': data_saham.get('Total Score', 0),
-                                        'histori': teks_ringkasan if teks_ringkasan else "Arsip belum tersedia."
-                                    }
-                                hasil_ai = analisa_bandar_ai_multisaham(data_kompilasi, 'pilihan_ai')
-                                st.info(hasil_ai)
+                            df_valid = df_hasil[df_hasil['Ticker'].isin(saham_valid)].copy()
+                            if 'Change (%)' in df_valid.columns:
+                                df_valid = df_valid[df_valid['Change (%)'] <= 5.0]
+                                saham_valid = df_valid['Ticker'].tolist()
+
+                            if not saham_valid:
+                                st.error("❌ Saham yang Anda masukkan sudah terbang terlalu tinggi (>5%). Gunakan AI Bandar untuk mencari saham yang masih di bawah!")
+                            else:
+                                if len(saham_valid) > 19:
+                                    st.info("🤖 Menyaring 19 saham terbaik untuk mencegah limit AI...")
+                                    df_valid = df_valid.sort_values(by=['Total Score', 'Volume'], ascending=[False, False])
+                                    saham_valid = df_valid['Ticker'].head(19).tolist()
+                                
+                                with st.spinner(f"Menganalisa {len(saham_valid)} saham untuk BSJP besok..."):
+                                    data_kompilasi = {}
+                                    for ticker in saham_valid:
+                                        data_saham = df_hasil[df_hasil['Ticker'] == ticker].iloc[0]
+                                        teks_ringkasan = get_historical_summary(ticker)
+                                        data_kompilasi[ticker] = {
+                                            'harga': data_saham.get('Harga (Rp)', 0),
+                                            'change': data_saham.get('Change (%)', 0), 
+                                            'broksum': data_saham.get('Broksum', 'Tidak Ada'),
+                                            'status': data_saham.get('Fase Siklus Bandar', 'Normal'),
+                                            'skor': data_saham.get('Total Score', 0),
+                                            'histori': teks_ringkasan if teks_ringkasan else "Arsip belum tersedia."
+                                        }
+                                    hasil_ai = analisa_bandar_ai_multisaham(data_kompilasi, 'pilihan_ai')
+                                    st.info(hasil_ai)
 
                 elif "Forensik Bandar" in pilihan_ai:
                     st.subheader("📡 Radar Pencari Model Gemini Aktif (Live Server)")
@@ -950,17 +1113,11 @@ if not df_hasil.empty:
                             else:
                                 st.info("🔄 Langkah 1: Meminta katalog model langsung dari server Google AI...")
                                 
-                                import google.generativeai as genai
-                                import time
-                                import pandas as pd
-                                
                                 daftar_model_aktif = []
                                 try:
                                     genai.configure(api_key=GEMINI_API_KEY)
-                                    # Menarik semua model yang mendukung text generation
                                     for m in genai.list_models():
                                         if 'generateContent' in m.supported_generation_methods:
-                                            # Nama model dari Google biasanya berformat 'models/nama-model'
                                             daftar_model_aktif.append(m.name)
                                 except Exception as e:
                                     st.error(f"Gagal menarik data dari server Google. Error: {e}")
@@ -990,7 +1147,6 @@ if not df_hasil.empty:
                                     hasil_rekap = []
                                     
                                     for i, nama_model in enumerate(daftar_model_aktif):
-                                        # Karena nama model formatnya 'models/gemini-xxx', kita hilangkan 'models/' agar bersih
                                         model_id_bersih = nama_model.replace("models/", "")
                                         status_text.text(f"⏳ Sedang menguji: {model_id_bersih} ({i+1}/{len(daftar_model_aktif)})")
                                         
@@ -1012,7 +1168,7 @@ if not df_hasil.empty:
                                             hasil_rekap.append({"Nama Model": model_id_bersih, "Status": f"❌ Gagal: {pesan_error[:30]}..."})
                                         
                                         progress_bar.progress((i + 1) / len(daftar_model_aktif))
-                                        time.sleep(2) # Jeda agar tidak kena rate limit
+                                        time.sleep(2)
                                     
                                     status_text.success("🎉 Pengecekan Server Google Selesai!")
                                     
@@ -1023,321 +1179,107 @@ if not df_hasil.empty:
                                     st.info("💡 **TUGAS ANDA:** Salin nama model yang berstatus '✅ Lulus & Patuh', dan kita gunakan nama pasti itu untuk skrip turnamen!")
 
                 elif "Pemburu ARA" in pilihan_ai:
-                    st.subheader("🎯 Turnamen AI (Spesialis Akumulasi Siluman)")
-                    st.markdown("Pilih arena rumus di bawah ini. Mesin akan otomatis menarik saham yang lolos, lalu melakukan kualifikasi brutal (5 saham/menit) secara estafet.")
+                    st.subheader("🎯 Pemburu ARA (Sistem Kualifikasi Lama)")
+                    st.info("💡 **Fitur Auto-Pilot 9 Rumus (Klasemen Global) telah dipindahkan ke menu '🤖 AI Bandar'.** Silakan buka menu tersebut untuk menggunakan mode pencetak Tabel Spreadsheet secara otomatis!")
+
+                    # ==============================================================
+                    # 🛸 TOMBOL AUTO-PILOT ULTIMATE (KLASEMEN GLOBAL)
+                    # ==============================================================
+                    st.markdown("### 🛸 Mode Auto-Pilot (Super AI & Klasemen)")
+                    st.markdown("Sistem akan menyeleksi 15 saham terbaik per rumus secara global, lalu AI akan memilih Top 5 untuk dicetak ke tabel Spreadsheet.")
                     
-                    if 'radar_aktif' not in st.session_state:
-                        st.session_state.radar_aktif = False
-                        st.session_state.radar_tahap = 1 
-                        st.session_state.radar_antrean = []
-                        st.session_state.radar_index = 0
-                        st.session_state.total_grup = 0
-                        st.session_state.semi_finalists = []
-                        st.session_state.file_ekspor = "Database/sinyal_ai_rumus_1.csv"
-
-                    GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
-                    
-                    if not st.session_state.radar_aktif:
-                        # 1. PINDAHKAN DROPDOWN KE ATAS
-                        pilihan_arena_ekspor = st.selectbox("📂 1. Pilih Sumber Data & Simpan Sinyal Ke Arena Bot:", ["Rumus 1", "Rumus 2", "Rumus 3", "Rumus 4", "Rumus 5", "Rumus 6", "Rumus 7", "Rumus 8", "Rumus 9"])
-                        
-                        # 2. SISTEM SEDOT DATA OTOMATIS
-                        peta_rumus = {
-                            "Rumus 1": df_v1, "Rumus 2": df_v2, "Rumus 3": df_v3, 
-                            "Rumus 4": df_v4, "Rumus 5": df_v5, "Rumus 6": df_v6, 
-                            "Rumus 7": df_v7, "Rumus 8": df_v8, "Rumus 9": df_v9
-                        }
-                        df_terpilih = peta_rumus[pilihan_arena_ekspor]
-                        saham_otomatis = "\n".join(df_terpilih['Ticker'].tolist()) if not df_terpilih.empty else ""
-                        
-                        # 3. KOTAK TEKS OTOMATIS TERISI
-                        st.markdown(f"**Terdapat {len(df_terpilih)} saham yang ditarik dari {pilihan_arena_ekspor}:**")
-                        input_v8 = st.text_area("📋 2. Daftar Saham Turnamen (Bisa diedit manual jika perlu):", value=saham_otomatis, height=200, key=f"input_pemburu_ara_{pilihan_arena_ekspor}")
-                        
-                        if st.button("🚀 Mulai Turnamen Otomatis"):
-                            if not GEMINI_API_KEY:
-                                st.error("❌ Kunci API GEMINI belum dipasang di Secrets!")
-                            else:
-                                saham_bersih = [s.strip().upper() for s in re.split(r'[,\s\n]+', input_v8) if s.strip()]
-                                saham_unik = list(dict.fromkeys(saham_bersih))
-                                saham_valid = [s for s in saham_unik if s in df_hasil['Ticker'].values]
-                                
-                                if not saham_valid:
-                                    st.error("❌ Kode saham tidak valid atau tidak ada di database.")
-                                else:
-                                    batch_size = 10
-                                    groups = [saham_valid[i:i + batch_size] for i in range(0, len(saham_valid), batch_size)]
-                                    
-                                    st.session_state.radar_antrean = groups
-                                    st.session_state.total_grup = len(groups)
-                                    st.session_state.radar_index = 0
-                                    st.session_state.semi_finalists = []
-                                    st.session_state.radar_tahap = 1
-                                    st.session_state.file_ekspor = f"Database/sinyal_ai_rumus_{pilihan_arena_ekspor.split(' ')[1]}.csv"
-                                    st.session_state.radar_aktif = True
-                                    
-                                    st.rerun()
-
-                        # ==============================================================
-                        # 🛸 TOMBOL AUTO-PILOT (SAPU JAGAT RUMUS 1 SAMPAI 9)
-                        # ==============================================================
-                        st.markdown("---")
-                        st.markdown("### 🛸 Mode Auto-Pilot (Super AI)")
-                        st.markdown("Sekali klik, mesin akan menelusuri, mengekstrak, dan mengeksekusi turnamen untuk Rumus 1 hingga Rumus 9 secara bergantian tanpa henti.")
-                        
-                        if st.button("🛸 Jalankan Auto-Pilot (Semua Rumus 1-9)", type="primary"):
-                            if not GEMINI_API_KEY:
-                                st.error("❌ Kunci API GEMINI belum dipasang!")
-                            else:
-                                import json
-                                import re
-                                import time
-                                import pandas as pd
-                                
-                                # Mengumpulkan semua DataFrame rumus ke dalam satu peta
-                                daftar_rumus = {
-                                    1: df_v1, 2: df_v2, 3: df_v3, 
-                                    4: df_v4, 5: df_v5, 6: df_v6, 
-                                    7: df_v7, 8: df_v8, 9: df_v9
-                                }
-                                
-                                progress_keseluruhan = st.progress(0)
-                                status_autopilot = st.empty()
-                                
-                                # Looping dari Rumus 1 sampai 9
-                                for i in range(1, 10):
-                                    df_target = daftar_rumus[i]
-                                    progress_keseluruhan.progress((i - 1) / 9.0)
-                                    
-                                    if len(df_target) < 3:
-                                        status_autopilot.warning(f"⏭️ Rumus {i} dilewati (Saham kurang dari 3).")
-                                        time.sleep(1.5)
-                                        continue
-                                    
-                                    saham_valid = df_target['Ticker'].tolist()
-                                    status_autopilot.info(f"🔄 **Menyapu Rumus {i}**... (Membedah {len(saham_valid)} saham)")
-                                    
-                                    # --- FASE 1: PENYISIHAN ---
-                                    batch_size = 10
-                                    groups = [saham_valid[idx:idx + batch_size] for idx in range(0, len(saham_valid), batch_size)]
-                                    semi_finalists = []
-                                    
-                                    for idx_grp, group_sekarang in enumerate(groups):
-                                        status_autopilot.info(f"🔄 Rumus {i} - Babak Penyisihan Grup {idx_grp+1} dari {len(groups)}...")
-                                        data_grup = {}
-                                        for ticker in group_sekarang:
-                                            data_saham = df_hasil[df_hasil['Ticker'] == ticker].iloc[0]
-                                            data_grup[ticker] = {
-                                                'harga': data_saham.get('Harga (Rp)', 0),
-                                                'volume': data_saham.get('Volume', 0),
-                                                'broksum': data_saham.get('Broksum', 'Tidak Ada'),
-                                                'tekanan_bandar': data_saham.get('Tekanan Bandar', 'Normal'),
-                                                'supply': data_saham.get('Kondisi Supply', 'Normal'),
-                                                'obv': data_saham.get('OBV Trend', 'Normal'),
-                                                'fibo': data_saham.get('Status Fibonacci', 'Normal')
-                                            }
-                                            
-                                        hasil_kual = ai_penyisihan_turnamen(data_grup, GEMINI_API_KEY)
-                                        if hasil_kual:
-                                            lolos = [s.strip().upper() for s in hasil_kual.replace('`', '').split(',')]
-                                            lolos_valid = [s for s in lolos if s in group_sekarang]
-                                            semi_finalists.extend(lolos_valid)
-                                            
-                                    # --- FASE 2: GRAND FINAL ---
-                                    if not semi_finalists:
-                                        st.warning(f"⏭️ Rumus {i} gagal di penyisihan (Tidak ada yang memenuhi standar).")
-                                        continue
-                                        
-                                    if len(semi_finalists) > 35:
-                                        df_semi = df_hasil[df_hasil['Ticker'].isin(semi_finalists)].sort_values(by=['Total Score', 'Volume'], ascending=[False, False])
-                                        semi_finalists = df_semi['Ticker'].head(35).tolist()
-                                    
-                                    status_autopilot.warning(f"🧠 Rumus {i} - AI Meracik Grand Final dari {len(semi_finalists)} saham kandidat...")
-                                    data_final = {}
-                                    for ticker in semi_finalists:
-                                        data_saham = df_hasil[df_hasil['Ticker'] == ticker].iloc[0]
-                                        data_final[ticker] = {
-                                            'harga': data_saham.get('Harga (Rp)', 0),
-                                            'volume': data_saham.get('Volume', 0),
-                                            'broksum': data_saham.get('Broksum', 'Tidak Ada'),
-                                            'tekanan_bandar': data_saham.get('Tekanan Bandar', 'Normal'),
-                                            'supply': data_saham.get('Kondisi Supply', 'Normal'),
-                                            'obv': data_saham.get('OBV Trend', 'Normal'),
-                                            'fibo': data_saham.get('Status Fibonacci', 'Normal'),
-                                            'vwap': data_saham.get('Posisi VWAP', 'Normal'),
-                                            'pola_candle': data_saham.get('Pola Candle', 'Normal')
-                                        }
-                                    
-                                    try:
-                                        hasil_mentah, model_dipakai = ai_grand_final_top5(data_final, GEMINI_API_KEY)
-                                        teks_bersih = hasil_mentah.replace('```json', '').replace('```', '').strip()
-                                        pencarian_json = re.search(r'\[\s*\{.*?\}\s*\]', teks_bersih, re.DOTALL)
-                                        
-                                        if pencarian_json:
-                                            bersih = pencarian_json.group(0)
-                                            hasil_json = json.loads(bersih)
-                                            df_tampil = pd.DataFrame(hasil_json)
-                                            if 'Target_TP' in df_tampil.columns and 'Target_CL' in df_tampil.columns:
-                                                df_sinyal = df_tampil[['Ticker', 'Target_TP', 'Target_CL']]
-                                                df_sinyal.to_csv(f"Database/sinyal_ai_rumus_{i}.csv", index=False)
-                                                st.success(f"✅ Rumus {i} Selesai! Sinyal diamankan ke sistem bot.")
-                                        else:
-                                            st.error(f"❌ Rumus {i} Gagal mencetak sinyal (Format tabel JSON terputus).")
-                                    except Exception as e:
-                                        st.error(f"❌ Error pada Rumus {i}: {e}")
-                                    
-                                    # Mengambil nafas agar server Gemini tidak kebanjiran request
-                                    time.sleep(3)
-                                
-                                progress_keseluruhan.progress(1.0)
-                                status_autopilot.success("🎉 MISSION ACCOMPLISHED! SEMUA RUMUS BERHASIL DI-SCREENING!")
-                                st.balloons()            
-                    else:
-                        st.warning("⚠️ **JANGAN ME-REFRESH BROWSER!** Mesin sedang menjalankan turnamen.")
-                        if st.button("🛑 Hentikan Turnamen Darurat"):
-                            st.session_state.radar_aktif = False
-                            st.rerun()
-
-                        if st.session_state.radar_tahap == 1:
-                            idx = st.session_state.radar_index
-                            total = st.session_state.total_grup
+                    if st.button("🛸 Jalankan Auto-Pilot Ultimate", type="primary"):
+                        if not GEMINI_API_KEY:
+                            st.error("❌ Kunci API GEMINI belum dipasang!")
+                        else:
+                            daftar_rumus = {
+                                1: df_v1, 2: df_v2, 3: df_v3, 
+                                4: df_v4, 5: df_v5, 6: df_v6, 
+                                7: df_v7, 8: df_v8, 9: df_v9
+                            }
                             
-                            st.info(f"⚔️ **Babak Penyisihan: Membedah Grup {idx + 1} dari {total}**...")
-                            st.progress((idx) / total if total > 0 else 0)
-
-                            group_sekarang = st.session_state.radar_antrean[idx]
+                            progress_bar = st.progress(0)
+                            status_teks = st.empty()
                             
-                            data_grup = {}
-                            for ticker in group_sekarang:
-                                data_saham = df_hasil[df_hasil['Ticker'] == ticker].iloc[0]
-                                data_grup[ticker] = {
-                                    'harga': data_saham.get('Harga (Rp)', 0),
-                                    'volume': data_saham.get('Volume', 0),
-                                    'broksum': data_saham.get('Broksum', 'Tidak Ada'),
-                                    'tekanan_bandar': data_saham.get('Tekanan Bandar', 'Normal'),
-                                    'supply': data_saham.get('Kondisi Supply', 'Normal'),
-                                    'obv': data_saham.get('OBV Trend', 'Normal'),
-                                    'fibo': data_saham.get('Status Fibonacci', 'Normal')
-                                }
+                            # Siapkan keranjang untuk membuat tabel spreadsheet di akhir
+                            keranjang_spreadsheet = {f"RUMUS {i}": [] for i in range(1, 10)}
+                            
+                            for i in range(1, 10):
+                                df_target = daftar_rumus[i]
+                                progress_bar.progress(i / 9.0)
                                 
-                            hasil_kualifikasi = ai_penyisihan_turnamen(data_grup, GEMINI_API_KEY)
-                            
-                            if "SKIP_GRUP" not in hasil_kualifikasi and "ERROR" not in hasil_kualifikasi:
-                                lolos = [s.strip().upper() for s in hasil_kualifikasi.replace('`', '').split(',')]
-                                lolos_valid = [s for s in lolos if s in group_sekarang] 
-                                st.session_state.semi_finalists.extend(lolos_valid)
-
-                            st.session_state.radar_index += 1
-
-                            st.markdown("### 🏆 Daftar Semi-Finalis Sementara")
-                            if not st.session_state.semi_finalists:
-                                st.info("Belum ada yang lolos kualifikasi brutal...")
-                            else:
-                                st.success(f"Berhasil mengumpulkan **{len(st.session_state.semi_finalists)} saham** unggulan: {', '.join(st.session_state.semi_finalists)}")
-
-                            if st.session_state.radar_index < total:
-                                placeholder_timer = st.empty()
-                                for i in range(15, 0, -1):
-                                    placeholder_timer.warning(f"⏳ Lanjut ke Grup {idx + 2} dalam **{i} detik**.")
+                                if len(df_target) == 0:
+                                    status_teks.warning(f"⏭️ Rumus {i} kosong. Dilewati.")
                                     time.sleep(1)
-                                st.rerun()
-                            else:
-                                st.session_state.radar_tahap = 2
-                                st.rerun()
-
-                        elif st.session_state.radar_tahap == 2:
-                            st.markdown("### 🏟️ MEMULAI GRAND FINAL")
-                            st.progress(1.0)
-                            
-                            semi_finalists = st.session_state.semi_finalists
-                            
-                            if not semi_finalists:
-                                st.error("💀 Sangat brutal! Tidak ada satu pun saham yang lolos dari babak kualifikasi hari ini.")
-                                st.session_state.radar_aktif = False
-                                if st.button("🔄 Reset"): st.rerun()
-                            else:
-                                if len(semi_finalists) > 35:
-                                    st.warning("⚠️ Saham yang lolos terlalu banyak. AI akan memilih 35 terbaik berdasarkan skor sistem sebelum masuk Grand Final.")
-                                    df_semi = df_hasil[df_hasil['Ticker'].isin(semi_finalists)].sort_values(by=['Total Score', 'Volume'], ascending=[False, False])
-                                    semi_finalists = df_semi['Ticker'].head(35).tolist()
-
-                                with st.spinner(f"🧠 AI Master sedang meracik Grand Final TOP 5 dari {len(semi_finalists)} saham Semi-Finalis..."):
-                                    data_final = {}
-                                    for ticker in semi_finalists:
-                                        data_saham = df_hasil[df_hasil['Ticker'] == ticker].iloc[0]
-                                        data_final[ticker] = {
-                                            'harga': data_saham.get('Harga (Rp)', 0),
-                                            'volume': data_saham.get('Volume', 0),
-                                            'broksum': data_saham.get('Broksum', 'Tidak Ada'),
-                                            'tekanan_bandar': data_saham.get('Tekanan Bandar', 'Normal'),
-                                            'supply': data_saham.get('Kondisi Supply', 'Normal'),
-                                            'obv': data_saham.get('OBV Trend', 'Normal'),
-                                            'fibo': data_saham.get('Status Fibonacci', 'Normal'),
-                                            'vwap': data_saham.get('Posisi VWAP', 'Normal'),
-                                            'pola_candle': data_saham.get('Pola Candle', 'Normal')
-                                        }
+                                    continue
+                                    
+                                status_teks.info(f"🔄 **Algojo Python bekerja pada Rumus {i}**... (Mengekstrak data global)")
+                                
+                                saham_valid = df_target['Ticker'].tolist()
+                                df_seleksi = df_hasil[df_hasil['Ticker'].isin(saham_valid)].copy()
+                                
+                                df_seleksi['Score_Num'] = pd.to_numeric(df_seleksi['Total Score'], errors='coerce').fillna(0)
+                                
+                                # TAHAP 1: KLASEMEN GLOBAL (Pilih Top 15 berdasarkan Data Keras)
+                                df_sorted = df_seleksi.sort_values(by=['Score_Num', 'Volume', 'Change (%)'], ascending=[False, False, False])
+                                top_15 = df_sorted.head(15)
+                                
+                                data_kirim_ai = {}
+                                for _, row in top_15.iterrows():
+                                    data_kirim_ai[row['Ticker']] = {
+                                        'Harga': row.get('Harga (Rp)', 0),
+                                        'Volume': row.get('Volume', 0),
+                                        'Score': row.get('Score_Num', 0),
+                                        'Change_Pct': row.get('Change (%)', 0),
+                                        'Tekanan_Bandar': row.get('Tekanan Bandar', 'Normal'),
+                                        'Broksum': row.get('Broksum', 'Normal')
+                                    }
+                                    
+                                status_teks.warning(f"🧠 Rumus {i} - Sidang Grand Final AI... (Menyaring 5 Jawara dari Top 15)")
+                                
+                                # TAHAP 2: HAKIM AI (Pilih Top 5 Mutlak)
+                                try:
+                                    hasil_mentah = ai_hakim_klasemen(data_kirim_ai, GEMINI_API_KEY)
+                                    teks_bersih = hasil_mentah.replace('```json', '').replace('```', '').strip()
+                                    pencarian_json = re.search(r'\[\s*\{.*?\}\s*\]', teks_bersih, re.DOTALL)
+                                    
+                                    if pencarian_json:
+                                        hasil_json = json.loads(pencarian_json.group(0))
+                                        df_tampil = pd.DataFrame(hasil_json)
                                         
-                                    try:
-                                        hasil_mentah, model_dipakai = ai_grand_final_top5(data_final, GEMINI_API_KEY)
-                                        
-                                        # ========================================================
-                                        # PEMURNI JSON OTOMATIS (Regex Cleaner)
-                                        # ========================================================
-                                        import re
-                                        import json
-                                        
-                                        # Hapus backticks markdown jika AI menyertakannya
-                                        teks_bersih = hasil_mentah.replace('```json', '').replace('```', '').strip()
-                                        
-                                        # Gunakan Regex untuk menciduk paksa pola JSON (List of Dicts)
-                                        pencarian_json = re.search(r'\[\s*\{.*?\}\s*\]', teks_bersih, re.DOTALL)
-                                        
-                                        if pencarian_json:
-                                            bersih = pencarian_json.group(0)
-                                            try:
-                                                hasil_json = json.loads(bersih)
-                                                df_tampil = pd.DataFrame(hasil_json)
-                                                
-                                                st.success(f"🎉 **TURNAMEN SELESAI!** (Model: {model_dipakai})")
-                                                st.balloons()
-                                                
-                                                with st.container():
-                                                    st.markdown("### 🏆 Hasil Keputusan Grand Final AI")
-                                                    
-                                                    # Atur kolom Peringkat menjadi index agar rapi (angka 0,1,2,3 di kiri hilang)
-                                                    if "Peringkat" in df_tampil.columns:
-                                                        df_tampil.set_index("Peringkat", inplace=True)
-                                                    
-                                                    # Gunakan data_editor / dataframe dengan tampilan kustom
-                                                    import streamlit as st
-                                                    st.dataframe(
-                                                        df_tampil,
-                                                        use_container_width=True,
-                                                        column_config={
-                                                            "Ticker": st.column_config.TextColumn("Kode Saham", width="small"),
-                                                            "Alasan": st.column_config.TextColumn("🧠 Alasan Analisis AI", width="large"),
-                                                            "Target_TP": st.column_config.NumberColumn("🎯 Target TP (Rp)", format="%d"),
-                                                            "Target_CL": st.column_config.NumberColumn("✂️ Target CL (Rp)", format="%d")
-                                                        }
-                                                    )
-                                                    st.markdown("---")
-                                                
-                                                if 'Target_TP' in df_tampil.columns and 'Target_CL' in df_tampil.columns:
-                                                    df_sinyal = df_tampil[['Ticker', 'Target_TP', 'Target_CL']]
-                                                    df_sinyal.to_csv(st.session_state.file_ekspor, index=False)
-                                                    st.info(f"🤖 Sinyal dikirim ke Bot Simulator! Cek Tab 4.")
-                                                    
-                                            except json.JSONDecodeError as json_err:
-                                                st.error(f"Gagal membaca format data setelah disaring. Error: {json_err}\n\nTeks tersaring:\n{bersih}")
+                                        # Ambil ticker untuk masuk ke tabel spreadsheet
+                                        if 'Ticker' in df_tampil.columns:
+                                            jawara_tickers = df_tampil['Ticker'].tolist()
                                         else:
-                                            st.error(f"Format JSON List [] tidak ditemukan dalam respon AI. Pastikan Prompt menginstruksikan format JSON murni.\n\nRespon Asli AI:\n{hasil_mentah}")
-
-                                    except Exception as ai_err:
-                                        st.error(str(ai_err))
-
-                                    st.session_state.radar_aktif = False
-                                    if st.button("🔄 Mulai Turnamen Baru"):
-                                        st.rerun()
+                                            jawara_tickers = []
+                                            
+                                        # Batasi maksimal 5, jika kurang tambahkan string kosong "" agar tabel rata
+                                        jawara_tickers = (jawara_tickers + ["", "", "", "", ""])[:5] 
+                                        keranjang_spreadsheet[f"RUMUS {i}"] = jawara_tickers
+                                        
+                                        # Simpan sinyal untuk dieksekusi bot malam ini
+                                        if 'Target_TP' in df_tampil.columns and 'Target_CL' in df_tampil.columns:
+                                            df_sinyal = df_tampil[['Ticker', 'Target_TP', 'Target_CL']]
+                                            df_sinyal.to_csv(f"Database/sinyal_ai_rumus_{i}.csv", index=False)
+                                            
+                                    else:
+                                        st.error(f"❌ Rumus {i} Gagal (AI tidak merespon JSON yang benar).")
+                                        keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
+                                        
+                                except Exception as e:
+                                    st.error(f"❌ Error pada Rumus {i}: {e}")
+                                    keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
+                                
+                                time.sleep(2) # Nafas untuk API Google
+                            
+                            status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
+                            st.balloons()
+                            
+                            # TAHAP 3: CETAK TABEL SPREADSHEET (Siap Copy-Paste)
+                            st.markdown("### 📋 Tabel Master Portofolio (Siap Salin)")
+                            df_spreadsheet = pd.DataFrame(keranjang_spreadsheet)
+                            
+                            st.data_editor(df_spreadsheet, use_container_width=True, hide_index=True)
 
     # ==========================================
     # TAB 4: PORTOFOLIO & BOT
@@ -1349,14 +1291,11 @@ if not df_hasil.empty:
         if st.button("🛒 Eksekusi Pembelian Bot Sekarang!", type="primary", use_container_width=True):
             with st.spinner("Bot sedang membaca sinyal dan mengeksekusi pembelian..."):
                 import subprocess
-                import time
-                import sys  # <-- Kita butuh ini untuk mencari jalur Python yang benar
+                import sys  
                 
                 try:
-                    # GANTI "python" menjadi sys.executable
                     proses_bot = subprocess.run([sys.executable, "bot_simulator.py"], capture_output=True, text=True)
                     
-                    # Jika bot gagal (exit code bukan 0)
                     if proses_bot.returncode != 0:
                         st.error("❌ Bot gagal dijalankan. Berikut adalah log error dari sistem:")
                         st.code(proses_bot.stderr, language="bash")
@@ -1368,64 +1307,76 @@ if not df_hasil.empty:
                     st.error(f"Sistem web gagal memanggil file bot: {e}")
         
         st.markdown("---")
-    with tab4:
-        st.markdown("## 📊 Dashboard Bot Simulator")
-        pilihan_arena = st.selectbox("Pilih Arena:", [
-            "Rumus 1", "Rumus 2", "Rumus 3", "Rumus 4", "Rumus 5", "Rumus 6", "Rumus 7", "Rumus 8", "Rumus 9"
-        ])
+        
+        # =========================================================
+        # 📊 LAPORAN PERFORMA (SISTEM BRANKAS 3 LAPIS)
+        # =========================================================
+        st.markdown("## 📊 Dashboard Performa AI (Live)")
+        
+        pilihan_arena = st.selectbox("📂 Pilih Arena untuk diinspeksi:", [f"Rumus {i}" for i in range(1, 10)])
         nomor_rumus = pilihan_arena.split(" ")[1]
-        
+
         FILE_SINYAL = f"Database/sinyal_ai_rumus_{nomor_rumus}.csv"
-        FILE_PORTO = f"Database/portofolio_virtual_rumus_{nomor_rumus}.csv"
-        FILE_HIST = f"Database/history_trade_rumus_{nomor_rumus}.csv"
-        MODAL_AWAL = 100000000.0
+        file_porto = f"Database/portofolio_aktif_rumus_{nomor_rumus}.csv"
+        file_hist = f"Database/histori_transaksi_rumus_{nomor_rumus}.csv"
 
-        df_porto = pd.read_csv(FILE_PORTO) if os.path.exists(FILE_PORTO) else pd.DataFrame()
-        df_hist = pd.read_csv(FILE_HIST) if os.path.exists(FILE_HIST) else pd.DataFrame()
-
-        modal_terpakai = df_porto['Total_Modal'].sum() if not df_porto.empty else 0
-        saldo_kas = MODAL_AWAL - modal_terpakai
+        MODAL_AWAL = 100000000.0 
         
-        total_realized_profit = df_hist['Total_Return_Rp'].sum() if not df_hist.empty else 0
-        total_aset = saldo_kas + modal_terpakai + total_realized_profit
+        df_porto = pd.read_csv(file_porto) if os.path.exists(file_porto) else pd.DataFrame()
+        df_hist = pd.read_csv(file_hist) if os.path.exists(file_hist) else pd.DataFrame()
+
+        # ---------------------------------------------------------
+        # 🏆 LAPIS 3: PAPAN SKOR WINRATE & SALDO KAS
+        # ---------------------------------------------------------
+        total_profit_rp = df_hist['Total_Return_Rp'].sum() if not df_hist.empty and 'Total_Return_Rp' in df_hist.columns else 0
+        modal_terpakai = df_porto['Total_Modal'].sum() if not df_porto.empty and 'Total_Modal' in df_porto.columns else 0
+        
+        saldo_saat_ini = MODAL_AWAL + total_profit_rp - modal_terpakai
+        total_aset = saldo_saat_ini + modal_terpakai
         
         total_trade = len(df_hist)
-        if total_trade > 0:
-            win_count = len(df_hist[df_hist['Return_%'] > 0])
-            win_rate = (win_count / total_trade) * 100
+        if total_trade > 0 and 'Return_%' in df_hist.columns:
+            win_trade = len(df_hist[df_hist['Return_%'] > 0])
+            winrate = (win_trade / total_trade) * 100
         else:
-            win_rate = 0.0
+            winrate = 0.0
 
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric(label="💰 Total Aset (Rp)", value=f"{total_aset:,.0f}".replace(",", "."))
+            st.metric(label="💰 Total Aset (Kas + Saham)", value=f"Rp {total_aset:,.0f}".replace(",", "."))
         with col2:
-            st.metric(label="💵 Kas Tersedia (Rp)", value=f"{saldo_kas:,.0f}".replace(",", "."))
+            st.metric(label="💵 Dana Kas Tersedia", value=f"Rp {saldo_saat_ini:,.0f}".replace(",", "."))
         with col3:
-            st.metric(label="📈 Realized Profit (Rp)", value=f"{total_realized_profit:,.0f}".replace(",", "."), delta=f"{total_realized_profit:,.0f}")
+            st.metric(label="📈 Realized Profit/Loss", value=f"Rp {total_profit_rp:,.0f}".replace(",", "."), delta=f"Rp {total_profit_rp:,.0f}".replace(",", "."))
         with col4:
-            st.metric(label="🎯 Win Rate AI", value=f"{win_rate:.1f}%", delta=f"{total_trade} Transaksi Selesai", delta_color="off")
+            st.metric(label="🎯 Winrate AI", value=f"{winrate:.1f}%", delta=f"{total_trade} Selesai", delta_color="off")
 
         st.markdown("---")
         
-        sub1, sub2, sub3 = st.tabs(["📌 Antrean (Watchlist)", "🟢 Portofolio Aktif", "📚 Riwayat Transaksi (Closed)"])
+        # ---------------------------------------------------------
+        # MENUNJUKKAN 3 TABEL (ANTREAN, AKTIF, HISTORI)
+        # ---------------------------------------------------------
+        sub1, sub2, sub3 = st.tabs(["📝 Sinyal Antrean", "🟢 Lapis 1: Portofolio Aktif", "📚 Lapis 2: Histori Transaksi"])
+        
         with sub1:
             if os.path.exists(FILE_SINYAL):
                 df_sinyal = pd.read_csv(FILE_SINYAL)
-                st.success("🔥 Sinyal AI telah diterima! Bot akan mengeksekusi pembelian pada jam bursa.")
+                st.success("🔥 Sinyal AI (Kertas Belanja) telah diterima! Bot akan mengeksekusi pembelian pada jam bursa.")
                 st.dataframe(df_sinyal, use_container_width=True, hide_index=True)
             else:
-                st.info(f"KOSONG. Belum ada sinyal masuk untuk {pilihan_arena}, atau bot sudah mengeksekusi dan membakar kertas belanja.")
+                st.info(f"KOSONG. Belum ada sinyal masuk untuk {pilihan_arena}, atau bot sudah membelinya dan membakar kertas belanja.")
+        
         with sub2:
             if not df_porto.empty:
                 df_porto_tampil = df_porto.copy()
-                df_porto_tampil['Harga_Beli'] = df_porto_tampil['Harga_Beli'].apply(lambda x: f"Rp {x:,.0f}")
-                df_porto_tampil['Target_TP'] = df_porto_tampil['Target_TP'].apply(lambda x: f"Rp {x:,.0f}")
-                df_porto_tampil['Target_CL'] = df_porto_tampil['Target_CL'].apply(lambda x: f"Rp {x:,.0f}")
+                df_porto_tampil['Harga_Beli'] = df_porto_tampil['Harga_Beli'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
+                df_porto_tampil['Target_TP'] = df_porto_tampil['Target_TP'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
+                df_porto_tampil['Target_CL'] = df_porto_tampil['Target_CL'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
                 df_porto_tampil['Total_Modal'] = df_porto_tampil['Total_Modal'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
                 st.dataframe(df_porto_tampil, use_container_width=True, hide_index=True)
             else:
-                st.info(f"Buku portofolio {pilihan_arena} kosong.")
+                st.info("📦 Gudang kosong. Belum ada saham yang dibeli atau semua sudah terjual (Masuk ke Lapis 2).")
+        
         with sub3:
             if not df_hist.empty:
                 def warnai_profit(val):
@@ -1433,7 +1384,12 @@ if not df_hasil.empty:
                         color = '#166534' if val > 0 else '#991b1b' if val < 0 else ''
                         return f'background-color: {color}'
                     return ''
-                df_hist_tampil = df_hist.sort_values(by='Tanggal_Jual', ascending=False).reset_index(drop=True)
+                    
+                if 'Tanggal_Jual' in df_hist.columns:
+                    df_hist_tampil = df_hist.sort_values(by='Tanggal_Jual', ascending=False).reset_index(drop=True)
+                else:
+                    df_hist_tampil = df_hist.copy()
+                    
                 st.dataframe(
                     df_hist_tampil.style.applymap(warnai_profit, subset=['Total_Return_Rp', 'Return_%']).format({
                         'Harga_Beli': "Rp {:,.0f}",
@@ -1445,4 +1401,4 @@ if not df_hasil.empty:
                     hide_index=True
                 )
             else:
-                st.info(f"Belum ada riwayat penjualan saham untuk {pilihan_arena}.")
+                st.info(f"📭 Belum ada riwayat penjualan saham untuk {pilihan_arena}.")
