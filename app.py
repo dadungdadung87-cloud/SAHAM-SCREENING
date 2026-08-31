@@ -837,28 +837,34 @@ if not df_hasil.empty:
             # --- SYARAT MUTLAK: WAJIB SQUEEZE ---
             cond_squeeze = (df_hasil.get('Status BB', '') == 'Squeeze')
 
-            # RUMUS 1 : Squeeze + Supply Kering
-            cond_v1 = (cond_squeeze & df_hasil.get('Kondisi Supply', '').astype(str).str.contains('Supply Kering', na=False))
+            # RUMUS 1 (BARU) : Squeeze + Supply Kering + Di Atas VWAP
+            cond_v1 = (cond_squeeze & 
+                       df_hasil.get('Kondisi Supply', '').astype(str).str.contains('Supply Kering', na=False) &
+                       (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)'))
             df_v1 = df_hasil[cond_v1].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 2 : Squeeze + Anomali Bandar
-            cond_v2 = (cond_squeeze & df_hasil.get('Prediksi Machine Learning', '').astype(str).str.contains('ANOMALI BANDAR', na=False))
+            # RUMUS 2 (BARU - Mantan R2) : Squeeze + Anomali ML + OBV Akumulasi
+            cond_v2 = (cond_squeeze & 
+                       df_hasil.get('Prediksi Machine Learning', '').astype(str).str.contains('ANOMALI BANDAR', na=False) &
+                       (df_hasil.get('OBV Trend', '') == 'Akumulasi (Naik)'))
             df_v2 = df_hasil[cond_v2].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 3 : Squeeze + Golden Rebound Fibo 61.8%
-            cond_v3 = (cond_squeeze & df_hasil.get('Status Fibonacci', '').astype(str).str.contains('61.8%', na=False))
+            # RUMUS 3 (BARU - Mantan R6) : Squeeze + Akumulasi Kuat (Bandar) + Akumulasi Pro (A/D)
+            cond_v3 = (cond_squeeze & 
+                       (df_hasil.get('Status Bandar', '') == 'Akumulasi Kuat') &
+                       (df_hasil.get('Kekuatan A/D', '') == 'Akumulasi Pro (Smart Money)'))
             df_v3 = df_hasil[cond_v3].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 4 : Squeeze + Golden Cross
-            cond_v4 = (cond_squeeze & (df_hasil.get('MA Cross', '') == 'Golden Cross'))
+            # RUMUS 4 (Mantan R3) : Squeeze + Golden Rebound Fibo 61.8%
+            cond_v4 = (cond_squeeze & df_hasil.get('Status Fibonacci', '').astype(str).str.contains('61.8%', na=False))
             df_v4 = df_hasil[cond_v4].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 5 : Squeeze + Hammer
-            cond_v5 = (cond_squeeze & (df_hasil.get('Pola Candle', '') == 'Hammer (Potensi Reversal)'))
+            # RUMUS 5 (Mantan R4) : Squeeze + Golden Cross
+            cond_v5 = (cond_squeeze & (df_hasil.get('MA Cross', '') == 'Golden Cross'))
             df_v5 = df_hasil[cond_v5].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 6 : Squeeze + Akumulasi Kuat
-            cond_v6 = (cond_squeeze & (df_hasil.get('Status Bandar', '') == 'Akumulasi Kuat'))
+            # RUMUS 6 (Mantan R5) : Squeeze + Hammer
+            cond_v6 = (cond_squeeze & (df_hasil.get('Pola Candle', '') == 'Hammer (Potensi Reversal)'))
             df_v6 = df_hasil[cond_v6].copy() if not df_hasil.empty else pd.DataFrame()
 
             # RUMUS 7 : Squeeze + Solid (Jarang Dibanting)
@@ -879,14 +885,14 @@ if not df_hasil.empty:
                 pilihan_v = st.selectbox(
                     "Pilih Rumus Screener (Wajib Squeeze):",
                     [
-                        "RUMUS 1 : Squeeze + Supply Kering (Siap Pump) 🏜️", 
-                        "RUMUS 2 : Squeeze + 🔥 ANOMALI BANDAR (Siap Ledakan)", 
-                        "RUMUS 3 : Squeeze + Golden Rebound Fibo 61.8% (Golden Ratio) 🎯", 
-                        "RUMUS 4 : Squeeze + Golden Cross", 
-                        "RUMUS 5 : Squeeze + Hammer (Potensi Reversal)",
-                        "RUMUS 6 : Squeeze + 🕵️ Status Bandar ( Akumulasi Kuat )",
+                        "RUMUS 1 : Squeeze + Supply Kering 🏜️ + Di Atas VWAP", 
+                        "RUMUS 2 : Squeeze + 🔥 ANOMALI ML + OBV Akumulasi Naik", 
+                        "RUMUS 3 : Squeeze + 🕵️ Akumulasi Kuat (Broksum & Smart Money)", 
+                        "RUMUS 4 : Squeeze + Golden Rebound Fibo 61.8% (Golden Ratio) 🎯", 
+                        "RUMUS 5 : Squeeze + Golden Cross",
+                        "RUMUS 6 : Squeeze + Hammer (Potensi Reversal)",
                         "RUMUS 7 : Squeeze + Solid (Jarang Dibanting)",
-                        "RUMUS 8 : Squeeze + 🔄 Siklus Wyckoff ( Accumulation (Kumpul Barang) )",
+                        "RUMUS 8 : Squeeze + 🔄 Siklus Wyckoff ( Accumulation )",
                         "RUMUS 9 : Squeeze + Sangat Menarik (> 1:3)"
                     ]
                 )
