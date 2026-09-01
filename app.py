@@ -622,7 +622,7 @@ def render_strategy_table(df_subset, file_name):
 
         # KITA TAMBAHKAN "Value Transaksi" DI SINI:
         kolom_utama = ["Ticker", "Harga (Rp)", "Change (%)", "Value Transaksi", "Volume", "Total Score", "Auto Trading Plan"]
-        kolom_tambahan = ["Broksum", "Trend MA (5,20,50)", "RVOL (Anomali Vol)", "Tekanan Bandar", "Status Bandar", "Kekuatan A/D", "Sinyal Cuci Barang", "Status BB", "MA Signal"]
+        kolom_tambahan = ["Kelas Transaksi", "Broksum", "Trend MA (5,20,50)", "RVOL (Anomali Vol)", "Tekanan Bandar", "Status Bandar", "Kekuatan A/D", "Sinyal Cuci Barang", "Status BB", "MA Signal"]
         kolom_tampil = [c for c in kolom_utama + kolom_tambahan if c in df_subset.columns]
 
         # KITA TAMBAHKAN FORMATTER UNTUK VALUE DI SINI:
