@@ -868,7 +868,7 @@ if not df_hasil.empty:
                        (df_hasil.get('Kekuatan A/D', '') == 'Akumulasi Pro (Smart Money)'))
             df_v3 = df_hasil[cond_v3].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 4 (BARU) : Squeeze + Volume Tembus MA20 + Kelas Transaksi Ritel Aktif (5M - 50M)
+            # RUMUS 4 (BARU) : Squeeze + Volume Tembus MA20 + Ritel Aktif (5M - 50M)
             cond_v4 = (cond_squeeze & 
                        (df_hasil.get('Vol Breakout', '') == 'Tembus MA20') &
                        (df_hasil.get('Kelas Transaksi', '') == 'Ritel Aktif (5M - 50M)'))
@@ -903,7 +903,7 @@ if not df_hasil.empty:
                         "RUMUS 1 : Squeeze + Supply Kering 🏜️ + Di Atas VWAP", 
                         "RUMUS 2 : Squeeze + 🔥 ANOMALI ML + OBV Akumulasi Naik", 
                         "RUMUS 3 : Squeeze + 🕵️ Akumulasi Kuat (Broksum & Smart Money)", 
-                        "RUMUS 4 : Squeeze + 🔊 Volume Tembus MA20 + 💸 Ritel Aktif (5M-50M)", # <--- UBAH DISINI
+                        "RUMUS 4 : Squeeze + Volume Tembus MA20 🔊 + Ritel Aktif 💸", 
                         "RUMUS 5 : Squeeze + Golden Cross",
                         "RUMUS 6 : Squeeze + Hammer (Potensi Reversal)",
                         "RUMUS 7 : Squeeze + Solid (Jarang Dibanting)",
