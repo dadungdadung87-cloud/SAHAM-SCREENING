@@ -1033,8 +1033,7 @@ if not df_hasil.empty:
             df_v1 = df_hasil[cond_v1].copy() if not df_hasil.empty else pd.DataFrame()
 
             cond_v2 = (cond_squeeze & 
-                       df_hasil.get('Prediksi Machine Learning', '').astype(str).str.contains('ANOMALI BANDAR', na=False) &
-                       (df_hasil.get('OBV Trend', '') == 'Akumulasi (Naik)'))
+                       (df_hasil.get('Status Fibonacci', '') == 'Golden Rebound Fibo 61.8% (Golden Ratio) 🎯'))
             df_v2 = df_hasil[cond_v2].copy() if not df_hasil.empty else pd.DataFrame()
 
             cond_v3 = (cond_squeeze & 
@@ -1069,7 +1068,7 @@ if not df_hasil.empty:
                     "Pilih Rumus Screener (Wajib Squeeze):",
                     [
                         "RUMUS 1 : Squeeze + Supply Kering 🏜️ + Di Atas VWAP", 
-                        "RUMUS 2 : Squeeze + 🔥 ANOMALI ML + OBV Akumulasi Naik", 
+                        "RUMUS 2 : Squeeze + 📏 Golden Rebound Fibo 61.8% (Golden Ratio) 🎯", 
                         "RUMUS 3 : Squeeze + 🕵️ Akumulasi Kuat (Broksum & Smart Money)", 
                         "RUMUS 4 : Squeeze + Volume Tembus MA20 🔊 + Ritel Aktif 💸", 
                         "RUMUS 5 : Squeeze + Golden Cross",
