@@ -1,3 +1,25 @@
+# =====================================================================
+# 🗺️  PETA PART app.py (untuk update: cukup sebut nomor PART)
+# ---------------------------------------------------------------------
+# PART 01 : IMPOR MODUL
+# PART 02 : FUNGSI AI KLASIK (Hakim, OpenRouter, Turnamen, Grand Final)
+# PART 03 : MESIN AUTO-PILOT CEPAT & PARALEL (+ REM CERDAS)
+# PART 04 : SISTEM ARSIP CERDAS (DATA HARIAN)
+# PART 05 : PENGATURAN UI/UX & CSS
+# PART 06 : LOAD KONFIGURASI JSON (MASTER FILTERS)
+# PART 07 : PRESET & LOAD DATA SAHAM
+# PART 08 : HEADER & SIDEBAR
+# PART 09 : FORMATTER & PEWARNAAN TABEL + TABEL STRATEGI
+# PART 10 : TAB 1 - MARKET OVERVIEW
+# PART 11 : TAB 2 - SCREENER UTAMA
+# PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS, AI BANDAR, AUTO-PILOT)
+# PART 13 : TAB 4 - PORTOFOLIO BOT
+# =====================================================================
+
+
+# =====================================================================
+# >>> PART 01 : IMPOR MODUL <<<
+# =====================================================================
 import io
 import streamlit as st
 import pandas as pd
@@ -13,9 +35,10 @@ from datetime import datetime
 from openai import OpenAI
 import google.generativeai as genai
 
-# ==========================================
-# 🧠 FUNGSI HAKIM AI (KLASEMEN GLOBAL DENGAN RADAR & MODE JSON)
-# ==========================================
+
+# =====================================================================
+# >>> PART 02 : FUNGSI AI KLASIK (Hakim, OpenRouter, Turnamen) <<<
+# =====================================================================
 def ai_hakim_klasemen(data_top15, api_key):
     import google.generativeai as genai
     import time
@@ -69,89 +92,6 @@ def ai_hakim_klasemen(data_top15, api_key):
             continue 
             
     return f"Error_AI (Semua model aktif gagal eksekusi): {pesan_error_terakhir}"
-
-# ==========================================
-# 🧠 SISTEM ARSIP CERDAS (DATA HARIAN)
-# ==========================================
-def get_historical_summary(ticker):
-    arsip_files = glob.glob("Arsip_Data_Harian/screener_*.csv")
-    if not arsip_files: return None
-    arsip_files.sort(reverse=True)
-    arsip_files = arsip_files[:5]
-    
-    df_list = []
-    for file in arsip_files:
-        try:
-            cols = ["Waktu Update", "Ticker", "Harga (Rp)", "Volume", "Posisi VWAP", "OBV Trend", "Tekanan Bandar", "Fase Siklus Bandar", "Trend MA (5,20,50)"]
-            temp_df = pd.read_csv(file, usecols=lambda c: c in cols)
-            temp_df = temp_df[temp_df["Ticker"] == ticker]
-            if not temp_df.empty:
-                date_str = file.split("_")[-1].replace(".csv", "")
-                temp_df["Tanggal"] = date_str
-                df_list.append(temp_df)
-        except: pass
-    
-    if not df_list: return None
-    df_history = pd.concat(df_list, ignore_index=True)
-    df_history = df_history.sort_values(by=["Tanggal", "Waktu Update"])
-    
-    summary_text = f"REKAM JEJAK ARSIP HARIAN SAHAM {ticker}:\n\n"
-    for date, group in df_history.groupby("Tanggal"):
-        open_price = group.iloc[0]["Harga (Rp)"]
-        close_price = group.iloc[-1]["Harga (Rp)"]
-        max_vol = group["Volume"].max()
-        tekanan_akhir = group.iloc[-1]["Tekanan Bandar"]
-        siklus = group.iloc[-1]["Fase Siklus Bandar"]
-        summary_text += f"📅 {date} | Buka: {open_price} | Tutup: {close_price} | Max Vol Harian: {max_vol} | Tekanan Akhir: {tekanan_akhir} | Siklus Wyckoff: {siklus}\n"
-    return summary_text
-
-def get_forensic_data(ticker):
-    arsip_files = glob.glob("Arsip_Data_Harian/screener_*.csv")
-    if not arsip_files: return None
-    arsip_files.sort(reverse=True)
-    arsip_files = arsip_files[:5] 
-    
-    df_list = []
-    for file in arsip_files:
-        try:
-            cols = ["Waktu Update", "Ticker", "Harga (Rp)", "Volume", "Posisi VWAP", "OBV Trend", "Tekanan Bandar", "Fase Siklus Bandar", "Trend MA (5,20,50)", "Status BB", "RVOL (Anomali Vol)"]
-            temp_df = pd.read_csv(file, usecols=lambda c: c in cols)
-            temp_df = temp_df[temp_df["Ticker"] == ticker]
-            if not temp_df.empty:
-                date_str = file.split("_")[-1].replace(".csv", "")
-                temp_df["Tanggal"] = date_str
-                df_list.append(temp_df)
-        except: pass
-    
-    if not df_list: return None
-    df_history = pd.concat(df_list, ignore_index=True)
-    df_history = df_history.sort_values(by=["Tanggal", "Waktu Update"])
-    
-    tanggal_unik = sorted(df_history["Tanggal"].unique())
-    if len(tanggal_unik) > 1:
-        tanggal_unik = tanggal_unik[:-1] 
-        tanggal_unik = tanggal_unik[-3:] 
-    else:
-        return "Data historis sebelum hari ini belum tersedia di arsip."
-        
-    df_history = df_history[df_history["Tanggal"].isin(tanggal_unik)]
-    
-    summary_text = f"REKAM JEJAK H-3 SEBELUM MELEDAK SAHAM {ticker}:\n"
-    for date, group in df_history.groupby("Tanggal"):
-        close_price = group.iloc[-1]["Harga (Rp)"]
-        max_vol = group["Volume"].max()
-        tekanan_akhir = group.iloc[-1]["Tekanan Bandar"]
-        siklus = group.iloc[-1]["Fase Siklus Bandar"]
-        obv = group.iloc[-1]["OBV Trend"] if "OBV Trend" in group.columns else "N/A"
-        rvol = group.iloc[-1]["RVOL (Anomali Vol)"] if "RVOL (Anomali Vol)" in group.columns else "N/A"
-        bb = group.iloc[-1]["Status BB"] if "Status BB" in group.columns else "N/A"
-        
-        summary_text += f"📅 {date} | Tutup: {close_price} | Vol: {max_vol} | Tekanan: {tekanan_akhir} | Siklus: {siklus} | OBV: {obv} | RVOL: {rvol} | BB: {bb}\n"
-    return summary_text
-
-# ==========================================
-# 🤖 OTAK KECERDASAN BUATAN (OPENROUTER)
-# ==========================================
 
 # AI BANDAR (V6)
 def analisa_bandar_ai_multisaham(data_saham_dict, pilihan_ai):
@@ -371,9 +311,10 @@ def ai_grand_final_top5(data_saham_dict, api_key):
             
     raise Exception("🚨 KRITIS: Semua 7 model AI Gemini sedang mengalami limit maksimal atau server sibuk. Mohon jeda turnamen 1-2 menit sebelum mencoba lagi.")
 
-# ==========================================
-# 🚀 >>> BARU: MESIN AUTO-PILOT CEPAT & PARALEL (9 RUMUS)
-# ==========================================
+
+# =====================================================================
+# >>> PART 03 : MESIN AUTO-PILOT CEPAT & PARALEL (+ REM CERDAS) <<<
+# =====================================================================
 def radar_model_gemini_cepat(api_key):
     # Radar dinyalakan CUKUP SEKALI: keluarga flash/lite (cepat) diprioritaskan, sisanya cadangan.
     genai.configure(api_key=api_key)
@@ -522,9 +463,90 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
     if progress_bar: progress_bar.progress(1.0)
     return keranjang, None
 
-# ==========================================
-# PENGATURAN UI/UX & API
-# ==========================================
+
+# =====================================================================
+# >>> PART 04 : SISTEM ARSIP CERDAS (DATA HARIAN) <<<
+# =====================================================================
+def get_historical_summary(ticker):
+    arsip_files = glob.glob("Arsip_Data_Harian/screener_*.csv")
+    if not arsip_files: return None
+    arsip_files.sort(reverse=True)
+    arsip_files = arsip_files[:5]
+    
+    df_list = []
+    for file in arsip_files:
+        try:
+            cols = ["Waktu Update", "Ticker", "Harga (Rp)", "Volume", "Posisi VWAP", "OBV Trend", "Tekanan Bandar", "Fase Siklus Bandar", "Trend MA (5,20,50)"]
+            temp_df = pd.read_csv(file, usecols=lambda c: c in cols)
+            temp_df = temp_df[temp_df["Ticker"] == ticker]
+            if not temp_df.empty:
+                date_str = file.split("_")[-1].replace(".csv", "")
+                temp_df["Tanggal"] = date_str
+                df_list.append(temp_df)
+        except: pass
+    
+    if not df_list: return None
+    df_history = pd.concat(df_list, ignore_index=True)
+    df_history = df_history.sort_values(by=["Tanggal", "Waktu Update"])
+    
+    summary_text = f"REKAM JEJAK ARSIP HARIAN SAHAM {ticker}:\n\n"
+    for date, group in df_history.groupby("Tanggal"):
+        open_price = group.iloc[0]["Harga (Rp)"]
+        close_price = group.iloc[-1]["Harga (Rp)"]
+        max_vol = group["Volume"].max()
+        tekanan_akhir = group.iloc[-1]["Tekanan Bandar"]
+        siklus = group.iloc[-1]["Fase Siklus Bandar"]
+        summary_text += f"📅 {date} | Buka: {open_price} | Tutup: {close_price} | Max Vol Harian: {max_vol} | Tekanan Akhir: {tekanan_akhir} | Siklus Wyckoff: {siklus}\n"
+    return summary_text
+
+def get_forensic_data(ticker):
+    arsip_files = glob.glob("Arsip_Data_Harian/screener_*.csv")
+    if not arsip_files: return None
+    arsip_files.sort(reverse=True)
+    arsip_files = arsip_files[:5] 
+    
+    df_list = []
+    for file in arsip_files:
+        try:
+            cols = ["Waktu Update", "Ticker", "Harga (Rp)", "Volume", "Posisi VWAP", "OBV Trend", "Tekanan Bandar", "Fase Siklus Bandar", "Trend MA (5,20,50)", "Status BB", "RVOL (Anomali Vol)"]
+            temp_df = pd.read_csv(file, usecols=lambda c: c in cols)
+            temp_df = temp_df[temp_df["Ticker"] == ticker]
+            if not temp_df.empty:
+                date_str = file.split("_")[-1].replace(".csv", "")
+                temp_df["Tanggal"] = date_str
+                df_list.append(temp_df)
+        except: pass
+    
+    if not df_list: return None
+    df_history = pd.concat(df_list, ignore_index=True)
+    df_history = df_history.sort_values(by=["Tanggal", "Waktu Update"])
+    
+    tanggal_unik = sorted(df_history["Tanggal"].unique())
+    if len(tanggal_unik) > 1:
+        tanggal_unik = tanggal_unik[:-1] 
+        tanggal_unik = tanggal_unik[-3:] 
+    else:
+        return "Data historis sebelum hari ini belum tersedia di arsip."
+        
+    df_history = df_history[df_history["Tanggal"].isin(tanggal_unik)]
+    
+    summary_text = f"REKAM JEJAK H-3 SEBELUM MELEDAK SAHAM {ticker}:\n"
+    for date, group in df_history.groupby("Tanggal"):
+        close_price = group.iloc[-1]["Harga (Rp)"]
+        max_vol = group["Volume"].max()
+        tekanan_akhir = group.iloc[-1]["Tekanan Bandar"]
+        siklus = group.iloc[-1]["Fase Siklus Bandar"]
+        obv = group.iloc[-1]["OBV Trend"] if "OBV Trend" in group.columns else "N/A"
+        rvol = group.iloc[-1]["RVOL (Anomali Vol)"] if "RVOL (Anomali Vol)" in group.columns else "N/A"
+        bb = group.iloc[-1]["Status BB"] if "Status BB" in group.columns else "N/A"
+        
+        summary_text += f"📅 {date} | Tutup: {close_price} | Vol: {max_vol} | Tekanan: {tekanan_akhir} | Siklus: {siklus} | OBV: {obv} | RVOL: {rvol} | BB: {bb}\n"
+    return summary_text
+
+
+# =====================================================================
+# >>> PART 05 : PENGATURAN UI/UX & CSS <<<
+# =====================================================================
 st.set_page_config(page_title="Screener Saham IHSG", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
@@ -542,9 +564,10 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ==========================================
-# LOAD KONFIGURASI JSON
-# ==========================================
+
+# =====================================================================
+# >>> PART 06 : LOAD KONFIGURASI JSON (MASTER FILTERS) <<<
+# =====================================================================
 FILE_CONFIG = "config_web.json"
 FILE_PRESET = "preset_kustom.json"
 FILE_HASIL = "Database/hasil_screener.csv"
@@ -604,9 +627,10 @@ if "Mid Cap (Lapis 2) + Small Cap (Lapis 3)" not in WEB_CONFIG["MASTER_FILTERS"]
 
 MASTER_FILTERS = WEB_CONFIG["MASTER_FILTERS"]
 
-# ==========================================
-# DATABASE PRESET & LOAD DATA
-# ==========================================
+
+# =====================================================================
+# >>> PART 07 : PRESET & LOAD DATA SAHAM <<<
+# =====================================================================
 def muat_preset():
     preset_bawaan = {
         "🌙 BSJP (Beli Sore 15:30)": {k: "Semua" for k in MASTER_FILTERS},
@@ -656,9 +680,10 @@ if not df_hasil.empty and 'Volume' in df_hasil.columns and 'Harga (Rp)' in df_ha
     # Value = Harga * Volume * 100 (karena 1 Lot = 100 Lembar)
     df_hasil['Value Transaksi'] = df_hasil['Harga (Rp)'] * df_hasil['Volume'] * 100
 
-# ==========================================
-# HEADER & SIDEBAR
-# ==========================================
+
+# =====================================================================
+# >>> PART 08 : HEADER & SIDEBAR <<<
+# =====================================================================
 if not df_hasil.empty and "Terakhir Update" in df_hasil.columns:
     waktu_update = str(df_hasil["Terakhir Update"].iloc[0]) + " WIB"
     st.sidebar.markdown(f"""
@@ -732,9 +757,10 @@ st.title("⚡ AlgoTrade Screener - IHSG Ultimate")
 st.markdown("Detektor Jejak Bandar, Anomali Volume, & Strategi BSJP.")
 st.markdown("---")
 
-# ==========================================
-# FUNGSI PEWARNAAN & FORMATTER TABEL
-# ==========================================
+
+# =====================================================================
+# >>> PART 09 : FORMATTER & PEWARNAAN TABEL + TABEL STRATEGI <<<
+# =====================================================================
 def format_skor(s): return "⭐" * int(s) if pd.notna(s) and int(s) > 0 else "-"
 def format_pct(v): return f"{'▲ ' if v > 0 else '▼ '}{v:+.2f}%" if pd.notna(v) and v != 0 else "0.00%"
 def format_mom(v): return "▲ Positif" if v == "Positif" else ("▼ Negatif" if v == "Negatif" else v)
@@ -798,9 +824,10 @@ def render_strategy_table(df_subset, file_name):
             st.caption("Klik icon 'Copy' untuk paste ke Tab AI.")
     else: st.info("🔍 Belum ada pergerakan saham yang memenuhi kriteria strategi ini pada sesi saat ini.")
 
-# ==============================================================================
-# RENDER 4 TABS UTAMA (VERSI BERSIH 100%)
-# ==============================================================================
+
+# =====================================================================
+# >>> PART 10 : TAB 1 - MARKET OVERVIEW <<<
+# =====================================================================
 if not df_hasil.empty:
     tab1, tab2, tab3, tab4 = st.tabs([
         "📊 Market Overview", 
@@ -809,9 +836,6 @@ if not df_hasil.empty:
         "💼 Portofolio Bot"
     ])
     
-    # ==========================================================================
-    # [TAB 1] MARKET OVERVIEW 
-    # ==========================================================================
     with tab1:
         st.markdown("### 📊 Ringkasan Pasar IHSG")
         
@@ -873,9 +897,10 @@ if not df_hasil.empty:
                 df_val = df_hasil.nlargest(10, 'Turnover')
                 render_top_table(df_val, ['Ticker', 'Harga (Rp)', 'Turnover', 'Change (%)'], {'Harga (Rp)': format_angka, 'Turnover': format_singkat_rp, 'Change (%)': format_pct})
 
-    # ==========================================================================
-    # [TAB 2] SCREENER UTAMA
-    # ==========================================================================
+
+# =====================================================================
+# >>> PART 11 : TAB 2 - SCREENER UTAMA <<<
+# =====================================================================
     with tab2:
         def reset_semua_filter():
             for k, info in MASTER_FILTERS.items():
@@ -967,7 +992,7 @@ if not df_hasil.empty:
                 if col in df_tampil.columns: format_dict[col] = format_angka
             if "Change (%)" in df_tampil.columns: format_dict["Change (%)"] = format_pct
             if "Momentum" in df_tampil.columns: format_dict["Momentum"] = format_mom
-            if "Value Transaksi" in df_tampil.columns: format_dict["Value Transaksi"] = format_singkat_rp # <-- Tambahkan ini
+            if "Value Transaksi" in df_tampil.columns: format_dict["Value Transaksi"] = format_singkat_rp
             for col in ["PER (x)", "PBV (x)"]:
                 if col in df_tampil.columns: format_dict[col] = format_desimal
             if "RSI (14D)" in df_tampil.columns: format_dict["RSI (14D)"] = "{:.0f}"
@@ -988,9 +1013,10 @@ if not df_hasil.empty:
                 st.caption("Klik icon 'Copy' untuk paste massal ke Tab AI.")
         else: st.warning("Tidak ada data sesuai filter.")
 
-    # ==========================================================================
-    # [TAB 3] ASISTEN AI SPESIAL (TURNAMEN)
-    # ==========================================================================
+
+# =====================================================================
+# >>> PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS & AUTO-PILOT) <<<
+# =====================================================================
     with tab3:
         st.markdown("## 🦅 Radar BSJP & Laboratorium Forensik AI")
         st.markdown("<div class='bandar-box-green'><b>💡 INFO:</b> Gunakan kotak pilihan (Dropdown) di bawah ini untuk beralih antar strategi atau mode AI agar tampilan lebih rapi.</div>", unsafe_allow_html=True)
@@ -1001,47 +1027,38 @@ if not df_hasil.empty:
             # --- SYARAT MUTLAK: WAJIB SQUEEZE ---
             cond_squeeze = (df_hasil.get('Status BB', '') == 'Squeeze')
 
-            # RUMUS 1 (BARU) : Squeeze + Supply Kering + Di Atas VWAP
             cond_v1 = (cond_squeeze & 
                        df_hasil.get('Kondisi Supply', '').astype(str).str.contains('Supply Kering', na=False) &
                        (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)'))
             df_v1 = df_hasil[cond_v1].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 2 (BARU - Mantan R2) : Squeeze + Anomali ML + OBV Akumulasi
             cond_v2 = (cond_squeeze & 
                        df_hasil.get('Prediksi Machine Learning', '').astype(str).str.contains('ANOMALI BANDAR', na=False) &
                        (df_hasil.get('OBV Trend', '') == 'Akumulasi (Naik)'))
             df_v2 = df_hasil[cond_v2].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 3 (BARU - Mantan R6) : Squeeze + Akumulasi Kuat (Bandar) + Akumulasi Pro (A/D)
             cond_v3 = (cond_squeeze & 
                        (df_hasil.get('Status Bandar', '') == 'Akumulasi Kuat') &
                        (df_hasil.get('Kekuatan A/D', '') == 'Akumulasi Pro (Smart Money)'))
             df_v3 = df_hasil[cond_v3].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 4 (BARU) : Squeeze + Volume Tembus MA20 + Ritel Aktif (5M - 50M)
             cond_v4 = (cond_squeeze & 
                        (df_hasil.get('Vol Breakout', '') == 'Tembus MA20') &
                        (df_hasil.get('Kelas Transaksi', '') == 'Ritel Aktif (5M - 50M)'))
             df_v4 = df_hasil[cond_v4].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 5 (Mantan R4) : Squeeze + Golden Cross
             cond_v5 = (cond_squeeze & (df_hasil.get('MA Cross', '') == 'Golden Cross'))
             df_v5 = df_hasil[cond_v5].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 6 (Mantan R5) : Squeeze + Hammer
             cond_v6 = (cond_squeeze & (df_hasil.get('Pola Candle', '') == 'Hammer (Potensi Reversal)'))
             df_v6 = df_hasil[cond_v6].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 7 : Squeeze + Solid (Jarang Dibanting)
             cond_v7 = (cond_squeeze & (df_hasil.get('Karakter Gorengan', '') == 'Solid (Jarang Dibanting)'))
             df_v7 = df_hasil[cond_v7].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 8 : Squeeze + Accumulation (Wyckoff)
             cond_v8 = (cond_squeeze & (df_hasil.get('Fase Siklus Bandar', '') == 'Accumulation (Kumpul Barang)'))
             df_v8 = df_hasil[cond_v8].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 9 : Squeeze + Risk/Reward Menarik
             cond_v9 = (cond_squeeze & (df_hasil.get('Risk/Reward Ratio', '') == 'Sangat Menarik (> 1:3)'))
             df_v9 = df_hasil[cond_v9].copy() if not df_hasil.empty else pd.DataFrame()
 
@@ -1097,18 +1114,16 @@ if not df_hasil.empty:
                 if "AI Bandar" in pilihan_ai:
                     st.subheader("🤖 AI Bandar (Persiapan BSJP Besok)")
                     
-                    # MEMBAGI AI BANDAR MENJADI 2 TAB AGAR RAPI
                     tab_otomatis, tab_manual = st.tabs(["🛸 Auto-Pilot 9 Rumus (Spreadsheet)", "✍️ Mode Manual (Paste Saham)"])
                     
                     with tab_otomatis:
                         st.markdown("Sistem akan menyeleksi 15 saham terbaik per rumus secara global, lalu AI akan memilih Top 5 untuk dicetak ke tabel Spreadsheet.")
                         
-                        # >>> BARU: Opsi Mode Kilat
+                        # Opsi Mode Kilat
                         paksa_sidang = st.checkbox("🔄 Paksa Sidang Ulang (abaikan cache Mode Kilat)", key="paksa_sidang_ulang")
                         
                         if st.button("🛸 Jalankan Auto-Pilot Ultimate", type="primary", key="autopilot_utama"):
                             
-                            # PASTIKAN BARIS INI ADA TEPAT DI BAWAH "if st.button"
                             GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
                             
                             if not GEMINI_API_KEY:
@@ -1120,7 +1135,7 @@ if not df_hasil.empty:
                                     7: df_v7, 8: df_v8, 9: df_v9
                                 }
                                 
-                                # >>> BARU: MODE KILAT — data belum berubah = hasil instan dari cache
+                                # MODE KILAT — data belum berubah = hasil instan dari cache
                                 stempel_data = str(df_hasil["Terakhir Update"].iloc[0]) if "Terakhir Update" in df_hasil.columns else "tanpa_stempel"
                                 FILE_CACHE_AUTOPILOT = "Database/cache_autopilot.json"
                                 
@@ -1149,7 +1164,6 @@ if not df_hasil.empty:
                                         status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
                                         st.balloons()
                                 
-                                # TAHAP 3: CETAK TABEL SPREADSHEET (Siap Copy-Paste)
                                 st.markdown("### 📋 Tabel Master Portofolio (Siap Salin)")
                                 
                                 # Sabuk pengaman: paksa semua kolom rata 5 baris agar DataFrame tidak mungkin error
@@ -1287,9 +1301,6 @@ if not df_hasil.empty:
                     st.subheader("🎯 Pemburu ARA (Sistem Kualifikasi Lama)")
                     st.info("💡 **Fitur Auto-Pilot 9 Rumus (Klasemen Global) telah dipindahkan ke menu '🤖 AI Bandar'.** Silakan buka menu tersebut untuk menggunakan mode pencetak Tabel Spreadsheet secara otomatis!")
 
-                    # ==============================================================
-                    # 🛸 TOMBOL AUTO-PILOT ULTIMATE (KLASEMEN GLOBAL) — >>> BARU: MESIN CEPAT & PARALEL
-                    # ==============================================================
                     st.markdown("### 🛸 Mode Auto-Pilot (Super AI & Klasemen)")
                     st.markdown("Sistem akan menyeleksi 15 saham terbaik per rumus secara global, lalu AI akan memilih Top 5 untuk dicetak ke tabel Spreadsheet.")
                     
@@ -1304,7 +1315,7 @@ if not df_hasil.empty:
                                 7: df_v7, 8: df_v8, 9: df_v9
                             }
                             
-                            # >>> BARU: MODE KILAT (cache bersama dengan tab AI Bandar)
+                            # MODE KILAT (cache bersama dengan tab AI Bandar)
                             stempel_data = str(df_hasil["Terakhir Update"].iloc[0]) if "Terakhir Update" in df_hasil.columns else "tanpa_stempel"
                             FILE_CACHE_AUTOPILOT = "Database/cache_autopilot.json"
                             
@@ -1333,7 +1344,6 @@ if not df_hasil.empty:
                                     status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
                                     st.balloons()
                             
-                            # TAHAP 3: CETAK TABEL SPREADSHEET (Siap Copy-Paste)
                             st.markdown("### 📋 Tabel Master Portofolio (Siap Salin)")
                             
                             for kunci in keranjang_spreadsheet:
@@ -1343,9 +1353,10 @@ if not df_hasil.empty:
                             
                             st.data_editor(df_spreadsheet, use_container_width=True, hide_index=True)
 
-    # ==========================================
-    # TAB 4: PORTOFOLIO & BOT
-    # ==========================================
+
+# =====================================================================
+# >>> PART 13 : TAB 4 - PORTOFOLIO BOT <<<
+# =====================================================================
     with tab4:
         st.markdown("## 🤖 Monitor Bot Simulator")
         
@@ -1370,9 +1381,6 @@ if not df_hasil.empty:
         
         st.markdown("---")
         
-        # =========================================================
-        # 📊 LAPORAN PERFORMA (SISTEM BRANKAS 3 LAPIS)
-        # =========================================================
         st.markdown("## 📊 Dashboard Performa AI (Live)")
         
         pilihan_arena = st.selectbox("📂 Pilih Arena untuk diinspeksi:", [f"Rumus {i}" for i in range(1, 10)])
@@ -1387,9 +1395,6 @@ if not df_hasil.empty:
         df_porto = pd.read_csv(file_porto) if os.path.exists(file_porto) else pd.DataFrame()
         df_hist = pd.read_csv(file_hist) if os.path.exists(file_hist) else pd.DataFrame()
 
-        # ---------------------------------------------------------
-        # 🏆 LAPIS 3: PAPAN SKOR WINRATE & SALDO KAS
-        # ---------------------------------------------------------
         total_profit_rp = df_hist['Total_Return_Rp'].sum() if not df_hist.empty and 'Total_Return_Rp' in df_hist.columns else 0
         modal_terpakai = df_porto['Total_Modal'].sum() if not df_porto.empty and 'Total_Modal' in df_porto.columns else 0
         
@@ -1415,9 +1420,6 @@ if not df_hasil.empty:
 
         st.markdown("---")
         
-        # ---------------------------------------------------------
-        # MENUNJUKKAN 3 TABEL (ANTREAN, AKTIF, HISTORI)
-        # ---------------------------------------------------------
         sub1, sub2, sub3 = st.tabs(["📝 Sinyal Antrean", "🟢 Lapis 1: Portofolio Aktif", "📚 Lapis 2: Histori Transaksi"])
         
         with sub1:
