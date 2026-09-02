@@ -969,8 +969,9 @@ if not df_hasil.empty:
                                 progress_bar = st.progress(0)
                                 status_teks = st.empty()
                                 
-                                # Siapkan keranjang untuk membuat tabel spreadsheet di akhir
-                                keranjang_spreadsheet = {f"RUMUS {i}": [] for i in range(1, 10)}
+                                # >>> PERBAIKAN #1: Keranjang tidak lagi dimulai kosong ([]),
+                                # tapi langsung diisi 5 sel kosong agar semua kolom selalu sama panjang.
+                                keranjang_spreadsheet = {f"RUMUS {i}": ["", "", "", "", ""] for i in range(1, 10)}
                                 
                                 for i in range(1, 10):
                                     df_target = daftar_rumus[i]
@@ -1070,6 +1071,12 @@ if not df_hasil.empty:
                                 
                                 # TAHAP 3: CETAK TABEL SPREADSHEET (Siap Copy-Paste)
                                 st.markdown("### 📋 Tabel Master Portofolio (Siap Salin)")
+                                
+                                # >>> PERBAIKAN #2: Sabuk pengaman terakhir — paksa semua kolom
+                                # rata menjadi tepat 5 baris agar pd.DataFrame tidak mungkin error.
+                                for kunci in keranjang_spreadsheet:
+                                    keranjang_spreadsheet[kunci] = (keranjang_spreadsheet[kunci] + ["", "", "", "", ""])[:5]
+                                
                                 df_spreadsheet = pd.DataFrame(keranjang_spreadsheet)
                                 
                                 st.data_editor(df_spreadsheet, use_container_width=True, hide_index=True)
@@ -1220,8 +1227,8 @@ if not df_hasil.empty:
                             progress_bar = st.progress(0)
                             status_teks = st.empty()
                             
-                            # Siapkan keranjang untuk membuat tabel spreadsheet di akhir
-                            keranjang_spreadsheet = {f"RUMUS {i}": [] for i in range(1, 10)}
+                            # >>> PERBAIKAN #3: Sama seperti Perbaikan #1 — keranjang diisi 5 sel kosong sejak awal.
+                            keranjang_spreadsheet = {f"RUMUS {i}": ["", "", "", "", ""] for i in range(1, 10)}
                             
                             for i in range(1, 10):
                                 df_target = daftar_rumus[i]
@@ -1296,6 +1303,11 @@ if not df_hasil.empty:
                             
                             # TAHAP 3: CETAK TABEL SPREADSHEET (Siap Copy-Paste)
                             st.markdown("### 📋 Tabel Master Portofolio (Siap Salin)")
+                            
+                            # >>> PERBAIKAN #4: Sama seperti Perbaikan #2 — paksa semua kolom rata 5 baris.
+                            for kunci in keranjang_spreadsheet:
+                                keranjang_spreadsheet[kunci] = (keranjang_spreadsheet[kunci] + ["", "", "", "", ""])[:5]
+                            
                             df_spreadsheet = pd.DataFrame(keranjang_spreadsheet)
                             
                             st.data_editor(df_spreadsheet, use_container_width=True, hide_index=True)
