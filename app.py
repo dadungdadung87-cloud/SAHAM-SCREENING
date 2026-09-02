@@ -500,6 +500,11 @@ def load_data_saham():
 
 df_hasil = load_data_saham()
 
+# --- TAMBAHAN KALKULASI VALUE TRANSAKSI OTOMATIS ---
+if not df_hasil.empty and 'Volume' in df_hasil.columns and 'Harga (Rp)' in df_hasil.columns:
+    # Value = Harga * Volume * 100 (karena 1 Lot = 100 Lembar)
+    df_hasil['Value Transaksi'] = df_hasil['Harga (Rp)'] * df_hasil['Volume'] * 100
+
 # ==========================================
 # HEADER & SIDEBAR
 # ==========================================
@@ -592,10 +597,10 @@ def format_singkat_vol(v):
     return f"{v:.0f} Lot"
 
 def format_singkat_rp(v):
-    if pd.isna(v): return "-"
-    if v >= 1_000_000_000_000: return f"Rp {v/1_000_000_000_000:.2f} T"
-    elif v >= 1_000_000_000: return f"Rp {v/1_000_000_000:.2f} M"
-    elif v >= 1_000_000: return f"Rp {v/1_000_000:.2f} Jt"
+    if pd.isna(v) or v == 0: return "-"
+    if v >= 1_000_000_000_000: return f"🔥 Rp {v/1_000_000_000_000:.2f} T"
+    elif v >= 1_000_000_000: return f"💰 Rp {v/1_000_000_000:.2f} M"
+    elif v >= 1_000_000: return f"🪙 Rp {v/1_000_000:.2f} Jt"
     return f"Rp {v:,.0f}".replace(",", ".")
 
 def warna_tabel(val):
@@ -615,11 +620,18 @@ def render_strategy_table(df_subset, file_name):
         if sort_cols: df_subset = df_subset.sort_values(by=sort_cols, ascending=[False, False]).reset_index(drop=True)
         if "Total Score" in df_subset.columns: df_subset["Total Score"] = df_subset["Total Score"].apply(format_skor)
 
-        kolom_utama = ["Ticker", "Harga (Rp)", "Change (%)", "Volume", "Total Score", "Auto Trading Plan"]
-        kolom_tambahan = ["Broksum", "Trend MA (5,20,50)", "RVOL (Anomali Vol)", "Tekanan Bandar", "Status Bandar", "Kekuatan A/D", "Sinyal Cuci Barang", "Status BB", "MA Signal"]
+        # KITA TAMBAHKAN "Value Transaksi" DI SINI:
+        kolom_utama = ["Ticker", "Harga (Rp)", "Change (%)", "Value Transaksi", "Volume", "Total Score", "Auto Trading Plan"]
+        kolom_tambahan = ["Kelas Transaksi", "Broksum", "Trend MA (5,20,50)", "RVOL (Anomali Vol)", "Tekanan Bandar", "Status Bandar", "Kekuatan A/D", "Sinyal Cuci Barang", "Status BB", "MA Signal"]
         kolom_tampil = [c for c in kolom_utama + kolom_tambahan if c in df_subset.columns]
 
-        styler = df_subset[kolom_tampil].style.format({"Harga (Rp)": format_angka, "Volume": format_angka, "Change (%)": format_pct})
+        # KITA TAMBAHKAN FORMATTER UNTUK VALUE DI SINI:
+        styler = df_subset[kolom_tampil].style.format({
+            "Harga (Rp)": format_angka, 
+            "Volume": format_angka, 
+            "Change (%)": format_pct,
+            "Value Transaksi": format_singkat_rp
+        })
         subset_warna = [c for c in kolom_tampil if c not in ["Ticker", "Auto Trading Plan"]]
         tabel_jadi = styler.map(warna_tabel, subset=subset_warna) if hasattr(styler, 'map') else styler.applymap(warna_tabel, subset=subset_warna)
 
@@ -786,11 +798,11 @@ if not df_hasil.empty:
             df_tampil = df_filtered.iloc[idx_awal : idx_awal + per_hal].copy()
             if "Total Score" in df_tampil.columns: df_tampil["Total Score"] = df_tampil["Total Score"].apply(format_skor)
             
-            kolom_ringkasan = ["Ticker", "Harga (Rp)", "Change (%)", "Broksum", "Rekomendasi", "Status Open", "Posisi VWAP", "Total Score", "Volume", "Auto Trading Plan"]
-            kolom_bandar = ["Ticker", "Harga (Rp)", "Change (%)", "Broksum", "Fase Siklus Bandar", "Kekuatan A/D", "Status Bandar", "RVOL (Anomali Vol)", "Karakter Gorengan", "Tekanan Bandar", "OBV Trend", "Kondisi Supply", "Prediksi Machine Learning"]
-            kolom_teknikal = ["Ticker", "Harga (Rp)", "Change (%)", "Auto Trading Plan", "Risk/Reward Ratio", "Status Fibonacci", "Sinyal Cuci Barang", "Posisi Entry", "Pola Candle", "Trend MA (5,20,50)", "MA Signal", "Status BB", "RSI (14D)", "MACD", "Status Stochastic"]
-            kolom_fundamental = ["Ticker", "Harga (Rp)", "Kategori", "Valuasi", "PER (x)", "PBV (x)", "Kelas Transaksi", "Likuiditas", "Status Sentimen"]
-            kolom_semua = ["Ticker", "Broksum", "Status Open", "Risk/Reward Ratio", "Status Fibonacci", "Auto Trading Plan", "Streak Harian", "Sinyal Cuci Barang", "Kategori", "Kelas Transaksi", "Valuasi", "Harga (Rp)", "PER (x)", "PBV (x)", "Harga MA20", "Posisi VWAP", "Support", "Resistance", "Posisi Entry", "Pola Candle", "Change (%)", "Volume", "RVOL (Anomali Vol)", "Vol Breakout", "Status Gap", "Fase Siklus Bandar", "Karakter Gorengan", "Tekanan Bandar", "Kekuatan A/D", "Status Bandar", "OBV Trend", "RSI (14D)", "Momentum", "Trend MA (5,20,50)", "MA Signal", "MA Cross", "MACD", "Status Stochastic", "Status BB", "Risiko", "Likuiditas", "Status Sentimen", "Prediksi Machine Learning", "Kondisi Supply", "Total Score", "Rekomendasi"]
+            kolom_ringkasan = ["Ticker", "Harga (Rp)", "Change (%)", "Value Transaksi", "Volume", "Broksum", "Rekomendasi", "Status Open", "Posisi VWAP", "Total Score", "Auto Trading Plan"]
+            kolom_bandar = ["Ticker", "Harga (Rp)", "Change (%)", "Value Transaksi", "Broksum", "Fase Siklus Bandar", "Kekuatan A/D", "Status Bandar", "RVOL (Anomali Vol)", "Karakter Gorengan", "Tekanan Bandar", "OBV Trend", "Kondisi Supply", "Prediksi Machine Learning"]
+            kolom_teknikal = ["Ticker", "Harga (Rp)", "Change (%)", "Value Transaksi", "Auto Trading Plan", "Risk/Reward Ratio", "Status Fibonacci", "Sinyal Cuci Barang", "Posisi Entry", "Pola Candle", "Trend MA (5,20,50)", "MA Signal", "Status BB", "RSI (14D)", "MACD", "Status Stochastic"]
+            kolom_fundamental = ["Ticker", "Harga (Rp)", "Value Transaksi", "Kategori", "Valuasi", "PER (x)", "PBV (x)", "Kelas Transaksi", "Likuiditas", "Status Sentimen"]
+            kolom_semua = ["Ticker", "Value Transaksi", "Broksum", "Status Open", "Risk/Reward Ratio", "Status Fibonacci", "Auto Trading Plan", "Streak Harian", "Sinyal Cuci Barang", "Kategori", "Kelas Transaksi", "Valuasi", "Harga (Rp)", "PER (x)", "PBV (x)", "Harga MA20", "Posisi VWAP", "Support", "Resistance", "Posisi Entry", "Pola Candle", "Change (%)", "Volume", "RVOL (Anomali Vol)", "Vol Breakout", "Status Gap", "Fase Siklus Bandar", "Karakter Gorengan", "Tekanan Bandar", "Kekuatan A/D", "Status Bandar", "OBV Trend", "RSI (14D)", "Momentum", "Trend MA (5,20,50)", "MA Signal", "MA Cross", "MACD", "Status Stochastic", "Status BB", "Risiko", "Likuiditas", "Status Sentimen", "Prediksi Machine Learning", "Kondisi Supply", "Total Score", "Rekomendasi"]
             
             if "Ringkasan" in mode_tampilan: kolom_pilih = kolom_ringkasan
             elif "Bandarmologi" in mode_tampilan: kolom_pilih = kolom_bandar
@@ -804,6 +816,7 @@ if not df_hasil.empty:
                 if col in df_tampil.columns: format_dict[col] = format_angka
             if "Change (%)" in df_tampil.columns: format_dict["Change (%)"] = format_pct
             if "Momentum" in df_tampil.columns: format_dict["Momentum"] = format_mom
+            if "Value Transaksi" in df_tampil.columns: format_dict["Value Transaksi"] = format_singkat_rp # <-- Tambahkan ini
             for col in ["PER (x)", "PBV (x)"]:
                 if col in df_tampil.columns: format_dict[col] = format_desimal
             if "RSI (14D)" in df_tampil.columns: format_dict["RSI (14D)"] = "{:.0f}"
@@ -855,8 +868,10 @@ if not df_hasil.empty:
                        (df_hasil.get('Kekuatan A/D', '') == 'Akumulasi Pro (Smart Money)'))
             df_v3 = df_hasil[cond_v3].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 4 (Mantan R3) : Squeeze + Golden Rebound Fibo 61.8%
-            cond_v4 = (cond_squeeze & df_hasil.get('Status Fibonacci', '').astype(str).str.contains('61.8%', na=False))
+            # RUMUS 4 (BARU) : Squeeze + Volume Tembus MA20 + Ritel Aktif (5M - 50M)
+            cond_v4 = (cond_squeeze & 
+                       (df_hasil.get('Vol Breakout', '') == 'Tembus MA20') &
+                       (df_hasil.get('Kelas Transaksi', '') == 'Ritel Aktif (5M - 50M)'))
             df_v4 = df_hasil[cond_v4].copy() if not df_hasil.empty else pd.DataFrame()
 
             # RUMUS 5 (Mantan R4) : Squeeze + Golden Cross
@@ -888,7 +903,7 @@ if not df_hasil.empty:
                         "RUMUS 1 : Squeeze + Supply Kering 🏜️ + Di Atas VWAP", 
                         "RUMUS 2 : Squeeze + 🔥 ANOMALI ML + OBV Akumulasi Naik", 
                         "RUMUS 3 : Squeeze + 🕵️ Akumulasi Kuat (Broksum & Smart Money)", 
-                        "RUMUS 4 : Squeeze + Golden Rebound Fibo 61.8% (Golden Ratio) 🎯", 
+                        "RUMUS 4 : Squeeze + Volume Tembus MA20 🔊 + Ritel Aktif 💸", 
                         "RUMUS 5 : Squeeze + Golden Cross",
                         "RUMUS 6 : Squeeze + Hammer (Potensi Reversal)",
                         "RUMUS 7 : Squeeze + Solid (Jarang Dibanting)",
