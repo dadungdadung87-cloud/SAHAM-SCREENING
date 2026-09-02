@@ -694,10 +694,15 @@ if not df_hasil.empty and "Terakhir Update" in df_hasil.columns:
     """, unsafe_allow_html=True)
 
 if st.sidebar.button("🔃 Sync & Muat Ulang Data Server", use_container_width=True):
-    with st.spinner("Menarik data terbaru dari GitHub Server..."):
+    with st.spinner("Menyelaraskan data lokal ↔ GitHub (aman anti-timpa)..."):
         try:
-            os.system("git pull origin main") 
-            time.sleep(2) 
+            # 1) AMANKAN perubahan lokal (sinyal/transaksi) ke GitHub dulu agar tidak tertimpa
+            os.system("git add Database/*.csv")
+            os.system("git commit -m '🛡️ Amankan data lokal sebelum sync'")
+            # 2) Baru tarik data terbaru (rebase agar riwayat lurus)
+            os.system("git pull --rebase origin main")
+            os.system("git push origin main")
+            time.sleep(2)
         except Exception as e:
             st.sidebar.error(f"Gagal Sync: {e}")
     st.cache_data.clear()

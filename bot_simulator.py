@@ -25,7 +25,13 @@ def auto_save_github():
         if "nothing to commit" in commit_process.stdout or "nothing to commit" in commit_process.stderr:
             print("✅ Data aman. Tidak ada transaksi baru.")
             return
-        subprocess.run(["git", "push", "origin", "main"], check=True)
+        # COMMIT dulu, baru samakan riwayat (rebase), lalu push — anti ditolak
+        subprocess.run(["git", "pull", "--rebase", "origin", "main"], capture_output=True, text=True)
+        push_process = subprocess.run(["git", "push", "origin", "main"], capture_output=True, text=True)
+        if push_process.returncode != 0:
+            # 1x percobaan ulang setelah rebase
+            subprocess.run(["git", "pull", "--rebase", "origin", "main"], capture_output=True, text=True)
+            subprocess.run(["git", "push", "origin", "main"], check=True)
         print("🚀 Pencadangan berhasil! Data portofolio Anda abadi.")
     except Exception as e:
         print(f"❌ Gagal melakukan Auto-Save. Error: {e}")
