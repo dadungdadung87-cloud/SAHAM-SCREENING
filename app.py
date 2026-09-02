@@ -372,6 +372,157 @@ def ai_grand_final_top5(data_saham_dict, api_key):
     raise Exception("🚨 KRITIS: Semua 7 model AI Gemini sedang mengalami limit maksimal atau server sibuk. Mohon jeda turnamen 1-2 menit sebelum mencoba lagi.")
 
 # ==========================================
+# 🚀 >>> BARU: MESIN AUTO-PILOT CEPAT & PARALEL (9 RUMUS)
+# ==========================================
+def radar_model_gemini_cepat(api_key):
+    # Radar dinyalakan CUKUP SEKALI: keluarga flash/lite (cepat) diprioritaskan, sisanya cadangan.
+    genai.configure(api_key=api_key)
+    cepat, cadangan = [], []
+    try:
+        for m in genai.list_models():
+            if 'generateContent' in m.supported_generation_methods:
+                nama = m.name.replace("models/", "")
+                if ("flash" in nama.lower()) or ("lite" in nama.lower()):
+                    cepat.append(nama)
+                else:
+                    cadangan.append(nama)
+    except Exception:
+        pass
+    return cepat + cadangan
+
+def ai_hakim_klasemen_cepat(data_top15, api_key, daftar_model):
+    # Hakim AI versi cepat: radar tidak diulang; AI HANYA memilih 5 Ticker (JSON pendek);
+    # Target TP/CL TIDAK lagi dihitung AI (dihitung eksak oleh Python) -> lebih cepat & bebas halusinasi hitung.
+    genai.configure(api_key=api_key)
+    prompt = f"""
+    Select EXACTLY 5 Tickers that have the highest combination of 'Score' and 'Volume' from the data below.
+    
+    DATA:
+    {data_top15}
+    
+    Output a JSON array containing EXACTLY 5 objects, each with EXACTLY 1 key: "Ticker".
+    """
+    pesan_error_terakhir = ""
+    for nama_model in daftar_model:
+        try:
+            model = genai.GenerativeModel(
+                nama_model,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.0,
+                    response_mime_type="application/json",
+                    max_output_tokens=512,
+                )
+            )
+            response = model.generate_content(prompt)
+            return response.text
+        except Exception as e:
+            pesan_error_terakhir = str(e)
+            # REM CERDAS: jeda HANYA jika server sibuk / kena limit (429/503)
+            if any(k in str(e) for k in ["429", "503", "RESOURCE_EXHAUSTED", "UNAVAILABLE"]):
+                time.sleep(3)
+            continue
+    return f"Error_AI (Semua model aktif gagal eksekusi): {pesan_error_terakhir}"
+
+def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None, status_teks=None):
+    # Mengadili 9 rumus secara PARALEL (3 pekerja bersamaan). Mengembalikan (keranjang, error_global).
+    import concurrent.futures
+
+    keranjang = {f"RUMUS {i}": ["", "", "", "", ""] for i in range(1, 10)}
+
+    if status_teks: status_teks.info("📡 Radar model: menarik daftar model Gemini online (cukup sekali)...")
+    daftar_model = radar_model_gemini_cepat(api_key)
+    if not daftar_model:
+        return keranjang, "❌ Tidak ada model Gemini yang online untuk API Key ini."
+
+    def sidang_satu_rumus(i):
+        try:
+            df_target = daftar_rumus[i]
+            saham_valid = df_target['Ticker'].tolist()
+            df_seleksi = df_data[df_data['Ticker'].isin(saham_valid)].copy()
+            df_seleksi['Score_Num'] = pd.to_numeric(df_seleksi['Total Score'], errors='coerce').fillna(0)
+            df_sorted = df_seleksi.sort_values(by=['Score_Num', 'Volume', 'Change (%)'], ascending=[False, False, False])
+            top_15 = df_sorted.head(15)
+
+            data_kirim_ai = {}
+            for _, row in top_15.iterrows():
+                data_kirim_ai[row['Ticker']] = {
+                    'Harga': row.get('Harga (Rp)', 0),
+                    'Volume': row.get('Volume', 0),
+                    'Score': row.get('Score_Num', 0),
+                    'Change_Pct': row.get('Change (%)', 0),
+                    'Tekanan_Bandar': row.get('Tekanan Bandar', 'Normal'),
+                    'Broksum': row.get('Broksum', 'Normal')
+                }
+
+            hasil_mentah = ai_hakim_klasemen_cepat(data_kirim_ai, api_key, daftar_model)
+            if "Error_AI" in hasil_mentah:
+                return i, None, hasil_mentah
+
+            # PENYEDOT DEBU: coba baca blok JSON dari yang paling bawah
+            semua_blok_kurung = re.findall(r'\[.*?\]', hasil_mentah, re.DOTALL)
+            hasil_json = None
+            for blok in reversed(semua_blok_kurung):
+                try:
+                    blok_bersih = blok.replace("'", '"')
+                    blok_bersih = re.sub(r',\s*\]', ']', blok_bersih)
+                    calon = json.loads(blok_bersih)
+                    if isinstance(calon, list):
+                        hasil_json = calon
+                        break
+                except:
+                    continue
+            if hasil_json is None:
+                return i, None, f"Format JSON tidak utuh. Respons: {hasil_mentah[:150]}"
+
+            tickers_ai = []
+            for item in hasil_json:
+                t = (item.get("Ticker", "") if isinstance(item, dict) else str(item)).strip().upper()
+                if t and t in data_kirim_ai and t not in tickers_ai:
+                    tickers_ai.append(t)
+            tickers_ai = tickers_ai[:5]
+
+            # TP (+5%) & CL (-3%) dihitung EKSAK oleh Python
+            baris_sinyal = []
+            for t in tickers_ai:
+                harga = float(data_kirim_ai[t]['Harga'])
+                baris_sinyal.append({
+                    "Ticker": t,
+                    "Target_TP": int(round(harga * 1.05)),
+                    "Target_CL": int(round(harga * 0.97)),
+                })
+            if baris_sinyal:
+                pd.DataFrame(baris_sinyal).to_csv(f"Database/sinyal_ai_rumus_{i}.csv", index=False)
+
+            jawara = [b["Ticker"] for b in baris_sinyal]
+            return i, (jawara + ["", "", "", "", ""])[:5], None
+        except Exception as e:
+            return i, None, str(e)
+
+    rumus_aktif = [i for i in range(1, 10) if len(daftar_rumus[i]) > 0]
+    for i in range(1, 10):
+        if len(daftar_rumus[i]) == 0 and status_teks:
+            status_teks.warning(f"⏭️ Rumus {i} kosong. Dilewati.")
+
+    if status_teks: status_teks.info(f"🚀 Sidang paralel dimulai: {len(rumus_aktif)} rumus aktif, 3 hakim bekerja bersamaan...")
+
+    selesai = 0
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        futures = [executor.submit(sidang_satu_rumus, i) for i in rumus_aktif]
+        for fut in concurrent.futures.as_completed(futures):
+            i, jawara, err = fut.result()
+            selesai += 1
+            if progress_bar: progress_bar.progress(min(selesai / 9.0, 1.0))
+            if err:
+                if status_teks: status_teks.error(f"❌ Rumus {i} gagal: {err}")
+                keranjang[f"RUMUS {i}"] = ["", "", "", "", ""]
+            else:
+                keranjang[f"RUMUS {i}"] = jawara
+                if status_teks: status_teks.success(f"✅ Rumus {i} selesai ({selesai}/{len(rumus_aktif)} sidang aktif).")
+
+    if progress_bar: progress_bar.progress(1.0)
+    return keranjang, None
+
+# ==========================================
 # PENGATURAN UI/UX & API
 # ==========================================
 st.set_page_config(page_title="Screener Saham IHSG", layout="wide", initial_sidebar_state="expanded")
@@ -952,6 +1103,9 @@ if not df_hasil.empty:
                     with tab_otomatis:
                         st.markdown("Sistem akan menyeleksi 15 saham terbaik per rumus secara global, lalu AI akan memilih Top 5 untuk dicetak ke tabel Spreadsheet.")
                         
+                        # >>> BARU: Opsi Mode Kilat
+                        paksa_sidang = st.checkbox("🔄 Paksa Sidang Ulang (abaikan cache Mode Kilat)", key="paksa_sidang_ulang")
+                        
                         if st.button("🛸 Jalankan Auto-Pilot Ultimate", type="primary", key="autopilot_utama"):
                             
                             # PASTIKAN BARIS INI ADA TEPAT DI BAWAH "if st.button"
@@ -966,114 +1120,39 @@ if not df_hasil.empty:
                                     7: df_v7, 8: df_v8, 9: df_v9
                                 }
                                 
-                                progress_bar = st.progress(0)
-                                status_teks = st.empty()
+                                # >>> BARU: MODE KILAT — data belum berubah = hasil instan dari cache
+                                stempel_data = str(df_hasil["Terakhir Update"].iloc[0]) if "Terakhir Update" in df_hasil.columns else "tanpa_stempel"
+                                FILE_CACHE_AUTOPILOT = "Database/cache_autopilot.json"
                                 
-                                # >>> PERBAIKAN #1: Keranjang tidak lagi dimulai kosong ([]),
-                                # tapi langsung diisi 5 sel kosong agar semua kolom selalu sama panjang.
-                                keranjang_spreadsheet = {f"RUMUS {i}": ["", "", "", "", ""] for i in range(1, 10)}
-                                
-                                for i in range(1, 10):
-                                    df_target = daftar_rumus[i]
-                                    progress_bar.progress(i / 9.0)
-                                    
-                                    if len(df_target) == 0:
-                                        status_teks.warning(f"⏭️ Rumus {i} kosong. Dilewati.")
-                                        time.sleep(1)
-                                        continue
-                                        
-                                    status_teks.info(f"🔄 **Algojo Python bekerja pada Rumus {i}**... (Mengekstrak data global)")
-                                    
-                                    saham_valid = df_target['Ticker'].tolist()
-                                    df_seleksi = df_hasil[df_hasil['Ticker'].isin(saham_valid)].copy()
-                                    
-                                    df_seleksi['Score_Num'] = pd.to_numeric(df_seleksi['Total Score'], errors='coerce').fillna(0)
-                                    
-                                    # TAHAP 1: KLASEMEN GLOBAL (Pilih Top 15 berdasarkan Data Keras)
-                                    df_sorted = df_seleksi.sort_values(by=['Score_Num', 'Volume', 'Change (%)'], ascending=[False, False, False])
-                                    top_15 = df_sorted.head(15)
-                                    
-                                    data_kirim_ai = {}
-                                    for _, row in top_15.iterrows():
-                                        data_kirim_ai[row['Ticker']] = {
-                                            'Harga': row.get('Harga (Rp)', 0),
-                                            'Volume': row.get('Volume', 0),
-                                            'Score': row.get('Score_Num', 0),
-                                            'Change_Pct': row.get('Change (%)', 0),
-                                            'Tekanan_Bandar': row.get('Tekanan Bandar', 'Normal'),
-                                            'Broksum': row.get('Broksum', 'Normal')
-                                        }
-                                        
-                                    status_teks.warning(f"🧠 Rumus {i} - Sidang Grand Final AI... (Menyaring 5 Jawara dari Top 15)")
-                                    
-                                    # TAHAP 2: HAKIM AI (Pilih Top 5 Mutlak)
+                                keranjang_spreadsheet = None
+                                if not paksa_sidang and os.path.exists(FILE_CACHE_AUTOPILOT):
                                     try:
-                                        hasil_mentah = ai_hakim_klasemen(data_kirim_ai, GEMINI_API_KEY)
-                                        
-                                        if "Error_AI:" in hasil_mentah:
-                                            st.error(f"❌ API Error Rumus {i} : {hasil_mentah}")
-                                            keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
-                                            continue
-                                            
-                                        import json
-                                        import re
-                                        
-                                        # ========================================================
-                                        # PENYEDOT DEBU V2 (Sistem Coba-Baca dari Bawah)
-                                        # ========================================================
-                                        # Cari SEMUA teks yang diapit kurung siku [...]
-                                        semua_blok_kurung = re.findall(r'\[.*?\]', hasil_mentah, re.DOTALL)
-                                        
-                                        hasil_json = None
-                                        
-                                        # Coba baca dari blok yang paling bawah (hasil akhir AI) ke atas
-                                        for blok in reversed(semua_blok_kurung):
-                                            try:
-                                                # Bersihkan tanda kutip nyeleneh dan koma berlebih
-                                                blok_bersih = blok.replace("'", '"')
-                                                blok_bersih = re.sub(r',\s*\]', ']', blok_bersih) 
-                                                
-                                                # Coba ubah teks menjadi tabel asli
-                                                hasil_json = json.loads(blok_bersih)
-                                                
-                                                if isinstance(hasil_json, list):
-                                                    break # Berhasil menemukan tabel utuh! Hentikan pencarian.
-                                                else:
-                                                    hasil_json = None
-                                            except:
-                                                continue # Jika gagal (karena ada titik-titik '...'), lanjut coba blok lain
-                                                
-                                        if hasil_json is not None:
-                                            df_tampil = pd.DataFrame(hasil_json)
-                                            
-                                            # Ambil ticker untuk tabel
-                                            jawara_tickers = df_tampil['Ticker'].tolist() if 'Ticker' in df_tampil.columns else []
-                                            jawara_tickers = (jawara_tickers + ["", "", "", "", ""])[:5] 
-                                            keranjang_spreadsheet[f"RUMUS {i}"] = jawara_tickers
-                                            
-                                            # Simpan Sinyal
-                                            if 'Target_TP' in df_tampil.columns and 'Target_CL' in df_tampil.columns:
-                                                df_tampil[['Ticker', 'Target_TP', 'Target_CL']].to_csv(f"Database/sinyal_ai_rumus_{i}.csv", index=False)
-                                                
-                                        else:
-                                            st.error(f"❌ Rumus {i} dilewati: Tidak ada format tabel yang utuh.")
-                                            st.code(hasil_mentah, language="text")
-                                            keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
-                                            
-                                    except Exception as e:
-                                        st.error(f"❌ Error Sistem Mesin pada Rumus {i}: {e}")
-                                        keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
-                                    
-                                    time.sleep(2.5) # Nafas panjang untuk API Google
+                                        with open(FILE_CACHE_AUTOPILOT, "r") as f: cache_muat = json.load(f)
+                                        if cache_muat.get("stempel_data") == stempel_data and cache_muat.get("keranjang"):
+                                            keranjang_spreadsheet = cache_muat["keranjang"]
+                                            st.info("⚡ **Mode Kilat Aktif:** Data belum berubah sejak sidang terakhir — hasil ditampilkan instan dari cache.")
+                                    except: pass
                                 
-                                status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
-                                st.balloons()
+                                if keranjang_spreadsheet is None:
+                                    progress_bar = st.progress(0)
+                                    status_teks = st.empty()
+                                    
+                                    keranjang_spreadsheet, err_global = jalankan_sidang_autopilot(daftar_rumus, df_hasil, GEMINI_API_KEY, progress_bar, status_teks)
+                                    
+                                    if err_global:
+                                        st.error(err_global)
+                                    else:
+                                        try:
+                                            with open(FILE_CACHE_AUTOPILOT, "w") as f:
+                                                json.dump({"stempel_data": stempel_data, "keranjang": keranjang_spreadsheet}, f, indent=4)
+                                        except: pass
+                                        status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
+                                        st.balloons()
                                 
                                 # TAHAP 3: CETAK TABEL SPREADSHEET (Siap Copy-Paste)
                                 st.markdown("### 📋 Tabel Master Portofolio (Siap Salin)")
                                 
-                                # >>> PERBAIKAN #2: Sabuk pengaman terakhir — paksa semua kolom
-                                # rata menjadi tepat 5 baris agar pd.DataFrame tidak mungkin error.
+                                # Sabuk pengaman: paksa semua kolom rata 5 baris agar DataFrame tidak mungkin error
                                 for kunci in keranjang_spreadsheet:
                                     keranjang_spreadsheet[kunci] = (keranjang_spreadsheet[kunci] + ["", "", "", "", ""])[:5]
                                 
@@ -1209,12 +1288,13 @@ if not df_hasil.empty:
                     st.info("💡 **Fitur Auto-Pilot 9 Rumus (Klasemen Global) telah dipindahkan ke menu '🤖 AI Bandar'.** Silakan buka menu tersebut untuk menggunakan mode pencetak Tabel Spreadsheet secara otomatis!")
 
                     # ==============================================================
-                    # 🛸 TOMBOL AUTO-PILOT ULTIMATE (KLASEMEN GLOBAL)
+                    # 🛸 TOMBOL AUTO-PILOT ULTIMATE (KLASEMEN GLOBAL) — >>> BARU: MESIN CEPAT & PARALEL
                     # ==============================================================
                     st.markdown("### 🛸 Mode Auto-Pilot (Super AI & Klasemen)")
                     st.markdown("Sistem akan menyeleksi 15 saham terbaik per rumus secara global, lalu AI akan memilih Top 5 untuk dicetak ke tabel Spreadsheet.")
                     
-                    if st.button("🛸 Jalankan Auto-Pilot Ultimate", type="primary"):
+                    if st.button("🛸 Jalankan Auto-Pilot Ultimate", type="primary", key="autopilot_ara"):
+                        GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
                         if not GEMINI_API_KEY:
                             st.error("❌ Kunci API GEMINI belum dipasang!")
                         else:
@@ -1224,87 +1304,38 @@ if not df_hasil.empty:
                                 7: df_v7, 8: df_v8, 9: df_v9
                             }
                             
-                            progress_bar = st.progress(0)
-                            status_teks = st.empty()
+                            # >>> BARU: MODE KILAT (cache bersama dengan tab AI Bandar)
+                            stempel_data = str(df_hasil["Terakhir Update"].iloc[0]) if "Terakhir Update" in df_hasil.columns else "tanpa_stempel"
+                            FILE_CACHE_AUTOPILOT = "Database/cache_autopilot.json"
                             
-                            # >>> PERBAIKAN #3: Sama seperti Perbaikan #1 — keranjang diisi 5 sel kosong sejak awal.
-                            keranjang_spreadsheet = {f"RUMUS {i}": ["", "", "", "", ""] for i in range(1, 10)}
-                            
-                            for i in range(1, 10):
-                                df_target = daftar_rumus[i]
-                                progress_bar.progress(i / 9.0)
-                                
-                                if len(df_target) == 0:
-                                    status_teks.warning(f"⏭️ Rumus {i} kosong. Dilewati.")
-                                    time.sleep(1)
-                                    continue
-                                    
-                                status_teks.info(f"🔄 **Algojo Python bekerja pada Rumus {i}**... (Mengekstrak data global)")
-                                
-                                saham_valid = df_target['Ticker'].tolist()
-                                df_seleksi = df_hasil[df_hasil['Ticker'].isin(saham_valid)].copy()
-                                
-                                df_seleksi['Score_Num'] = pd.to_numeric(df_seleksi['Total Score'], errors='coerce').fillna(0)
-                                
-                                # TAHAP 1: KLASEMEN GLOBAL (Pilih Top 15 berdasarkan Data Keras)
-                                df_sorted = df_seleksi.sort_values(by=['Score_Num', 'Volume', 'Change (%)'], ascending=[False, False, False])
-                                top_15 = df_sorted.head(15)
-                                
-                                data_kirim_ai = {}
-                                for _, row in top_15.iterrows():
-                                    data_kirim_ai[row['Ticker']] = {
-                                        'Harga': row.get('Harga (Rp)', 0),
-                                        'Volume': row.get('Volume', 0),
-                                        'Score': row.get('Score_Num', 0),
-                                        'Change_Pct': row.get('Change (%)', 0),
-                                        'Tekanan_Bandar': row.get('Tekanan Bandar', 'Normal'),
-                                        'Broksum': row.get('Broksum', 'Normal')
-                                    }
-                                    
-                                status_teks.warning(f"🧠 Rumus {i} - Sidang Grand Final AI... (Menyaring 5 Jawara dari Top 15)")
-                                
-                                # TAHAP 2: HAKIM AI (Pilih Top 5 Mutlak)
+                            keranjang_spreadsheet = None
+                            if os.path.exists(FILE_CACHE_AUTOPILOT):
                                 try:
-                                    hasil_mentah = ai_hakim_klasemen(data_kirim_ai, GEMINI_API_KEY)
-                                    teks_bersih = hasil_mentah.replace('```json', '').replace('```', '').strip()
-                                    pencarian_json = re.search(r'\[\s*\{.*?\}\s*\]', teks_bersih, re.DOTALL)
-                                    
-                                    if pencarian_json:
-                                        hasil_json = json.loads(pencarian_json.group(0))
-                                        df_tampil = pd.DataFrame(hasil_json)
-                                        
-                                        # Ambil ticker untuk masuk ke tabel spreadsheet
-                                        if 'Ticker' in df_tampil.columns:
-                                            jawara_tickers = df_tampil['Ticker'].tolist()
-                                        else:
-                                            jawara_tickers = []
-                                            
-                                        # Batasi maksimal 5, jika kurang tambahkan string kosong "" agar tabel rata
-                                        jawara_tickers = (jawara_tickers + ["", "", "", "", ""])[:5] 
-                                        keranjang_spreadsheet[f"RUMUS {i}"] = jawara_tickers
-                                        
-                                        # Simpan sinyal untuk dieksekusi bot malam ini
-                                        if 'Target_TP' in df_tampil.columns and 'Target_CL' in df_tampil.columns:
-                                            df_sinyal = df_tampil[['Ticker', 'Target_TP', 'Target_CL']]
-                                            df_sinyal.to_csv(f"Database/sinyal_ai_rumus_{i}.csv", index=False)
-                                            
-                                    else:
-                                        st.error(f"❌ Rumus {i} Gagal (AI tidak merespon JSON yang benar).")
-                                        keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
-                                        
-                                except Exception as e:
-                                    st.error(f"❌ Error pada Rumus {i}: {e}")
-                                    keranjang_spreadsheet[f"RUMUS {i}"] = ["", "", "", "", ""]
-                                
-                                time.sleep(2) # Nafas untuk API Google
+                                    with open(FILE_CACHE_AUTOPILOT, "r") as f: cache_muat = json.load(f)
+                                    if cache_muat.get("stempel_data") == stempel_data and cache_muat.get("keranjang"):
+                                        keranjang_spreadsheet = cache_muat["keranjang"]
+                                        st.info("⚡ **Mode Kilat Aktif:** hasil sidang sebelumnya ditampilkan instan dari cache.")
+                                except: pass
                             
-                            status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
-                            st.balloons()
+                            if keranjang_spreadsheet is None:
+                                progress_bar = st.progress(0)
+                                status_teks = st.empty()
+                                
+                                keranjang_spreadsheet, err_global = jalankan_sidang_autopilot(daftar_rumus, df_hasil, GEMINI_API_KEY, progress_bar, status_teks)
+                                
+                                if err_global:
+                                    st.error(err_global)
+                                else:
+                                    try:
+                                        with open(FILE_CACHE_AUTOPILOT, "w") as f:
+                                            json.dump({"stempel_data": stempel_data, "keranjang": keranjang_spreadsheet}, f, indent=4)
+                                    except: pass
+                                    status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
+                                    st.balloons()
                             
                             # TAHAP 3: CETAK TABEL SPREADSHEET (Siap Copy-Paste)
                             st.markdown("### 📋 Tabel Master Portofolio (Siap Salin)")
                             
-                            # >>> PERBAIKAN #4: Sama seperti Perbaikan #2 — paksa semua kolom rata 5 baris.
                             for kunci in keranjang_spreadsheet:
                                 keranjang_spreadsheet[kunci] = (keranjang_spreadsheet[kunci] + ["", "", "", "", ""])[:5]
                             
