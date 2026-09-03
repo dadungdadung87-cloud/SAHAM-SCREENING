@@ -26,16 +26,16 @@ echo "⏳ Memulai pembaruan data saham..."
 
 # ==========================================
 # FITUR SAPU OTOMATIS (MAX 50 HARI)
-# Menggunakan nama folder yang benar: Arsip_Data_Harian
-find Arsip_Data_Harian/ -name "*.csv" -type f -mtime +50 -delete
+# Arsip kini hidup di LAPTOP + CLOUDFLARE R2 (tidak di-push ke GitHub)
 # ==========================================
+find Arsip_Data_Harian/ -name "*.csv" -type f -mtime +50 -delete
 
 echo "📤 Mengupload ke GitHub..."
 
 # 4) COMMIT dulu perubahan lokal agar TIDAK tertimpa saat pull
+#    (HANYA Database/*.csv — arsip TIDAK ikut, karena sudah lewat R2)
 git add Database/*.csv
-git add Arsip_Data_Harian/*.csv
-git commit -m "Auto-update data, arsip, dan bot simulator" || echo "Tidak ada perubahan"
+git commit -m "Auto-update data dan bot simulator (arsip via R2)" || echo "Tidak ada perubahan"
 
 # 5) Tarik lagi (rebase) untuk menjemput commit yang masuk selama proses berjalan
 git pull --rebase origin main || git rebase --abort
