@@ -695,8 +695,20 @@ def manual_override(): st.session_state.preset_selector = "Matikan Preset (Manua
 
 @st.cache_data(ttl=10)
 def load_data_saham():
-    if not os.path.exists(FILE_HASIL): return pd.DataFrame()
-    df = pd.read_csv(FILE_HASIL)
+    df = None
+    # >>> BARU: prioritas baca REAL-TIME dari Cloudflare R2
+    try:
+        import r2_client
+        tmp = os.path.join(tempfile.gettempdir(), "hasil_screener_r2.csv")
+        if r2_client.download_arsip("Database/hasil_screener.csv", tmp):
+            df = pd.read_csv(tmp)
+    except Exception:
+        df = None
+    # Fallback: file lokal (hasil git pull) jika R2 gagal
+    if df is None or df.empty:
+        if not os.path.exists(FILE_HASIL): return pd.DataFrame()
+        df = pd.read_csv(FILE_HASIL)
+
     if os.path.exists(FILE_AKUISISI):
         df_akuisisi = pd.read_csv(FILE_AKUISISI)
         if "Status Akuisisi" in df.columns: df = df.drop(columns=["Status Akuisisi"])
