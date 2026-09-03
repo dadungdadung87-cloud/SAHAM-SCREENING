@@ -611,6 +611,14 @@ def main():
             # 1. SELALU Simpan Data Utama (Overwrite untuk Web)
             df_hasil.to_csv(FILE_HASIL, index=False)
             
+            # >>> BARU: Upload data utama ke R2 agar web real-time (tidak mentok lagi)
+            try:
+                import r2_client
+                if r2_client.upload_arsip(FILE_HASIL, "Database/hasil_screener.csv"):
+                    print("☁️ Data utama (hasil_screener) ter-upload ke R2.")
+            except Exception as e:
+                print(f"⚠️ Gagal upload data utama ke R2: {e}")
+            
             # 2. LOGIKA JAM & HARI PINTAR (DENGAN PEMBAGIAN 3 FOLDER)
             hari_ini = now.weekday() # 0 = Senin, 1=Selasa ... 4=Jumat
             
