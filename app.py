@@ -465,25 +465,60 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
 
 
 # =====================================================================
-# >>> PART 04 : SISTEM ARSIP CERDAS (DATA HARIAN) <<<
+# >>> PART 04 : SISTEM ARSIP CERDAS (DATA HARIAN) — R2 + LOKAL <<<
 # =====================================================================
-def get_historical_summary(ticker):
+import r2_client
+import tempfile
+
+@st.cache_data(ttl=60)
+def _muat_arsip_r2():
+    # Ambil 5 arsip terbaru dari Cloudflare R2 (cache 60 detik)
+    keys = r2_client.list_arsip()
+    keys.sort(reverse=True)
+    hasil = []
+    for key in keys[:5]:
+        date_str = key.split("_")[-1].replace(".csv", "")
+        tmp = os.path.join(tempfile.gettempdir(), f"arsip_r2_{date_str}.csv")
+        if r2_client.download_arsip(key, tmp):
+            try:
+                hasil.append((date_str, pd.read_csv(tmp)))
+            except Exception:
+                pass
+    return hasil
+
+def _muat_arsip_lokal():
+    # Fallback: baca dari folder lokal jika R2 kosong/gagal
     arsip_files = glob.glob("Arsip_Data_Harian/screener_*.csv")
-    if not arsip_files: return None
     arsip_files.sort(reverse=True)
-    arsip_files = arsip_files[:5]
-    
-    df_list = []
-    for file in arsip_files:
+    hasil = []
+    for file in arsip_files[:5]:
+        date_str = file.split("_")[-1].replace(".csv", "")
         try:
-            cols = ["Waktu Update", "Ticker", "Harga (Rp)", "Volume", "Posisi VWAP", "OBV Trend", "Tekanan Bandar", "Fase Siklus Bandar", "Trend MA (5,20,50)"]
-            temp_df = pd.read_csv(file, usecols=lambda c: c in cols)
+            hasil.append((date_str, pd.read_csv(file)))
+        except Exception:
+            pass
+    return hasil
+
+def muat_arsip():
+    data = _muat_arsip_r2()
+    if not data:
+        data = _muat_arsip_lokal()
+    return data
+
+def get_historical_summary(ticker):
+    cols = ["Waktu Update", "Ticker", "Harga (Rp)", "Volume", "Posisi VWAP", "OBV Trend", "Tekanan Bandar", "Fase Siklus Bandar", "Trend MA (5,20,50)"]
+    df_list = []
+    for date_str, df in muat_arsip():
+        try:
+            ada_cols = [c for c in cols if c in df.columns]
+            temp_df = df[ada_cols]
             temp_df = temp_df[temp_df["Ticker"] == ticker]
             if not temp_df.empty:
-                date_str = file.split("_")[-1].replace(".csv", "")
+                temp_df = temp_df.copy()
                 temp_df["Tanggal"] = date_str
                 df_list.append(temp_df)
-        except: pass
+        except Exception:
+            pass
     
     if not df_list: return None
     df_history = pd.concat(df_list, ignore_index=True)
@@ -500,22 +535,19 @@ def get_historical_summary(ticker):
     return summary_text
 
 def get_forensic_data(ticker):
-    arsip_files = glob.glob("Arsip_Data_Harian/screener_*.csv")
-    if not arsip_files: return None
-    arsip_files.sort(reverse=True)
-    arsip_files = arsip_files[:5] 
-    
+    cols = ["Waktu Update", "Ticker", "Harga (Rp)", "Volume", "Posisi VWAP", "OBV Trend", "Tekanan Bandar", "Fase Siklus Bandar", "Trend MA (5,20,50)", "Status BB", "RVOL (Anomali Vol)"]
     df_list = []
-    for file in arsip_files:
+    for date_str, df in muat_arsip():
         try:
-            cols = ["Waktu Update", "Ticker", "Harga (Rp)", "Volume", "Posisi VWAP", "OBV Trend", "Tekanan Bandar", "Fase Siklus Bandar", "Trend MA (5,20,50)", "Status BB", "RVOL (Anomali Vol)"]
-            temp_df = pd.read_csv(file, usecols=lambda c: c in cols)
+            ada_cols = [c for c in cols if c in df.columns]
+            temp_df = df[ada_cols]
             temp_df = temp_df[temp_df["Ticker"] == ticker]
             if not temp_df.empty:
-                date_str = file.split("_")[-1].replace(".csv", "")
+                temp_df = temp_df.copy()
                 temp_df["Tanggal"] = date_str
                 df_list.append(temp_df)
-        except: pass
+        except Exception:
+            pass
     
     if not df_list: return None
     df_history = pd.concat(df_list, ignore_index=True)

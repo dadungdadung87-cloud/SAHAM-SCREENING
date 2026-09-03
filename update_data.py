@@ -621,6 +621,15 @@ def main():
                 file_exists = os.path.isfile(file_arsip_harian)
                 df_hasil.to_csv(file_arsip_harian, mode='a', header=not file_exists, index=False)
                 
+                # >>> BARU: Upload arsip ke Cloudflare R2 (agar web selalu real-time)
+                try:
+                    import r2_client
+                    object_name = f"Arsip_Data_Harian/{os.path.basename(file_arsip_harian)}"
+                    if r2_client.upload_arsip(file_arsip_harian, object_name):
+                        print("☁️ Arsip harian ter-upload ke Cloudflare R2.")
+                except Exception as e:
+                    print(f"⚠️ Gagal upload R2: {e}")
+                
                 print(f"✅ Selesai! Data Web diperbarui & Diarsipkan ke sistem 3 Folder (Arsip_Data_Harian).")
                 
             # Jika hari Sabtu atau Minggu
