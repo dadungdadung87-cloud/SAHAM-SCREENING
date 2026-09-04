@@ -338,7 +338,8 @@ def ai_hakim_klasemen_cepat(data_top15, api_key, daftar_model):
     DATA:
     {data_top15}
 
-    Output a JSON array containing EXACTLY 5 objects, each with EXACTLY 1 key: "Ticker".
+    CRITICAL: Output ONLY a raw JSON array with EXACTLY 5 objects, each with EXACTLY 1 key: "Ticker".
+    DO NOT add explanations, markdown, or any other text. Keep the output as short as possible.
     """
     pesan_error_terakhir = ""
     for nama_model in daftar_model:
@@ -348,11 +349,15 @@ def ai_hakim_klasemen_cepat(data_top15, api_key, daftar_model):
                 generation_config=genai.types.GenerationConfig(
                     temperature=0.0,
                     response_mime_type="application/json",
-                    max_output_tokens=512,
+                    max_output_tokens=1024,
                 )
             )
             response = model.generate_content(prompt)
-            return response.text
+            teks = response.text or ""
+            if not teks.strip():
+                pesan_error_terakhir = "Respons kosong dari model"
+                continue
+            return teks
         except Exception as e:
             pesan_error_terakhir = str(e)
             if any(k in str(e) for k in ["429", "503", "RESOURCE_EXHAUSTED", "UNAVAILABLE"]):
@@ -398,8 +403,9 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
             if "Error_AI" in hasil_mentah:
                 return i, n_kandidat, None, hasil_mentah
 
-            semua_blok_kurung = re.findall(r'\[.*?\]', hasil_mentah, re.DOTALL)
+            # ---- LAPIS 1: coba parse JSON utuh ----
             hasil_json = None
+            semua_blok_kurung = re.findall(r'\[.*\]', hasil_mentah, re.DOTALL)
             for blok in reversed(semua_blok_kurung):
                 try:
                     blok_bersih = blok.replace("'", '"')
@@ -410,15 +416,23 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
                         break
                 except:
                     continue
-            if hasil_json is None:
-                return i, n_kandidat, None, f"JSON tidak utuh: {hasil_mentah[:120]}"
 
             tickers_ai = []
-            for item in hasil_json:
-                t = (item.get("Ticker", "") if isinstance(item, dict) else str(item)).strip().upper()
-                if t and t in data_kirim_ai and t not in tickers_ai:
-                    tickers_ai.append(t)
+            if hasil_json is not None:
+                for item in hasil_json:
+                    t = (item.get("Ticker", "") if isinstance(item, dict) else str(item)).strip().upper()
+                    if t and t in data_kirim_ai and t not in tickers_ai:
+                        tickers_ai.append(t)
+            else:
+                # ---- LAPIS 2 (PENYELAMAT): JSON terpotong? Selamatkan ticker yang sudah lengkap ----
+                for m in re.finditer(r'Ticker"\s*:\s*"([A-Za-z0-9]+)', hasil_mentah):
+                    t = m.group(1).strip().upper()
+                    if t and t in data_kirim_ai and t not in tickers_ai:
+                        tickers_ai.append(t)
             tickers_ai = tickers_ai[:5]
+
+            if not tickers_ai:
+                return i, n_kandidat, None, f"AI tidak mengembalikan ticker valid. Respons: {hasil_mentah[:120]}"
 
             baris_sinyal = []
             for t in tickers_ai:
