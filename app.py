@@ -693,19 +693,25 @@ def apply_preset():
 
 def manual_override(): st.session_state.preset_selector = "Matikan Preset (Manual)"
 
+# >>> BARU: lencana jujur — menunjukkan dari mana web benar-benar membaca data
+SUMBER_DATA = "❓"
+
 @st.cache_data(ttl=10)
 def load_data_saham():
+    global SUMBER_DATA
     df = None
-    # >>> BARU: prioritas baca REAL-TIME dari Cloudflare R2
+    # Prioritas: baca REAL-TIME dari Cloudflare R2
     try:
         import r2_client
         tmp = os.path.join(tempfile.gettempdir(), "hasil_screener_r2.csv")
         if r2_client.download_arsip("Database/hasil_screener.csv", tmp):
             df = pd.read_csv(tmp)
+            SUMBER_DATA = "☁️ R2 (real-time)"
     except Exception:
         df = None
-    # Fallback: file lokal (hasil git pull) jika R2 gagal
+    # Fallback: file lokal (hasil git) jika R2 gagal
     if df is None or df.empty:
+        SUMBER_DATA = "📁 Lokal/Git (cadangan) — R2 GAGAL"
         if not os.path.exists(FILE_HASIL): return pd.DataFrame()
         df = pd.read_csv(FILE_HASIL)
 
@@ -736,6 +742,8 @@ if not df_hasil.empty and "Terakhir Update" in df_hasil.columns:
             <strong style="color: #06b6d4; font-size: 14px;">{waktu_update}</strong>
         </div>
     """, unsafe_allow_html=True)
+
+st.sidebar.caption(f"📡 Sumber Data: {SUMBER_DATA}")
 
 if st.sidebar.button("🔃 Sync & Muat Ulang Data Server", use_container_width=True):
     with st.spinner("Menarik data terbaru dari Cloudflare R2..."):
