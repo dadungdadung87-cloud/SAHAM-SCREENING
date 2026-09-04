@@ -1492,7 +1492,30 @@ if not df_hasil.empty:
                         st.rerun()
                 except Exception as e:
                     st.error(f"Sistem web gagal memanggil file bot: {e}")
-        
+                    
+        # >>> BARU: Tombol backup & restore portofolio via R2
+        col_backup, col_restore = st.columns(2)
+        with col_backup:
+            if st.button("💾 Backup Portofolio ke R2", use_container_width=True):
+                with st.spinner("Mengunggah seluruh Database ke Cloudflare R2..."):
+                    import r2_client
+                    ok = r2_client.upload_database()
+                if ok:
+                    st.success("✅ Portofolio, histori & sinyal AMAN di R2 (tidak akan hilang meski reboot)!")
+                else:
+                    st.error("❌ Gagal backup ke R2.")
+        with col_restore:
+            if st.button("⬇️ Tarik Portofolio dari R2", use_container_width=True):
+                with st.spinner("Menarik data portofolio terbaru dari R2..."):
+                    import r2_client
+                    ok = r2_client.download_database()
+                if ok:
+                    st.success("✅ Data portofolio terbaru berhasil ditarik!")
+                    time.sleep(1)
+                    st.rerun()
+                else:
+                    st.error("❌ Gagal menarik dari R2.")
+
         st.markdown("---")
         
         st.markdown("## 📊 Dashboard Performa AI (Live)")
