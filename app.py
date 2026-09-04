@@ -1079,6 +1079,7 @@ if not df_hasil.empty:
 # =====================================================================
 # >>> PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS & AUTO-PILOT) <<<
 # =====================================================================
+    VERSI_SIDANG = "v2"
     with tab3:
         st.markdown("## 🦅 Radar BSJP & Laboratorium Forensik AI")
         st.markdown("<div class='bandar-box-green'><b>💡 INFO:</b> Gunakan kotak pilihan (Dropdown) di bawah ini untuk beralih antar strategi atau mode AI agar tampilan lebih rapi.</div>", unsafe_allow_html=True)
@@ -1204,7 +1205,7 @@ if not df_hasil.empty:
                                 if not paksa_sidang and os.path.exists(FILE_CACHE_AUTOPILOT):
                                     try:
                                         with open(FILE_CACHE_AUTOPILOT, "r") as f: cache_muat = json.load(f)
-                                        if cache_muat.get("stempel_data") == stempel_data and cache_muat.get("keranjang"):
+                                        if cache_muat.get("stempel_data") == stempel_data and cache_muat.get("versi") == VERSI_SIDANG and cache_muat.get("keranjang"):
                                             # Validasi: cache hanya dipakai jika minimal 1 rumus punya isi
                                             ada_isi_cache = any(len([t for t in cache_muat["keranjang"].get(f"RUMUS {i}", []) if t]) > 0 for i in range(1, 10))
                                             if ada_isi_cache:
@@ -1235,7 +1236,7 @@ if not df_hasil.empty:
                                         if ada_isi:
                                             try:
                                                 with open(FILE_CACHE_AUTOPILOT, "w") as f:
-                                                    json.dump({"stempel_data": stempel_data, "keranjang": keranjang_spreadsheet}, f, indent=4)
+                                                    json.dump({"stempel_data": stempel_data, "versi": VERSI_SIDANG, "keranjang": keranjang_spreadsheet}, f, indent=4)
                                             except: pass
                                             status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
                                             st.balloons()
@@ -1382,6 +1383,9 @@ if not df_hasil.empty:
                     st.markdown("### 🛸 Mode Auto-Pilot (Super AI & Klasemen)")
                     st.markdown("Sistem akan menyeleksi 15 saham terbaik per rumus secara global, lalu AI akan memilih Top 5 untuk dicetak ke tabel Spreadsheet.")
                     
+                    # >>> BARU: opsi paksa sidang tersedia juga di menu ini
+                    paksa_sidang_ara = st.checkbox("🔄 Paksa Sidang Ulang (abaikan cache Mode Kilat)", key="paksa_sidang_ara")
+                    
                     if st.button("🛸 Jalankan Auto-Pilot Ultimate", type="primary", key="autopilot_ara"):
                         GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
                         if not GEMINI_API_KEY:
@@ -1393,16 +1397,14 @@ if not df_hasil.empty:
                                 7: df_v7, 8: df_v8, 9: df_v9
                             }
                             
-                            # MODE KILAT (cache bersama dengan tab AI Bandar)
                             stempel_data = str(df_hasil["Terakhir Update"].iloc[0]) if "Terakhir Update" in df_hasil.columns else "tanpa_stempel"
                             FILE_CACHE_AUTOPILOT = "Database/cache_autopilot.json"
                             
                             keranjang_spreadsheet = None
-                            if os.path.exists(FILE_CACHE_AUTOPILOT):
+                            if not paksa_sidang_ara and os.path.exists(FILE_CACHE_AUTOPILOT):
                                 try:
                                     with open(FILE_CACHE_AUTOPILOT, "r") as f: cache_muat = json.load(f)
-                                    if cache_muat.get("stempel_data") == stempel_data and cache_muat.get("keranjang"):
-                                        # Validasi: cache hanya dipakai jika minimal 1 rumus punya isi
+                                    if cache_muat.get("stempel_data") == stempel_data and cache_muat.get("versi") == VERSI_SIDANG and cache_muat.get("keranjang"):
                                         ada_isi_cache = any(len([t for t in cache_muat["keranjang"].get(f"RUMUS {i}", []) if t]) > 0 for i in range(1, 10))
                                         if ada_isi_cache:
                                             keranjang_spreadsheet = cache_muat["keranjang"]
@@ -1418,7 +1420,6 @@ if not df_hasil.empty:
                                 if err_global:
                                     st.error(err_global)
                                 else:
-                                    # >>> BARU: Tampilkan laporan transparan
                                     df_laporan = pd.DataFrame([{
                                         "Rumus": f"RUMUS {i}",
                                         "Status": laporan_sidang[i]["status"],
@@ -1427,12 +1428,11 @@ if not df_hasil.empty:
                                     st.markdown("### 🧾 Laporan Sidang (Transparan)")
                                     st.dataframe(df_laporan, use_container_width=True, hide_index=True)
                                     
-                                    # Validasi: hanya simpan cache jika minimal 1 rumus sukses
                                     ada_isi = any(laporan_sidang[i]["status"] == "✅ Sukses" for i in range(1, 10))
                                     if ada_isi:
                                         try:
                                             with open(FILE_CACHE_AUTOPILOT, "w") as f:
-                                                json.dump({"stempel_data": stempel_data, "keranjang": keranjang_spreadsheet}, f, indent=4)
+                                                json.dump({"stempel_data": stempel_data, "versi": VERSI_SIDANG, "keranjang": keranjang_spreadsheet}, f, indent=4)
                                         except: pass
                                         status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
                                         st.balloons()
