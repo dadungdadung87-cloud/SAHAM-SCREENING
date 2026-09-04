@@ -13,6 +13,31 @@ FILE_MARKET = "Database/hasil_screener.csv"
 DIR_DB = "Database"       
 
 # ==========================================
+# ☁️ FUNGSI SINKRON R2 (BARU)
+# ==========================================
+def sinkron_r2_masuk():
+    """Tarik state portofolio terbaru dari R2 sebelum bot bekerja."""
+    try:
+        import r2_client
+        if r2_client.download_database():
+            print("☁️ State portofolio tersinkron dari R2.")
+            return True
+        print("⚠️ R2 kosong/belum ada data — pakai file lokal.")
+        return True
+    except Exception as e:
+        print(f"⚠️ Gagal sinkron masuk R2: {e}")
+        return False
+
+def sinkron_r2_keluar():
+    """Kirim state portofolio terbaru ke R2 setelah bot bekerja."""
+    try:
+        import r2_client
+        if r2_client.upload_database():
+            print("☁️ State portofolio ter-upload ke R2.")
+    except Exception as e:
+        print(f"⚠️ Gagal sinkron keluar R2: {e}")
+
+# ==========================================
 # 🛠️ FUNGSI AUTO-SAVE KE GITHUB (ABADI)
 # ==========================================
 def auto_save_github():
@@ -70,6 +95,11 @@ def jalankan_bot():
     print(f"[{now.strftime('%H:%M:%S')}] Membangunkan Bot Simulator AI...")
 
     # ----------------------------------------------------
+    # ☁️ SINKRON MASUK: tarik state terbaru dari R2
+    # ----------------------------------------------------
+    r2_ok = sinkron_r2_masuk()
+
+    # ----------------------------------------------------
     # 🔒 GEMBOK PAGI: SISTEM PENGAMAN ANTI-HILANG DATA
     # ----------------------------------------------------
     if not os.path.exists(FILE_MARKET):
@@ -86,6 +116,18 @@ def jalankan_bot():
         print(f"🔒 GEMBOK AKTIF: Gagal membaca data market ({e}). Bot tidur kembali.")
         return
     # ----------------------------------------------------
+
+    # >>> BARU: GEMBOK SORE — jika data market bukan hari kerja aktif,
+    # bot hanya boleh evaluasi jual, TIDAK membeli (mencegah beli harga basi)
+    try:
+        stempel_market = str(df_market['Terakhir Update'].iloc[0])[:10]
+    except Exception:
+        stempel_market = tanggal_hari_ini
+    hari_kerja = now.weekday() < 5
+    jam_bursa = datetime.strptime("09:00", "%H:%M").time() <= jam_sekarang <= datetime.strptime("16:00", "%H:%M").time()
+    mode_beli_aktif = hari_kerja and jam_bursa and (stempel_market == tanggal_hari_ini)
+    if not mode_beli_aktif:
+        print(" GEMBOK SORE AKTIF: data market bukan sesi aktif — bot hanya evaluasi jual, tidak membeli.")
 
     is_square_off_time = jam_sekarang >= jam_square_off
     if is_square_off_time:
@@ -171,7 +213,8 @@ def jalankan_bot():
         # ==========================================
         # FASE B: MODE BELI (MASUKKAN SAHAM KE GUDANG)
         # ==========================================
-        if os.path.exists(file_sinyal):
+        # >>> BARU: hanya beli jika mode_beli_aktif (data segar jam bursa)
+        if mode_beli_aktif and os.path.exists(file_sinyal):
             saldo_sekarang = cek_saldo_tersedia(df_porto)
             saham_dimiliki = df_porto['Ticker'].tolist() if not df_porto.empty else []
             try:
@@ -211,6 +254,8 @@ def jalankan_bot():
                 os.remove(file_sinyal)
             except Exception as e:
                 print(f"⚠️ Gagal membaca sinyal Rumus {i}: {e}")
+        elif os.path.exists(file_sinyal) and not mode_beli_aktif:
+            print(f" [RUMUS {i}] Sinyal diterima tetapi ditahan (di luar jam bursa) — akan dieksekusi sesi berikutnya.")
 
         # ----------------------------------------------------
         # 💾 SIMPAN SEMUA KE DALAM FILE CSV MASING-MASING
@@ -220,6 +265,12 @@ def jalankan_bot():
 
     print("✅ Inspeksi 9 Arena selesai.")
     
+    # ----------------------------------------------------
+    # ☁️ SINKRON KELUAR: kirim state terbaru ke R2
+    # ----------------------------------------------------
+    if r2_ok:
+        sinkron_r2_keluar()
+
     # EKSEKUSI AUTO-SAVE KE GITHUB
     auto_save_github()
 
