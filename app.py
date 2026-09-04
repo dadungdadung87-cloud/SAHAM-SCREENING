@@ -386,57 +386,64 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
             df_seleksi = df_data[df_data['Ticker'].isin(saham_valid)].copy()
             df_seleksi['Score_Num'] = pd.to_numeric(df_seleksi['Total Score'], errors='coerce').fillna(0)
             df_sorted = df_seleksi.sort_values(by=['Score_Num', 'Volume', 'Change (%)'], ascending=[False, False, False])
-            top_15 = df_sorted.head(15)
 
-            data_kirim_ai = {}
-            for _, row in top_15.iterrows():
-                data_kirim_ai[row['Ticker']] = {
-                    'Harga': row.get('Harga (Rp)', 0),
-                    'Volume': row.get('Volume', 0),
-                    'Score': row.get('Score_Num', 0),
-                    'Change_Pct': row.get('Change (%)', 0),
-                    'Tekanan_Bandar': row.get('Tekanan Bandar', 'Normal'),
-                    'Broksum': row.get('Broksum', 'Normal')
-                }
-
-            hasil_mentah = ai_hakim_klasemen_cepat(data_kirim_ai, api_key, daftar_model)
-            if "Error_AI" in hasil_mentah:
-                return i, n_kandidat, None, hasil_mentah
-
-            # ---- LAPIS 1: coba parse JSON utuh ----
-            hasil_json = None
-            semua_blok_kurung = re.findall(r'\[.*\]', hasil_mentah, re.DOTALL)
-            for blok in reversed(semua_blok_kurung):
-                try:
-                    blok_bersih = blok.replace("'", '"')
-                    blok_bersih = re.sub(r',\s*\]', ']', blok_bersih)
-                    calon = json.loads(blok_bersih)
-                    if isinstance(calon, list):
-                        hasil_json = calon
-                        break
-                except:
-                    continue
-
-            tickers_ai = []
-            if hasil_json is not None:
-                for item in hasil_json:
-                    t = (item.get("Ticker", "") if isinstance(item, dict) else str(item)).strip().upper()
-                    if t and t in data_kirim_ai and t not in tickers_ai:
-                        tickers_ai.append(t)
+            # >>> ATURAN BARU: kandidat <= 5 TIDAK perlu sidang AI — urutkan terbaik 1..5
+            if n_kandidat <= 5:
+                tickers_ai = df_sorted['Ticker'].tolist()[:5]
             else:
-                # ---- LAPIS 2 (PENYELAMAT): JSON terpotong? Selamatkan ticker yang sudah lengkap ----
-                for m in re.finditer(r'Ticker"\s*:\s*"([A-Za-z0-9]+)', hasil_mentah):
-                    t = m.group(1).strip().upper()
-                    if t and t in data_kirim_ai and t not in tickers_ai:
-                        tickers_ai.append(t)
-            tickers_ai = tickers_ai[:5]
+                top_15 = df_sorted.head(15)
+                data_kirim_ai = {}
+                for _, row in top_15.iterrows():
+                    data_kirim_ai[row['Ticker']] = {
+                        'Harga': row.get('Harga (Rp)', 0),
+                        'Volume': row.get('Volume', 0),
+                        'Score': row.get('Score_Num', 0),
+                        'Change_Pct': row.get('Change (%)', 0),
+                        'Tekanan_Bandar': row.get('Tekanan Bandar', 'Normal'),
+                        'Broksum': row.get('Broksum', 'Normal')
+                    }
 
-            if not tickers_ai:
-                return i, n_kandidat, None, f"AI tidak mengembalikan ticker valid. Respons: {hasil_mentah[:120]}"
+                hasil_mentah = ai_hakim_klasemen_cepat(data_kirim_ai, api_key, daftar_model)
+                if "Error_AI" in hasil_mentah:
+                    return i, n_kandidat, None, hasil_mentah
 
+                # Lapis 1: parse JSON utuh
+                hasil_json = None
+                semua_blok_kurung = re.findall(r'\[.*\]', hasil_mentah, re.DOTALL)
+                for blok in reversed(semua_blok_kurung):
+                    try:
+                        blok_bersih = blok.replace("'", '"')
+                        blok_bersih = re.sub(r',\s*\]', ']', blok_bersih)
+                        calon = json.loads(blok_bersih)
+                        if isinstance(calon, list):
+                            hasil_json = calon
+                            break
+                    except:
+                        continue
+
+                tickers_ai = []
+                if hasil_json is not None:
+                    for item in hasil_json:
+                        t = (item.get("Ticker", "") if isinstance(item, dict) else str(item)).strip().upper()
+                        if t and t in data_kirim_ai and t not in tickers_ai:
+                            tickers_ai.append(t)
+                else:
+                    # Lapis 2 (penyelamat): JSON terpotong? selamatkan ticker yang lengkap
+                    for m in re.finditer(r'Ticker"\s*:\s*"([A-Za-z0-9]+)', hasil_mentah):
+                        t = m.group(1).strip().upper()
+                        if t and t in data_kirim_ai and t not in tickers_ai:
+                            tickers_ai.append(t)
+                tickers_ai = tickers_ai[:5]
+
+                if not tickers_ai:
+                    return i, n_kandidat, None, f"AI tidak mengembalikan ticker valid. Respons: {hasil_mentah[:120]}"
+
+            # TP (+5%) & CL (-3%) dihitung eksak dari data lokal
             baris_sinyal = []
             for t in tickers_ai:
-                harga = float(data_kirim_ai[t]['Harga'])
+                row = df_sorted[df_sorted['Ticker'] == t]
+                if row.empty: continue
+                harga = float(row.iloc[0]['Harga (Rp)'])
                 baris_sinyal.append({
                     "Ticker": t,
                     "Target_TP": int(round(harga * 1.05)),
@@ -470,7 +477,8 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
                 if status_teks: status_teks.error(f"❌ Rumus {i} gagal: {err[:120]}")
             else:
                 n_jawara = len([t for t in jawara if t])
-                laporan[i] = {"status": "✅ Sukses", "detail": f"{n_kandidat} kandidat → {n_jawara} jawara"}
+                catatan = "≤5 kandidat: urut skor (tanpa AI)" if n_kandidat <= 5 else f"{n_kandidat} kandidat → sidang AI"
+                laporan[i] = {"status": "✅ Sukses", "detail": f"{catatan} → {n_jawara} jawara"}
                 keranjang[f"RUMUS {i}"] = jawara
                 if status_teks: status_teks.success(f"✅ Rumus {i} selesai ({selesai}/{len(rumus_aktif)}).")
 
@@ -1079,7 +1087,8 @@ if not df_hasil.empty:
 # =====================================================================
 # >>> PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS & AUTO-PILOT) <<<
 # =====================================================================
-    VERSI_SIDANG = "v2"
+    VERSI_SIDANG = "v3"
+    FILE_CACHE_AUTOPILOT = "Database/cache_autopilot.json"
     with tab3:
         st.markdown("## 🦅 Radar BSJP & Laboratorium Forensik AI")
         st.markdown("<div class='bandar-box-green'><b>💡 INFO:</b> Gunakan kotak pilihan (Dropdown) di bawah ini untuk beralih antar strategi atau mode AI agar tampilan lebih rapi.</div>", unsafe_allow_html=True)
@@ -1183,7 +1192,17 @@ if not df_hasil.empty:
                         
                         # Opsi Mode Kilat
                         paksa_sidang = st.checkbox("🔄 Paksa Sidang Ulang (abaikan cache Mode Kilat)", key="paksa_sidang_ulang")
-                        
+
+                        if st.button("🗑️ Hapus Cache Sidang", key="hapus_cache_sidang"):
+                            try:
+                                if os.path.exists(FILE_CACHE_AUTOPILOT):
+                                    os.remove(FILE_CACHE_AUTOPILOT)
+                                    st.success("✅ Cache sidang dihapus. Sidang berikutnya mulai dari awal.")
+                                else:
+                                    st.info("Tidak ada cache tersimpan.")
+                            except Exception as e:
+                                st.error(f"Gagal hapus cache: {e}")
+
                         if st.button("🛸 Jalankan Auto-Pilot Ultimate", type="primary", key="autopilot_utama"):
                             
                             GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
