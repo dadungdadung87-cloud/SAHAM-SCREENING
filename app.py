@@ -316,7 +316,6 @@ def ai_grand_final_top5(data_saham_dict, api_key):
 # >>> PART 03 : MESIN AUTO-PILOT CEPAT & PARALEL (+ REM CERDAS) <<<
 # =====================================================================
 def radar_model_gemini_cepat(api_key):
-    # Radar dinyalakan CUKUP SEKALI: keluarga flash/lite (cepat) diprioritaskan, sisanya cadangan.
     genai.configure(api_key=api_key)
     cepat, cadangan = [], []
     try:
@@ -332,15 +331,13 @@ def radar_model_gemini_cepat(api_key):
     return cepat + cadangan
 
 def ai_hakim_klasemen_cepat(data_top15, api_key, daftar_model):
-    # Hakim AI versi cepat: radar tidak diulang; AI HANYA memilih 5 Ticker (JSON pendek);
-    # Target TP/CL TIDAK lagi dihitung AI (dihitung eksak oleh Python) -> lebih cepat & bebas halusinasi hitung.
     genai.configure(api_key=api_key)
     prompt = f"""
     Select EXACTLY 5 Tickers that have the highest combination of 'Score' and 'Volume' from the data below.
-    
+
     DATA:
     {data_top15}
-    
+
     Output a JSON array containing EXACTLY 5 objects, each with EXACTLY 1 key: "Ticker".
     """
     pesan_error_terakhir = ""
@@ -358,26 +355,28 @@ def ai_hakim_klasemen_cepat(data_top15, api_key, daftar_model):
             return response.text
         except Exception as e:
             pesan_error_terakhir = str(e)
-            # REM CERDAS: jeda HANYA jika server sibuk / kena limit (429/503)
             if any(k in str(e) for k in ["429", "503", "RESOURCE_EXHAUSTED", "UNAVAILABLE"]):
-                time.sleep(3)
+                time.sleep(5)
+            else:
+                time.sleep(1)
             continue
     return f"Error_AI (Semua model aktif gagal eksekusi): {pesan_error_terakhir}"
 
 def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None, status_teks=None):
-    # Mengadili 9 rumus secara PARALEL (3 pekerja bersamaan). Mengembalikan (keranjang, error_global).
     import concurrent.futures
 
     keranjang = {f"RUMUS {i}": ["", "", "", "", ""] for i in range(1, 10)}
+    laporan = {i: {"status": "⏭️ Kosong", "detail": "Tidak ada saham yang lolos rumus ini"} for i in range(1, 10)}
 
     if status_teks: status_teks.info("📡 Radar model: menarik daftar model Gemini online (cukup sekali)...")
     daftar_model = radar_model_gemini_cepat(api_key)
     if not daftar_model:
-        return keranjang, "❌ Tidak ada model Gemini yang online untuk API Key ini."
+        return keranjang, "❌ Tidak ada model Gemini yang online untuk API Key ini.", laporan
 
     def sidang_satu_rumus(i):
         try:
             df_target = daftar_rumus[i]
+            n_kandidat = len(df_target)
             saham_valid = df_target['Ticker'].tolist()
             df_seleksi = df_data[df_data['Ticker'].isin(saham_valid)].copy()
             df_seleksi['Score_Num'] = pd.to_numeric(df_seleksi['Total Score'], errors='coerce').fillna(0)
@@ -397,9 +396,8 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
 
             hasil_mentah = ai_hakim_klasemen_cepat(data_kirim_ai, api_key, daftar_model)
             if "Error_AI" in hasil_mentah:
-                return i, None, hasil_mentah
+                return i, n_kandidat, None, hasil_mentah
 
-            # PENYEDOT DEBU: coba baca blok JSON dari yang paling bawah
             semua_blok_kurung = re.findall(r'\[.*?\]', hasil_mentah, re.DOTALL)
             hasil_json = None
             for blok in reversed(semua_blok_kurung):
@@ -413,7 +411,7 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
                 except:
                     continue
             if hasil_json is None:
-                return i, None, f"Format JSON tidak utuh. Respons: {hasil_mentah[:150]}"
+                return i, n_kandidat, None, f"JSON tidak utuh: {hasil_mentah[:120]}"
 
             tickers_ai = []
             for item in hasil_json:
@@ -422,7 +420,6 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
                     tickers_ai.append(t)
             tickers_ai = tickers_ai[:5]
 
-            # TP (+5%) & CL (-3%) dihitung EKSAK oleh Python
             baris_sinyal = []
             for t in tickers_ai:
                 harga = float(data_kirim_ai[t]['Harga'])
@@ -435,33 +432,36 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
                 pd.DataFrame(baris_sinyal).to_csv(f"Database/sinyal_ai_rumus_{i}.csv", index=False)
 
             jawara = [b["Ticker"] for b in baris_sinyal]
-            return i, (jawara + ["", "", "", "", ""])[:5], None
+            return i, n_kandidat, (jawara + ["", "", "", "", ""])[:5], None
         except Exception as e:
-            return i, None, str(e)
+            return i, len(daftar_rumus[i]), None, str(e)
 
     rumus_aktif = [i for i in range(1, 10) if len(daftar_rumus[i]) > 0]
     for i in range(1, 10):
         if len(daftar_rumus[i]) == 0 and status_teks:
             status_teks.warning(f"⏭️ Rumus {i} kosong. Dilewati.")
 
-    if status_teks: status_teks.info(f"🚀 Sidang paralel dimulai: {len(rumus_aktif)} rumus aktif, 3 hakim bekerja bersamaan...")
+    if status_teks: status_teks.info(f"🚀 Sidang paralel dimulai: {len(rumus_aktif)} rumus aktif, 2 hakim bekerja bersamaan...")
 
     selesai = 0
-    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
         futures = [executor.submit(sidang_satu_rumus, i) for i in rumus_aktif]
         for fut in concurrent.futures.as_completed(futures):
-            i, jawara, err = fut.result()
+            i, n_kandidat, jawara, err = fut.result()
             selesai += 1
             if progress_bar: progress_bar.progress(min(selesai / 9.0, 1.0))
             if err:
-                if status_teks: status_teks.error(f"❌ Rumus {i} gagal: {err}")
+                laporan[i] = {"status": "❌ Gagal", "detail": f"{n_kandidat} kandidat | {err[:120]}"}
                 keranjang[f"RUMUS {i}"] = ["", "", "", "", ""]
+                if status_teks: status_teks.error(f"❌ Rumus {i} gagal: {err[:120]}")
             else:
+                n_jawara = len([t for t in jawara if t])
+                laporan[i] = {"status": "✅ Sukses", "detail": f"{n_kandidat} kandidat → {n_jawara} jawara"}
                 keranjang[f"RUMUS {i}"] = jawara
-                if status_teks: status_teks.success(f"✅ Rumus {i} selesai ({selesai}/{len(rumus_aktif)} sidang aktif).")
+                if status_teks: status_teks.success(f"✅ Rumus {i} selesai ({selesai}/{len(rumus_aktif)}).")
 
     if progress_bar: progress_bar.progress(1.0)
-    return keranjang, None
+    return keranjang, None, laporan
 
 
 # =====================================================================
@@ -1191,25 +1191,42 @@ if not df_hasil.empty:
                                     try:
                                         with open(FILE_CACHE_AUTOPILOT, "r") as f: cache_muat = json.load(f)
                                         if cache_muat.get("stempel_data") == stempel_data and cache_muat.get("keranjang"):
-                                            keranjang_spreadsheet = cache_muat["keranjang"]
-                                            st.info("⚡ **Mode Kilat Aktif:** Data belum berubah sejak sidang terakhir — hasil ditampilkan instan dari cache.")
+                                            # Validasi: cache hanya dipakai jika minimal 1 rumus punya isi
+                                            ada_isi_cache = any(len([t for t in cache_muat["keranjang"].get(f"RUMUS {i}", []) if t]) > 0 for i in range(1, 10))
+                                            if ada_isi_cache:
+                                                keranjang_spreadsheet = cache_muat["keranjang"]
+                                                st.info("⚡ **Mode Kilat Aktif:** Data belum berubah sejak sidang terakhir — hasil ditampilkan instan dari cache.")
                                     except: pass
                                 
                                 if keranjang_spreadsheet is None:
                                     progress_bar = st.progress(0)
                                     status_teks = st.empty()
                                     
-                                    keranjang_spreadsheet, err_global = jalankan_sidang_autopilot(daftar_rumus, df_hasil, GEMINI_API_KEY, progress_bar, status_teks)
+                                    keranjang_spreadsheet, err_global, laporan_sidang = jalankan_sidang_autopilot(daftar_rumus, df_hasil, GEMINI_API_KEY, progress_bar, status_teks)
                                     
                                     if err_global:
                                         st.error(err_global)
                                     else:
-                                        try:
-                                            with open(FILE_CACHE_AUTOPILOT, "w") as f:
-                                                json.dump({"stempel_data": stempel_data, "keranjang": keranjang_spreadsheet}, f, indent=4)
-                                        except: pass
-                                        status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
-                                        st.balloons()
+                                        # >>> BARU: Tampilkan laporan transparan
+                                        df_laporan = pd.DataFrame([{
+                                            "Rumus": f"RUMUS {i}",
+                                            "Status": laporan_sidang[i]["status"],
+                                            "Keterangan": laporan_sidang[i]["detail"]
+                                        } for i in range(1, 10)])
+                                        st.markdown("### 🧾 Laporan Sidang (Transparan)")
+                                        st.dataframe(df_laporan, use_container_width=True, hide_index=True)
+                                        
+                                        # Validasi: hanya simpan cache jika minimal 1 rumus sukses
+                                        ada_isi = any(laporan_sidang[i]["status"] == "✅ Sukses" for i in range(1, 10))
+                                        if ada_isi:
+                                            try:
+                                                with open(FILE_CACHE_AUTOPILOT, "w") as f:
+                                                    json.dump({"stempel_data": stempel_data, "keranjang": keranjang_spreadsheet}, f, indent=4)
+                                            except: pass
+                                            status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
+                                            st.balloons()
+                                        else:
+                                            status_teks.warning("⚠️ Sidang selesai tetapi tidak ada jawara. Baca Laporan Sidang untuk tahu penyebab pastinya.")
                                 
                                 st.markdown("### 📋 Tabel Master Portofolio (Siap Salin)")
                                 
@@ -1371,25 +1388,42 @@ if not df_hasil.empty:
                                 try:
                                     with open(FILE_CACHE_AUTOPILOT, "r") as f: cache_muat = json.load(f)
                                     if cache_muat.get("stempel_data") == stempel_data and cache_muat.get("keranjang"):
-                                        keranjang_spreadsheet = cache_muat["keranjang"]
-                                        st.info("⚡ **Mode Kilat Aktif:** hasil sidang sebelumnya ditampilkan instan dari cache.")
+                                        # Validasi: cache hanya dipakai jika minimal 1 rumus punya isi
+                                        ada_isi_cache = any(len([t for t in cache_muat["keranjang"].get(f"RUMUS {i}", []) if t]) > 0 for i in range(1, 10))
+                                        if ada_isi_cache:
+                                            keranjang_spreadsheet = cache_muat["keranjang"]
+                                            st.info("⚡ **Mode Kilat Aktif:** hasil sidang sebelumnya ditampilkan instan dari cache.")
                                 except: pass
                             
                             if keranjang_spreadsheet is None:
                                 progress_bar = st.progress(0)
                                 status_teks = st.empty()
                                 
-                                keranjang_spreadsheet, err_global = jalankan_sidang_autopilot(daftar_rumus, df_hasil, GEMINI_API_KEY, progress_bar, status_teks)
+                                keranjang_spreadsheet, err_global, laporan_sidang = jalankan_sidang_autopilot(daftar_rumus, df_hasil, GEMINI_API_KEY, progress_bar, status_teks)
                                 
                                 if err_global:
                                     st.error(err_global)
                                 else:
-                                    try:
-                                        with open(FILE_CACHE_AUTOPILOT, "w") as f:
-                                            json.dump({"stempel_data": stempel_data, "keranjang": keranjang_spreadsheet}, f, indent=4)
-                                    except: pass
-                                    status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
-                                    st.balloons()
+                                    # >>> BARU: Tampilkan laporan transparan
+                                    df_laporan = pd.DataFrame([{
+                                        "Rumus": f"RUMUS {i}",
+                                        "Status": laporan_sidang[i]["status"],
+                                        "Keterangan": laporan_sidang[i]["detail"]
+                                    } for i in range(1, 10)])
+                                    st.markdown("### 🧾 Laporan Sidang (Transparan)")
+                                    st.dataframe(df_laporan, use_container_width=True, hide_index=True)
+                                    
+                                    # Validasi: hanya simpan cache jika minimal 1 rumus sukses
+                                    ada_isi = any(laporan_sidang[i]["status"] == "✅ Sukses" for i in range(1, 10))
+                                    if ada_isi:
+                                        try:
+                                            with open(FILE_CACHE_AUTOPILOT, "w") as f:
+                                                json.dump({"stempel_data": stempel_data, "keranjang": keranjang_spreadsheet}, f, indent=4)
+                                        except: pass
+                                        status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
+                                        st.balloons()
+                                    else:
+                                        status_teks.warning("⚠️ Sidang selesai tetapi tidak ada jawara. Baca Laporan Sidang untuk tahu penyebab pastinya.")
                             
                             st.markdown("### 📋 Tabel Master Portofolio (Siap Salin)")
                             
