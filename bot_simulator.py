@@ -94,6 +94,11 @@ def jalankan_bot():
     
     print(f"[{now.strftime('%H:%M:%S')}] Membangunkan Bot Simulator AI...")
 
+    # >>> BARU: GEMBOK AKHIR PEKAN — bot libur total Sabtu-Minggu
+    if now.weekday() >= 5:
+        print("😴 Akhir pekan terdeteksi. Bot libur — posisi aman sampai Senin.")
+        return
+    
     # ----------------------------------------------------
     # ☁️ SINKRON MASUK: tarik state terbaru dari R2
     # ----------------------------------------------------
@@ -117,17 +122,16 @@ def jalankan_bot():
         return
     # ----------------------------------------------------
 
-    # >>> BARU: GEMBOK SORE — jika data market bukan hari kerja aktif,
-    # bot hanya boleh evaluasi jual, TIDAK membeli (mencegah beli harga basi)
+    # >>> STRATEGI BSJP: beli BOLEH saat market tutup (harga penutupan),
+    # tetapi DILARANG jika data market sudah basi (> 3 hari).
     try:
         stempel_market = str(df_market['Terakhir Update'].iloc[0])[:10]
+        usia_data = (now - datetime.strptime(stempel_market, '%Y-%m-%d')).days
     except Exception:
-        stempel_market = tanggal_hari_ini
-    hari_kerja = now.weekday() < 5
-    jam_bursa = datetime.strptime("09:00", "%H:%M").time() <= jam_sekarang <= datetime.strptime("16:00", "%H:%M").time()
-    mode_beli_aktif = hari_kerja and jam_bursa and (stempel_market == tanggal_hari_ini)
+        usia_data = 0
+    mode_beli_aktif = usia_data <= 3
     if not mode_beli_aktif:
-        print(" GEMBOK SORE AKTIF: data market bukan sesi aktif — bot hanya evaluasi jual, tidak membeli.")
+        print(f"🔒 GEMBOK DATA BASI AKTIF: data market berusia {usia_data} hari — bot hanya evaluasi jual, tidak membeli.")
 
     is_square_off_time = jam_sekarang >= jam_square_off
     if is_square_off_time:
