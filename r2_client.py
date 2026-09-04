@@ -75,3 +75,42 @@ def list_arsip():
         return [item["Key"] for item in resp.get("Contents", [])]
     except Exception:
         return []
+
+# ==========================================
+# >>> BARU: BACKUP & RESTORE DATABASE (PORTOFOLIO) <<<
+# ==========================================
+def upload_database():
+    """Upload seluruh CSV di folder Database/ ke R2 (backup portofolio)"""
+    import glob
+    client, bucket = get_r2_client()
+    if not client: return False
+    try:
+        n = 0
+        for f in glob.glob("Database/*.csv"):
+            nama = os.path.basename(f)
+            # Lewati cache autopilot (tidak perlu dibackup)
+            if "cache_autopilot" in nama: continue
+            client.upload_file(f, bucket, f"Database/{nama}")
+            n += 1
+        return n > 0
+    except Exception:
+        return False
+
+def download_database():
+    """Download seluruh CSV dari folder Database/ R2 ke lokal (restore)"""
+    client, bucket = get_r2_client()
+    if not client: return False
+    try:
+        os.makedirs("Database", exist_ok=True)
+        resp = client.list_objects_v2(Bucket=bucket, Prefix="Database/")
+        n = 0
+        for item in resp.get("Contents", []):
+            key = item["Key"]
+            if key.endswith(".csv"):
+                nama = key.split("/")[-1]
+                if "cache_autopilot" in nama: continue
+                client.download_file(bucket, key, os.path.join("Database", nama))
+                n += 1
+        return n > 0
+    except Exception:
+        return False
