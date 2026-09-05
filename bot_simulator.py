@@ -13,7 +13,7 @@ FILE_MARKET = "Database/hasil_screener.csv"
 DIR_DB = "Database"       
 
 # ==========================================
-# ☁️ FUNGSI SINKRON R2 (BARU)
+# ☁️ FUNGSI SINKRON R2
 # ==========================================
 def sinkron_r2_masuk():
     """Tarik state portofolio terbaru dari R2 sebelum bot bekerja."""
@@ -21,19 +21,19 @@ def sinkron_r2_masuk():
         import r2_client
         if r2_client.download_database():
             print("☁️ State portofolio tersinkron dari R2.")
-            return True
-        print("⚠️ R2 kosong/belum ada data — pakai file lokal.")
+        else:
+            print("⚠️ R2 kosong/belum ada data — pakai file lokal.")
         return True
     except Exception as e:
         print(f"⚠️ Gagal sinkron masuk R2: {e}")
         return False
 
 def sinkron_r2_keluar():
-    """Kirim state portofolio terbaru ke R2 setelah bot bekerja."""
+    """Kirim state portofolio terbaru ke R2 (mode mirror: sinyal terbakar ikut terhapus)."""
     try:
         import r2_client
-        if r2_client.upload_database():
-            print("☁️ State portofolio ter-upload ke R2.")
+        if r2_client.upload_database(mirror=True):
+            print("☁️ State portofolio ter-upload ke R2 (mirror).")
     except Exception as e:
         print(f"⚠️ Gagal sinkron keluar R2: {e}")
 
@@ -50,11 +50,9 @@ def auto_save_github():
         if "nothing to commit" in commit_process.stdout or "nothing to commit" in commit_process.stderr:
             print("✅ Data aman. Tidak ada transaksi baru.")
             return
-        # COMMIT dulu, baru samakan riwayat (rebase), lalu push — anti ditolak
         subprocess.run(["git", "pull", "--rebase", "origin", "main"], capture_output=True, text=True)
         push_process = subprocess.run(["git", "push", "origin", "main"], capture_output=True, text=True)
         if push_process.returncode != 0:
-            # 1x percobaan ulang setelah rebase
             subprocess.run(["git", "pull", "--rebase", "origin", "main"], capture_output=True, text=True)
             subprocess.run(["git", "push", "origin", "main"], check=True)
         print("🚀 Pencadangan berhasil! Data portofolio Anda abadi.")
@@ -65,9 +63,7 @@ def auto_save_github():
 # 🛠️ FUNGSI INISIALISASI (BRANKAS 3 LAPIS)
 # ==========================================
 def inisialisasi_database(rumus_id):
-    # Lapis 1: Gudang Aktif (Cabut-Pasang)
     file_porto = os.path.join(DIR_DB, f"portofolio_aktif_rumus_{rumus_id}.csv")
-    # Lapis 2: Buku Besar Histori (Catat Abadi)
     file_hist = os.path.join(DIR_DB, f"histori_transaksi_rumus_{rumus_id}.csv")
     
     if not os.path.exists(file_porto):
@@ -94,11 +90,13 @@ def jalankan_bot():
     
     print(f"[{now.strftime('%H:%M:%S')}] Membangunkan Bot Simulator AI...")
 
-    # >>> BARU: GEMBOK AKHIR PEKAN — bot libur total Sabtu-Minggu
+    # ----------------------------------------------------
+    # 😴 GEMBOK AKHIR PEKAN — bot libur total Sabtu-Minggu
+    # ----------------------------------------------------
     if now.weekday() >= 5:
         print("😴 Akhir pekan terdeteksi. Bot libur — posisi aman sampai Senin.")
         return
-    
+
     # ----------------------------------------------------
     # ☁️ SINKRON MASUK: tarik state terbaru dari R2
     # ----------------------------------------------------
@@ -113,7 +111,6 @@ def jalankan_bot():
         
     try:
         df_market = pd.read_csv(FILE_MARKET)
-        # Jika file CSV kosong karena update cron gagal / bursa maintenance
         if df_market.empty or 'Ticker' not in df_market.columns or 'Harga (Rp)' not in df_market.columns:
             print("🔒 GEMBOK AKTIF: Data market kosong atau cacat. Bot tidur kembali untuk melindungi data Anda.")
             return
@@ -122,8 +119,10 @@ def jalankan_bot():
         return
     # ----------------------------------------------------
 
-    # >>> STRATEGI BSJP: beli BOLEH saat market tutup (harga penutupan),
-    # tetapi DILARANG jika data market sudah basi (> 3 hari).
+    # ----------------------------------------------------
+    # 🧓 GEMBOK DATA BASI: beli boleh malam hari (harga penutupan),
+    # tetapi dilarang jika data market berusia > 3 hari
+    # ----------------------------------------------------
     try:
         stempel_market = str(df_market['Terakhir Update'].iloc[0])[:10]
         usia_data = (now - datetime.strptime(stempel_market, '%Y-%m-%d')).days
@@ -160,7 +159,6 @@ def jalankan_bot():
                 porto_baru.append(posisi)
                 continue
 
-            # Ambil harga terkini, jika sahamnya tidak ditemukan di file market, TAHAN!
             try:
                 harga_sekarang = df_market[df_market['Ticker'] == ticker]['Harga (Rp)'].values[0]
             except:
@@ -171,7 +169,6 @@ def jalankan_bot():
             status_jual = ""
             harga_jual = 0
             
-            # Logika Cek Jual
             if is_square_off_time:
                 terjual = True
                 status_jual = "AUTO_SQUARE_OFF 🧹"
@@ -185,7 +182,6 @@ def jalankan_bot():
                 status_jual = "CUT_LOSS ✂️"
                 harga_jual = harga_sekarang
                 
-            # Jika saham terjual, pindahkan ke Buku Histori (Lapis 2)
             if terjual:
                 nilai_jual_kotor = harga_jual * posisi['Lot'] * 100
                 nilai_jual_bersih = nilai_jual_kotor - (nilai_jual_kotor * FEE_JUAL)
@@ -204,11 +200,10 @@ def jalankan_bot():
                 })
                 print(f"💰 [RUMUS {i}] JUAL: {ticker} @ Rp {harga_jual} | {status_jual} | {profit_pct:.2f}%")
             else:
-                porto_baru.append(posisi) # Jika tidak dijual, kembalikan ke Gudang (Lapis 1)
+                porto_baru.append(posisi)
 
-        # Update kondisi Lapis 1 & Lapis 2
         df_porto = pd.DataFrame(porto_baru)
-        if df_porto.empty: # Jaga-jaga agar struktur tabel tidak rusak jika kosong
+        if df_porto.empty:
             df_porto = pd.DataFrame(columns=['Tanggal_Beli', 'Ticker', 'Harga_Beli', 'Lot', 'Total_Modal', 'Target_TP', 'Target_CL'])
         
         if history_baru:
@@ -217,7 +212,6 @@ def jalankan_bot():
         # ==========================================
         # FASE B: MODE BELI (MASUKKAN SAHAM KE GUDANG)
         # ==========================================
-        # >>> BARU: hanya beli jika mode_beli_aktif (data segar jam bursa)
         if mode_beli_aktif and os.path.exists(file_sinyal):
             saldo_sekarang = cek_saldo_tersedia(df_porto)
             saham_dimiliki = df_porto['Ticker'].tolist() if not df_porto.empty else []
@@ -225,7 +219,6 @@ def jalankan_bot():
                 df_sinyal = pd.read_csv(file_sinyal)
                 for _, sinyal in df_sinyal.iterrows():
                     ticker = sinyal['Ticker']
-                    # Cegah beli saham yang sama berulang-ulang
                     if ticker in saham_dimiliki:
                         continue
                         
@@ -234,7 +227,6 @@ def jalankan_bot():
                     except:
                         continue
                     
-                    # Maksimal alokasi Rp 20 Juta per saham
                     alokasi_dana = min(20000000, saldo_sekarang)
                     harga_1_lot_plus_fee = (harga_beli * 100) * (1 + FEE_BELI)
                     
@@ -254,23 +246,19 @@ def jalankan_bot():
                         saldo_sekarang -= total_modal_dikeluarkan
                         print(f"🛒 [RUMUS {i}] BELI: {ticker} @ Rp {harga_beli} | {jumlah_lot} Lot")
 
-                # WAJIB: Hapus kertas belanja agar besok tidak dibeli lagi
                 os.remove(file_sinyal)
             except Exception as e:
                 print(f"⚠️ Gagal membaca sinyal Rumus {i}: {e}")
         elif os.path.exists(file_sinyal) and not mode_beli_aktif:
-            print(f" [RUMUS {i}] Sinyal diterima tetapi ditahan (di luar jam bursa) — akan dieksekusi sesi berikutnya.")
+            print(f" [RUMUS {i}] Sinyal diterima tetapi ditahan (data basi) — akan dieksekusi saat data segar.")
 
-        # ----------------------------------------------------
-        # 💾 SIMPAN SEMUA KE DALAM FILE CSV MASING-MASING
-        # ----------------------------------------------------
         df_porto.to_csv(file_porto, index=False)
         df_history.to_csv(file_hist, index=False)
 
     print("✅ Inspeksi 9 Arena selesai.")
     
     # ----------------------------------------------------
-    # ☁️ SINKRON KELUAR: kirim state terbaru ke R2
+    # ☁️ SINKRON KELUAR: kirim state terbaru ke R2 (mirror)
     # ----------------------------------------------------
     if r2_ok:
         sinkron_r2_keluar()
