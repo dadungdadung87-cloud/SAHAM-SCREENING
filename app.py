@@ -1472,6 +1472,16 @@ if not df_hasil.empty:
 # >>> PART 13 : TAB 4 - PORTOFOLIO BOT <<<
 # =====================================================================
     with tab4:
+        # >>> BARU: sedot otomatis state portofolio terbaru dari R2 (cache 60 detik)
+        @st.cache_data(ttl=60)
+        def _sedot_porto_r2():
+            try:
+                import r2_client
+                return r2_client.download_database()
+            except Exception:
+                return False
+        _sedot_porto_r2()
+                
         st.markdown("## 🤖 Monitor Bot Simulator")
         
         # --- TOMBOL PEMICU BOT ---
