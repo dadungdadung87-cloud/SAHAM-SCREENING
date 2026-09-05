@@ -79,21 +79,42 @@ def list_arsip():
 # ==========================================
 # >>> BARU: BACKUP & RESTORE DATABASE (PORTOFOLIO) <<<
 # ==========================================
-def upload_database():
-    """Upload seluruh CSV di folder Database/ ke R2 (backup portofolio)"""
+def upload_database(mirror=False):
+    """Upload CSV Database/ ke R2.
+    
+    Args:
+        mirror: Jika True, R2 dijadikan cermin persis — file CSV yang terhapus
+                di laptop juga akan terhapus di R2 (mencegah sinyal zombie).
+    """
     import glob
     client, bucket = get_r2_client()
     if not client: return False
     try:
-        n = 0
-        for f in glob.glob("Database/*.csv"):
+        # Kumpulkan semua file CSV lokal (kecuali cache)
+        files_lokal = [f for f in glob.glob("Database/*.csv") 
+                       if "cache_autopilot" not in os.path.basename(f)]
+        nama_lokal = {os.path.basename(f) for f in files_lokal}
+        
+        # Upload semua file lokal ke R2
+        for f in files_lokal:
             nama = os.path.basename(f)
-            # Lewati cache autopilot (tidak perlu dibackup)
-            if "cache_autopilot" in nama: continue
             client.upload_file(f, bucket, f"Database/{nama}")
-            n += 1
-        return n > 0
-    except Exception:
+        
+        # Mode mirror: hapus file di R2 yang sudah tidak ada di laptop
+        if mirror:
+            resp = client.list_objects_v2(Bucket=bucket, Prefix="Database/")
+            for item in resp.get("Contents", []):
+                nama_di_r2 = item["Key"].split("/")[-1]
+                if nama_di_r2 not in nama_lokal:
+                    try:
+                        client.delete_object(Bucket=bucket, Key=item["Key"])
+                        print(f"   🗑️ Mirror: {nama_di_r2} dihapus dari R2")
+                    except Exception:
+                        pass
+        
+        return len(files_lokal) > 0
+    except Exception as e:
+        print(f"⚠️ upload_database gagal: {e}")
         return False
 
 def download_database():
