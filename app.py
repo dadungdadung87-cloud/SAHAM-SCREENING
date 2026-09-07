@@ -1601,15 +1601,21 @@ if not df_hasil.empty:
                 else:
                     df_hist_tampil = df_hist.copy()
                     
-                st.dataframe(
-                    df_hist_tampil.style.applymap(warnai_profit, subset=['Total_Return_Rp', 'Return_%']).format({
-                        'Harga_Beli': "Rp {:,.0f}",
-                        'Harga_Jual': "Rp {:,.0f}",
-                        'Total_Return_Rp': "Rp {:,.0f}",
-                        'Return_%': "{:.2f}%"
-                    }),
-                    use_container_width=True,
-                    hide_index=True
-                )
+                # >>> BARU: aman untuk semua versi pandas (map vs applymap)
+                styler = df_hist_tampil.style
+                kolom_warna = [c for c in ['Total_Return_Rp', 'Return_%'] if c in df_hist_tampil.columns]
+                if kolom_warna:
+                    if hasattr(styler, "map"):
+                        styler = styler.map(warnai_profit, subset=kolom_warna)
+                    else:
+                        styler = styler.applymap(warnai_profit, subset=kolom_warna)
+                
+                fmt = {}
+                for c, f in [('Harga_Beli', "Rp {:,.0f}"), ('Harga_Jual', "Rp {:,.0f}"),
+                             ('Total_Return_Rp', "Rp {:,.0f}"), ('Return_%', "{:.2f}%")]:
+                    if c in df_hist_tampil.columns:
+                        fmt[c] = f
+                
+                st.dataframe(styler.format(fmt), use_container_width=True, hide_index=True)
             else:
                 st.info(f"📭 Belum ada riwayat penjualan saham untuk {pilihan_arena}.")
