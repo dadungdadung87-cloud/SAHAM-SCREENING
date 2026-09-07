@@ -1472,7 +1472,7 @@ if not df_hasil.empty:
 # >>> PART 13 : TAB 4 - PORTOFOLIO BOT <<<
 # =====================================================================
     with tab4:
-        # >>> BARU: sedot otomatis state portofolio terbaru dari R2 (cache 60 detik)
+        # >>> Sedot otomatis state portofolio terbaru dari R2 (cache 60 detik)
         @st.cache_data(ttl=60)
         def _sedot_porto_r2():
             try:
@@ -1481,7 +1481,7 @@ if not df_hasil.empty:
             except Exception:
                 return False
         _sedot_porto_r2()
-                
+
         st.markdown("## 🤖 Monitor Bot Simulator")
         
         # --- TOMBOL PEMICU BOT ---
@@ -1502,8 +1502,8 @@ if not df_hasil.empty:
                         st.rerun()
                 except Exception as e:
                     st.error(f"Sistem web gagal memanggil file bot: {e}")
-                    
-        # >>> BARU: Tombol backup & restore portofolio via R2
+        
+        # >>> Tombol backup & restore portofolio via R2
         col_backup, col_restore = st.columns(2)
         with col_backup:
             if st.button("💾 Backup Portofolio ke R2", use_container_width=True):
@@ -1525,7 +1525,7 @@ if not df_hasil.empty:
                     st.rerun()
                 else:
                     st.error("❌ Gagal menarik dari R2.")
-
+        
         st.markdown("---")
         
         st.markdown("## 📊 Dashboard Performa AI (Live)")
@@ -1548,12 +1548,21 @@ if not df_hasil.empty:
         saldo_saat_ini = MODAL_AWAL + total_profit_rp - modal_terpakai
         total_aset = saldo_saat_ini + modal_terpakai
         
+        # >>> Statistik win/loss/BE ala Stockbit
         total_trade = len(df_hist)
+        win_trade = loss_trade = be_trade = 0
+        winrate = 0.0
+        profit_factor = 0.0
+        avg_return = 0.0
         if total_trade > 0 and 'Return_%' in df_hist.columns:
-            win_trade = len(df_hist[df_hist['Return_%'] > 0])
+            win_trade = int((df_hist['Return_%'] > 0).sum())
+            loss_trade = int((df_hist['Return_%'] < 0).sum())
+            be_trade = total_trade - win_trade - loss_trade
             winrate = (win_trade / total_trade) * 100
-        else:
-            winrate = 0.0
+            gross_profit = df_hist.loc[df_hist['Total_Return_Rp'] > 0, 'Total_Return_Rp'].sum()
+            gross_loss = abs(df_hist.loc[df_hist['Total_Return_Rp'] < 0, 'Total_Return_Rp'].sum())
+            profit_factor = (gross_profit / gross_loss) if gross_loss > 0 else float('inf')
+            avg_return = df_hist['Return_%'].mean()
 
         col1, col2, col3, col4 = st.columns(4)
         with col1:
@@ -1561,9 +1570,44 @@ if not df_hasil.empty:
         with col2:
             st.metric(label="💵 Dana Kas Tersedia", value=f"Rp {saldo_saat_ini:,.0f}".replace(",", "."))
         with col3:
-            st.metric(label="📈 Realized Profit/Loss", value=f"Rp {total_profit_rp:,.0f}".replace(",", "."), delta=f"Rp {total_profit_rp:,.0f}".replace(",", "."))
+            # >>> Delta MERAH saat minus, HIJAU saat profit
+            tanda = "+" if total_profit_rp >= 0 else "-"
+            st.metric(label="📈 Realized Profit/Loss",
+                      value=f"Rp {total_profit_rp:,.0f}".replace(",", "."),
+                      delta=f"{tanda} Rp {abs(total_profit_rp):,.0f}".replace(",", "."),
+                      delta_color="normal")
         with col4:
-            st.metric(label="🎯 Winrate AI", value=f"{winrate:.1f}%", delta=f"{total_trade} Selesai", delta_color="off")
+            # >>> Jumlah win / loss / break-even ala Stockbit
+            st.metric(label="🎯 Winrate AI", value=f"{winrate:.1f}%",
+                      delta=f"✅ {win_trade} Win | ❌ {loss_trade} Loss | ➖ {be_trade} BE",
+                      delta_color="off")
+
+        # >>> Baris metrik profesional
+        m1, m2, m3, m4 = st.columns(4)
+        with m1:
+            pf_txt = "∞" if profit_factor == float('inf') else f"{profit_factor:.2f}"
+            st.metric(label="⚖️ Profit Factor", value=pf_txt)
+        with m2:
+            st.metric(label="📊 Rata-rata Return/Trade", value=f"{avg_return:.2f}%")
+        with m3:
+            n_tp = int(df_hist['Status'].str.contains('TAKE_PROFIT', na=False).sum()) if not df_hist.empty and 'Status' in df_hist.columns else 0
+            n_cl = int(df_hist['Status'].str.contains('CUT_LOSS', na=False).sum()) if not df_hist.empty and 'Status' in df_hist.columns else 0
+            n_so = int(df_hist['Status'].str.contains('SQUARE_OFF', na=False).sum()) if not df_hist.empty and 'Status' in df_hist.columns else 0
+            st.metric(label="🧾 Komposisi Exit", value=f"TP {n_tp} | CL {n_cl} | SO {n_so}")
+        with m4:
+            if total_trade > 0:
+                best = df_hist.loc[df_hist['Total_Return_Rp'].idxmax()]
+                worst = df_hist.loc[df_hist['Total_Return_Rp'].idxmin()]
+                st.metric(label="🏆 Terbaik / Terburuk", value=f"{best['Ticker']} / {worst['Ticker']}")
+            else:
+                st.metric(label="🏆 Terbaik / Terburuk", value="-")
+
+        # >>> Kurva equity (P/L kumulatif dari waktu ke waktu)
+        if total_trade > 0 and 'Tanggal_Jual' in df_hist.columns:
+            df_eq = df_hist.sort_values(by='Tanggal_Jual').copy()
+            df_eq['Kumulatif_Rp'] = df_eq['Total_Return_Rp'].cumsum()
+            st.markdown("### 📈 Kurva Equity (Realized P/L Kumulatif)")
+            st.line_chart(df_eq.set_index('Tanggal_Jual')[['Kumulatif_Rp']])
 
         st.markdown("---")
         
@@ -1601,7 +1645,7 @@ if not df_hasil.empty:
                 else:
                     df_hist_tampil = df_hist.copy()
                     
-                # >>> BARU: aman untuk semua versi pandas (map vs applymap)
+                # >>> Aman untuk semua versi pandas (map vs applymap)
                 styler = df_hist_tampil.style
                 kolom_warna = [c for c in ['Total_Return_Rp', 'Return_%'] if c in df_hist_tampil.columns]
                 if kolom_warna:
