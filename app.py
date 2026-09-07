@@ -1582,32 +1582,13 @@ if not df_hasil.empty:
                       delta=f"✅ {win_trade} Win | ❌ {loss_trade} Loss | ➖ {be_trade} BE",
                       delta_color="off")
 
-        # >>> Baris metrik profesional
-        m1, m2, m3, m4 = st.columns(4)
+        # >>> Baris kedua: dua metrik inti kualitas strategi
+        m1, m2 = st.columns(2)
         with m1:
             pf_txt = "∞" if profit_factor == float('inf') else f"{profit_factor:.2f}"
-            st.metric(label="⚖️ Profit Factor", value=pf_txt)
+            st.metric(label="⚖️ Profit Factor (ideal > 1.5)", value=pf_txt)
         with m2:
             st.metric(label="📊 Rata-rata Return/Trade", value=f"{avg_return:.2f}%")
-        with m3:
-            n_tp = int(df_hist['Status'].str.contains('TAKE_PROFIT', na=False).sum()) if not df_hist.empty and 'Status' in df_hist.columns else 0
-            n_cl = int(df_hist['Status'].str.contains('CUT_LOSS', na=False).sum()) if not df_hist.empty and 'Status' in df_hist.columns else 0
-            n_so = int(df_hist['Status'].str.contains('SQUARE_OFF', na=False).sum()) if not df_hist.empty and 'Status' in df_hist.columns else 0
-            st.metric(label="🧾 Komposisi Exit", value=f"TP {n_tp} | CL {n_cl} | SO {n_so}")
-        with m4:
-            if total_trade > 0:
-                best = df_hist.loc[df_hist['Total_Return_Rp'].idxmax()]
-                worst = df_hist.loc[df_hist['Total_Return_Rp'].idxmin()]
-                st.metric(label="🏆 Terbaik / Terburuk", value=f"{best['Ticker']} / {worst['Ticker']}")
-            else:
-                st.metric(label="🏆 Terbaik / Terburuk", value="-")
-
-        # >>> Kurva equity (P/L kumulatif dari waktu ke waktu)
-        if total_trade > 0 and 'Tanggal_Jual' in df_hist.columns:
-            df_eq = df_hist.sort_values(by='Tanggal_Jual').copy()
-            df_eq['Kumulatif_Rp'] = df_eq['Total_Return_Rp'].cumsum()
-            st.markdown("### 📈 Kurva Equity (Realized P/L Kumulatif)")
-            st.line_chart(df_eq.set_index('Tanggal_Jual')[['Kumulatif_Rp']])
 
         st.markdown("---")
         
