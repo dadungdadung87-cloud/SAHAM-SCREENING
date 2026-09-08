@@ -1087,7 +1087,7 @@ if not df_hasil.empty:
 # =====================================================================
 # >>> PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS & AUTO-PILOT) <<<
 # =====================================================================
-    VERSI_SIDANG = "v3"
+    VERSI_SIDANG = "v4"
     FILE_CACHE_AUTOPILOT = "Database/cache_autopilot.json"
     with tab3:
         st.markdown("## 🦅 Radar BSJP & Laboratorium Forensik AI")
@@ -1096,58 +1096,84 @@ if not df_hasil.empty:
         if 'Tekanan Bandar' not in df_hasil.columns:
             st.warning("⏳ **Fitur Radar belum menerima data terbaru.** Harap jalankan 'update_data.py'.")
         else:
-            # --- SYARAT MUTLAK: WAJIB SQUEEZE ---
-            cond_squeeze = (df_hasil.get('Status BB', '') == 'Squeeze')
-
-            cond_v1 = (cond_squeeze & 
-                       df_hasil.get('Kondisi Supply', '').astype(str).str.contains('Supply Kering', na=False) &
-                       (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)'))
+            # --- 9 RUMUS BARU (BSJP SEIMBANG: tidak terlalu ketat, tidak longgar) ---
+            # RUMUS 1: Tutup Kuat, Bandar Hajar
+            cond_v1 = ((df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)') &
+                       (df_hasil.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)') &
+                       (df_hasil.get('Status Open', '') == 'Open = Low (Bullish Kuat)') &
+                       (df_hasil.get('Rekomendasi', '') == 'BELI'))
             df_v1 = df_hasil[cond_v1].copy() if not df_hasil.empty else pd.DataFrame()
 
-            cond_v2 = (cond_squeeze & 
-                       (df_hasil.get('Status Fibonacci', '') == 'Golden Rebound Fibo 61.8% (Golden Ratio) 🎯'))
+            # RUMUS 2: Smart Money Menyelam
+            cond_v2 = ((df_hasil.get('Kekuatan A/D', '') == 'Akumulasi Pro (Smart Money)') &
+                       (df_hasil.get('Status Bandar', '') == 'Akumulasi Kuat') &
+                       (df_hasil.get('Posisi VWAP', '') == 'Persis di VWAP') &
+                       (df_hasil.get('MA Signal', '') == 'Uptrend'))
             df_v2 = df_hasil[cond_v2].copy() if not df_hasil.empty else pd.DataFrame()
 
-            cond_v3 = (cond_squeeze & 
-                       (df_hasil.get('Status Bandar', '') == 'Akumulasi Kuat') &
-                       (df_hasil.get('Kekuatan A/D', '') == 'Akumulasi Pro (Smart Money)'))
+            # RUMUS 3: Pantulan Jarum Bawah
+            cond_v3 = ((df_hasil.get('Pola Candle', '') == 'Hammer (Potensi Reversal)') &
+                       (df_hasil.get('Sinyal Cuci Barang', '') == 'Jarum Bawah (Sinyal Pantulan Kuat)') &
+                       (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)'))
             df_v3 = df_hasil[cond_v3].copy() if not df_hasil.empty else pd.DataFrame()
 
-            cond_v4 = (cond_squeeze & 
+            # RUMUS 4: Golden Cross Muda
+            cond_v4 = ((df_hasil.get('MA Cross', '') == 'Golden Cross') &
                        (df_hasil.get('Vol Breakout', '') == 'Tembus MA20') &
-                       (df_hasil.get('Kelas Transaksi', '') == 'Ritel Aktif (5M - 50M)'))
+                       (df_hasil.get('MA Signal', '') == 'Uptrend') &
+                       (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)'))
             df_v4 = df_hasil[cond_v4].copy() if not df_hasil.empty else pd.DataFrame()
 
-            cond_v5 = (cond_squeeze & (df_hasil.get('MA Cross', '') == 'Golden Cross'))
+            # RUMUS 5: Squeeze Berisi Bensin (versi longgar)
+            cond_v5 = ((df_hasil.get('Status BB', '') == 'Squeeze') &
+                       (df_hasil.get('Kondisi Supply', '').astype(str).str.contains('Supply Kering', na=False)) &
+                       (df_hasil.get('Kekuatan A/D', '') == 'Akumulasi (Naik)') &
+                       (df_hasil.get('Posisi VWAP', '') == 'Persis di VWAP'))
             df_v5 = df_hasil[cond_v5].copy() if not df_hasil.empty else pd.DataFrame()
 
-            cond_v6 = (cond_squeeze & (df_hasil.get('Pola Candle', '') == 'Hammer (Potensi Reversal)'))
+            # RUMUS 6: Momentum Likuid Sehat
+            cond_v6 = ((df_hasil.get('Kelas Transaksi', '') == 'Ritel Aktif (5M - 50M)') &
+                       (df_hasil.get('Sinyal Cuci Barang', '') == 'Naik 1 Hari Beruntun') &
+                       (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)') &
+                       (df_hasil.get('MA Signal', '') == 'Uptrend'))
             df_v6 = df_hasil[cond_v6].copy() if not df_hasil.empty else pd.DataFrame()
 
-            cond_v7 = (cond_squeeze & (df_hasil.get('Karakter Gorengan', '') == 'Solid (Jarang Dibanting)'))
+            # RUMUS 7: Golden Pocket Fibo
+            cond_v7 = ((df_hasil.get('Status Fibonacci', '') == 'Golden Rebound Fibo 61.8% (Golden Ratio) 🎯') &
+                       (df_hasil.get('MA Signal', '') == 'Uptrend') &
+                       (df_hasil.get('Kekuatan A/D', '') == 'Akumulasi (Naik)') &
+                       (df_hasil.get('Pola Candle', '') == 'Marubozu (Strong Bullish)'))
             df_v7 = df_hasil[cond_v7].copy() if not df_hasil.empty else pd.DataFrame()
 
-            cond_v8 = (cond_squeeze & (df_hasil.get('Fase Siklus Bandar', '') == 'Accumulation (Kumpul Barang)'))
+            # RUMUS 8: Gorengan Berkelas
+            cond_v8 = ((df_hasil.get('Kategori', '') == 'Small Cap (Lapis 3)') &
+                       (df_hasil.get('Karakter Gorengan', '') == 'Solid (Jarang Dibanting)') &
+                       (df_hasil.get('Kondisi Supply', '').astype(str).str.contains('Supply Kering', na=False)) &
+                       (df_hasil.get('Fase Siklus Bandar', '') == 'Accumulation (Kumpul Barang)'))
             df_v8 = df_hasil[cond_v8].copy() if not df_hasil.empty else pd.DataFrame()
 
-            cond_v9 = (cond_squeeze & (df_hasil.get('Risk/Reward Ratio', '') == 'Sangat Menarik (> 1:3)'))
+            # RUMUS 9: Arus Institusi Big Cap
+            cond_v9 = ((df_hasil.get('Kategori', '') == 'Big Cap (Lapis 1)') &
+                       (df_hasil.get('Kekuatan A/D', '') == 'Akumulasi Pro (Smart Money)') &
+                       (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)') &
+                       (df_hasil.get('Rekomendasi', '') == 'BELI'))
             df_v9 = df_hasil[cond_v9].copy() if not df_hasil.empty else pd.DataFrame()
 
             tab_screener, tab_ai = st.tabs(["🎯 Screener Spesial", "🧠 Asisten AI"])
             
             with tab_screener:
                 pilihan_v = st.selectbox(
-                    "Pilih Rumus Screener (Wajib Squeeze):",
+                    "Pilih Rumus Screener BSJP:",
                     [
-                        "RUMUS 1 : Squeeze + Supply Kering 🏜️ + Di Atas VWAP", 
-                        "RUMUS 2 : Squeeze + 📏 Golden Rebound Fibo 61.8% (Golden Ratio) 🎯", 
-                        "RUMUS 3 : Squeeze + 🕵️ Akumulasi Kuat (Broksum & Smart Money)", 
-                        "RUMUS 4 : Squeeze + Volume Tembus MA20 🔊 + Ritel Aktif 💸", 
-                        "RUMUS 5 : Squeeze + Golden Cross",
-                        "RUMUS 6 : Squeeze + Hammer (Potensi Reversal)",
-                        "RUMUS 7 : Squeeze + Solid (Jarang Dibanting)",
-                        "RUMUS 8 : Squeeze + 🔄 Siklus Wyckoff ( Accumulation )",
-                        "RUMUS 9 : Squeeze + Sangat Menarik (> 1:3)"
+                        "RUMUS 1 : Tutup Kuat, Bandar Hajar ",
+                        "RUMUS 2 : Smart Money Menyelam 🕵️",
+                        "RUMUS 3 : Pantulan Jarum Bawah 📌",
+                        "RUMUS 4 : Golden Cross Muda 🌱",
+                        "RUMUS 5 : Squeeze Berisi Bensin ⛽",
+                        "RUMUS 6 : Momentum Likuid Sehat 💧",
+                        "RUMUS 7 : Golden Pocket Fibo ",
+                        "RUMUS 8 : Gorengan Berkelas 🍳",
+                        "RUMUS 9 : Arus Institusi Big Cap 🏦"
                     ]
                 )
                 
@@ -1190,7 +1216,6 @@ if not df_hasil.empty:
                     with tab_otomatis:
                         st.markdown("Sistem akan menyeleksi 15 saham terbaik per rumus secara global, lalu AI akan memilih Top 5 untuk dicetak ke tabel Spreadsheet.")
                         
-                        # Opsi Mode Kilat
                         paksa_sidang = st.checkbox("🔄 Paksa Sidang Ulang (abaikan cache Mode Kilat)", key="paksa_sidang_ulang")
 
                         if st.button("🗑️ Hapus Cache Sidang", key="hapus_cache_sidang"):
@@ -1216,7 +1241,6 @@ if not df_hasil.empty:
                                     7: df_v7, 8: df_v8, 9: df_v9
                                 }
                                 
-                                # MODE KILAT — data belum berubah = hasil instan dari cache
                                 stempel_data = str(df_hasil["Terakhir Update"].iloc[0]) if "Terakhir Update" in df_hasil.columns else "tanpa_stempel"
                                 FILE_CACHE_AUTOPILOT = "Database/cache_autopilot.json"
                                 
@@ -1225,7 +1249,6 @@ if not df_hasil.empty:
                                     try:
                                         with open(FILE_CACHE_AUTOPILOT, "r") as f: cache_muat = json.load(f)
                                         if cache_muat.get("stempel_data") == stempel_data and cache_muat.get("versi") == VERSI_SIDANG and cache_muat.get("keranjang"):
-                                            # Validasi: cache hanya dipakai jika minimal 1 rumus punya isi
                                             ada_isi_cache = any(len([t for t in cache_muat["keranjang"].get(f"RUMUS {i}", []) if t]) > 0 for i in range(1, 10))
                                             if ada_isi_cache:
                                                 keranjang_spreadsheet = cache_muat["keranjang"]
@@ -1241,7 +1264,6 @@ if not df_hasil.empty:
                                     if err_global:
                                         st.error(err_global)
                                     else:
-                                        # >>> BARU: Tampilkan laporan transparan
                                         df_laporan = pd.DataFrame([{
                                             "Rumus": f"RUMUS {i}",
                                             "Status": laporan_sidang[i]["status"],
@@ -1250,7 +1272,6 @@ if not df_hasil.empty:
                                         st.markdown("### 🧾 Laporan Sidang (Transparan)")
                                         st.dataframe(df_laporan, use_container_width=True, hide_index=True)
                                         
-                                        # Validasi: hanya simpan cache jika minimal 1 rumus sukses
                                         ada_isi = any(laporan_sidang[i]["status"] == "✅ Sukses" for i in range(1, 10))
                                         if ada_isi:
                                             try:
@@ -1264,7 +1285,6 @@ if not df_hasil.empty:
                                 
                                 st.markdown("### 📋 Tabel Master Portofolio (Siap Salin)")
                                 
-                                # Sabuk pengaman: paksa semua kolom rata 5 baris agar DataFrame tidak mungkin error
                                 for kunci in keranjang_spreadsheet:
                                     keranjang_spreadsheet[kunci] = (keranjang_spreadsheet[kunci] + ["", "", "", "", ""])[:5]
                                 
@@ -1402,7 +1422,6 @@ if not df_hasil.empty:
                     st.markdown("### 🛸 Mode Auto-Pilot (Super AI & Klasemen)")
                     st.markdown("Sistem akan menyeleksi 15 saham terbaik per rumus secara global, lalu AI akan memilih Top 5 untuk dicetak ke tabel Spreadsheet.")
                     
-                    # >>> BARU: opsi paksa sidang tersedia juga di menu ini
                     paksa_sidang_ara = st.checkbox("🔄 Paksa Sidang Ulang (abaikan cache Mode Kilat)", key="paksa_sidang_ara")
                     
                     if st.button("🛸 Jalankan Auto-Pilot Ultimate", type="primary", key="autopilot_ara"):
