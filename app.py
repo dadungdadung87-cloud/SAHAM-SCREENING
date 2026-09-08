@@ -1096,63 +1096,65 @@ if not df_hasil.empty:
         if 'Tekanan Bandar' not in df_hasil.columns:
             st.warning("⏳ **Fitur Radar belum menerima data terbaru.** Harap jalankan 'update_data.py'.")
         else:
-            # --- 9 RUMUS BARU (BSJP SEIMBANG: tidak terlalu ketat, tidak longgar) ---
-            # RUMUS 1: Tutup Kuat, Bandar Hajar
+            # --- 9 RUMUS BSJP (KALIBRASI LONGGAR v4.1) ---
+            vwap_ok = (df_hasil.get('Posisi VWAP', '') != 'Di Bawah VWAP (Lemah)')
+            akumulasi = df_hasil.get('Kekuatan A/D', '').isin(['Akumulasi (Naik)', 'Akumulasi Pro (Smart Money)'])
+
+            # RUMUS 1: Tutup Kuat, Bandar Hajar (pertahankan — sudah subur)
             cond_v1 = ((df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)') &
                        (df_hasil.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)') &
                        (df_hasil.get('Status Open', '') == 'Open = Low (Bullish Kuat)') &
                        (df_hasil.get('Rekomendasi', '') == 'BELI'))
             df_v1 = df_hasil[cond_v1].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 2: Smart Money Menyelam
+            # RUMUS 2: Smart Money Menyelam (dilonggarkan: VWAP cukup tidak lemah)
             cond_v2 = ((df_hasil.get('Kekuatan A/D', '') == 'Akumulasi Pro (Smart Money)') &
                        (df_hasil.get('Status Bandar', '') == 'Akumulasi Kuat') &
-                       (df_hasil.get('Posisi VWAP', '') == 'Persis di VWAP') &
-                       (df_hasil.get('MA Signal', '') == 'Uptrend'))
+                       vwap_ok)
             df_v2 = df_hasil[cond_v2].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 3: Pantulan Jarum Bawah
-            cond_v3 = ((df_hasil.get('Pola Candle', '') == 'Hammer (Potensi Reversal)') &
-                       (df_hasil.get('Sinyal Cuci Barang', '') == 'Jarum Bawah (Sinyal Pantulan Kuat)') &
-                       (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)'))
+            # RUMUS 3: Pantulan Jarum Bawah (Hammer ATAU Jarum Bawah, keduanya valid)
+            cond_v3 = (((df_hasil.get('Pola Candle', '') == 'Hammer (Potensi Reversal)') |
+                        (df_hasil.get('Sinyal Cuci Barang', '') == 'Jarum Bawah (Sinyal Pantulan Kuat)')) &
+                       (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)') &
+                       akumulasi)
             df_v3 = df_hasil[cond_v3].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 4: Golden Cross Muda
+            # RUMUS 4: Golden Cross Muda (pertahankan — sudah subur)
             cond_v4 = ((df_hasil.get('MA Cross', '') == 'Golden Cross') &
                        (df_hasil.get('Vol Breakout', '') == 'Tembus MA20') &
                        (df_hasil.get('MA Signal', '') == 'Uptrend') &
                        (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)'))
             df_v4 = df_hasil[cond_v4].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 5: Squeeze Berisi Bensin (versi longgar)
+            # RUMUS 5: Squeeze Berisi Bensin (supply kering diganti larangan dijual-guyur)
             cond_v5 = ((df_hasil.get('Status BB', '') == 'Squeeze') &
-                       (df_hasil.get('Kondisi Supply', '').astype(str).str.contains('Supply Kering', na=False)) &
-                       (df_hasil.get('Kekuatan A/D', '') == 'Akumulasi (Naik)') &
-                       (df_hasil.get('Posisi VWAP', '') == 'Persis di VWAP'))
+                       akumulasi &
+                       vwap_ok &
+                       (df_hasil.get('Tekanan Bandar', '') != 'Dominan Jual (Guyur)'))
             df_v5 = df_hasil[cond_v5].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 6: Momentum Likuid Sehat
-            cond_v6 = ((df_hasil.get('Kelas Transaksi', '') == 'Ritel Aktif (5M - 50M)') &
+            # RUMUS 6: Momentum Likuid Sehat (contains agar tahan beda ejaan spasi)
+            cond_v6 = ((df_hasil.get('Kelas Transaksi', '').astype(str).str.contains('Ritel Aktif', na=False)) &
                        (df_hasil.get('Sinyal Cuci Barang', '') == 'Naik 1 Hari Beruntun') &
                        (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)') &
-                       (df_hasil.get('MA Signal', '') == 'Uptrend'))
+                       (df_hasil.get('Vol Breakout', '') == 'Tembus MA20'))
             df_v6 = df_hasil[cond_v6].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 7: Golden Pocket Fibo
-            cond_v7 = ((df_hasil.get('Status Fibonacci', '') == 'Golden Rebound Fibo 61.8% (Golden Ratio) 🎯') &
-                       (df_hasil.get('MA Signal', '') == 'Uptrend') &
-                       (df_hasil.get('Kekuatan A/D', '') == 'Akumulasi (Naik)') &
-                       (df_hasil.get('Pola Candle', '') == 'Marubozu (Strong Bullish)'))
+            # RUMUS 7: Golden Pocket Fibo (61.8 ATAU 78.6 = kantong emas)
+            cond_v7 = ((df_hasil.get('Status Fibonacci', '').astype(str).str.contains('61.8|78.6', na=False)) &
+                       akumulasi &
+                       vwap_ok)
             df_v7 = df_hasil[cond_v7].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 8: Gorengan Berkelas
+            # RUMUS 8: Gorengan Berkelas (fase Accumulation ATAU Mark-Up, supply tidak banjir)
             cond_v8 = ((df_hasil.get('Kategori', '') == 'Small Cap (Lapis 3)') &
                        (df_hasil.get('Karakter Gorengan', '') == 'Solid (Jarang Dibanting)') &
-                       (df_hasil.get('Kondisi Supply', '').astype(str).str.contains('Supply Kering', na=False)) &
-                       (df_hasil.get('Fase Siklus Bandar', '') == 'Accumulation (Kumpul Barang)'))
+                       (df_hasil.get('Fase Siklus Bandar', '').isin(['Accumulation (Kumpul Barang)', 'Mark-Up (Fase Pesta)'])) &
+                       (~df_hasil.get('Kondisi Supply', '').astype(str).str.contains('Supply Banjir', na=False)))
             df_v8 = df_hasil[cond_v8].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 9: Arus Institusi Big Cap
+            # RUMUS 9: Arus Institusi Big Cap (pertahankan — sudah subur)
             cond_v9 = ((df_hasil.get('Kategori', '') == 'Big Cap (Lapis 1)') &
                        (df_hasil.get('Kekuatan A/D', '') == 'Akumulasi Pro (Smart Money)') &
                        (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)') &
