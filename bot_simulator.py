@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import sys
 from datetime import datetime
 import subprocess
 
@@ -95,6 +96,20 @@ def jalankan_bot():
     # ----------------------------------------------------
     if now.weekday() >= 5:
         print("😴 Akhir pekan terdeteksi. Bot libur — posisi aman sampai Senin.")
+        return
+
+    # ----------------------------------------------------
+    # 🕒 PEMBAGIAN PENULIS (anti-race): cron vs manual
+    # ----------------------------------------------------
+    mode = "manual" if "--manual" in sys.argv[1:] else "cron"
+    jam_bursa_awal = datetime.strptime("08:45", "%H:%M").time()
+    jam_bursa_akhir = datetime.strptime("16:05", "%H:%M").time()
+    di_jam_bursa = (jam_bursa_awal <= jam_sekarang <= jam_bursa_akhir) and now.weekday() < 5
+    if mode == "cron" and not di_jam_bursa:
+        print("😴 Mode cron: di luar jam bursa. Penulis malam adalah tombol web — bot tidur.")
+        return
+    if mode == "manual" and di_jam_bursa:
+        print("⏳ Mode manual: jam bursa masih buka. Biarkan cron laptop yang bekerja — coba lagi setelah tutup pasar.")
         return
 
     # ----------------------------------------------------
