@@ -1,18 +1,23 @@
 #!/bin/bash
 
+# ==========================================
+# 🔒 FLOCK: cegah dua siklus bot berjalan bersamaan
+# (pembunuh utama penyebab penjualan dobel/hilang)
+# ==========================================
+exec 200>/tmp/bot_simulator.lock
+flock -n 200 || { echo "⏳ Siklus dilewati: bot sebelumnya masih berjalan."; exit 0; }
+
 # Masuk ke folder repositori
 cd /home/kaltaraid/Documents/SAHAM-SCREENING/ || exit 1
 
 # ==========================================
 #  P3K GIT: batalkan rebase/merge menggantung dari siklus sebelumnya
-# (mencegah cron macet total akibat git yang berhenti setengah jalan)
 # ==========================================
 git rebase --abort >/dev/null 2>&1
 git merge --abort >/dev/null 2>&1
 
 # ==========================================
 # LANGKAH 1: TARIK DATA TERBARU DULU (sinyal AI dari web, dll)
-# agar bot laptop mengeksekusi "kertas belanja" terbaru
 # ==========================================
 git pull --rebase origin main || git rebase --abort
 
@@ -26,15 +31,13 @@ echo "⏳ Memulai pembaruan data saham..."
 
 # ==========================================
 # FITUR SAPU OTOMATIS (MAX 50 HARI)
-# Arsip kini hidup di LAPTOP + CLOUDFLARE R2 (tidak di-push ke GitHub)
 # ==========================================
 find Arsip_Data_Harian/ -name "*.csv" -type f -mtime +50 -delete
 
 echo "📤 Mengupload ke GitHub..."
 
-# 4) COMMIT dulu perubahan lokal agar TIDAK tertimpa saat pull
-#    (HANYA Database/*.csv — arsip TIDAK ikut, karena sudah lewat R2)
-git add Database/*.csv
+# 4) COMMIT dulu — -A agar PENGHAPUSAN sinyal terbakar ikut tercatat
+git add -A Database/
 git commit -m "Auto-update data dan bot simulator (arsip via R2)" || echo "Tidak ada perubahan"
 
 # 5) Tarik lagi (rebase) untuk menjemput commit yang masuk selama proses berjalan
