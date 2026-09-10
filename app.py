@@ -1505,24 +1505,19 @@ if not df_hasil.empty:
 
         st.markdown("## 🤖 Monitor Bot Simulator")
         
-        # --- TOMBOL PEMICU BOT ---
-        if st.button("🛒 Eksekusi Pembelian Bot Sekarang!", type="primary", use_container_width=True):
-            with st.spinner("Bot sedang membaca sinyal dan mengeksekusi pembelian..."):
-                import subprocess
-                import sys  
-                
-                try:
-                    proses_bot = subprocess.run([sys.executable, "bot_simulator.py"], capture_output=True, text=True)
-                    
-                    if proses_bot.returncode != 0:
-                        st.error("❌ Bot gagal dijalankan. Berikut adalah log error dari sistem:")
-                        st.code(proses_bot.stderr, language="bash")
-                    else:
-                        st.success("✅ Bot selesai berbelanja! Memuat ulang halaman...")
-                        time.sleep(2)
-                        st.rerun()
-                except Exception as e:
-                    st.error(f"Sistem web gagal memanggil file bot: {e}")
+        # --- TOMBOL KIRIM SINYAL (Single Writer: hanya laptop yang eksekusi) ---
+        st.info("ℹ️ **Arsitektur Single Writer:** Web hanya mengirim sinyal ke R2. Bot laptop yang mengeksekusi pembelian otomatis setiap 5 menit via cron.")
+        if st.button("📨 Kirim Sinyal ke Bot Laptop (Eksekusi ≤5 menit)", type="primary", use_container_width=True):
+            import r2_client, glob, os
+            n = 0
+            for f in glob.glob("Database/sinyal_ai_rumus_*.csv"):
+                if r2_client.upload_arsip(f, f"Database/{os.path.basename(f)}"):
+                    n += 1
+            if n:
+                st.success(f"✅ {n} sinyal terkirim ke R2. Bot laptop akan mengeksekusi pada siklus cron berikutnya (maksimal 5 menit).")
+                st.info("💡 **Tips:** Buka Terminal di Codespaces untuk memantau log sinkronisasi sinyal.")
+            else:
+                st.warning("⚠️ Tidak ada sinyal baru untuk dikirim. Jalankan Auto-Pilot dulu di Tab 3 untuk menghasilkan sinyal AI.")
         
         # >>> Tombol backup & restore portofolio via R2
         col_backup, col_restore = st.columns(2)
