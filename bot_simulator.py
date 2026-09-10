@@ -43,7 +43,7 @@ def sinkron_r2_keluar():
 def auto_save_github():
     print("\n🔄 Memulai pencadangan (Auto-Save) permanen ke GitHub...")
     try:
-        subprocess.run(["git", "add", "Database/*.csv"], check=True)
+        subprocess.run(["git", "add", "-A", "Database/"], check=True)
         waktu_sekarang = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         pesan_komit = f"🤖 Bot Update Portofolio: {waktu_sekarang}"
         commit_process = subprocess.run(["git", "commit", "-m", pesan_komit], capture_output=True, text=True)
