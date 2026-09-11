@@ -92,11 +92,15 @@ def jalankan_bot():
     print(f"[{now.strftime('%H:%M:%S')}] Membangunkan Bot Simulator AI...")
 
     # ----------------------------------------------------
-    # 😴 GEMBOK AKHIR PEKAN — bot libur total Sabtu-Minggu
+    # 😴 GEMBOK AKHIR PEKAN — cron libur total; mode manual tetap
+    # boleh membeli karena harga penutupan tidak berubah saat akhir pekan
     # ----------------------------------------------------
-    if now.weekday() >= 5:
-        print("😴 Akhir pekan terdeteksi. Bot libur — posisi aman sampai Senin.")
+    mode = "manual" if "--manual" in sys.argv[1:] else "cron"
+    if now.weekday() >= 5 and mode == "cron":
+        print("😴 Akhir pekan terdeteksi. Cron libur — posisi aman sampai Senin.")
         return
+    if now.weekday() >= 5:
+        print("🛒 Manual akhir pekan: pembelian harga penutupan terakhir dilayani; evaluasi jual libur sampai Senin.")
 
     # ----------------------------------------------------
     # 🕒 PEMBAGIAN PENULIS (anti-race): cron vs manual
@@ -147,7 +151,7 @@ def jalankan_bot():
     if not mode_beli_aktif:
         print(f"🔒 GEMBOK DATA BASI AKTIF: data market berusia {usia_data} hari — bot hanya evaluasi jual, tidak membeli.")
 
-    is_square_off_time = jam_sekarang >= jam_square_off
+    is_square_off_time = (jam_sekarang >= jam_square_off) and now.weekday() < 5
     if is_square_off_time:
         print("🧹 WAKTU SQUARE OFF / SORE HARI! Evaluasi jual paksa diaktifkan.")
 
