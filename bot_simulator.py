@@ -235,7 +235,7 @@ def jalankan_bot():
         # ==========================================
         # FASE B: MODE BELI (MASUKKAN SAHAM KE GUDANG)
         # ==========================================
-        if mode_beli_aktif and os.path.exists(file_sinyal):
+        if mode == "manual" and mode_beli_aktif and os.path.exists(file_sinyal):
             saldo_sekarang = cek_saldo_tersedia(df_porto)
             saham_dimiliki = df_porto['Ticker'].tolist() if not df_porto.empty else []
             try:
@@ -272,8 +272,11 @@ def jalankan_bot():
                 os.remove(file_sinyal)
             except Exception as e:
                 print(f"⚠️ Gagal membaca sinyal Rumus {i}: {e}")
-        elif os.path.exists(file_sinyal) and not mode_beli_aktif:
-            print(f" [RUMUS {i}] Sinyal diterima tetapi ditahan (data basi) — akan dieksekusi saat data segar.")
+        elif os.path.exists(file_sinyal):
+            if mode != "manual":
+                print(f" 📝 [RUMUS {i}] Sinyal antre — menunggu eksekusi manual Anda (mode beli manual).")
+            elif not mode_beli_aktif:
+                print(f" [RUMUS {i}] Sinyal ditahan (data basi) — akan dieksekusi saat data segar.")
 
         df_porto.to_csv(file_porto, index=False)
         df_history.to_csv(file_hist, index=False)
