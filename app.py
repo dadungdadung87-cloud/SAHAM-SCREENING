@@ -483,6 +483,17 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
                 if status_teks: status_teks.success(f"✅ Rumus {i} selesai ({selesai}/{len(rumus_aktif)}).")
 
     if progress_bar: progress_bar.progress(1.0)
+
+    # >>> BARU: kirim kertas belanja ke R2 agar bot laptop bisa mengeksekusi otomatis
+    try:
+        import r2_client
+        for i in range(1, 10):
+            f_sinyal = f"Database/sinyal_ai_rumus_{i}.csv"
+            if os.path.exists(f_sinyal):
+                r2_client.upload_arsip(f_sinyal, f"Database/sinyal_ai_rumus_{i}.csv")
+    except Exception:
+        pass
+
     return keranjang, None, laporan
 
 
