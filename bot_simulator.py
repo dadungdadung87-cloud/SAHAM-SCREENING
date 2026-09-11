@@ -198,6 +198,14 @@ def jalankan_bot():
                 harga_jual = harga_sekarang
                 
             if terjual:
+                # >>> ANTI-DUPLIKASI: posisi yang sudah tercatat di histori tidak dicatat lagi
+                sudah_ada = False
+                if not df_history.empty:
+                    sudah_ada = ((df_history['Ticker'] == ticker) & (df_history['Tanggal_Beli'] == posisi['Tanggal_Beli'])).any()
+                if sudah_ada:
+                    print(f"⚠️ [RUMUS {i}] {ticker} sudah ada di histori — duplikat penjualan dicegah.")
+                    continue
+
                 nilai_jual_kotor = harga_jual * posisi['Lot'] * 100
                 nilai_jual_bersih = nilai_jual_kotor - (nilai_jual_kotor * FEE_JUAL)
                 profit_rp = nilai_jual_bersih - posisi['Total_Modal']
