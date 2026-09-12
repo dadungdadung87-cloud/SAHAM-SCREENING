@@ -378,7 +378,7 @@ def ai_top5_dari_daftar(data_dict, api_key, daftar_model, suhu=0.4):
     Candidate stocks with today's metrics (list order is RANDOMIZED; judge purely by data quality):
     {payload_text}
 
-    MISSION: Select EXACTLY 5 tickers with the strongest accumulation & readiness for tomorrow morning's upward move.
+    MISSION: Select EXACTLY 5 DIFFERENT tickers (NO duplicates, NO repeats) from the candidate list above, with the strongest accumulation & readiness for tomorrow morning's upward move.
     CRITICAL: Output ONLY a raw JSON array of 5 objects, each with EXACTLY 1 key: "Ticker".
     DO NOT add explanations, markdown, or any other text.
     """
@@ -406,9 +406,9 @@ def ai_top5_dari_daftar(data_dict, api_key, daftar_model, suhu=0.4):
     return f"Error_AI: {pesan_terakhir}"
 
 def _parse_ticker_top5(mentah, valid_set):
-    """Parse respons JSON AI untuk mengekstrak 5 ticker valid."""
     hasil = []
-    for blok in reversed(re.findall(r'\[.*\]', mentah, re.DOTALL)):
+    # Lapis 1: parse blok JSON
+    for blok in re.findall(r'\[.*\]', mentah, re.DOTALL):
         try:
             calon = json.loads(blok.replace("'", '"'))
             if isinstance(calon, list):
@@ -416,15 +416,16 @@ def _parse_ticker_top5(mentah, valid_set):
                     t = (item.get("Ticker", "") if isinstance(item, dict) else str(item)).strip().upper()
                     if t in valid_set and t not in hasil:
                         hasil.append(t)
-                if hasil:
-                    return hasil[:5]
         except Exception:
             continue
-    # Lapis penyelamat: ekstrak manual
-    for m in re.finditer(r'Ticker"\s*:\s*"([A-Za-z0-9]+)', mentah):
-        t = m.group(1).upper()
-        if t in valid_set and t not in hasil:
-            hasil.append(t)
+    # Lapis 2: penyelamat regex jika masih <5 (menyelamatkan ticker dari respons terpotong)
+    if len(hasil) < 5:
+        for m in re.finditer(r'\b([A-Z]{4})\b', mentah):
+            t = m.group(1)
+            if t in valid_set and t not in hasil:
+                hasil.append(t)
+            if len(hasil) >= 5:
+                break
     return hasil[:5]
 
 def jalankan_9_ronde_acak(df_data, daftar_ticker, api_key, progress_bar=None, status_teks=None):
@@ -460,14 +461,22 @@ def jalankan_9_ronde_acak(df_data, daftar_ticker, api_key, progress_bar=None, st
                 'vwap': row.get('Posisi VWAP', 'Normal'), 'supply': row.get('Kondisi Supply', 'Normal'),
                 'siklus': row.get('Fase Siklus Bandar', 'Normal'), 'rvol': row.get('RVOL (Anomali Vol)', 'Normal'),
             }
-        mentah = ai_top5_dari_daftar(data_dict, api_key, daftar_model)
-        if "Error_AI" in mentah:
+        top5 = []
+        pesan_terakhir = ""
+        for percobaan in range(1, 3):  # maksimal 2x percobaan per ronde
+            mentah = ai_top5_dari_daftar(data_dict, api_key, daftar_model)
+            if "Error_AI" in mentah:
+                pesan_terakhir = mentah
+                continue
+            top5 = _parse_ticker_top5(mentah, set(acak))
+            if len(top5) >= 5 or len(acak) < 5:
+                break
+        if not top5:
             hasil_ronde[ronde] = []
-            if status_teks: status_teks.warning(f"⚠️ Ronde {ronde} gagal: {mentah[:80]}")
+            if status_teks: status_teks.warning(f"⚠️ Ronde {ronde} gagal: {pesan_terakhir[:80] if pesan_terakhir else 'kurang dari 5 setelah 2 percobaan'}")
         else:
-            hasil_ronde[ronde] = _parse_ticker_top5(mentah, set(acak))
-            if status_teks: 
-                status_teks.success(f"✅ Ronde {ronde} selesai: {', '.join(hasil_ronde[ronde]) if hasil_ronde[ronde] else 'kosong'}")
+            hasil_ronde[ronde] = top5
+            if status_teks: status_teks.success(f"✅ Ronde {ronde} selesai: {', '.join(top5)}")
         if progress_bar: progress_bar.progress(ronde / 9.0)
     return hasil_ronde, None
 # =====================================================================
