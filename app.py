@@ -3,7 +3,7 @@
 # ---------------------------------------------------------------------
 # PART 01 : IMPOR MODUL
 # PART 02 : FUNGSI AI KLASIK (Hakim, OpenRouter, Turnamen, Grand Final)
-# PART 03 : MESIN AUTO-PILOT CEPAT & PARALEL (+ REM CERDAS)
+# PART 03 : MESIN AUTO-PILOT CEPAT & PARALEL (+ REM CERDAS) + 9 RONDE
 # PART 04 : SISTEM ARSIP CERDAS (DATA HARIAN)
 # PART 05 : PENGATURAN UI/UX & CSS
 # PART 06 : LOAD KONFIGURASI JSON (MASTER FILTERS)
@@ -12,7 +12,7 @@
 # PART 09 : FORMATTER & PEWARNAAN TABEL + TABEL STRATEGI
 # PART 10 : TAB 1 - MARKET OVERVIEW
 # PART 11 : TAB 2 - SCREENER UTAMA
-# PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS, AI BANDAR, AUTO-PILOT)
+# PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS, AI BANDAR, AUTO-PILOT, 9 RONDE)
 # PART 13 : TAB 4 - PORTOFOLIO BOT
 # =====================================================================
 
@@ -45,7 +45,6 @@ def ai_hakim_klasemen(data_top15, api_key):
     import time
     genai.configure(api_key=api_key)
     
-    # Prompt kita buat jauh lebih sederhana karena AI sudah dipaksa jadi mesin JSON
     prompt = f"""
     Select EXACTLY 5 Tickers that have the highest combination of 'Score' and 'Volume' from the data below.
     Calculate 'Target_TP' (+5% from Harga) and 'Target_CL' (-3% from Harga).
@@ -61,7 +60,6 @@ def ai_hakim_klasemen(data_top15, api_key):
         for m in genai.list_models():
             if 'generateContent' in m.supported_generation_methods:
                 nama_bersih = m.name.replace("models/", "")
-                # Prioritaskan model gemini-1.5 karena mendukung fitur JSON murni
                 if "1.5" in nama_bersih:
                     daftar_model_aktif.insert(0, nama_bersih)
                 else:
@@ -75,14 +73,11 @@ def ai_hakim_klasemen(data_top15, api_key):
     pesan_error_terakhir = ""
     for nama_model in daftar_model_aktif:
         try:
-            # ========================================================
-            # 🔇 FITUR LAKBAN: Memaksa AI HANYA membalas JSON murni
-            # ========================================================
             model = genai.GenerativeModel(
                 nama_model,
                 generation_config=genai.types.GenerationConfig(
                     temperature=0.0, 
-                    response_mime_type="application/json" # <--- INI FITUR AJAIBNYA!
+                    response_mime_type="application/json"
                 )
             )
             response = model.generate_content(prompt)
@@ -314,7 +309,7 @@ def ai_grand_final_top5(data_saham_dict, api_key):
 
 
 # =====================================================================
-# >>> PART 03 : MESIN AUTO-PILOT CEPAT & PARALEL (+ REM CERDAS) <<<
+# >>> PART 03 : MESIN AUTO-PILOT CEPAT & PARALEL (+ REM CERDAS) + 9 RONDE <<<
 # =====================================================================
 def radar_model_gemini_cepat(api_key):
     genai.configure(api_key=api_key)
@@ -368,6 +363,115 @@ def ai_hakim_klasemen_cepat(data_top15, api_key, daftar_model):
             continue
     return f"Error_AI (Semua model aktif gagal eksekusi): {pesan_error_terakhir}"
 
+# =====================================================================
+# 🎲 FUNGSI UNTUK UJI KONSISTENSI 9 RONDE (BARU)
+# =====================================================================
+def ai_top5_dari_daftar(data_dict, api_key, daftar_model, suhu=0.4):
+    """AI memilih Top 5 dari daftar saham dengan JSON murni (tanpa penjelasan)."""
+    genai.configure(api_key=api_key)
+    payload_text = ""
+    for ticker, d in data_dict.items():
+        payload_text += (f"\n- {ticker}: Harga {d['harga']} | Change {d['change']}% | Vol {d['volume']} | Score {d['skor']} | "
+                         f"Tekanan {d['tekanan']} | A/D {d['ad']} | VWAP {d['vwap']} | Supply {d['supply']} | Siklus {d['siklus']} | RVOL {d['rvol']}")
+    prompt = f"""
+    You are an elite Indonesian stock analyst for BSJP strategy (buy at close, sell at morning gap).
+    Candidate stocks with today's metrics (list order is RANDOMIZED; judge purely by data quality):
+    {payload_text}
+
+    MISSION: Select EXACTLY 5 tickers with the strongest accumulation & readiness for tomorrow morning's upward move.
+    CRITICAL: Output ONLY a raw JSON array of 5 objects, each with EXACTLY 1 key: "Ticker".
+    DO NOT add explanations, markdown, or any other text.
+    """
+    pesan_terakhir = ""
+    for nama_model in daftar_model:
+        try:
+            model = genai.GenerativeModel(
+                nama_model,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=suhu,
+                    response_mime_type="application/json",
+                    max_output_tokens=512,
+                )
+            )
+            response = model.generate_content(prompt)
+            teks = response.text or ""
+            if not teks.strip():
+                pesan_terakhir = "Respons kosong"
+                continue
+            return teks
+        except Exception as e:
+            pesan_terakhir = str(e)
+            time.sleep(2)
+            continue
+    return f"Error_AI: {pesan_terakhir}"
+
+def _parse_ticker_top5(mentah, valid_set):
+    """Parse respons JSON AI untuk mengekstrak 5 ticker valid."""
+    hasil = []
+    for blok in reversed(re.findall(r'\[.*\]', mentah, re.DOTALL)):
+        try:
+            calon = json.loads(blok.replace("'", '"'))
+            if isinstance(calon, list):
+                for item in calon:
+                    t = (item.get("Ticker", "") if isinstance(item, dict) else str(item)).strip().upper()
+                    if t in valid_set and t not in hasil:
+                        hasil.append(t)
+                if hasil:
+                    return hasil[:5]
+        except Exception:
+            continue
+    # Lapis penyelamat: ekstrak manual
+    for m in re.finditer(r'Ticker"\s*:\s*"([A-Za-z0-9]+)', mentah):
+        t = m.group(1).upper()
+        if t in valid_set and t not in hasil:
+            hasil.append(t)
+    return hasil[:5]
+
+def jalankan_9_ronde_acak(df_data, daftar_ticker, api_key, progress_bar=None, status_teks=None):
+    """Menjalankan 9 ronde pemilihan Top 5 dengan urutan acak setiap ronde."""
+    df_seleksi = df_data[df_data['Ticker'].isin(daftar_ticker)].copy()
+    if df_seleksi.empty:
+        return None, "❌ Tidak ada ticker valid di database hari ini."
+    # Batasi max 50 saham untuk mencegah konteks AI overflow
+    if len(df_seleksi) > 50:
+        df_seleksi['Score_Num'] = pd.to_numeric(df_seleksi['Total Score'], errors='coerce').fillna(0)
+        df_seleksi = df_seleksi.sort_values('Score_Num', ascending=False).head(50)
+    daftar_model = radar_model_gemini_cepat(api_key)
+    if not daftar_model:
+        return None, "❌ Tidak ada model Gemini yang online untuk API Key ini."
+    
+    hasil_ronde = {}
+    urutan_sebelumnya = []
+    for ronde in range(1, 10):
+        if status_teks: status_teks.info(f"🎲 Ronde {ronde}/9: mengacak urutan & menggelar sidang AI...")
+        acak = df_seleksi['Ticker'].tolist()
+        # Jaminan urutan berbeda dari ronde sebelumnya
+        while acak == urutan_sebelumnya and len(acak) > 1:
+            random.shuffle(acak)
+        urutan_sebelumnya = acak
+        
+        data_dict = {}
+        for t in acak:
+            row = df_seleksi[df_seleksi['Ticker'] == t].iloc[0]
+            data_dict[t] = {
+                'harga': row.get('Harga (Rp)', 0), 'change': row.get('Change (%)', 0),
+                'volume': row.get('Volume', 0), 'skor': row.get('Total Score', 0),
+                'tekanan': row.get('Tekanan Bandar', 'Normal'), 'ad': row.get('Kekuatan A/D', 'Normal'),
+                'vwap': row.get('Posisi VWAP', 'Normal'), 'supply': row.get('Kondisi Supply', 'Normal'),
+                'siklus': row.get('Fase Siklus Bandar', 'Normal'), 'rvol': row.get('RVOL (Anomali Vol)', 'Normal'),
+            }
+        mentah = ai_top5_dari_daftar(data_dict, api_key, daftar_model)
+        if "Error_AI" in mentah:
+            hasil_ronde[ronde] = []
+            if status_teks: status_teks.warning(f"⚠️ Ronde {ronde} gagal: {mentah[:80]}")
+        else:
+            hasil_ronde[ronde] = _parse_ticker_top5(mentah, set(acak))
+            if status_teks: 
+                status_teks.success(f"✅ Ronde {ronde} selesai: {', '.join(hasil_ronde[ronde]) if hasil_ronde[ronde] else 'kosong'}")
+        if progress_bar: progress_bar.progress(ronde / 9.0)
+    return hasil_ronde, None
+# =====================================================================
+
 def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None, status_teks=None):
     import concurrent.futures
 
@@ -388,7 +492,6 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
             df_seleksi['Score_Num'] = pd.to_numeric(df_seleksi['Total Score'], errors='coerce').fillna(0)
             df_sorted = df_seleksi.sort_values(by=['Score_Num', 'Volume', 'Change (%)'], ascending=[False, False, False])
 
-            # >>> ATURAN BARU: kandidat <= 5 TIDAK perlu sidang AI — urutkan terbaik 1..5
             if n_kandidat <= 5:
                 tickers_ai = df_sorted['Ticker'].tolist()[:5]
             else:
@@ -408,7 +511,6 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
                 if "Error_AI" in hasil_mentah:
                     return i, n_kandidat, None, hasil_mentah
 
-                # Lapis 1: parse JSON utuh
                 hasil_json = None
                 semua_blok_kurung = re.findall(r'\[.*\]', hasil_mentah, re.DOTALL)
                 for blok in reversed(semua_blok_kurung):
@@ -429,7 +531,6 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
                         if t and t in data_kirim_ai and t not in tickers_ai:
                             tickers_ai.append(t)
                 else:
-                    # Lapis 2 (penyelamat): JSON terpotong? selamatkan ticker yang lengkap
                     for m in re.finditer(r'Ticker"\s*:\s*"([A-Za-z0-9]+)', hasil_mentah):
                         t = m.group(1).strip().upper()
                         if t and t in data_kirim_ai and t not in tickers_ai:
@@ -439,7 +540,6 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
                 if not tickers_ai:
                     return i, n_kandidat, None, f"AI tidak mengembalikan ticker valid. Respons: {hasil_mentah[:120]}"
 
-            # TP (+5%) & CL (-3%) dihitung eksak dari data lokal
             baris_sinyal = []
             for t in tickers_ai:
                 row = df_sorted[df_sorted['Ticker'] == t]
@@ -485,7 +585,6 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
 
     if progress_bar: progress_bar.progress(1.0)
 
-    # >>> BARU: kirim kertas belanja ke R2 agar bot laptop bisa mengeksekusi otomatis
     try:
         import r2_client
         for i in range(1, 10):
@@ -506,7 +605,6 @@ import tempfile
 
 @st.cache_data(ttl=60)
 def _muat_arsip_r2():
-    # Ambil 5 arsip terbaru dari Cloudflare R2 (cache 60 detik)
     keys = r2_client.list_arsip()
     keys.sort(reverse=True)
     hasil = []
@@ -521,7 +619,6 @@ def _muat_arsip_r2():
     return hasil
 
 def _muat_arsip_lokal():
-    # Fallback: baca dari folder lokal jika R2 kosong/gagal
     arsip_files = glob.glob("Arsip_Data_Harian/screener_*.csv")
     arsip_files.sort(reverse=True)
     hasil = []
@@ -686,7 +783,6 @@ else:
 
 with open(FILE_CONFIG, "r") as f: WEB_CONFIG = json.load(f)
 
-# Auto-patch
 if "Mid Cap (Lapis 2) + Small Cap (Lapis 3)" not in WEB_CONFIG["MASTER_FILTERS"]["Kategori"]["options"]:
     WEB_CONFIG["MASTER_FILTERS"]["Kategori"]["options"] = ["Semua", "Big Cap (Lapis 1)", "Mid Cap (Lapis 2)", "Small Cap (Lapis 3)", "Mid Cap (Lapis 2) + Small Cap (Lapis 3)"]
     with open(FILE_CONFIG, "w") as f: json.dump(WEB_CONFIG, f, indent=4)
@@ -727,14 +823,12 @@ def apply_preset():
 
 def manual_override(): st.session_state.preset_selector = "Matikan Preset (Manual)"
 
-# >>> BARU: lencana jujur — menunjukkan dari mana web benar-benar membaca data
 SUMBER_DATA = "❓"
 
 @st.cache_data(ttl=10)
 def load_data_saham():
     global SUMBER_DATA
     df = None
-    # Prioritas: baca REAL-TIME dari Cloudflare R2
     try:
         import r2_client
         tmp = os.path.join(tempfile.gettempdir(), "hasil_screener_r2.csv")
@@ -743,7 +837,6 @@ def load_data_saham():
             SUMBER_DATA = "☁️ R2 (real-time)"
     except Exception:
         df = None
-    # Fallback: file lokal (hasil git) jika R2 gagal
     if df is None or df.empty:
         SUMBER_DATA = "📁 Lokal/Git (cadangan) — R2 GAGAL"
         if not os.path.exists(FILE_HASIL): return pd.DataFrame()
@@ -759,9 +852,7 @@ def load_data_saham():
 
 df_hasil = load_data_saham()
 
-# --- TAMBAHAN KALKULASI VALUE TRANSAKSI OTOMATIS ---
 if not df_hasil.empty and 'Volume' in df_hasil.columns and 'Harga (Rp)' in df_hasil.columns:
-    # Value = Harga * Volume * 100 (karena 1 Lot = 100 Lembar)
     df_hasil['Value Transaksi'] = df_hasil['Harga (Rp)'] * df_hasil['Volume'] * 100
 
 
@@ -873,14 +964,8 @@ def warna_tabel(val):
         elif "⭐" in val: return 'color: #22c55e;' if len(val) >= 6 else 'color: #ef4444;'
     return ''
 
-# ===========================================================
-# 🔀 HELPER: Tombol Acak Urutan Daftar Saham (anti-pengulangan)
-# ===========================================================
 def _render_salin_dengan_acak(daftar_ticker, key_state, key_btn):
-    """Render kolom Salin Daftar Saham + tombol 🔀 Acak yang dijamin tidak pengulangan."""
     sumber = "|".join(daftar_ticker)
-    
-    # Inisialisasi / reset jika sumber data berubah
     key_sumber = f"{key_state}_sumber"
     if st.session_state.get(key_sumber) != sumber:
         st.session_state[key_state] = daftar_ticker[:]
@@ -909,12 +994,10 @@ def render_strategy_table(df_subset, file_name):
         if sort_cols: df_subset = df_subset.sort_values(by=sort_cols, ascending=[False, False]).reset_index(drop=True)
         if "Total Score" in df_subset.columns: df_subset["Total Score"] = df_subset["Total Score"].apply(format_skor)
 
-        # KITA TAMBAHKAN "Value Transaksi" DI SINI:
         kolom_utama = ["Ticker", "Harga (Rp)", "Change (%)", "Value Transaksi", "Volume", "Total Score", "Auto Trading Plan"]
         kolom_tambahan = ["Kelas Transaksi", "Broksum", "Trend MA (5,20,50)", "RVOL (Anomali Vol)", "Tekanan Bandar", "Status Bandar", "Kekuatan A/D", "Sinyal Cuci Barang", "Status BB", "MA Signal"]
         kolom_tampil = [c for c in kolom_utama + kolom_tambahan if c in df_subset.columns]
 
-        # KITA TAMBAHKAN FORMATTER UNTUK VALUE DI SINI:
         styler = df_subset[kolom_tampil].style.format({
             "Harga (Rp)": format_angka, 
             "Volume": format_angka, 
@@ -931,7 +1014,6 @@ def render_strategy_table(df_subset, file_name):
         with pd.ExcelWriter(buffer, engine='openpyxl') as writer: tabel_jadi.to_excel(writer, index=False, sheet_name='Screener')
         c1.download_button(label=f"📥 Download {file_name} (Excel)", data=buffer.getvalue(), file_name=f"{file_name}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key=f"dl_{file_name}")
         with c2:
-            # >>> BARU: pakai helper dengan tombol 🔀 acak
             _render_salin_dengan_acak(
                 df_subset["Ticker"].tolist(),
                 key_state=f"acak_{file_name}",
@@ -1124,7 +1206,6 @@ if not df_hasil.empty:
                 csv_filter = df_filtered[kolom_ada].to_csv(index=False).encode('utf-8')
                 st.download_button(label=f"📥 Download Data Tabel CSV", data=csv_filter, file_name=f"Screener_View_{datetime.now().strftime('%Y%m%d_%H%M')}.csv", mime="text/csv", key="dl_tab2")
             with col_wl:
-                # >>> BARU: pakai helper dengan tombol 🔀 acak
                 _render_salin_dengan_acak(
                     df_filtered["Ticker"].tolist(),
                     key_state="acak_tab2",
@@ -1135,7 +1216,7 @@ if not df_hasil.empty:
 
 
 # =====================================================================
-# >>> PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS & AUTO-PILOT) <<<
+# >>> PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS & AUTO-PILOT & 9 RONDE) <<<
 # =====================================================================
     VERSI_SIDANG = "v5"
     FILE_CACHE_AUTOPILOT = "Database/cache_autopilot.json"
@@ -1146,65 +1227,55 @@ if not df_hasil.empty:
         if 'Tekanan Bandar' not in df_hasil.columns:
             st.warning("⏳ **Fitur Radar belum menerima data terbaru.** Harap jalankan 'update_data.py'.")
         else:
-            # --- 9 RUMUS BSJP (KALIBRASI FINAL v4.2 — berbasis sensus nilai) ---
             vwap_ok = (df_hasil.get('Posisi VWAP', '') != 'Di Bawah VWAP (Lemah)')
             akumulasi_pro = (df_hasil.get('Kekuatan A/D', '') == 'Akumulasi Pro (Smart Money)')
 
-            # RUMUS 1: Tutup Kuat, Bandar Hajar (subur — pertahankan)
             cond_v1 = ((df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)') &
                        (df_hasil.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)') &
                        (df_hasil.get('Status Open', '') == 'Open = Low (Bullish Kuat)') &
                        (df_hasil.get('Rekomendasi', '') == 'BELI'))
             df_v1 = df_hasil[cond_v1].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 2: Smart Money Menyelam (VWAP cukup "tidak lemah")
             cond_v2 = (akumulasi_pro &
                        (df_hasil.get('Status Bandar', '') == 'Akumulasi Kuat') &
                        vwap_ok)
             df_v2 = df_hasil[cond_v2].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 3: Pantulan Jarum Bawah (Hammer ATAU Jarum Bawah)
             cond_v3 = (((df_hasil.get('Pola Candle', '') == 'Hammer (Potensi Reversal)') |
                         (df_hasil.get('Sinyal Cuci Barang', '') == 'Jarum Bawah (Sinyal Pantulan Kuat)')) &
                        (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)') &
                        akumulasi_pro)
             df_v3 = df_hasil[cond_v3].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 4: Golden Cross Muda (subur — pertahankan)
             cond_v4 = ((df_hasil.get('MA Cross', '') == 'Golden Cross') &
                        (df_hasil.get('Vol Breakout', '') == 'Tembus MA20') &
                        (df_hasil.get('MA Signal', '') == 'Uptrend') &
                        (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)'))
             df_v4 = df_hasil[cond_v4].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 5: Squeeze Berisi Bensin (Smart Money + tidak sedang diguyur)
             cond_v5 = ((df_hasil.get('Status BB', '') == 'Squeeze') &
                        akumulasi_pro &
                        vwap_ok &
                        (df_hasil.get('Tekanan Bandar', '') != 'Dominan Jual (Guyur)'))
             df_v5 = df_hasil[cond_v5].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 6: Momentum Likuid Sehat (syarat beruntun diganti konfirmasi volume)
             cond_v6 = ((df_hasil.get('Kelas Transaksi', '') == 'Ritel Aktif (5M - 50M)') &
                        (df_hasil.get('Vol Breakout', '') == 'Tembus MA20') &
                        (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)') &
                        (df_hasil.get('MA Signal', '') == 'Uptrend'))
             df_v6 = df_hasil[cond_v6].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 7: Golden Pocket Fibo (kantong emas 61.8 / 78.6, ejaan sensus)
             cond_v7 = ((df_hasil.get('Status Fibonacci', '').astype(str).str.contains('61.8|78.6', na=False)) &
                        akumulasi_pro &
                        vwap_ok)
             df_v7 = df_hasil[cond_v7].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 8: Gorengan Berkelas (fase kumpul ATAW pesta, asal bukan banjir supply)
             cond_v8 = ((df_hasil.get('Kategori', '') == 'Small Cap (Lapis 3)') &
                        (df_hasil.get('Karakter Gorengan', '') == 'Solid (Jarang Dibanting)') &
                        (df_hasil.get('Fase Siklus Bandar', '').isin(['Accumulation (Kumpul Barang)', 'Mark-Up (Fase Pesta)'])) &
                        (~df_hasil.get('Kondisi Supply', '').astype(str).str.contains('Supply Banjir', na=False)))
             df_v8 = df_hasil[cond_v8].copy() if not df_hasil.empty else pd.DataFrame()
 
-            # RUMUS 9: Arus Institusi Big Cap (subur — pertahankan)
             cond_v9 = ((df_hasil.get('Kategori', '') == 'Big Cap (Lapis 1)') &
                        akumulasi_pro &
                        (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)') &
@@ -1263,7 +1334,8 @@ if not df_hasil.empty:
                 if "AI Bandar" in pilihan_ai:
                     st.subheader("🤖 AI Bandar (Persiapan BSJP Besok)")
                     
-                    tab_otomatis, tab_manual = st.tabs(["🛸 Auto-Pilot 9 Rumus (Spreadsheet)", "✍️ Mode Manual (Paste Saham)"])
+                    # >>> BARU: tambahkan tab_acak untuk 9 Ronde
+                    tab_otomatis, tab_manual, tab_acak = st.tabs(["🛸 Auto-Pilot 9 Rumus (Spreadsheet)", "✍️ Mode Manual (Paste Saham)", "🎲 Uji Konsistensi 9 Ronde"])
                     
                     with tab_otomatis:
                         st.markdown("Sistem akan menyeleksi 15 saham terbaik per rumus secara global, lalu AI akan memilih Top 5 untuk dicetak ke tabel Spreadsheet.")
@@ -1381,6 +1453,38 @@ if not df_hasil.empty:
                                         }
                                     hasil_ai = analisa_bandar_ai_multisaham(data_kompilasi, 'pilihan_ai')
                                     st.info(hasil_ai)
+
+                    # >>> BARU: Tab 9 Ronde Uji Konsistensi
+                    with tab_acak:
+                        st.markdown("Paste puluhan saham → AI memilih Top 5 → urutan diacak otomatis → diulang sampai **9 ronde**. Hasil dicetak sebagai spreadsheet murni, tanpa penjelasan.")
+                        input_acak = st.text_area("📋 Paste Daftar Saham (Enter/Spasi):", height=200, key="input_acak_9ronde", placeholder="Contoh:\nBBCA\nTLKM\nASII\nGOTO\nBUKA\n...")
+                        if st.button("🎲 Jalankan 9 Ronde Top-5", type="primary", key="btn_9ronde"):
+                            GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
+                            if not GEMINI_API_KEY:
+                                st.error("❌ Kunci API GEMINI belum dipasang!")
+                            else:
+                                saham_bersih = [s.strip().upper() for s in re.split(r'[,\s\n]+', input_acak) if s.strip()]
+                                saham_unik = list(dict.fromkeys(saham_bersih))
+                                if len(saham_unik) < 5:
+                                    st.error("❌ Minimal 5 kode saham valid untuk menggelar 9 ronde.")
+                                else:
+                                    progress_bar = st.progress(0)
+                                    status_teks = st.empty()
+                                    hasil_ronde, err = jalankan_9_ronde_acak(df_hasil, saham_unik, GEMINI_API_KEY, progress_bar, status_teks)
+                                    if err:
+                                        st.error(err)
+                                    else:
+                                        df_spread = pd.DataFrame({f"RONDE {i}": (hasil_ronde.get(i, []) + ["", "", "", "", ""])[:5] for i in range(1, 10)})
+                                        st.markdown("### 📋 Spreadsheet Top-5 per Ronde (Siap Salin)")
+                                        st.data_editor(df_spread, use_container_width=True, hide_index=True)
+                                        from collections import Counter
+                                        freq = Counter()
+                                        for i in range(1, 10):
+                                            freq.update(hasil_ronde.get(i, []))
+                                        if freq:
+                                            df_freq = pd.DataFrame([(t, c) for t, c in freq.most_common()], columns=["Ticker", "Muncul (dari 9 Ronde)"])
+                                            st.markdown("### 🏆 Rekap Konsistensi (semakin sering muncul = semakin dipercaya AI)")
+                                            st.dataframe(df_freq, use_container_width=True, hide_index=True)
 
                 elif "Forensik Bandar" in pilihan_ai:
                     st.subheader("📡 Radar Pencari Model Gemini Aktif (Live Server)")
@@ -1543,7 +1647,6 @@ if not df_hasil.empty:
 # >>> PART 13 : TAB 4 - PORTOFOLIO BOT <<<
 # =====================================================================
     with tab4:
-        # >>> Sedot otomatis state portofolio terbaru dari R2 (cache 60 detik)
         @st.cache_data(ttl=60)
         def _sedot_porto_r2():
             try:
@@ -1555,7 +1658,6 @@ if not df_hasil.empty:
 
         st.markdown("## 🤖 Monitor Bot Simulator")
         
-        # --- TOMBOL EKSEKUSI INSTAN (mode manual = penulis malam hari) ---
         st.info("🕒 **Pembagian penulis otomatis:** Jam bursa (Sen–Jum 08:45–16:05) = cron laptop yang bekerja. Di luar jam bursa = tombol ini yang bekerja (beli instan harga penutupan). Akhir pekan = semua libur.")
         if st.button("🛒 Eksekusi Pembelian Bot Sekarang!", type="primary", use_container_width=True):
             with st.spinner("Bot mengeksekusi pembelian dengan harga terakhir..."):
@@ -1574,7 +1676,6 @@ if not df_hasil.empty:
                 except Exception as e:
                     st.error(f"Sistem web gagal memanggil file bot: {e}")
         
-        # >>> Tombol backup & restore portofolio via R2
         col_backup, col_restore = st.columns(2)
         with col_backup:
             if st.button("💾 Backup Portofolio ke R2", use_container_width=True):
@@ -1619,7 +1720,6 @@ if not df_hasil.empty:
         saldo_saat_ini = MODAL_AWAL + total_profit_rp - modal_terpakai
         total_aset = saldo_saat_ini + modal_terpakai
         
-        # >>> Statistik win/loss/BE ala Stockbit
         total_trade = len(df_hist)
         win_trade = loss_trade = be_trade = 0
         winrate = 0.0
@@ -1641,19 +1741,16 @@ if not df_hasil.empty:
         with col2:
             st.metric(label="💵 Dana Kas Tersedia", value=f"Rp {saldo_saat_ini:,.0f}".replace(",", "."))
         with col3:
-            # >>> Delta MERAH saat minus, HIJAU saat profit
             tanda = "+" if total_profit_rp >= 0 else "-"
             st.metric(label="📈 Realized Profit/Loss",
                       value=f"Rp {total_profit_rp:,.0f}".replace(",", "."),
                       delta=f"{tanda} Rp {abs(total_profit_rp):,.0f}".replace(",", "."),
                       delta_color="normal")
         with col4:
-            # >>> Jumlah win / loss / break-even ala Stockbit
             st.metric(label="🎯 Winrate AI", value=f"{winrate:.1f}%",
                       delta=f"✅ {win_trade} Win | ❌ {loss_trade} Loss | ➖ {be_trade} BE",
                       delta_color="off")
 
-        # >>> Baris kedua: dua metrik inti kualitas strategi
         m1, m2 = st.columns(2)
         with m1:
             pf_txt = "∞" if profit_factor == float('inf') else f"{profit_factor:.2f}"
@@ -1697,7 +1794,6 @@ if not df_hasil.empty:
                 else:
                     df_hist_tampil = df_hist.copy()
                     
-                # >>> Aman untuk semua versi pandas (map vs applymap)
                 styler = df_hist_tampil.style
                 kolom_warna = [c for c in ['Total_Return_Rp', 'Return_%'] if c in df_hist_tampil.columns]
                 if kolom_warna:
