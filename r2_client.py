@@ -135,3 +135,48 @@ def download_database():
         return n > 0
     except Exception:
         return False
+
+# ==========================================
+# 🧰 UTILITAS BUKU BESAR & PENJAGA PENYIMPANAN 9GB
+# ==========================================
+def list_semua_objek():
+    client, bucket = get_r2_client()
+    if not client: return []
+    objs, token = [], None
+    while True:
+        kwargs = {"Bucket": bucket}
+        if token: kwargs["ContinuationToken"] = token
+        resp = client.list_objects_v2(**kwargs)
+        for it in resp.get("Contents", []):
+            objs.append((it["Key"], it["Size"]))
+        if resp.get("IsTruncated"): token = resp.get("NextContinuationToken")
+        else: break
+    return objs
+
+def hapus_objek(key):
+    client, bucket = get_r2_client()
+    if not client: return False
+    try:
+        client.delete_object(Bucket=bucket, Key=key)
+        return True
+    except Exception:
+        return False
+
+def prune_r2_jika_penuh(batas_gb=9.0):
+    """Hapus arsip PALING TUA otomatis hanya saat bucket mendekati batas."""
+    objs = list_semua_objek()
+    total = sum(s for _, s in objs)
+    batas = int(batas_gb * 1024 ** 3)
+    if total <= batas:
+        print(f"🛡️ R2 aman: {total / 1024 ** 3:.2f} GB / {batas_gb} GB")
+        return 0
+    ukuran = dict(objs)
+    arsip = sorted([k for k, _ in objs if k.startswith("Arsip_Data_Harian/")])
+    terhapus = 0
+    for key in arsip:
+        if total <= batas: break
+        if hapus_objek(key):
+            total -= ukuran[key]; terhapus += 1
+            print(f"🗑️ Prune otomatis (tertua dulu): {key}")
+    print(f"🛡️ Prune selesai: {terhapus} arsip tua dihapus.")
+    return terhapus        
