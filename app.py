@@ -1036,11 +1036,12 @@ def render_strategy_table(df_subset, file_name):
 # >>> PART 10 : TAB 1 - MARKET OVERVIEW <<<
 # =====================================================================
 if not df_hasil.empty:
-    tab1, tab2, tab3, tab4 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "📊 Market Overview", 
         "📌 Screener Utama", 
         "🤖 Asisten AI Spesial", 
-        "💼 Portofolio Bot"
+        "💼 Portofolio Bot",
+        "💬 Ruang Obrolan AI"
     ])
     
     with tab1:
@@ -1820,3 +1821,117 @@ if not df_hasil.empty:
                 st.dataframe(styler.format(fmt), use_container_width=True, hide_index=True)
             else:
                 st.info(f"📭 Belum ada riwayat penjualan saham untuk {pilihan_arena}.")
+
+# =====================================================================
+# >>> PART 14 : TAB 5 - RUANG OBROLAN AI (RAG DATA LOKAL, GRATIS) <<<
+# =====================================================================
+    with tab5:
+        st.markdown("## 💬 Ruang Obrolan AI (Asisten Pribadi Screener)")
+        st.caption("Fakta saham/porto/market diambil dari data web Anda (screener hari ini, arsip R2, portofolio & histori bot). Ilmu umum tetap seperti AI pada umumnya. Gratis via Gemini free tier / OpenRouter free.")
+
+        if "chat_history" not in st.session_state:
+            st.session_state.chat_history = []
+
+        def ekstrak_ticker(pesan):
+            kata = re.findall(r'\b[A-Z]{4}\b', pesan.upper())
+            valid = []
+            for k in kata:
+                if not df_hasil.empty and k in df_hasil['Ticker'].values and k not in valid:
+                    valid.append(k)
+            return valid[:3]
+
+        def bangun_konteks(pesan):
+            blok = []
+            # 1) Saham yang disebut user
+            for t in ekstrak_ticker(pesan):
+                row = df_hasil[df_hasil['Ticker'] == t] if not df_hasil.empty else pd.DataFrame()
+                if row is not None and not row.empty:
+                    r = row.iloc[0]
+                    blok.append(f"DATA HARI INI {t}: Harga {r.get('Harga (Rp)')}, Change {r.get('Change (%)')}%, Volume {r.get('Volume')}, Score {r.get('Total Score')}, Rekomendasi {r.get('Rekomendasi')}, Tekanan {r.get('Tekanan Bandar')}, A/D {r.get('Kekuatan A/D')}, VWAP {r.get('Posisi VWAP')}, Siklus {r.get('Fase Siklus Bandar')}, Supply {r.get('Kondisi Supply')}, BB {r.get('Status BB')}, RVOL {r.get('RVOL (Anomali Vol)')}, Plan {r.get('Auto Trading Plan')}")
+                hist = get_historical_summary(t)
+                if hist:
+                    blok.append(hist)
+            # 2) Portofolio & histori bot
+            if any(k in pesan.lower() for k in ["porto", "portofolio", "posisi", "punya", "beli", "jual", "profit", "rugi", "winrate", "arena"]):
+                for i in range(1, 10):
+                    fp = f"Database/portofolio_aktif_rumus_{i}.csv"
+                    fh = f"Database/histori_transaksi_rumus_{i}.csv"
+                    if os.path.exists(fp):
+                        dp = pd.read_csv(fp)
+                        if not dp.empty:
+                            blok.append(f"PORTO RUMUS {i}: " + "; ".join(f"{r.Ticker} ({r.Lot} lot @ {r.Harga_Beli})" for r in dp.itertuples()))
+                    if os.path.exists(fh):
+                        dh = pd.read_csv(fh)
+                        if not dh.empty:
+                            blok.append(f"HISTORI RUMUS {i}: {len(dh)} transaksi, realized P/L Rp {dh['Total_Return_Rp'].sum():,.0f}")
+            # 3) Ringkasan market
+            if any(k in pesan.lower() for k in ["market", "pasar", "ihsg", "sentimen", "overview"]):
+                if not df_hasil.empty and 'Change (%)' in df_hasil.columns:
+                    naik = int((df_hasil['Change (%)'] > 0).sum()); turun = int((df_hasil['Change (%)'] < 0).sum())
+                    blok.append(f"MARKET HARI INI: {len(df_hasil)} saham terpantau, {naik} naik, {turun} turun.")
+            # 4) Daftar rumus
+            if "rumus" in pesan.lower():
+                blok.append("9 RUMUS BSJP AKTIF: 1 Tutup Kuat Bandar Hajar; 2 Smart Money Menyelam; 3 Pantulan Jarum Bawah; 4 Golden Cross Muda; 5 Squeeze Berisi Bensin; 6 Momentum Likuid Sehat; 7 Golden Pocket Fibo; 8 Gorengan Berkelas; 9 Arus Institusi Big Cap.")
+            return "\n\n".join(blok) if blok else "(Tidak ada data lokal spesifik yang relevan dengan pertanyaan ini; gunakan pengetahuan umum dan katakan jika fakta lokal tidak tersedia.)"
+
+        def tanya_ai_lokal(pesan, konteks, riwayat):
+            prompt_sistem = f"""
+            Kamu adalah asisten AI pribadi dari aplikasi "AlgoTrade Screener - IHSG Ultimate" milik user.
+            FAKTA tentang saham, portofolio, sinyal, dan market HARUS berasal dari BLOK DATA LOKAL di bawah.
+            Untuk edukasi, penjelasan indikator, strategi, dan ilmu umum, gunakan pengetahuan umummu seperti asisten AI biasa.
+            Jika data lokal tidak memuat fakta yang ditanya, katakan jujur bahwa data tidak tersedia di sistem user.
+            Jawab dalam Bahasa Indonesia yang santai namun analitis, seperti teman diskusi trading.
+
+            BLOK DATA LOKAL (dari web/R2 user):
+            {konteks}
+            """
+            # Mesin 1: Gemini free tier (pakai radar model yang sudah ada)
+            try:
+                GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
+                if GEMINI_API_KEY:
+                    daftar_model = radar_model_gemini_cepat(GEMINI_API_KEY)
+                    if daftar_model:
+                        genai.configure(api_key=GEMINI_API_KEY)
+                        model = genai.GenerativeModel(daftar_model[0])
+                        msgs = [{"role": ("model" if m["role"] == "assistant" else "user"), "content": m["content"]} for m in riwayat]
+                        chat = model.start_chat(history=msgs)
+                        resp = chat.send_message(prompt_sistem + "\n\nPERTANYAAN USER: " + pesan)
+                        if resp.text:
+                            return resp.text, f"Gemini gratis ({daftar_model[0]})"
+            except Exception:
+                pass
+            # Mesin 2: OpenRouter free
+            try:
+                OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY", os.environ.get("OPENROUTER_API_KEY"))
+                if OPENROUTER_API_KEY:
+                    client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
+                    msgs = [{"role": "system", "content": prompt_sistem}] + riwayat + [{"role": "user", "content": pesan}]
+                    comp = client.chat.completions.create(model="openrouter/free", messages=msgs, temperature=0.4, max_tokens=2000)
+                    isi = comp.choices[0].message.content
+                    if isi:
+                        return isi, "OpenRouter gratis"
+            except Exception as e:
+                return f"❌ Gagal menghubungi AI: {e}", "error"
+            return "❌ Tidak ada mesin AI gratis yang tersedia saat ini.", "error"
+
+        for m in st.session_state.chat_history:
+            with st.chat_message(m["role"]):
+                st.markdown(m["content"])
+
+        if st.button("🗑️ Bersihkan Percakapan"):
+            st.session_state.chat_history = []
+            st.rerun()
+
+        if pesan := st.chat_input("Tanya apa saja: 'Analisa TAXI untuk BSJP besok', 'Bagaimana performa rumus 1?', atau 'Jelaskan cara kerja squeeze'..."):
+            st.session_state.chat_history.append({"role": "user", "content": pesan})
+            with st.chat_message("user"):
+                st.markdown(pesan)
+            jawaban, mesin = "", ""
+            with st.chat_message("assistant"):
+                with st.spinner("Membaca data lokal & berpikir..."):
+                    konteks = bangun_konteks(pesan)
+                    riwayat = st.session_state.chat_history[-7:-1]
+                    jawaban, mesin = tanya_ai_lokal(pesan, konteks, riwayat)
+                st.markdown(jawaban)
+                st.caption(f"⚡ Dijawab via {mesin} dengan konteks data lokal Anda.")
+            st.session_state.chat_history.append({"role": "assistant", "content": jawaban})                
