@@ -715,6 +715,32 @@ def get_forensic_data(ticker):
         summary_text += f"📅 {date} | Tutup: {close_price} | Vol: {max_vol} | Tekanan: {tekanan_akhir} | Siklus: {siklus} | OBV: {obv} | RVOL: {rvol} | BB: {bb}\n"
     return summary_text
 
+# ==========================================
+# 📖 HELPER BUKU BESAR & ARSIP HARIAN (TAB 5)
+# ==========================================
+KEY_LEDGER = "Buku_Besar/ringkasan_harian.csv.gz"
+
+@st.cache_data(ttl=3600)
+def muat_buku_besar():
+    try:
+        import r2_client
+        tmp = os.path.join(tempfile.gettempdir(), "ringkasan_harian_web.csv.gz")
+        if r2_client.download_arsip(KEY_LEDGER, tmp):
+            return pd.read_csv(tmp)
+    except Exception:
+        pass
+    return pd.DataFrame()
+
+@st.cache_data(ttl=3600)
+def muat_arsip_harian(tanggal):
+    try:
+        import r2_client
+        tmp = os.path.join(tempfile.gettempdir(), f"arsip_web_{tanggal}.csv")
+        if r2_client.download_arsip(f"Arsip_Data_Harian/screener_{tanggal}.csv", tmp):
+            return pd.read_csv(tmp)
+    except Exception:
+        pass
+    return pd.DataFrame()
 
 # =====================================================================
 # >>> PART 05 : PENGATURAN UI/UX & CSS <<<
@@ -1041,7 +1067,7 @@ if not df_hasil.empty:
         "📌 Screener Utama", 
         "🤖 Asisten AI Spesial", 
         "💼 Portofolio Bot",
-        "💬 Ruang Obrolan AI"
+        "🕵️ Detektif Ledakan & Chat"
     ])
     
     with tab1:
@@ -1823,115 +1849,275 @@ if not df_hasil.empty:
                 st.info(f"📭 Belum ada riwayat penjualan saham untuk {pilihan_arena}.")
 
 # =====================================================================
-# >>> PART 14 : TAB 5 - RUANG OBROLAN AI (RAG DATA LOKAL, GRATIS) <<<
+# >>> PART 14 : TAB 5 - DETEKTIF LEDAKAN (OTOPSI H-1) + CHAT AI <<<
 # =====================================================================
     with tab5:
-        st.markdown("## 💬 Ruang Obrolan AI (Asisten Pribadi Screener)")
-        st.caption("Fakta saham/porto/market diambil dari data web Anda (screener hari ini, arsip R2, portofolio & histori bot). Ilmu umum tetap seperti AI pada umumnya. Gratis via Gemini free tier / OpenRouter free.")
+        st.markdown("## 🕵️ Detektif Ledakan & Ruang Obrolan AI")
+        st.caption("Angka dihitung LOKAL dari arsip intraday R2 (snapshot 5-menitan) + Buku Besar Harian (50 hari, gzip ±1MB). AI gratis hanya menyusun narasi — tidak berhitung.")
 
-        if "chat_history" not in st.session_state:
-            st.session_state.chat_history = []
+        HARI_INI = (datetime.utcnow() + pd.Timedelta(hours=7)).strftime("%Y-%m-%d")
+        lb = muat_buku_besar()
+        tgl_opsi = sorted(lb["Tanggal"].astype(str).unique(), reverse=True) if not lb.empty else []
+        arsip_hari_ini = muat_arsip_harian(HARI_INI)
+        if not arsip_hari_ini.empty and HARI_INI not in tgl_opsi:
+            tgl_opsi = [HARI_INI] + tgl_opsi
 
-        def ekstrak_ticker(pesan):
-            kata = re.findall(r'\b[A-Z]{4}\b', pesan.upper())
-            valid = []
-            for k in kata:
-                if not df_hasil.empty and k in df_hasil['Ticker'].values and k not in valid:
-                    valid.append(k)
-            return valid[:3]
+        def _set_otopsi(t, tgl):
+            st.session_state["otopsi_ticker"] = t
+            st.session_state["otopsi_tanggal"] = tgl
 
-        def bangun_konteks(pesan):
-            blok = []
-            # 1) Saham yang disebut user
-            for t in ekstrak_ticker(pesan):
-                row = df_hasil[df_hasil['Ticker'] == t] if not df_hasil.empty else pd.DataFrame()
-                if row is not None and not row.empty:
-                    r = row.iloc[0]
-                    blok.append(f"DATA HARI INI {t}: Harga {r.get('Harga (Rp)')}, Change {r.get('Change (%)')}%, Volume {r.get('Volume')}, Score {r.get('Total Score')}, Rekomendasi {r.get('Rekomendasi')}, Tekanan {r.get('Tekanan Bandar')}, A/D {r.get('Kekuatan A/D')}, VWAP {r.get('Posisi VWAP')}, Siklus {r.get('Fase Siklus Bandar')}, Supply {r.get('Kondisi Supply')}, BB {r.get('Status BB')}, RVOL {r.get('RVOL (Anomali Vol)')}, Plan {r.get('Auto Trading Plan')}")
-                hist = get_historical_summary(t)
-                if hist:
-                    blok.append(hist)
-            # 2) Portofolio & histori bot
-            if any(k in pesan.lower() for k in ["porto", "portofolio", "posisi", "punya", "beli", "jual", "profit", "rugi", "winrate", "arena"]):
-                for i in range(1, 10):
-                    fp = f"Database/portofolio_aktif_rumus_{i}.csv"
-                    fh = f"Database/histori_transaksi_rumus_{i}.csv"
-                    if os.path.exists(fp):
-                        dp = pd.read_csv(fp)
-                        if not dp.empty:
-                            blok.append(f"PORTO RUMUS {i}: " + "; ".join(f"{r.Ticker} ({r.Lot} lot @ {r.Harga_Beli})" for r in dp.itertuples()))
-                    if os.path.exists(fh):
-                        dh = pd.read_csv(fh)
-                        if not dh.empty:
-                            blok.append(f"HISTORI RUMUS {i}: {len(dh)} transaksi, realized P/L Rp {dh['Total_Return_Rp'].sum():,.0f}")
-            # 3) Ringkasan market
-            if any(k in pesan.lower() for k in ["market", "pasar", "ihsg", "sentimen", "overview"]):
-                if not df_hasil.empty and 'Change (%)' in df_hasil.columns:
-                    naik = int((df_hasil['Change (%)'] > 0).sum()); turun = int((df_hasil['Change (%)'] < 0).sum())
-                    blok.append(f"MARKET HARI INI: {len(df_hasil)} saham terpantau, {naik} naik, {turun} turun.")
-            # 4) Daftar rumus
-            if "rumus" in pesan.lower():
-                blok.append("9 RUMUS BSJP AKTIF: 1 Tutup Kuat Bandar Hajar; 2 Smart Money Menyelam; 3 Pantulan Jarum Bawah; 4 Golden Cross Muda; 5 Squeeze Berisi Bensin; 6 Momentum Likuid Sehat; 7 Golden Pocket Fibo; 8 Gorengan Berkelas; 9 Arus Institusi Big Cap.")
-            return "\n\n".join(blok) if blok else "(Tidak ada data lokal spesifik yang relevan dengan pertanyaan ini; gunakan pengetahuan umum dan katakan jika fakta lokal tidak tersedia.)"
+        # ---------- Mesin hitung lokal ----------
+        def anomali_intraday(df_day, ticker):
+            g = df_day[df_day["Ticker"] == ticker].copy()
+            if g.empty: return [], None
+            cw = next((c for c in ["Waktu Update", "Terakhir Update"] if c in g.columns), g.columns[0])
+            g["_jam"] = g[cw].astype(str).str.split(" ").str[-1].str[:5]
+            g = g.sort_values("_jam")
+            h = pd.to_numeric(g["Harga (Rp)"], errors="coerce")
+            v = pd.to_numeric(g["Volume"], errors="coerce")
+            c = pd.to_numeric(g["Change (%)"], errors="coerce")
+            swing = (h.max() - h.min()) / h.min() * 100 if h.min() else 0.0
+            ringkas = {"Open": h.iloc[0], "High": h.max(), "Low": h.min(), "Close": h.iloc[-1],
+                       "Swing_%": round(swing, 2), "Puncak_Change_%": round(c.max(), 2) if not c.isna().all() else 0.0,
+                       "Slot": len(g)}
+            ciri = []
+            dv = v.diff().fillna(0)
+            if len(dv) > 9:
+                rata = dv.iloc[1:-6].mean()
+                akhir = dv.tail(6).sum()
+                if rata and rata > 0 and akhir / (rata * 6) >= 2.5:
+                    ciri.append(f"🌋 Ledakan volume sesi akhir: 30 menit terakhir ≈{akhir / (rata * 6):.1f}x rata-rata slot")
+            ta, tk = str(g.iloc[0].get("Tekanan Bandar", "")), str(g.iloc[-1].get("Tekanan Bandar", ""))
+            if "Jual" in ta and "Beli" in tk:
+                ciri.append(f"🔄 Pressure flip: {ta} → {tk}")
+            bbs = g["Status BB"].astype(str).tolist() if "Status BB" in g.columns else []
+            if "Squeeze" in bbs and any("Breakout" in b for b in bbs[bbs.index("Squeeze"):]):
+                ciri.append("🌐 Squeeze → Breakout Upper dalam satu hari")
+            if swing < 3 and "Beli" in tk and "Akumulasi" in str(g.iloc[-1].get("Kekuatan A/D", "")):
+                ciri.append(f"🤫 Silent accumulation: harga flat (swing {swing:.1f}%) tapi {tk} + {g.iloc[-1].get('Kekuatan A/D')}")
+            p15 = g[g["_jam"] >= "15:00"]
+            if len(p15) > 0 and len(h) > len(p15):
+                dasar = h.iloc[-len(p15) - 1]
+                if dasar:
+                    jump = (h.iloc[-1] - dasar) / dasar * 100
+                    if jump >= 1.5: ciri.append(f"⏰ Closing jump: {jump:+.1f}% setelah 15:00")
+            if not c.isna().all() and abs(c.iloc[0]) >= 2:
+                ciri.append(f"🚪 Gap open: {c.iloc[0]:+.1f}% di snapshot pertama")
+            if "Posisi VWAP" in g.columns:
+                rk = (g["Posisi VWAP"].astype(str) == "Di Atas VWAP (Kuat)").mean()
+                if rk >= 0.7: ciri.append(f"🛡️ Ditahan di atas VWAP {rk * 100:.0f}% waktu perdagangan")
+            return ciri, ringkas
 
-        def tanya_ai_lokal(pesan, konteks, riwayat):
-            prompt_sistem = f"""
-            Kamu adalah asisten AI pribadi dari aplikasi "AlgoTrade Screener - IHSG Ultimate" milik user.
-            FAKTA tentang saham, portofolio, sinyal, dan market HARUS berasal dari BLOK DATA LOKAL di bawah.
-            Untuk edukasi, penjelasan indikator, strategi, dan ilmu umum, gunakan pengetahuan umummu seperti asisten AI biasa.
-            Jika data lokal tidak memuat fakta yang ditanya, katakan jujur bahwa data tidak tersedia di sistem user.
-            Jawab dalam Bahasa Indonesia yang santai namun analitis, seperti teman diskusi trading.
+        def kenapa_lolos(r):
+            get = lambda k: str(r.get(k, ""))
+            vk = get("Posisi VWAP") == "Di Atas VWAP (Kuat)"
+            vo = get("Posisi VWAP") != "Di Bawah VWAP (Lemah)"
+            ap = get("Kekuatan A/D") == "Akumulasi Pro (Smart Money)"
+            cek = {
+                1: [("VWAP kuat", vk), ("Tekanan HAKA", get("Tekanan Bandar") == "Dominan Beli (Hajar Kanan)"), ("Open=Low", get("Status Open") == "Open = Low (Bullish Kuat)"), ("Rekomendasi BELI", get("Rekomendasi") == "BELI")],
+                2: [("Smart Money A/D", ap), ("Bandar Akumulasi Kuat", get("Status Bandar") == "Akumulasi Kuat"), ("VWAP tidak lemah", vo)],
+                3: [("Hammer/Jarum Bawah", get("Pola Candle") == "Hammer (Potensi Reversal)" or get("Sinyal Cuci Barang") == "Jarum Bawah (Sinyal Pantulan Kuat)"), ("VWAP kuat", vk), ("Smart Money A/D", ap)],
+                4: [("Golden Cross", get("MA Cross") == "Golden Cross"), ("Tembus MA20", get("Vol Breakout") == "Tembus MA20"), ("Uptrend", get("MA Signal") == "Uptrend"), ("VWAP kuat", vk)],
+                5: [("Squeeze", get("Status BB") == "Squeeze"), ("Smart Money A/D", ap), ("VWAP tidak lemah", vo), ("Bukan diguyur", get("Tekanan Bandar") != "Dominan Jual (Guyur)")],
+                6: [("Ritel Aktif", get("Kelas Transaksi") == "Ritel Aktif (5M - 50M)"), ("Tembus MA20", get("Vol Breakout") == "Tembus MA20"), ("VWAP kuat", vk), ("Uptrend", get("MA Signal") == "Uptrend")],
+                7: [("Fibo 61.8/78.6", "61.8" in get("Status Fibonacci") or "78.6" in get("Status Fibonacci")), ("Smart Money A/D", ap), ("VWAP tidak lemah", vo)],
+                8: [("Small Cap", get("Kategori") == "Small Cap (Lapis 3)"), ("Solid", get("Karakter Gorengan") == "Solid (Jarang Dibanting)"), ("Fase kumpul/pesta", get("Fase Siklus Bandar") in ("Accumulation (Kumpul Barang)", "Mark-Up (Fase Pesta)")), ("Supply tidak banjir", "Supply Banjir" not in get("Kondisi Supply"))],
+                9: [("Big Cap", get("Kategori") == "Big Cap (Lapis 1)"), ("Smart Money A/D", ap), ("VWAP kuat", vk), ("Rekomendasi BELI", get("Rekomendasi") == "BELI")],
+            }
+            return {i: [lab for lab, ok in pairs if not ok] for i, pairs in cek.items() if any(not ok for _, ok in pairs)}
 
-            BLOK DATA LOKAL (dari web/R2 user):
+        def tren_50h(ticker):
+            if lb.empty: return None
+            g = lb[lb["Ticker"] == ticker].sort_values("Tanggal").tail(50).copy()
+            if g.empty: return None
+            for kol in ["Volume", "Close"]:
+                g[kol] = pd.to_numeric(g[kol], errors="coerce")
+            g["MA5_vol"] = g["Volume"].rolling(5).mean()
+            g["MA20_vol"] = g["Volume"].rolling(20).mean()
+            g["MA50_vol"] = g["Volume"].rolling(50).mean()
+            g["MA20_close"] = g["Close"].rolling(20).mean()
+            return g
+
+        def narasi_ai(konteks, pertanyaan):
+            prompt = f"""Kamu analis detektif pasar saham Indonesia. FAKTA hanya dari BLOK DATA di bawah; untuk edukasi/konsep gunakan pengetahuan umum. Jika fakta tidak ada, katakan jujur. Jawab Bahasa Indonesia, analitis, tanpa basa-basi.
+            BLOK DATA:
             {konteks}
-            """
-            # Mesin 1: Gemini free tier (pakai radar model yang sudah ada)
+            PERTANYAAN: {pertanyaan}"""
             try:
-                GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
-                if GEMINI_API_KEY:
-                    daftar_model = radar_model_gemini_cepat(GEMINI_API_KEY)
-                    if daftar_model:
-                        genai.configure(api_key=GEMINI_API_KEY)
-                        model = genai.GenerativeModel(daftar_model[0])
-                        msgs = [{"role": ("model" if m["role"] == "assistant" else "user"), "content": m["content"]} for m in riwayat]
-                        chat = model.start_chat(history=msgs)
-                        resp = chat.send_message(prompt_sistem + "\n\nPERTANYAAN USER: " + pesan)
-                        if resp.text:
-                            return resp.text, f"Gemini gratis ({daftar_model[0]})"
-            except Exception:
-                pass
-            # Mesin 2: OpenRouter free
+                GK = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
+                if GK:
+                    dm = radar_model_gemini_cepat(GK)
+                    if dm:
+                        genai.configure(api_key=GK)
+                        r = genai.GenerativeModel(dm[0]).generate_content(prompt)
+                        if r.text: return r.text, f"Gemini ({dm[0]})"
+            except Exception: pass
             try:
-                OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY", os.environ.get("OPENROUTER_API_KEY"))
-                if OPENROUTER_API_KEY:
-                    client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
-                    msgs = [{"role": "system", "content": prompt_sistem}] + riwayat + [{"role": "user", "content": pesan}]
-                    comp = client.chat.completions.create(model="openrouter/free", messages=msgs, temperature=0.4, max_tokens=2000)
-                    isi = comp.choices[0].message.content
-                    if isi:
-                        return isi, "OpenRouter gratis"
+                OK_ = st.secrets.get("OPENROUTER_API_KEY", os.environ.get("OPENROUTER_API_KEY"))
+                if OK_:
+                    cp = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OK_).chat.completions.create(
+                        model="openrouter/free", messages=[{"role": "user", "content": prompt}], temperature=0.4, max_tokens=1500)
+                    if cp.choices[0].message.content: return cp.choices[0].message.content, "OpenRouter"
             except Exception as e:
-                return f"❌ Gagal menghubungi AI: {e}", "error"
-            return "❌ Tidak ada mesin AI gratis yang tersedia saat ini.", "error"
+                return f"❌ AI gagal: {e}", "error"
+            return "❌ Tidak ada mesin AI gratis tersedia.", "error"
 
-        for m in st.session_state.chat_history:
-            with st.chat_message(m["role"]):
-                st.markdown(m["content"])
+        def simpan_kasus(entry):
+            try:
+                import r2_client
+                tmp = os.path.join(tempfile.gettempdir(), "kasus_web.json")
+                data = []
+                if r2_client.download_arsip("Buku_Besar/kasus_ledakan.json", tmp):
+                    try: data = json.load(open(tmp))
+                    except Exception: data = []
+                data.append(entry); data = data[-200:]
+                json.dump(data, open(tmp, "w"), indent=2)
+                r2_client.upload_arsip(tmp, "Buku_Besar/kasus_ledakan.json")
+            except Exception: pass
 
-        if st.button("🗑️ Bersihkan Percakapan"):
-            st.session_state.chat_history = []
-            st.rerun()
+        # ---------- Panel kontrol ----------
+        if not tgl_opsi:
+            st.info("📖 Buku Besar belum ada. Jalankan sekali di laptop: `./.venv/bin/python bangun_buku_besar.py --backfill`")
+        c1, c2 = st.columns([1, 1])
+        with c1:
+            ticker_inp = st.text_input("Kode saham:", placeholder="Contoh: LAPD", key="otopsi_ticker").strip().upper()
+        with c2:
+            tanggal_inp = st.selectbox("Tanggal otopsi:", tgl_opsi if tgl_opsi else [HARI_INI], key="otopsi_tanggal")
 
-        if pesan := st.chat_input("Tanya apa saja: 'Analisa TAXI untuk BSJP besok', 'Bagaimana performa rumus 1?', atau 'Jelaskan cara kerja squeeze'..."):
-            st.session_state.chat_history.append({"role": "user", "content": pesan})
-            with st.chat_message("user"):
-                st.markdown(pesan)
-            jawaban, mesin = "", ""
+        # ---------- Chip ledakan (swing low→high ≥10%) ----------
+        if not lb.empty and tgl_opsi:
+            tgl_chip = HARI_INI if HARI_INI in tgl_opsi else tgl_opsi[0]
+            dfx = lb[lb["Tanggal"].astype(str) == tgl_chip]
+            df_ledakan = dfx[(pd.to_numeric(dfx["Swing_%"], errors="coerce") >= 10) | (pd.to_numeric(dfx["Puncak_Change_%"], errors="coerce") >= 10)]
+            df_ledakan = df_ledakan.sort_values("Swing_%", ascending=False).head(12)
+            if not df_ledakan.empty:
+                st.markdown(f"**🔥 Terdeteksi swing low→high ≥10% pada {tgl_chip}** *(saham yang pagi terbang lalu sore turun TETAP tertangkap)*:")
+                n_col = min(len(df_ledakan), 6)
+                chips = st.columns(n_col)
+        for i, (_, r) in enumerate(df_ledakan.head(n_col).iterrows()):
+            with chips[i]:
+                st.button(f"{r.Ticker} ⤴{float(r['Swing_%']):.0f}%", key=f"chip_{r.Ticker}_{tgl_chip}",
+                          on_click=_set_otopsi, args=(r.Ticker, tgl_chip))
+
+        # ---------- Tombol template ----------
+        st.markdown("---")
+        tpl = st.columns(4)
+        aksi = None
+        with tpl[0]:
+            if st.button("🩺 Otopsi H-1", use_container_width=True): aksi = "otopsi"
+            if st.button("🚫 Kenapa lolos radar?", use_container_width=True): aksi = "lolos"
+        with tpl[1]:
+            if st.button("📈 Tren 50H (MA5/20/50)", use_container_width=True): aksi = "tren"
+            if st.button("🎯 Checklist siap gap-up", use_container_width=True): aksi = "gapup"
+        with tpl[2]:
+            if st.button("🧬 Ciri ledakan (naratif)", use_container_width=True): aksi = "dna"
+            if st.button("⏱️ Fokus sesi akhir 14:00+", use_container_width=True): aksi = "sesi"
+        with tpl[3]:
+            if st.button("💡 Usulan rumus baru", use_container_width=True): aksi = "rumus"
+            if st.button("🗑️ Bersihkan chat", use_container_width=True):
+                st.session_state["chat_detektif"] = []
+                st.rerun()
+
+        # ---------- Eksekusi template ----------
+        if aksi and ticker_inp and tanggal_inp:
+            df_day = muat_arsip_harian(tanggal_inp)
+            ciri, ringkas = anomali_intraday(df_day, ticker_inp) if not df_day.empty else ([], None)
+            row_h1 = None
+            if not df_day.empty and not df_day[df_day["Ticker"] == ticker_inp].empty:
+                row_h1 = df_day[df_day["Ticker"] == ticker_inp].iloc[-1]
+            elif not lb.empty:
+                lbb = lb[(lb["Ticker"] == ticker_inp) & (lb["Tanggal"].astype(str) == tanggal_inp)]
+                if not lbb.empty: row_h1 = lbb.iloc[-1]
+            if row_h1 is None:
+                st.warning(f"❌ Tidak ada data {ticker_inp} pada {tanggal_inp}.")
+            else:
+                konteks = f"SAHAM {ticker_inp} TANGGAL {tanggal_inp}\n"
+                if ringkas: konteks += f"OHLC intraday: Open {ringkas['Open']} High {ringkas['High']} Low {ringkas['Low']} Close {ringkas['Close']} | Swing {ringkas['Swing_%']}% | Puncak change {ringkas['Puncak_Change_%']}%\n"
+                konteks += f"Baris penutup hari: Tekanan {row_h1.get('Tekanan Bandar', row_h1.get('Tekanan'))} | Siklus {row_h1.get('Fase Siklus Bandar', row_h1.get('Siklus'))} | A/D {row_h1.get('Kekuatan A/D', row_h1.get('AD'))} | BB {row_h1.get('Status BB', row_h1.get('BB'))} | RVOL {row_h1.get('RVOL (Anomali Vol)', row_h1.get('RVOL'))} | Supply {row_h1.get('Kondisi Supply', row_h1.get('Supply'))} | Score {row_h1.get('Total Score', row_h1.get('Score'))} | Rekomendasi {row_h1.get('Rekomendasi')}\n"
+                if ciri: konteks += "ANOMALI TERDETEKSI:\n- " + "\n- ".join(ciri) + "\n"
+                gt = tren_50h(ticker_inp)
+                if gt is not None and len(gt) > 1:
+                    l = gt.iloc[-1]
+                    konteks += f"TREN 50H: hari ke-{len(gt)} | Close {l['Close']} vs MA20 {l['MA20_close']:.0f} | Vol terakhir {l['Volume']:.0f} vs MA5 {l['MA5_vol']:.0f} / MA20 {l['MA20_vol']:.0f} / MA50 {l['MA50_vol']:.0f}\n"
+
+                if aksi == "otopsi":
+                    st.markdown(f"### 🩺 Otopsi {ticker_inp} — {tanggal_inp}")
+                    if ringkas:
+                        st.dataframe(pd.DataFrame([ringkas]), use_container_width=True, hide_index=True)
+                    st.markdown("**Ciri anomali yang terdeteksi mesin:**")
+                    st.markdown("\n".join(f"- {x}" for x in ciri) if ciri else "- Tidak ada anomali besar; hari itu tenang.")
+                    pertanyaan = f"Jelaskan secara naratif mengapa pergerakan {ticker_inp} pada {tanggal_inp} penting/tidak sebagai persiapan ledakan hari berikutnya."
+                elif aksi == "lolos":
+                    gagal = kenapa_lolos(row_h1)
+                    st.markdown(f"### 🚫 Kenapa {ticker_inp} tidak masuk screener pada {tanggal_inp}?")
+                    for i, buruk in gagal.items():
+                        st.markdown(f"- **Rumus {i} gagal:** " + ", ".join(buruk))
+                    konteks += f"SYARAT RUMUS YANG GAGAL: {gagal}\n"
+                    pertanyaan = f"Berdasarkan syarat yang gagal ini, jelaskan kenapa radar melewatkan {ticker_inp} dan ciri mana yang sebenarnya sudah memberi petunjuk."
+                elif aksi == "tren":
+                    st.markdown(f"### 📈 Tren 50H {ticker_inp}")
+                    if gt is None: st.warning("Buku Besar belum punya riwayat saham ini.")
+                    else:
+                        st.line_chart(gt.set_index("Tanggal")[["Close", "MA20_close"]])
+                        st.bar_chart(gt.set_index("Tanggal")[["Volume"]])
+                        pertanyaan = f"Interpretasikan tren 50 hari {ticker_inp}: ada build-up senyap atau tidak?"
+                elif aksi == "gapup":
+                    cek = [
+                        ("Tutup dekat high intraday (≥98%)", ringkas and ringkas["Close"] >= 0.98 * ringkas["High"]),
+                        ("Swing intraday ≥5%", ringkas and ringkas["Swing_%"] >= 5),
+                        ("Volume >2x MA20 volume", gt is not None and len(gt) > 1 and gt['Volume'].iloc[-1] > 2 * gt['MA20_vol'].iloc[-1]),
+                        ("Tekanan akhir Dominan Beli", "Beli" in str(row_h1.get("Tekanan Bandar", row_h1.get("Tekanan")))),
+                        ("A/D Akumulasi", "Akumulasi" in str(row_h1.get("Kekuatan A/D", row_h1.get("AD")))),
+                        ("Supply tidak banjir", "Banjir" not in str(row_h1.get("Kondisi Supply", row_h1.get("Supply")))),
+                    ]
+                    skor = sum(1 for _, ok in cek if ok)
+                    st.markdown(f"### 🎯 Checklist siap gap-up {ticker_inp} — skor {skor}/{len(cek)}")
+                    for lab, ok in cek: st.markdown(f"- {'✅' if ok else '❌'} {lab}")
+                    st.markdown(f"**Kesimpulan mesin:** {'SIAP GAP-UP' if skor >= 4 else 'MERAGUKAN' if skor >= 2 else 'TIDAK SIAP'} (angka oleh mesin, bukan AI)")
+                    konteks += f"CHECKLIST GAPUP: skor {skor}/{len(cek)}\n"
+                    pertanyaan = "Beri opini singkat atas checklist gap-up ini."
+                elif aksi == "dna":
+                    pertanyaan = f"Sebut dan jelaskan ciri-ciri ledakan yang terlihat pada {ticker_inp} tanggal {tanggal_inp} berdasarkan BLOK DATA, dalam bentuk daftar ciri TERLIHAT vs TIDAK TERLIHAT. Jangan bergantung pada skor."
+                elif aksi == "sesi":
+                    if df_day.empty: st.warning("Arsip intraday tanggal itu tidak tersedia.")
+                    else:
+                        gs = df_day[df_day["Ticker"] == ticker_inp].copy()
+                        cw = next((c for c in ["Waktu Update", "Terakhir Update"] if c in gs.columns), gs.columns[0])
+                        gs["_jam"] = gs[cw].astype(str).str.split(" ").str[-1].str[:5]
+                        gs = gs[gs["_jam"] >= "14:00"]
+                        st.dataframe(gs[["_jam", "Harga (Rp)", "Volume", "Change (%)", "Tekanan Bandar"]].tail(20), use_container_width=True, hide_index=True)
+                    pertanyaan = f"Analisis sesi akhir (14:00-tutup) {ticker_inp} pada {tanggal_inp}: ada persiapan mark-up apa?"
+                else:  # rumus
+                    pertanyaan = f"Berdasarkan kasus {ticker_inp} {tanggal_inp} yang lolos radar, usulkan 1 rumus/filter BARU yang konkret (sebutkan nama kolom dan nilainya) agar pola serupa tertangkap besok."
+
+                with st.spinner("Mesin menghitung + AI menyusun narasi..."):
+                    jawab, mesin = narasi_ai(konteks, pertanyaan)
+                st.markdown(jawab)
+                st.caption(f"⚡ Narasi via {mesin} | angka dihitung lokal.")
+                simpan_kasus({"tanggal_otopsi": str(datetime.utcnow() + pd.Timedelta(hours=7))[:19],
+                              "ticker": ticker_inp, "tanggal_data": tanggal_inp, "mode": aksi,
+                              "ciri": ciri, "ringkas": ringkas})
+
+        # ---------- Chat bebas ----------
+        st.markdown("---")
+        st.markdown("### 🗨️ Obrolan bebas (konteks: data lokal Anda)")
+        if "chat_detektif" not in st.session_state: st.session_state["chat_detektif"] = []
+        for m in st.session_state["chat_detektif"]:
+            with st.chat_message(m["role"]): st.markdown(m["content"])
+        if pesan := st.chat_input("Tanya apa saja: analisa, edukasi, atau lanjutan otopsi di atas..."):
+            st.session_state["chat_detektif"].append({"role": "user", "content": pesan})
+            with st.chat_message("user"): st.markdown(pesan)
             with st.chat_message("assistant"):
-                with st.spinner("Membaca data lokal & berpikir..."):
-                    konteks = bangun_konteks(pesan)
-                    riwayat = st.session_state.chat_history[-7:-1]
-                    jawaban, mesin = tanya_ai_lokal(pesan, konteks, riwayat)
-                st.markdown(jawaban)
-                st.caption(f"⚡ Dijawab via {mesin} dengan konteks data lokal Anda.")
-            st.session_state.chat_history.append({"role": "assistant", "content": jawaban})                
+                with st.spinner("Berpikir..."):
+                    ctx = ""
+                    tk = re.findall(r"\b[A-Z]{4}\b", pesan.upper())
+                    tk = [t for t in tk if not lb.empty and t in set(lb["Ticker"])] or (tk[:1] if tk else [])
+                    for t in tk[:2]:
+                        gt = tren_50h(t)
+                        if gt is not None and len(gt):
+                            l = gt.iloc[-1]
+                            ctx += f"{t}: close {l['Close']} swing terakhir {l['Swing_%']}% vol {l['Volume']:.0f} (MA20 {l['MA20_vol']:.0f})\n"
+                    jawab, mesin = narasi_ai(ctx or "(tidak ada data lokal relevan)", pesan)
+                st.markdown(jawab)
+                st.caption(f"⚡ via {mesin}")
+            st.session_state["chat_detektif"].append({"role": "assistant", "content": jawab})                
