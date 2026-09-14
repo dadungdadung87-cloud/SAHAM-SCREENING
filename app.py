@@ -1943,24 +1943,46 @@ if not df_hasil.empty:
             BLOK DATA:
             {konteks}
             PERTANYAAN: {pertanyaan}"""
+            
+            error_log = []
+            
+            # 1. Coba Gemini (Langsung tembak model flash, skip list_models agar tidak kena rate limit)
             try:
                 GK = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
                 if GK:
-                    dm = radar_model_gemini_cepat(GK)
-                    if dm:
-                        genai.configure(api_key=GK)
-                        r = genai.GenerativeModel(dm[0]).generate_content(prompt)
-                        if r.text: return r.text, f"Gemini ({dm[0]})"
-            except Exception: pass
+                    genai.configure(api_key=GK)
+                    for model_nama in ["gemini-1.5-flash-latest", "gemini-1.5-flash", "gemini-1.0-pro"]:
+                        try:
+                            r = genai.GenerativeModel(model_nama).generate_content(prompt)
+                            if r.text: return r.text, f"Gemini ({model_nama})"
+                        except Exception:
+                            continue
+                    error_log.append("Gemini: Semua model flash/pro limit atau gagal.")
+                else:
+                    error_log.append("Gemini: API Key tidak ada di secrets.")
+            except Exception as e:
+                error_log.append(f"Gemini error: {str(e)[:80]}")
+
+            # 2. Coba OpenRouter
             try:
                 OK_ = st.secrets.get("OPENROUTER_API_KEY", os.environ.get("OPENROUTER_API_KEY"))
                 if OK_:
-                    cp = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OK_).chat.completions.create(
-                        model="openrouter/free", messages=[{"role": "user", "content": prompt}], temperature=0.4, max_tokens=1500)
-                    if cp.choices[0].message.content: return cp.choices[0].message.content, "OpenRouter"
+                    client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OK_)
+                    cp = client.chat.completions.create(
+                        model="openrouter/free", 
+                        messages=[{"role": "user", "content": prompt}], 
+                        temperature=0.4, 
+                        max_tokens=1500
+                    )
+                    isi = cp.choices[0].message.content
+                    if isi: return isi, "OpenRouter"
+                    else: error_log.append("OpenRouter: Respons kosong dari server.")
+                else:
+                    error_log.append("OpenRouter: API Key tidak ada di secrets.")
             except Exception as e:
-                return f"❌ AI gagal: {e}", "error"
-            return "❌ Tidak ada mesin AI gratis tersedia.", "error"
+                error_log.append(f"OpenRouter error: {str(e)[:80]}")
+
+            return f"❌ Kedua mesin AI gagal. Detail: {' | '.join(error_log)}", "error"
 
         def simpan_kasus(entry):
             try:
