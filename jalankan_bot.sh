@@ -25,6 +25,7 @@ echo "⏳ Memulai pembaruan data saham..."
 
 # 3. JALANKAN BOT SIMULATOR (Menggunakan .venv juga)
 ./.venv/bin/python bot_simulator.py
+./.venv/bin/python bangun_buku_besar.py
 
 # ==========================================
 # FITUR SAPU OTOMATIS (MAX 50 HARI)
