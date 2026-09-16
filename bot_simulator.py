@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import subprocess
 
 # ==========================================
@@ -84,7 +84,7 @@ def cek_saldo_tersedia(df_porto):
 # 🤖 MESIN EKSEKUSI UTAMA (MODE BSJP)
 # ==========================================
 def jalankan_bot():
-    now = datetime.utcnow() + timedelta(hours=7)  # WIB (UTC+7): laptop & Cloud pakai jam yang sama
+    now = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=7)  # WIB (UTC+7): laptop & Cloud pakai jam yang sama
     tanggal_hari_ini = now.strftime('%Y-%m-%d')
     jam_sekarang = now.time()
     jam_square_off = datetime.strptime("15:30", "%H:%M").time()
