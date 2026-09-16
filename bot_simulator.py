@@ -92,24 +92,31 @@ def jalankan_bot():
     print(f"[{now.strftime('%H:%M:%S')}] Membangunkan Bot Simulator AI...")
 
     # ----------------------------------------------------
-    # 😴 GEMBOK AKHIR PEKAN — cron libur total; mode manual tetap
-    # boleh membeli karena harga penutupan tidak berubah saat akhir pekan
+    # 🔑 DETEKSI MODE: manual / cron / liquidate
     # ----------------------------------------------------
     mode = "manual" if "--manual" in sys.argv[1:] else "cron"
-    if now.weekday() >= 5 and mode == "cron":
+    liquidate = "--liquidate" in sys.argv[1:]
+    if liquidate:
+        print("🧨 MODE LIQUIDATE: SEMUA posisi dijual paksa sekarang (aturan 'beli hari ini tahan' dilewati).")
+
+    # ----------------------------------------------------
+    # 😴 GEMBOK AKHIR PEKAN — cron libur total; mode manual tetap
+    # boleh membeli karena harga penutupan tidak berubah saat akhir pekan
+    # >>> LIQUIDATE BEBAS lewat kapan saja <<<
+    # ----------------------------------------------------
+    if now.weekday() >= 5 and mode == "cron" and not liquidate:
         print("😴 Akhir pekan terdeteksi. Cron libur — posisi aman sampai Senin.")
         return
-    if now.weekday() >= 5:
+    if now.weekday() >= 5 and not liquidate:
         print("🛒 Manual akhir pekan: pembelian harga penutupan terakhir dilayani; evaluasi jual libur sampai Senin.")
 
     # ----------------------------------------------------
     # 🕒 PEMBAGIAN PENULIS (anti-race): cron vs manual
     # ----------------------------------------------------
-    mode = "manual" if "--manual" in sys.argv[1:] else "cron"
     jam_bursa_awal = datetime.strptime("08:45", "%H:%M").time()
     jam_bursa_akhir = datetime.strptime("16:05", "%H:%M").time()
     di_jam_bursa = (jam_bursa_awal <= jam_sekarang <= jam_bursa_akhir) and now.weekday() < 5
-    if mode == "cron" and not di_jam_bursa:
+    if mode == "cron" and not di_jam_bursa and not liquidate:
         print("😴 Mode cron: di luar jam bursa. Penulis malam adalah tombol web — bot tidur.")
         return
 
@@ -171,8 +178,8 @@ def jalankan_bot():
             ticker = posisi['Ticker']
             tgl_beli_saham = str(posisi['Tanggal_Beli']).split()[0]
             
-            # BSJP: Jika beli hari ini, TAHAN! (Tidak Boleh Dijual)
-            if tgl_beli_saham == tanggal_hari_ini:
+            # >>> LIQUIDATE: bypass aturan 'beli hari ini tahan'
+            if tgl_beli_saham == tanggal_hari_ini and not liquidate:
                 porto_baru.append(posisi)
                 continue
 
@@ -186,7 +193,12 @@ def jalankan_bot():
             status_jual = ""
             harga_jual = 0
             
-            if is_square_off_time:
+            # >>> LIQUIDATE: jual paksa semua posisi
+            if liquidate:
+                terjual = True
+                status_jual = "LIQUIDATE MANUAL 🧨"
+                harga_jual = harga_sekarang
+            elif is_square_off_time:
                 terjual = True
                 status_jual = "AUTO_SQUARE_OFF 🧹"
                 harga_jual = harga_sekarang
@@ -236,8 +248,9 @@ def jalankan_bot():
 
         # ==========================================
         # FASE B: MODE BELI (MASUKKAN SAHAM KE GUDANG)
+        # >>> LIQUIDATE: skip beli agar tidak langsung beli ulang sinyal lama
         # ==========================================
-        if mode == "manual" and mode_beli_aktif and os.path.exists(file_sinyal):
+        if mode == "manual" and mode_beli_aktif and os.path.exists(file_sinyal) and not liquidate:
             saldo_sekarang = cek_saldo_tersedia(df_porto)
             saham_dimiliki = df_porto['Ticker'].tolist() if not df_porto.empty else []
             try:
