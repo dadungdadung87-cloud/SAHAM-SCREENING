@@ -13,7 +13,8 @@
 # PART 10 : TAB 1 - MARKET OVERVIEW
 # PART 11 : TAB 2 - SCREENER UTAMA
 # PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS, AI BANDAR, AUTO-PILOT, 9 RONDE)
-# PART 13 : TAB 4 - PORTOFOLIO BOT
+# PART 13 : TAB 4 - PORTOFOLIO BOT (+ KURASI DAFTAR BELANJA)
+# PART 14 : TAB 5 - DETEKTIF LEDAKAN (HANYA BACA) + CHAT AI
 # =====================================================================
 
 
@@ -1370,7 +1371,6 @@ if not df_hasil.empty:
                 if "AI Bandar" in pilihan_ai:
                     st.subheader("🤖 AI Bandar (Persiapan BSJP Besok)")
                     
-                    # >>> BARU: tambahkan tab_acak untuk 9 Ronde
                     tab_otomatis, tab_manual, tab_acak = st.tabs(["🛸 Auto-Pilot 9 Rumus (Spreadsheet)", "✍️ Mode Manual (Paste Saham)", "🎲 Uji Konsistensi 9 Ronde"])
                     
                     with tab_otomatis:
@@ -1490,7 +1490,7 @@ if not df_hasil.empty:
                                     hasil_ai = analisa_bandar_ai_multisaham(data_kompilasi, 'pilihan_ai')
                                     st.info(hasil_ai)
 
-                    # >>> BARU: Tab 9 Ronde Uji Konsistensi
+                    # >>> Tab 9 Ronde Uji Konsistensi
                     with tab_acak:
                         st.markdown("Paste puluhan saham → AI memilih Top 5 → urutan diacak otomatis → diulang sampai **9 ronde**. Hasil dicetak sebagai spreadsheet murni, tanpa penjelasan.")
                         input_acak = st.text_area("📋 Paste Daftar Saham (Enter/Spasi):", height=200, key="input_acak_9ronde", placeholder="Contoh:\nBBCA\nTLKM\nASII\nGOTO\nBUKA\n...")
@@ -1680,7 +1680,7 @@ if not df_hasil.empty:
 
 
 # =====================================================================
-# >>> PART 13 : TAB 4 - PORTOFOLIO BOT <<<
+# >>> PART 13 : TAB 4 - PORTOFOLIO BOT (+ KURASI DAFTAR BELANJA) <<<
 # =====================================================================
     with tab4:
         @st.cache_data(ttl=60)
@@ -1694,7 +1694,8 @@ if not df_hasil.empty:
 
         st.markdown("## 🤖 Monitor Bot Simulator")
         
-        st.info("🕒 **Pembagian penulis otomatis:** Jam bursa (Sen–Jum 08:45–16:05) = cron laptop yang bekerja. Di luar jam bursa = tombol ini yang bekerja (beli instan harga penutupan). Akhir pekan = semua libur.")
+        # >>> PAGAR STRATEGI: beli = manual saja, jual = otomatis
+        st.info("🔒 **Pagar strategi:** BELI hanya lewat tombol di bawah ini (manual). Cron laptop TIDAK pernah membeli — ia hanya mengurus JUAL (TP/CL/square-off) saat jam bursa. Daftar belanja yang tidak Anda inginkan bisa disapu bersih di bagian **Kurasi** bawah.")
         if st.button("🛒 Eksekusi Pembelian Bot Sekarang!", type="primary", use_container_width=True):
             with st.spinner("Bot mengeksekusi pembelian dengan harga terakhir..."):
                 import subprocess
@@ -1733,6 +1734,39 @@ if not df_hasil.empty:
                     st.rerun()
                 else:
                     st.error("❌ Gagal menarik dari R2.")
+        
+        # >>> BARU: KURASI DAFTAR BELANJA — sapu bersih 9 rumus (lokal + R2)
+        st.markdown("---")
+        st.markdown("### 🗑️ Kurasi Daftar Belanja")
+        st.caption("Buang kertas belanja yang tidak ingin Anda beli — terhapus di web DAN di R2, sehingga cron laptop & tombol Eksekusi tidak akan menyentuhnya. Posisi yang sudah dibeli TIDAK tersentuh.")
+        if st.session_state.get("konfirmasi_sapu_sinyal"):
+            st.warning("️ Seluruh daftar belanja di 9 arena akan dihapus (lokal & R2). Lanjutkan?")
+            col_ya, col_batal = st.columns(2)
+            with col_ya:
+                if st.button("✅ YA, SAPU BERSIH SEMUA", type="primary", key="sapu_ya"):
+                    terhapus = 0
+                    for i in range(1, 10):
+                        f_local = f"Database/sinyal_ai_rumus_{i}.csv"
+                        if os.path.exists(f_local):
+                            try:
+                                os.remove(f_local); terhapus += 1
+                            except Exception: pass
+                        try:
+                            r2_client.hapus_objek(f"Database/sinyal_ai_rumus_{i}.csv")
+                        except Exception: pass
+                    st.session_state["konfirmasi_sapu_sinyal"] = False
+                    st.success(f"🧹 Selesai: {terhapus} file lokal dibuang + seluruh objek sinyal di R2 dihapus. Daftar belanja kini kosong.")
+                    time.sleep(1)
+                    st.rerun()
+            with col_batal:
+                if st.button("↩️ Batal", key="sapu_batal"):
+                    st.session_state["konfirmasi_sapu_sinyal"] = False
+                    st.rerun()
+        else:
+            if st.button("🗑️ Kosongkan Semua Daftar Belanja (9 Rumus)", use_container_width=True,
+                         help="Hapus kertas belanja yang tidak ingin Anda beli — lokal & R2 sekaligus"):
+                st.session_state["konfirmasi_sapu_sinyal"] = True
+                st.rerun()
         
         st.markdown("---")
         
@@ -1801,7 +1835,7 @@ if not df_hasil.empty:
         with sub1:
             if os.path.exists(FILE_SINYAL):
                 df_sinyal = pd.read_csv(FILE_SINYAL)
-                st.success("🔥 Sinyal AI (Kertas Belanja) telah diterima! Bot akan mengeksekusi pembelian pada jam bursa.")
+                st.success("🔥 Sinyal AI (Kertas Belanja) diterima! Menunggu eksekusi MANUAL Anda lewat tombol 🛒 di atas — cron tidak akan membelinya.")
                 st.dataframe(df_sinyal, use_container_width=True, hide_index=True)
             else:
                 st.info(f"KOSONG. Belum ada sinyal masuk untuk {pilihan_arena}, atau bot sudah membelinya dan membakar kertas belanja.")
@@ -1849,11 +1883,12 @@ if not df_hasil.empty:
                 st.info(f"📭 Belum ada riwayat penjualan saham untuk {pilihan_arena}.")
 
 # =====================================================================
-# >>> PART 14 : TAB 5 - DETEKTIF LEDAKAN (OTOPSI H-1) + CHAT AI <<<
+# >>> PART 14 : TAB 5 - DETEKTIF LEDAKAN (HANYA BACA) + CHAT AI <<<
 # =====================================================================
     with tab5:
         st.markdown("## 🕵️ Detektif Ledakan & Ruang Obrolan AI")
         st.caption("Angka dihitung LOKAL dari arsip intraday R2 (snapshot 5-menitan) + Buku Besar Harian (50 hari, gzip ±1MB). AI gratis hanya menyusun narasi — tidak berhitung.")
+        st.caption("🔒 **Pagar keamanan:** Tab ini hanya MEMBACA & MENGANALISIS — tidak pernah membeli, menjual, atau mengubah portofolio/sinyal Anda.")
 
         HARI_INI = (datetime.utcnow() + pd.Timedelta(hours=7)).strftime("%Y-%m-%d")
         lb = muat_buku_besar()
@@ -2016,10 +2051,10 @@ if not df_hasil.empty:
                 st.markdown(f"**🔥 Terdeteksi swing low→high ≥10% pada {tgl_chip}** *(saham yang pagi terbang lalu sore turun TETAP tertangkap)*:")
                 n_col = min(len(df_ledakan), 6)
                 chips = st.columns(n_col)
-        for i, (_, r) in enumerate(df_ledakan.head(n_col).iterrows()):
-            with chips[i]:
-                st.button(f"{r.Ticker} ⤴{float(r['Swing_%']):.0f}%", key=f"chip_{r.Ticker}_{tgl_chip}",
-                          on_click=_set_otopsi, args=(r.Ticker, tgl_chip))
+                for i, (_, r) in enumerate(df_ledakan.head(n_col).iterrows()):
+                    with chips[i]:
+                        st.button(f"{r.Ticker} ⤴{float(r['Swing_%']):.0f}%", key=f"chip_{r.Ticker}_{tgl_chip}",
+                                  on_click=_set_otopsi, args=(r.Ticker, tgl_chip))
 
         # ---------- Tombol template ----------
         st.markdown("---")
@@ -2142,4 +2177,4 @@ if not df_hasil.empty:
                     jawab, mesin = narasi_ai(ctx or "(tidak ada data lokal relevan)", pesan)
                 st.markdown(jawab)
                 st.caption(f"⚡ via {mesin}")
-            st.session_state["chat_detektif"].append({"role": "assistant", "content": jawab})                
+            st.session_state["chat_detektif"].append({"role": "assistant", "content": jawab})
