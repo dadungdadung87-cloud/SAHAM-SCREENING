@@ -1654,7 +1654,64 @@ if not df_hasil.empty:
                                     st.info("💡 **TUGAS ANDA:** Salin nama model yang berstatus '✅ Lulus & Patuh', dan kita gunakan nama pasti itu untuk skrip turnamen!")
 
                 elif "Pemburu ARA" in pilihan_ai:
-                    st.subheader("📡 Radar Live Top-5 (Referensi Uang Asli)")
+                    st.subheader("🎯 Pemburu ARA — 2 Bagian")
+                    st.caption("**Bagian 1** mencetak daftar belanja simulator. **Bagian 2** radar referensi uang asli (tidak menulis apa pun).")
+
+                    # ========== BAGIAN 1: PEMBUAT DAFTAR BELANJA (SIMULATOR) ==========
+                    st.markdown("### 🛸 Bagian 1 — Auto-Pilot Pembuat Daftar Belanja")
+                    st.caption("Menyeleksi 15 saham terbaik per rumus → AI sidang Top 5 → **menulis kertas belanja** ke simulator (Tab 4).")
+                    paksa_sidang_ara = st.checkbox("🔄 Paksa Sidang Ulang (abaikan cache Mode Kilat)", key="paksa_sidang_ara")
+                    if st.button("🛸 Jalankan Auto-Pilot (Buat Daftar Belanja)", type="primary", key="autopilot_ara"):
+                        GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
+                        if not GEMINI_API_KEY:
+                            st.error("❌ Kunci API GEMINI belum dipasang!")
+                        else:
+                            daftar_rumus = {1: df_v1, 2: df_v2, 3: df_v3, 4: df_v4, 5: df_v5, 6: df_v6, 7: df_v7, 8: df_v8, 9: df_v9}
+                            stempel_data = str(df_hasil["Terakhir Update"].iloc[0]) if "Terakhir Update" in df_hasil.columns else "tanpa_stempel"
+                            keranjang_spreadsheet = None
+                            if not paksa_sidang_ara and os.path.exists(FILE_CACHE_AUTOPILOT):
+                                try:
+                                    with open(FILE_CACHE_AUTOPILOT, "r") as f: cache_muat = json.load(f)
+                                    if cache_muat.get("stempel_data") == stempel_data and cache_muat.get("versi") == VERSI_SIDANG and cache_muat.get("keranjang"):
+                                        ada_isi_cache = any(len([t for t in cache_muat["keranjang"].get(f"RUMUS {i}", []) if t]) > 0 for i in range(1, 10))
+                                        if ada_isi_cache:
+                                            keranjang_spreadsheet = cache_muat["keranjang"]
+                                            st.info("⚡ **Mode Kilat Aktif:** hasil sidang sebelumnya ditampilkan instan dari cache.")
+                                except: pass
+                            if keranjang_spreadsheet is None:
+                                progress_bar = st.progress(0)
+                                status_teks = st.empty()
+                                keranjang_spreadsheet, err_global, laporan_sidang = jalankan_sidang_autopilot(daftar_rumus, df_hasil, GEMINI_API_KEY, progress_bar, status_teks)
+                                if err_global:
+                                    st.error(err_global)
+                                else:
+                                    df_laporan = pd.DataFrame([{
+                                        "Rumus": f"RUMUS {i}",
+                                        "Status": laporan_sidang[i]["status"],
+                                        "Keterangan": laporan_sidang[i]["detail"]
+                                    } for i in range(1, 10)])
+                                    st.markdown("#### 🧾 Laporan Sidang (Transparan)")
+                                    st.dataframe(df_laporan, use_container_width=True, hide_index=True)
+                                    ada_isi = any(laporan_sidang[i]["status"] == "✅ Sukses" for i in range(1, 10))
+                                    if ada_isi:
+                                        try:
+                                            with open(FILE_CACHE_AUTOPILOT, "w") as f:
+                                                json.dump({"stempel_data": stempel_data, "versi": VERSI_SIDANG, "keranjang": keranjang_spreadsheet}, f, indent=4)
+                                        except: pass
+                                        status_teks.success("🎉 MISSION ACCOMPLISHED! Daftar belanja baru tercetak & ter-upload ke R2.")
+                                        st.balloons()
+                                    else:
+                                        status_teks.warning("⚠️ Sidang selesai tetapi tidak ada jawara. Baca Laporan Sidang untuk tahu penyebab pastinya.")
+                            st.markdown("#### 📋 Tabel Master Portofolio (Siap Salin)")
+                            for kunci in keranjang_spreadsheet:
+                                keranjang_spreadsheet[kunci] = (keranjang_spreadsheet[kunci] + ["", "", "", "", ""])[:5]
+                            df_spreadsheet = pd.DataFrame(keranjang_spreadsheet)
+                            st.data_editor(df_spreadsheet, use_container_width=True, hide_index=True)
+
+                    st.markdown("---")
+
+                    # ========== BAGIAN 2: RADAR LIVE (REFERENSI UANG ASLI) ==========
+                    st.markdown("### 📡 Bagian 2 — Radar Live Top-5 (Referensi Uang Asli)")
                     st.caption("Screening ulang otomatis ±5 menit dari data R2 terbaru. **MURNI TAMPILAN** — tidak menulis sinyal simulator, tidak membeli apa pun.")
                     if AUTOREFRESH_OK:
                         st_autorefresh(interval=5 * 60 * 1000, key="radar_live_autorefresh")
@@ -1675,7 +1732,7 @@ if not df_hasil.empty:
 
                     df_radar = pd.DataFrame({f"RUMUS {i}": _top5_lokal(dfv) for i, dfv in enumerate(
                         [df_v1, df_v2, df_v3, df_v4, df_v5, df_v6, df_v7, df_v8, df_v9], start=1)})
-                    st.markdown("### 🏆 Top-5 per Rumus (tidak digabung)")
+                    st.markdown("#### 🏆 Top-5 per Rumus (tidak digabung)")
                     st.dataframe(df_radar, use_container_width=True, hide_index=True)
                     st.caption("ℹ️ Referensi keputusan uang asli Anda di broker. Simulator tetap memakai jalur daftar belanja sendiri (Tab 4).")
                     if st.button("🧠 Mintakan opini AI sekarang (hemat kuota: hanya saat diklik)", key="btn_opini_radar"):
