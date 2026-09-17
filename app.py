@@ -1,20 +1,20 @@
 # =====================================================================
-# 🗺️  PETA PART app.py (untuk update: cukup sebut nomor PART)
+# 🗺️  PETA PART app.py v5.0
 # ---------------------------------------------------------------------
-# PART 01 : IMPOR MODUL
-# PART 02 : FUNGSI AI KLASIK (Hakim, OpenRouter, Turnamen, Grand Final)
-# PART 03 : MESIN AUTO-PILOT CEPAT & PARALEL (+ REM CERDAS) + 9 RONDE
-# PART 04 : SISTEM ARSIP CERDAS (DATA HARIAN)
+# PART 01 : IMPOR MODUL (+ autorefresh)
+# PART 02 : FUNGSI AI KLASIK
+# PART 03 : MESIN AUTO-PILOT CEPAT + narasi bersama
+# PART 04 : SISTEM ARSIP CERDAS
 # PART 05 : PENGATURAN UI/UX & CSS
-# PART 06 : LOAD KONFIGURASI JSON (MASTER FILTERS)
+# PART 06 : LOAD KONFIGURASI JSON
 # PART 07 : PRESET & LOAD DATA SAHAM
 # PART 08 : HEADER & SIDEBAR
-# PART 09 : FORMATTER & PEWARNAAN TABEL + TABEL STRATEGI
+# PART 09 : FORMATTER & PEWARNAAN TABEL
 # PART 10 : TAB 1 - MARKET OVERVIEW
 # PART 11 : TAB 2 - SCREENER UTAMA
-# PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS, AI BANDAR, AUTO-PILOT, 9 RONDE)
-# PART 13 : TAB 4 - PORTOFOLIO BOT (+ KURASI DAFTAR BELANJA)
-# PART 14 : TAB 5 - DETEKTIF LEDAKAN (HANYA BACA) + CHAT AI
+# PART 12 : TAB 3 - ASISTEN AI (RUMUS v5.0 + RADAR LIVE)
+# PART 13 : TAB 4 - PORTOFOLIO BOT (+ KURASI)
+# PART 14 : TAB 5 - DETEKTIF LEDAKAN
 # =====================================================================
 
 
@@ -36,6 +36,13 @@ from datetime import datetime
 # IMPORT UNTUK AI OPENROUTER & GOOGLE
 from openai import OpenAI
 import google.generativeai as genai
+
+# REFRESH OTOMATIS UNTUK RADAR LIVE (TAB 3)
+try:
+    from streamlit_autorefresh import st_autorefresh
+    AUTOREFRESH_OK = True
+except Exception:
+    AUTOREFRESH_OK = False
 
 
 # =====================================================================
@@ -326,6 +333,31 @@ def radar_model_gemini_cepat(api_key):
     except Exception:
         pass
     return cepat + cadangan
+
+def panggil_ai_teks(prompt):
+    """Mesin narasi gratis: Gemini flash dulu, fallback OpenRouter free."""
+    try:
+        GK = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
+        if GK:
+            genai.configure(api_key=GK)
+            for mn in ["gemini-1.5-flash-latest", "gemini-1.5-flash", "gemini-1.0-pro"]:
+                try:
+                    r = genai.GenerativeModel(mn).generate_content(prompt)
+                    if r.text: return r.text, f"Gemini ({mn})"
+                except Exception:
+                    continue
+    except Exception:
+        pass
+    try:
+        OK_ = st.secrets.get("OPENROUTER_API_KEY", os.environ.get("OPENROUTER_API_KEY"))
+        if OK_:
+            cp = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OK_).chat.completions.create(
+                model="openrouter/free", messages=[{"role": "user", "content": prompt}], temperature=0.4, max_tokens=1200)
+            isi = cp.choices[0].message.content
+            if isi: return isi, "OpenRouter"
+    except Exception as e:
+        return f"❌ AI gagal: {e}", "error"
+    return "❌ Tidak ada mesin AI gratis tersedia.", "error"
 
 def ai_hakim_klasemen_cepat(data_top15, api_key, daftar_model):
     genai.configure(api_key=api_key)
@@ -1253,9 +1285,9 @@ if not df_hasil.empty:
 
 
 # =====================================================================
-# >>> PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS & AUTO-PILOT & 9 RONDE) <<<
+# >>> PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS v5.0 + RADAR LIVE) <<<
 # =====================================================================
-    VERSI_SIDANG = "v5"
+    VERSI_SIDANG = "v5.0"
     FILE_CACHE_AUTOPILOT = "Database/cache_autopilot.json"
     with tab3:
         st.markdown("## 🦅 Radar BSJP & Laboratorium Forensik AI")
@@ -1264,60 +1296,74 @@ if not df_hasil.empty:
         if 'Tekanan Bandar' not in df_hasil.columns:
             st.warning("⏳ **Fitur Radar belum menerima data terbaru.** Harap jalankan 'update_data.py'.")
         else:
-            vwap_ok = (df_hasil.get('Posisi VWAP', '') != 'Di Bawah VWAP (Lemah)')
-            akumulasi_pro = (df_hasil.get('Kekuatan A/D', '') == 'Akumulasi Pro (Smart Money)')
+            # --- SUSUNAN RUMUS v5.0: 1-5 remap, 6-9 rumus baru ---
+            df_v1 = df_v2 = df_v3 = df_v4 = df_v5 = df_v6 = df_v7 = df_v8 = df_v9 = pd.DataFrame()
+            if not df_hasil.empty:
+                vwap_ok = (df_hasil.get('Posisi VWAP', '') != 'Di Bawah VWAP (Lemah)')
+                vwap_kuat = (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)')
+                akumulasi_pro = (df_hasil.get('Kekuatan A/D', '') == 'Akumulasi Pro (Smart Money)')
+                change_num = pd.to_numeric(df_hasil.get('Change (%)', 0), errors='coerce')
 
-            cond_v1 = ((df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)') &
-                       (df_hasil.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)') &
-                       (df_hasil.get('Status Open', '') == 'Open = Low (Bullish Kuat)') &
-                       (df_hasil.get('Rekomendasi', '') == 'BELI'))
-            df_v1 = df_hasil[cond_v1].copy() if not df_hasil.empty else pd.DataFrame()
+                # RUMUS 1: Smart Money Menyelam (eks R2)
+                cond_v1 = (akumulasi_pro &
+                           (df_hasil.get('Status Bandar', '') == 'Akumulasi Kuat') &
+                           vwap_ok)
+                df_v1 = df_hasil[cond_v1].copy()
 
-            cond_v2 = (akumulasi_pro &
-                       (df_hasil.get('Status Bandar', '') == 'Akumulasi Kuat') &
-                       vwap_ok)
-            df_v2 = df_hasil[cond_v2].copy() if not df_hasil.empty else pd.DataFrame()
+                # RUMUS 2: Pantulan Jarum Bawah (eks R3)
+                cond_v2 = (((df_hasil.get('Pola Candle', '') == 'Hammer (Potensi Reversal)') |
+                            (df_hasil.get('Sinyal Cuci Barang', '') == 'Jarum Bawah (Sinyal Pantulan Kuat)')) &
+                           vwap_kuat &
+                           akumulasi_pro)
+                df_v2 = df_hasil[cond_v2].copy()
 
-            cond_v3 = (((df_hasil.get('Pola Candle', '') == 'Hammer (Potensi Reversal)') |
-                        (df_hasil.get('Sinyal Cuci Barang', '') == 'Jarum Bawah (Sinyal Pantulan Kuat)')) &
-                       (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)') &
-                       akumulasi_pro)
-            df_v3 = df_hasil[cond_v3].copy() if not df_hasil.empty else pd.DataFrame()
+                # RUMUS 3: Tutup Kuat, Bandar Hajar (eks R1)
+                cond_v3 = (vwap_kuat &
+                           (df_hasil.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)') &
+                           (df_hasil.get('Status Open', '') == 'Open = Low (Bullish Kuat)') &
+                           (df_hasil.get('Rekomendasi', '') == 'BELI'))
+                df_v3 = df_hasil[cond_v3].copy()
 
-            cond_v4 = ((df_hasil.get('MA Cross', '') == 'Golden Cross') &
-                       (df_hasil.get('Vol Breakout', '') == 'Tembus MA20') &
-                       (df_hasil.get('MA Signal', '') == 'Uptrend') &
-                       (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)'))
-            df_v4 = df_hasil[cond_v4].copy() if not df_hasil.empty else pd.DataFrame()
+                # RUMUS 4: Golden Cross Muda (tetap)
+                cond_v4 = ((df_hasil.get('MA Cross', '') == 'Golden Cross') &
+                           (df_hasil.get('Vol Breakout', '') == 'Tembus MA20') &
+                           (df_hasil.get('MA Signal', '') == 'Uptrend') &
+                           vwap_kuat)
+                df_v4 = df_hasil[cond_v4].copy()
 
-            cond_v5 = ((df_hasil.get('Status BB', '') == 'Squeeze') &
-                       akumulasi_pro &
-                       vwap_ok &
-                       (df_hasil.get('Tekanan Bandar', '') != 'Dominan Jual (Guyur)'))
-            df_v5 = df_hasil[cond_v5].copy() if not df_hasil.empty else pd.DataFrame()
+                # RUMUS 5: Momentum Likuid Sehat (eks R6)
+                cond_v5 = ((df_hasil.get('Kelas Transaksi', '') == 'Ritel Aktif (5M - 50M)') &
+                           (df_hasil.get('Vol Breakout', '') == 'Tembus MA20') &
+                           vwap_kuat &
+                           (df_hasil.get('MA Signal', '') == 'Uptrend'))
+                df_v5 = df_hasil[cond_v5].copy()
 
-            cond_v6 = ((df_hasil.get('Kelas Transaksi', '') == 'Ritel Aktif (5M - 50M)') &
-                       (df_hasil.get('Vol Breakout', '') == 'Tembus MA20') &
-                       (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)') &
-                       (df_hasil.get('MA Signal', '') == 'Uptrend'))
-            df_v6 = df_hasil[cond_v6].copy() if not df_hasil.empty else pd.DataFrame()
+                # RUMUS 6: BARU — Ledakan Volume Senyap
+                cond_v6 = ((df_hasil.get('RVOL (Anomali Vol)', '').isin(['Anomali Tinggi (150-300%)', 'Ledakan Ekstrem (> 300%)'])) &
+                           (df_hasil.get('OBV Trend', '') == 'Akumulasi (Naik)') &
+                           (change_num <= 5.0) &
+                           (df_hasil.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)'))
+                df_v6 = df_hasil[cond_v6].copy()
 
-            cond_v7 = ((df_hasil.get('Status Fibonacci', '').astype(str).str.contains('61.8|78.6', na=False)) &
-                       akumulasi_pro &
-                       vwap_ok)
-            df_v7 = df_hasil[cond_v7].copy() if not df_hasil.empty else pd.DataFrame()
+                # RUMUS 7: BARU — Anomali Machine Learning
+                cond_v7 = ((df_hasil.get('Prediksi Machine Learning', '') == '🔥 ANOMALI BANDAR (Siap Ledakan)') &
+                           (df_hasil.get('Status Stochastic', '').isin(['Oversold (Jenuh Jual - Peluang)', 'Golden Cross (Awal Bullish)'])) &
+                           vwap_ok)
+                df_v7 = df_hasil[cond_v7].copy()
 
-            cond_v8 = ((df_hasil.get('Kategori', '') == 'Small Cap (Lapis 3)') &
-                       (df_hasil.get('Karakter Gorengan', '') == 'Solid (Jarang Dibanting)') &
-                       (df_hasil.get('Fase Siklus Bandar', '').isin(['Accumulation (Kumpul Barang)', 'Mark-Up (Fase Pesta)'])) &
-                       (~df_hasil.get('Kondisi Supply', '').astype(str).str.contains('Supply Banjir', na=False)))
-            df_v8 = df_hasil[cond_v8].copy() if not df_hasil.empty else pd.DataFrame()
+                # RUMUS 8: BARU — Katalis Sentimen & Akuisisi
+                cond_v8 = (((df_hasil.get('Status Sentimen', '') == 'Sentimen Positif 📰') |
+                            (df_hasil.get('Status Akuisisi', '').isin(['RENCANA AKUISISI', 'DALAM AKUISISI']))) &
+                           (df_hasil.get('MA Signal', '') == 'Uptrend') &
+                           (df_hasil.get('Rekomendasi', '') == 'BELI'))
+                df_v8 = df_hasil[cond_v8].copy()
 
-            cond_v9 = ((df_hasil.get('Kategori', '') == 'Big Cap (Lapis 1)') &
-                       akumulasi_pro &
-                       (df_hasil.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)') &
-                       (df_hasil.get('Rekomendasi', '') == 'BELI'))
-            df_v9 = df_hasil[cond_v9].copy() if not df_hasil.empty else pd.DataFrame()
+                # RUMUS 9: BARU — MACD Momentum Terukur
+                cond_v9 = ((df_hasil.get('MACD', '').isin(['Strong Bullish', 'Bullish MACD'])) &
+                           (df_hasil.get('Risk/Reward Ratio', '').isin(['Sangat Menarik (> 1:3)', 'Ideal (1:2)'])) &
+                           (df_hasil.get('Posisi Entry', '') == 'Dekat Support (Low Risk)') &
+                           (df_hasil.get('Momentum', '') == 'Positif'))
+                df_v9 = df_hasil[cond_v9].copy()
 
             tab_screener, tab_ai = st.tabs(["🎯 Screener Spesial", "🧠 Asisten AI"])
             
@@ -1325,15 +1371,15 @@ if not df_hasil.empty:
                 pilihan_v = st.selectbox(
                     "Pilih Rumus Screener BSJP:",
                     [
-                        "RUMUS 1 : Tutup Kuat, Bandar Hajar ",
-                        "RUMUS 2 : Smart Money Menyelam 🕵️",
-                        "RUMUS 3 : Pantulan Jarum Bawah 📌",
+                        "RUMUS 1 : Smart Money Menyelam 🕵️",
+                        "RUMUS 2 : Pantulan Jarum Bawah 📌",
+                        "RUMUS 3 : Tutup Kuat, Bandar Hajar ⚡",
                         "RUMUS 4 : Golden Cross Muda 🌱",
-                        "RUMUS 5 : Squeeze Berisi Bensin ⛽",
-                        "RUMUS 6 : Momentum Likuid Sehat 💧",
-                        "RUMUS 7 : Golden Pocket Fibo ",
-                        "RUMUS 8 : Gorengan Berkelas 🍳",
-                        "RUMUS 9 : Arus Institusi Big Cap 🏦"
+                        "RUMUS 5 : Momentum Likuid Sehat 💧",
+                        "RUMUS 6 : Ledakan Volume Senyap 🌋",
+                        "RUMUS 7 : Anomali Machine Learning 🧠",
+                        "RUMUS 8 : Katalis Sentimen & Akuisisi 📰",
+                        "RUMUS 9 : MACD Momentum Terukur 🎯"
                     ]
                 )
                 
@@ -1608,75 +1654,38 @@ if not df_hasil.empty:
                                     st.info("💡 **TUGAS ANDA:** Salin nama model yang berstatus '✅ Lulus & Patuh', dan kita gunakan nama pasti itu untuk skrip turnamen!")
 
                 elif "Pemburu ARA" in pilihan_ai:
-                    st.subheader("🎯 Pemburu ARA (Sistem Kualifikasi Lama)")
-                    st.info("💡 **Fitur Auto-Pilot 9 Rumus (Klasemen Global) telah dipindahkan ke menu '🤖 AI Bandar'.** Silakan buka menu tersebut untuk menggunakan mode pencetak Tabel Spreadsheet secara otomatis!")
+                    st.subheader("📡 Radar Live Top-5 (Referensi Uang Asli)")
+                    st.caption("Screening ulang otomatis ±5 menit dari data R2 terbaru. **MURNI TAMPILAN** — tidak menulis sinyal simulator, tidak membeli apa pun.")
+                    if AUTOREFRESH_OK:
+                        st_autorefresh(interval=5 * 60 * 1000, key="radar_live_autorefresh")
+                    else:
+                        st.info("⚠️ Package streamlit-autorefresh belum aktif — refresh lewat tombol sidebar Sync.")
+                    _now = datetime.utcnow() + pd.Timedelta(hours=7)
+                    _jam = _now.time()
+                    live = (_now.weekday() < 5) and (pd.Timestamp("08:45").time() <= _jam <= pd.Timestamp("16:05").time())
+                    st.caption("🟢 DATA LIVE (jam bursa)" if live else "📴 Data penutupan terakhir (di luar jam bursa)")
 
-                    st.markdown("### 🛸 Mode Auto-Pilot (Super AI & Klasemen)")
-                    st.markdown("Sistem akan menyeleksi 15 saham terbaik per rumus secara global, lalu AI akan memilih Top 5 untuk dicetak ke tabel Spreadsheet.")
-                    
-                    paksa_sidang_ara = st.checkbox("🔄 Paksa Sidang Ulang (abaikan cache Mode Kilat)", key="paksa_sidang_ara")
-                    
-                    if st.button("🛸 Jalankan Auto-Pilot Ultimate", type="primary", key="autopilot_ara"):
-                        GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
-                        if not GEMINI_API_KEY:
-                            st.error("❌ Kunci API GEMINI belum dipasang!")
-                        else:
-                            daftar_rumus = {
-                                1: df_v1, 2: df_v2, 3: df_v3, 
-                                4: df_v4, 5: df_v5, 6: df_v6, 
-                                7: df_v7, 8: df_v8, 9: df_v9
-                            }
-                            
-                            stempel_data = str(df_hasil["Terakhir Update"].iloc[0]) if "Terakhir Update" in df_hasil.columns else "tanpa_stempel"
-                            FILE_CACHE_AUTOPILOT = "Database/cache_autopilot.json"
-                            
-                            keranjang_spreadsheet = None
-                            if not paksa_sidang_ara and os.path.exists(FILE_CACHE_AUTOPILOT):
-                                try:
-                                    with open(FILE_CACHE_AUTOPILOT, "r") as f: cache_muat = json.load(f)
-                                    if cache_muat.get("stempel_data") == stempel_data and cache_muat.get("versi") == VERSI_SIDANG and cache_muat.get("keranjang"):
-                                        ada_isi_cache = any(len([t for t in cache_muat["keranjang"].get(f"RUMUS {i}", []) if t]) > 0 for i in range(1, 10))
-                                        if ada_isi_cache:
-                                            keranjang_spreadsheet = cache_muat["keranjang"]
-                                            st.info("⚡ **Mode Kilat Aktif:** hasil sidang sebelumnya ditampilkan instan dari cache.")
-                                except: pass
-                            
-                            if keranjang_spreadsheet is None:
-                                progress_bar = st.progress(0)
-                                status_teks = st.empty()
-                                
-                                keranjang_spreadsheet, err_global, laporan_sidang = jalankan_sidang_autopilot(daftar_rumus, df_hasil, GEMINI_API_KEY, progress_bar, status_teks)
-                                
-                                if err_global:
-                                    st.error(err_global)
-                                else:
-                                    df_laporan = pd.DataFrame([{
-                                        "Rumus": f"RUMUS {i}",
-                                        "Status": laporan_sidang[i]["status"],
-                                        "Keterangan": laporan_sidang[i]["detail"]
-                                    } for i in range(1, 10)])
-                                    st.markdown("### 🧾 Laporan Sidang (Transparan)")
-                                    st.dataframe(df_laporan, use_container_width=True, hide_index=True)
-                                    
-                                    ada_isi = any(laporan_sidang[i]["status"] == "✅ Sukses" for i in range(1, 10))
-                                    if ada_isi:
-                                        try:
-                                            with open(FILE_CACHE_AUTOPILOT, "w") as f:
-                                                json.dump({"stempel_data": stempel_data, "versi": VERSI_SIDANG, "keranjang": keranjang_spreadsheet}, f, indent=4)
-                                        except: pass
-                                        status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
-                                        st.balloons()
-                                    else:
-                                        status_teks.warning("⚠️ Sidang selesai tetapi tidak ada jawara. Baca Laporan Sidang untuk tahu penyebab pastinya.")
-                            
-                            st.markdown("### 📋 Tabel Master Portofolio (Siap Salin)")
-                            
-                            for kunci in keranjang_spreadsheet:
-                                keranjang_spreadsheet[kunci] = (keranjang_spreadsheet[kunci] + ["", "", "", "", ""])[:5]
-                            
-                            df_spreadsheet = pd.DataFrame(keranjang_spreadsheet)
-                            
-                            st.data_editor(df_spreadsheet, use_container_width=True, hide_index=True)
+                    def _top5_lokal(dfv):
+                        if dfv is None or dfv.empty: return ["-", "-", "-", "-", "-"]
+                        d = dfv.copy()
+                        d["_s"] = pd.to_numeric(d.get("Total Score", 0), errors="coerce").fillna(0)
+                        d["_v"] = pd.to_numeric(d.get("Volume", 0), errors="coerce").fillna(0)
+                        d = d.sort_values(["_s", "_v"], ascending=[False, False])
+                        return (d["Ticker"].tolist() + [""] * 5)[:5]
+
+                    df_radar = pd.DataFrame({f"RUMUS {i}": _top5_lokal(dfv) for i, dfv in enumerate(
+                        [df_v1, df_v2, df_v3, df_v4, df_v5, df_v6, df_v7, df_v8, df_v9], start=1)})
+                    st.markdown("### 🏆 Top-5 per Rumus (tidak digabung)")
+                    st.dataframe(df_radar, use_container_width=True, hide_index=True)
+                    st.caption("ℹ️ Referensi keputusan uang asli Anda di broker. Simulator tetap memakai jalur daftar belanja sendiri (Tab 4).")
+                    if st.button("🧠 Mintakan opini AI sekarang (hemat kuota: hanya saat diklik)", key="btn_opini_radar"):
+                        prompt_radar = f"""Berikut hasil radar top-5 per rumus screener IHSG saat ini:
+{df_radar.to_string(index=False)}
+Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang paling layak dieksekusi uang asli sore ini dan mana yang sebaiknya dihindari, beserta alasan teknikal singkat."""
+                        with st.spinner("AI menyusun opini..."):
+                            jawab_r, mesin_r = panggil_ai_teks(prompt_radar)
+                        st.markdown(jawab_r)
+                        st.caption(f"⚡ via {mesin_r}")
 
 
 # =====================================================================
@@ -1948,16 +1957,18 @@ if not df_hasil.empty:
             vk = get("Posisi VWAP") == "Di Atas VWAP (Kuat)"
             vo = get("Posisi VWAP") != "Di Bawah VWAP (Lemah)"
             ap = get("Kekuatan A/D") == "Akumulasi Pro (Smart Money)"
+            _ch = pd.to_numeric(r.get("Change (%)", 0), errors="coerce")
+            _ch = 0.0 if pd.isna(_ch) else float(_ch)
             cek = {
-                1: [("VWAP kuat", vk), ("Tekanan HAKA", get("Tekanan Bandar") == "Dominan Beli (Hajar Kanan)"), ("Open=Low", get("Status Open") == "Open = Low (Bullish Kuat)"), ("Rekomendasi BELI", get("Rekomendasi") == "BELI")],
-                2: [("Smart Money A/D", ap), ("Bandar Akumulasi Kuat", get("Status Bandar") == "Akumulasi Kuat"), ("VWAP tidak lemah", vo)],
-                3: [("Hammer/Jarum Bawah", get("Pola Candle") == "Hammer (Potensi Reversal)" or get("Sinyal Cuci Barang") == "Jarum Bawah (Sinyal Pantulan Kuat)"), ("VWAP kuat", vk), ("Smart Money A/D", ap)],
+                1: [("Smart Money A/D", ap), ("Bandar Akumulasi Kuat", get("Status Bandar") == "Akumulasi Kuat"), ("VWAP tidak lemah", vo)],
+                2: [("Hammer/Jarum Bawah", get("Pola Candle") == "Hammer (Potensi Reversal)" or get("Sinyal Cuci Barang") == "Jarum Bawah (Sinyal Pantulan Kuat)"), ("VWAP kuat", vk), ("Smart Money A/D", ap)],
+                3: [("VWAP kuat", vk), ("Tekanan HAKA", get("Tekanan Bandar") == "Dominan Beli (Hajar Kanan)"), ("Open=Low", get("Status Open") == "Open = Low (Bullish Kuat)"), ("Rekomendasi BELI", get("Rekomendasi") == "BELI")],
                 4: [("Golden Cross", get("MA Cross") == "Golden Cross"), ("Tembus MA20", get("Vol Breakout") == "Tembus MA20"), ("Uptrend", get("MA Signal") == "Uptrend"), ("VWAP kuat", vk)],
-                5: [("Squeeze", get("Status BB") == "Squeeze"), ("Smart Money A/D", ap), ("VWAP tidak lemah", vo), ("Bukan diguyur", get("Tekanan Bandar") != "Dominan Jual (Guyur)")],
-                6: [("Ritel Aktif", get("Kelas Transaksi") == "Ritel Aktif (5M - 50M)"), ("Tembus MA20", get("Vol Breakout") == "Tembus MA20"), ("VWAP kuat", vk), ("Uptrend", get("MA Signal") == "Uptrend")],
-                7: [("Fibo 61.8/78.6", "61.8" in get("Status Fibonacci") or "78.6" in get("Status Fibonacci")), ("Smart Money A/D", ap), ("VWAP tidak lemah", vo)],
-                8: [("Small Cap", get("Kategori") == "Small Cap (Lapis 3)"), ("Solid", get("Karakter Gorengan") == "Solid (Jarang Dibanting)"), ("Fase kumpul/pesta", get("Fase Siklus Bandar") in ("Accumulation (Kumpul Barang)", "Mark-Up (Fase Pesta)")), ("Supply tidak banjir", "Supply Banjir" not in get("Kondisi Supply"))],
-                9: [("Big Cap", get("Kategori") == "Big Cap (Lapis 1)"), ("Smart Money A/D", ap), ("VWAP kuat", vk), ("Rekomendasi BELI", get("Rekomendasi") == "BELI")],
+                5: [("Ritel Aktif", get("Kelas Transaksi") == "Ritel Aktif (5M - 50M)"), ("Tembus MA20", get("Vol Breakout") == "Tembus MA20"), ("VWAP kuat", vk), ("Uptrend", get("MA Signal") == "Uptrend")],
+                6: [("RVOL anomali tinggi", get("RVOL (Anomali Vol)") in ("Anomali Tinggi (150-300%)", "Ledakan Ekstrem (> 300%)")), ("OBV Akumulasi", get("OBV Trend") == "Akumulasi (Naik)"), ("Change ≤ 5%", _ch <= 5.0), ("Tekanan HAKA", get("Tekanan Bandar") == "Dominan Beli (Hajar Kanan)")],
+                7: [("ML Anomali Bandar", get("Prediksi Machine Learning") == "🔥 ANOMALI BANDAR (Siap Ledakan)"), ("Stochastic peluang", get("Status Stochastic") in ("Oversold (Jenuh Jual - Peluang)", "Golden Cross (Awal Bullish)")), ("VWAP tidak lemah", vo)],
+                8: [("Katalis sentimen/akuisisi", get("Status Sentimen") == "Sentimen Positif 📰" or get("Status Akuisisi") in ("RENCANA AKUISISI", "DALAM AKUISISI")), ("Uptrend", get("MA Signal") == "Uptrend"), ("Rekomendasi BELI", get("Rekomendasi") == "BELI")],
+                9: [("MACD bullish", get("MACD") in ("Strong Bullish", "Bullish MACD")), ("R/R menarik", get("Risk/Reward Ratio") in ("Sangat Menarik (> 1:3)", "Ideal (1:2)")), ("Dekat Support", get("Posisi Entry") == "Dekat Support (Low Risk)"), ("Momentum Positif", get("Momentum") == "Positif")],
             }
             return {i: [lab for lab, ok in pairs if not ok] for i, pairs in cek.items() if any(not ok for _, ok in pairs)}
 

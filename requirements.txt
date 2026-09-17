@@ -11,3 +11,4 @@ openpyxl
 groq
 openai
 boto3
+streamlit-autorefresh
