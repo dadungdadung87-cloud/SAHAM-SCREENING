@@ -38,6 +38,29 @@ def sinkron_r2_keluar():
     except Exception as e:
         print(f"⚠️ Gagal sinkron keluar R2: {e}")
 
+def sinkron_sinyal_dari_r2():
+    """Hapus sinyal lokal yang sudah tidak ada di R2 (misal disapu via tombol web)."""
+    try:
+        import r2_client
+        kunci_r2 = set(r2_client.list_arsip())
+        terhapus = 0
+        for i in range(1, 10):
+            f_sinyal = os.path.join(DIR_DB, f"sinyal_ai_rumus_{i}.csv")
+            kunci = f"Database/sinyal_ai_rumus_{i}.csv"
+            if os.path.exists(f_sinyal) and kunci not in kunci_r2:
+                try:
+                    os.remove(f_sinyal)
+                    terhapus += 1
+                    print(f"🗑️ Sinyal Rumus {i} lokal dibuang (tidak ada di R2 — disapu via web).")
+                except Exception:
+                    pass
+        if terhapus == 0:
+            print("✅ Sinyal lokal & R2 selaras.")
+        return True
+    except Exception as e:
+        print(f"⚠️ Sinkron sinyal gagal: {e}")
+        return False
+
 # ==========================================
 # 🛠️ FUNGSI AUTO-SAVE KE GITHUB (ABADI)
 # ==========================================
@@ -156,6 +179,13 @@ def jalankan_bot():
     if not mode_beli_aktif:
         print(f"🔒 GEMBOK DATA BASI AKTIF: data market berusia {usia_data} hari — bot hanya evaluasi jual, tidak membeli.")
 
+    # ----------------------------------------------------
+    # 🧹 SINKRON SINYAL: R2 adalah sumber kebenaran
+    # Sinyal yang sudah disapu via web (tombol Tab 4) akan
+    # ikut dihapus di lokal agar cron tidak membeli diam-diam.
+    # ----------------------------------------------------
+    sinkron_sinyal_dari_r2()
+
     is_square_off_time = (jam_sekarang >= jam_square_off) and now.weekday() < 5
     if is_square_off_time:
         print("🧹 WAKTU SQUARE OFF / SORE HARI! Evaluasi jual paksa diaktifkan.")
@@ -180,15 +210,54 @@ def jalankan_bot():
             
             # >>> LIQUIDATE: bypass aturan 'beli hari ini tahan'
             if tgl_beli_saham == tanggal_hari_ini and not liquidate:
-                porto_baru.append(posisi)
-                continue
-
+                # Cek apakah ticker ada di market dulu — kalau suspend, JANGAN ditahan
+                try:
+                    _ = df_market[df_market['Ticker'] == ticker]['Harga (Rp)'].values[0]
+                    # Ticker ada + beli hari ini → tahan sesuai aturan BSJP
+                    porto_baru.append(posisi)
+                    continue
+                except:
+                    # Ticker TIDAK ada (suspend/delisting) → paksa jual, abaikan aturan tahan
+                    print(f"⚠️ [RUMUS {i}] {ticker}: SUSPEND / DELETED terdeteksi — aturan 'beli hari ini tahan' dilewati.")
+            
+            # Cek apakah ticker masih ada di market
             try:
                 harga_sekarang = df_market[df_market['Ticker'] == ticker]['Harga (Rp)'].values[0]
+                ticker_ada = True
             except:
-                porto_baru.append(posisi) 
-                continue
+                # >>> SUSPEND_FORCE_EXIT: ticker tidak ditemukan = suspend/delisting
+                ticker_ada = False
+                harga_jual = posisi['Harga_Beli']  # jual di harga beli → loss hanya fee
+                status_jual = "SUSPEND_FORCE_EXIT ⚠️"
                 
+                # Hitung profit (akan rugi sebesar fee beli+jual)
+                nilai_jual_kotor = harga_jual * posisi['Lot'] * 100
+                nilai_jual_bersih = nilai_jual_kotor - (nilai_jual_kotor * FEE_JUAL)
+                profit_rp = nilai_jual_bersih - posisi['Total_Modal']
+                profit_pct = (profit_rp / posisi['Total_Modal']) * 100
+                
+                # Anti-duplikasi histori
+                sudah_ada = False
+                if not df_history.empty:
+                    sudah_ada = ((df_history['Ticker'] == ticker) & (df_history['Tanggal_Beli'] == posisi['Tanggal_Beli'])).any()
+                if sudah_ada:
+                    print(f"⚠️ [RUMUS {i}] {ticker} sudah ada di histori — duplikat SUSPEND dicegah.")
+                    continue
+                
+                history_baru.append({
+                    'Tanggal_Beli': posisi['Tanggal_Beli'],
+                    'Tanggal_Jual': now.strftime("%Y-%m-%d %H:%M"),
+                    'Ticker': ticker,
+                    'Harga_Beli': posisi['Harga_Beli'],
+                    'Harga_Jual': harga_jual,
+                    'Status': status_jual,
+                    'Total_Return_Rp': round(profit_rp, 2),
+                    'Return_%': round(profit_pct, 2)
+                })
+                print(f"⚠️ [RUMUS {i}] SUSPEND_FORCE_EXIT: {ticker} | Jual paksa @ Rp {harga_jual} (harga beli) | {profit_pct:.2f}% (fee only)")
+                continue  # skip evaluasi TP/CL/square-off/liquidate
+                
+            # >>> Flow normal: ticker ada → evaluasi TP/CL/square-off/liquidate
             terjual = False
             status_jual = ""
             harga_jual = 0
