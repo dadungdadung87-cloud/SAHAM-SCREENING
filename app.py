@@ -1710,32 +1710,72 @@ if not df_hasil.empty:
 
                     st.markdown("---")
 
-                    # ========== BAGIAN 2: RADAR LIVE (REFERENSI UANG ASLI) ==========
-                    st.markdown("### 📡 Bagian 2 — Radar Live Top-5 (Referensi Uang Asli)")
-                    st.caption("Screening ulang otomatis ±5 menit dari data R2 terbaru. **MURNI TAMPILAN** — tidak menulis sinyal simulator, tidak membeli apa pun.")
+                    # ========== BAGIAN 2: RADAR LIVE (SUMBER AI YANG SAMA) ==========
+                    st.markdown("### 📡 Bagian 2 — Radar Live Top-5 (Sumber AI yang Sama)")
+                    st.caption("Menampilkan **hasil sidang AI yang sama persis** dengan Daftar Belanja (Bagian 1). Tidak ada AI kedua → hasil dijamin identik & hemat kuota. Refresh ±5 menit hanya memuat ulang hasil.")
                     if AUTOREFRESH_OK:
                         st_autorefresh(interval=5 * 60 * 1000, key="radar_live_autorefresh")
-                    else:
-                        st.info("⚠️ Package streamlit-autorefresh belum aktif — refresh lewat tombol sidebar Sync.")
                     _now = datetime.utcnow() + pd.Timedelta(hours=7)
                     _jam = _now.time()
                     live = (_now.weekday() < 5) and (pd.Timestamp("08:45").time() <= _jam <= pd.Timestamp("16:05").time())
                     st.caption("🟢 DATA LIVE (jam bursa)" if live else "📴 Data penutupan terakhir (di luar jam bursa)")
 
-                    def _top5_lokal(dfv):
-                        if dfv is None or dfv.empty: return ["-", "-", "-", "-", "-"]
-                        d = dfv.copy()
-                        d["_s"] = pd.to_numeric(d.get("Total Score", 0), errors="coerce").fillna(0)
-                        d["_v"] = pd.to_numeric(d.get("Volume", 0), errors="coerce").fillna(0)
-                        d = d.sort_values(["_s", "_v"], ascending=[False, False])
-                        return (d["Ticker"].tolist() + [""] * 5)[:5]
+                    stempel_now = str(df_hasil["Terakhir Update"].iloc[0]) if (not df_hasil.empty and "Terakhir Update" in df_hasil.columns) else "tanpa_stempel"
 
-                    df_radar = pd.DataFrame({f"RUMUS {i}": _top5_lokal(dfv) for i, dfv in enumerate(
-                        [df_v1, df_v2, df_v3, df_v4, df_v5, df_v6, df_v7, df_v8, df_v9], start=1)})
-                    st.markdown("#### 🏆 Top-5 per Rumus (tidak digabung)")
-                    st.dataframe(df_radar, use_container_width=True, hide_index=True)
-                    st.caption("ℹ️ Referensi keputusan uang asli Anda di broker. Simulator tetap memakai jalur daftar belanja sendiri (Tab 4).")
-                    if st.button("🧠 Mintakan opini AI sekarang (hemat kuota: hanya saat diklik)", key="btn_opini_radar"):
+                    def _muat_keranjang_ai():
+                        # Prioritas: cache sidang yang stempelnya cocok dengan data sekarang
+                        try:
+                            if os.path.exists(FILE_CACHE_AUTOPILOT):
+                                with open(FILE_CACHE_AUTOPILOT) as f:
+                                    cm = json.load(f)
+                                if cm.get("versi") == VERSI_SIDANG and cm.get("keranjang") and cm.get("stempel_data") == stempel_now:
+                                    return cm["keranjang"], "cache_cocok"
+                        except Exception:
+                            pass
+                        # Fallback: baca file sinyal aktif (isi keranjang yang sama)
+                        ker, ada = {}, False
+                        for i in range(1, 10):
+                            fs = f"Database/sinyal_ai_rumus_{i}.csv"
+                            if os.path.exists(fs):
+                                try:
+                                    ds = pd.read_csv(fs)
+                                    ker[f"RUMUS {i}"] = (ds["Ticker"].tolist() + ["", "", "", "", ""])[:5]
+                                    ada = True
+                                except Exception:
+                                    ker[f"RUMUS {i}"] = ["", "", "", "", ""]
+                            else:
+                                ker[f"RUMUS {i}"] = ["", "", "", "", ""]
+                        return (ker if ada else None), "sinyal"
+
+                    auto_sidang_radar = st.checkbox("🤖 Auto-sidang ulang saat data berubah (pakai kuota AI)", key="auto_sidang_radar")
+                    keranjang_radar, sumber_radar = _muat_keranjang_ai()
+
+                    if auto_sidang_radar and sumber_radar != "cache_cocok":
+                        GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
+                        if GEMINI_API_KEY:
+                            with st.spinner("Data berubah — sidang AI ulang agar Radar & Daftar Belanja tetap identik..."):
+                                daftar_rumus_r = {1: df_v1, 2: df_v2, 3: df_v3, 4: df_v4, 5: df_v5, 6: df_v6, 7: df_v7, 8: df_v8, 9: df_v9}
+                                keranjang_radar, err_r, lap_r = jalankan_sidang_autopilot(daftar_rumus_r, df_hasil, GEMINI_API_KEY)
+                                if not err_r and keranjang_radar:
+                                    try:
+                                        with open(FILE_CACHE_AUTOPILOT, "w") as f:
+                                            json.dump({"stempel_data": stempel_now, "versi": VERSI_SIDANG, "keranjang": keranjang_radar}, f, indent=4)
+                                    except Exception:
+                                        pass
+                                    sumber_radar = "sidang_baru"
+
+                    if keranjang_radar:
+                        df_radar = pd.DataFrame({k: (v + ["", "", "", "", ""])[:5] for k, v in keranjang_radar.items()})
+                        st.markdown("#### 🏆 Top-5 per Rumus (hasil sidang AI — identik dengan Daftar Belanja)")
+                        st.dataframe(df_radar, use_container_width=True, hide_index=True)
+                        lbl = {"cache_cocok": "⚡ cache sidang (data belum berubah)",
+                               "sinyal": "📄 file sinyal aktif",
+                               "sidang_baru": "🤖 sidang AI baru saja dijalankan"}.get(sumber_radar, sumber_radar)
+                        st.caption(f"Sumber: {lbl}.")
+                    else:
+                        st.info("📭 Belum ada hasil sidang AI. Jalankan **Bagian 1** sekali, atau centang Auto-sidang di atas.")
+                        df_radar = None
+                    if df_radar is not None and st.button("🧠 Mintakan opini AI sekarang (hemat kuota: hanya saat diklik)", key="btn_opini_radar"):
                         prompt_radar = f"""Berikut hasil radar top-5 per rumus screener IHSG saat ini:
 {df_radar.to_string(index=False)}
 Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang paling layak dieksekusi uang asli sore ini dan mana yang sebaiknya dihindari, beserta alasan teknikal singkat."""
