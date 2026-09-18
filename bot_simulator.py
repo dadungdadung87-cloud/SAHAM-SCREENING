@@ -38,11 +38,72 @@ def sinkron_r2_keluar():
     except Exception as e:
         print(f"⚠️ Gagal sinkron keluar R2: {e}")
 
-def sinkron_sinyal_dari_r2():
-    """Hapus sinyal lokal yang sudah tidak ada di R2 (misal disapu via tombol web)."""
+def _dapatkan_daftar_objek_r2():
+    """Helper: dapatkan daftar SEMUA objek di R2 (bukan hanya arsip harian)."""
+    import r2_client
+    
+    # Metode 1: fungsi list_semua_objek (jika ada)
     try:
-        import r2_client
-        kunci_r2 = set(r2_client.list_arsip())
+        result = r2_client.list_semua_objek()
+        if result:
+            keys = set()
+            for item in result:
+                if isinstance(item, tuple):
+                    keys.add(item[0])
+                else:
+                    keys.add(str(item))
+            return keys
+    except AttributeError:
+        pass
+    except Exception:
+        pass
+    
+    # Metode 2: list_objects via boto3 langsung (fallback paling reliable)
+    try:
+        import boto3
+        endpoint = os.environ.get("R2_ENDPOINT_URL") or os.environ.get("CLOUDFLARE_R2_ENDPOINT")
+        access_key = os.environ.get("R2_ACCESS_KEY_ID") or os.environ.get("CLOUDFLARE_R2_ACCESS_KEY_ID")
+        secret_key = os.environ.get("R2_SECRET_ACCESS_KEY") or os.environ.get("CLOUDFLARE_R2_SECRET_ACCESS_KEY")
+        bucket = os.environ.get("R2_BUCKET_NAME") or os.environ.get("CLOUDFLARE_R2_BUCKET_NAME")
+        if all([endpoint, access_key, secret_key, bucket]):
+            s3 = boto3.client('s3',
+                endpoint_url=endpoint,
+                aws_access_key_id=access_key,
+                aws_secret_access_key=secret_key,
+            )
+            keys = set()
+            paginator = s3.get_paginator('list_objects_v2')
+            for page in paginator.paginate(Bucket=bucket):
+                for obj in page.get('Contents', []):
+                    keys.add(obj['Key'])
+            return keys
+    except Exception:
+        pass
+    
+    # Metode 3: list_arsip HANYA jika prefiks Database/ (tidak ideal, fallback terakhir)
+    try:
+        arsip_keys = r2_client.list_arsip()
+        # list_arsip hanya mengembalikan arsip harian, jadi tidak bisa dipakai untuk cek Database/
+        # Return empty agar tidak menghapus apa-apa
+        return set()
+    except Exception:
+        return set()
+
+def sinkron_sinyal_dari_r2():
+    """Hapus sinyal lokal yang sudah tidak ada di R2 (misal disapu via tombol web).
+    
+    PERBAIKAN v2: hanya menghapus jika kita YAKIN sinyal tidak ada di R2.
+    Jika gagal mendeteksi daftar R2, LEBIH AMAN tidak menghapus apa-apa
+    daripada menghapus semua sinyal (bug lama).
+    """
+    try:
+        kunci_r2 = _dapatkan_daftar_objek_r2()
+        
+        # KONSERVATIF: jika tidak bisa mendapatkan daftar R2, SKIP penghapusan
+        if not kunci_r2:
+            print("⚠️ Tidak bisa mendapatkan daftar objek R2 — sinkronisasi sinyal dilewati (aman: tidak ada sinyal yang dihapus).")
+            return True
+        
         terhapus = 0
         for i in range(1, 10):
             f_sinyal = os.path.join(DIR_DB, f"sinyal_ai_rumus_{i}.csv")
@@ -193,6 +254,7 @@ def jalankan_bot():
     # 🧹 SINKRON SINYAL: R2 adalah sumber kebenaran
     # Sinyal yang sudah disapu via web (tombol Tab 4) akan
     # ikut dihapus di lokal agar cron tidak membeli diam-diam.
+    # PERBAIKAN v2: hanya hapus jika kita YAKIN sinyal tidak ada di R2
     # ----------------------------------------------------
     sinkron_sinyal_dari_r2()
 
