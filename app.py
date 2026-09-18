@@ -1285,10 +1285,23 @@ if not df_hasil.empty:
 
 
 # =====================================================================
-# >>> PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS v5.0 + RADAR LIVE) <<<
+# >>> PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS v5.0 + RADAR LIVE + TELEGRAM SNAPSHOT) <<<
 # =====================================================================
     VERSI_SIDANG = "v5.0"
     FILE_CACHE_AUTOPILOT = "Database/cache_autopilot.json"
+
+    # S1 — Helper simpan snapshot sidang ke R2 (dipakai Radar Live + bot Telegram)
+    def simpan_snapshot_radar(keranjang, stempel_data):
+        try:
+            snap = {"stempel_data": stempel_data, "versi": VERSI_SIDANG, "keranjang": keranjang,
+                    "waktu": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}
+            path = os.path.join("Database", "radar_snapshot.json")
+            with open(path, "w") as f: json.dump(snap, f)
+            import r2_client
+            r2_client.upload_arsip(path, "Database/radar_snapshot.json")
+        except Exception:
+            pass
+
     with tab3:
         st.markdown("## 🦅 Radar BSJP & Laboratorium Forensik AI")
         st.markdown("<div class='bandar-box-green'><b>💡 INFO:</b> Gunakan kotak pilihan (Dropdown) di bawah ini untuk beralih antar strategi atau mode AI agar tampilan lebih rapi.</div>", unsafe_allow_html=True)
@@ -1484,6 +1497,8 @@ if not df_hasil.empty:
                                                 with open(FILE_CACHE_AUTOPILOT, "w") as f:
                                                     json.dump({"stempel_data": stempel_data, "versi": VERSI_SIDANG, "keranjang": keranjang_spreadsheet}, f, indent=4)
                                             except: pass
+                                            # S2a — simpan snapshot untuk Telegram
+                                            simpan_snapshot_radar(keranjang_spreadsheet, stempel_data)
                                             status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
                                             st.balloons()
                                         else:
@@ -1698,6 +1713,8 @@ if not df_hasil.empty:
                                             with open(FILE_CACHE_AUTOPILOT, "w") as f:
                                                 json.dump({"stempel_data": stempel_data, "versi": VERSI_SIDANG, "keranjang": keranjang_spreadsheet}, f, indent=4)
                                         except: pass
+                                        # S2b — simpan snapshot untuk Telegram
+                                        simpan_snapshot_radar(keranjang_spreadsheet, stempel_data)
                                         status_teks.success("🎉 MISSION ACCOMPLISHED! Daftar belanja baru tercetak & ter-upload ke R2.")
                                         st.balloons()
                                     else:
@@ -1723,7 +1740,6 @@ if not df_hasil.empty:
                     stempel_now = str(df_hasil["Terakhir Update"].iloc[0]) if (not df_hasil.empty and "Terakhir Update" in df_hasil.columns) else "tanpa_stempel"
 
                     def _muat_keranjang_ai():
-                        # Prioritas: cache sidang yang stempelnya cocok dengan data sekarang
                         try:
                             if os.path.exists(FILE_CACHE_AUTOPILOT):
                                 with open(FILE_CACHE_AUTOPILOT) as f:
@@ -1732,7 +1748,6 @@ if not df_hasil.empty:
                                     return cm["keranjang"], "cache_cocok"
                         except Exception:
                             pass
-                        # Fallback: baca file sinyal aktif (isi keranjang yang sama)
                         ker, ada = {}, False
                         for i in range(1, 10):
                             fs = f"Database/sinyal_ai_rumus_{i}.csv"
@@ -1762,6 +1777,8 @@ if not df_hasil.empty:
                                             json.dump({"stempel_data": stempel_now, "versi": VERSI_SIDANG, "keranjang": keranjang_radar}, f, indent=4)
                                     except Exception:
                                         pass
+                                    # S3 — simpan snapshot untuk Telegram
+                                    simpan_snapshot_radar(keranjang_radar, stempel_now)
                                     sumber_radar = "sidang_baru"
 
                     if keranjang_radar:
