@@ -150,6 +150,16 @@ def jalankan_bot():
     r2_ok = sinkron_r2_masuk()
 
     # ----------------------------------------------------
+    # 🔄 SEGARKAN DATA MARKET DARI R2 (agar sama dengan data sidang web)
+    # ----------------------------------------------------
+    try:
+        import r2_client
+        r2_client.download_arsip("Database/hasil_screener.csv", FILE_MARKET)
+        print("🔄 Data market disegarkan dari R2.")
+    except Exception as e:
+        print(f"⚠️ Gagal segarkan data market dari R2: {e} — pakai file lokal.")
+
+    # ----------------------------------------------------
     # 🔒 GEMBOK PAGI: SISTEM PENGAMAN ANTI-HILANG DATA
     # ----------------------------------------------------
     if not os.path.exists(FILE_MARKET):
@@ -322,25 +332,27 @@ def jalankan_bot():
         if mode == "manual" and mode_beli_aktif and os.path.exists(file_sinyal) and not liquidate:
             saldo_sekarang = cek_saldo_tersedia(df_porto)
             saham_dimiliki = df_porto['Ticker'].tolist() if not df_porto.empty else []
+            jumlah_beli = 0
             try:
                 df_sinyal = pd.read_csv(file_sinyal)
                 for _, sinyal in df_sinyal.iterrows():
-                    ticker = sinyal['Ticker']
+                    ticker = str(sinyal['Ticker']).strip()
                     if ticker in saham_dimiliki:
+                        print(f"   ↳ {ticker}: sudah dimiliki, lewati.")
                         continue
-                        
                     try:
-                        harga_beli = df_market[df_market['Ticker'] == ticker]['Harga (Rp)'].values[0]
-                    except:
+                        harga_beli = float(df_market[df_market['Ticker'] == ticker]['Harga (Rp)'].values[0])
+                    except Exception:
+                        print(f"   ↳ {ticker}: TIDAK ADA di data market (suspend/delisting) — lewati.")
                         continue
-                    
+                    if harga_beli <= 0:
+                        print(f"   ↳ {ticker}: harga tidak valid (0) — lewati.")
+                        continue
                     alokasi_dana = min(20000000, saldo_sekarang)
                     harga_1_lot_plus_fee = (harga_beli * 100) * (1 + FEE_BELI)
-                    
-                    if alokasi_dana >= harga_1_lot_plus_fee: 
+                    if alokasi_dana >= harga_1_lot_plus_fee:
                         jumlah_lot = int(alokasi_dana // harga_1_lot_plus_fee)
                         total_modal_dikeluarkan = jumlah_lot * harga_1_lot_plus_fee
-                        
                         df_porto = pd.concat([df_porto, pd.DataFrame([{
                             'Tanggal_Beli': now.strftime("%Y-%m-%d %H:%M"),
                             'Ticker': ticker,
@@ -351,9 +363,15 @@ def jalankan_bot():
                             'Target_CL': sinyal['Target_CL']
                         }])], ignore_index=True)
                         saldo_sekarang -= total_modal_dikeluarkan
+                        jumlah_beli += 1
                         print(f"🛒 [RUMUS {i}] BELI: {ticker} @ Rp {harga_beli} | {jumlah_lot} Lot")
-
-                os.remove(file_sinyal)
+                    else:
+                        print(f"   ↳ {ticker}: saldo tidak cukup (sisa Rp {saldo_sekarang:,.0f}) — lewati.")
+                if jumlah_beli > 0:
+                    os.remove(file_sinyal)
+                    print(f"🔥 [RUMUS {i}] Kertas belanja dibakar ({jumlah_beli} saham dibeli).")
+                else:
+                    print(f"⚠️ [RUMUS {i}] TIDAK ada pembelian — kertas belanja DIPERTAHANKAN.")
             except Exception as e:
                 print(f"⚠️ Gagal membaca sinyal Rumus {i}: {e}")
         elif os.path.exists(file_sinyal):
