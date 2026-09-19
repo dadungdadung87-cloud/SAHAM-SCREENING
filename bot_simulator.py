@@ -152,7 +152,7 @@ def inisialisasi_database(rumus_id):
     file_hist = os.path.join(DIR_DB, f"histori_transaksi_rumus_{rumus_id}.csv")
     
     if not os.path.exists(file_porto):
-        pd.DataFrame(columns=['Tanggal_Beli', 'Ticker', 'Harga_Beli', 'Lot', 'Total_Modal', 'Target_TP', 'Target_CL']).to_csv(file_porto, index=False)
+        pd.DataFrame(columns=['Tanggal_Beli', 'Ticker', 'Harga_Beli', 'Lot', 'Total_Modal', 'Target_TP', 'Target_CL', 'Mode_Beli']).to_csv(file_porto, index=False)
         
     if not os.path.exists(file_hist):
         pd.DataFrame(columns=['Tanggal_Beli', 'Tanggal_Jual', 'Ticker', 'Harga_Beli', 'Harga_Jual', 'Status', 'Total_Return_Rp', 'Return_%']).to_csv(file_hist, index=False)
@@ -178,7 +178,7 @@ def jalankan_bot():
     # ----------------------------------------------------
     # 🔑 DETEKSI MODE: manual / cron / liquidate
     # ----------------------------------------------------
-    mode = "manual" if "--manual" in sys.argv[1:] else "cron"
+    mode = "jadwal" if "--jadwal" in sys.argv[1:] else ("manual" if "--manual" in sys.argv[1:] else "cron")
     liquidate = "--liquidate" in sys.argv[1:]
     if liquidate:
         print("🧨 MODE LIQUIDATE: SEMUA posisi dijual paksa sekarang (aturan 'beli hari ini tahan' dilewati).")
@@ -391,12 +391,19 @@ def jalankan_bot():
         # FASE B: MODE BELI (MASUKKAN SAHAM KE GUDANG)
         # >>> LIQUIDATE: skip beli agar tidak langsung beli ulang sinyal lama
         # ==========================================
-        if mode == "manual" and mode_beli_aktif and os.path.exists(file_sinyal) and not liquidate:
+        if (mode == "manual" or mode == "jadwal") and mode_beli_aktif and os.path.exists(file_sinyal) and not liquidate:
             saldo_sekarang = cek_saldo_tersedia(df_porto)
             saham_dimiliki = df_porto['Ticker'].tolist() if not df_porto.empty else []
             jumlah_beli = 0
             try:
                 df_sinyal = pd.read_csv(file_sinyal)
+                # Mode jadwal: hanya beli sinyal dengan stempel hari ini
+                if mode == "jadwal" and 'Stempel' in df_sinyal.columns:
+                    tgl_hari_ini = now.strftime('%Y-%m-%d')
+                    df_sinyal = df_sinyal[df_sinyal['Stempel'] == tgl_hari_ini]
+                    if df_sinyal.empty:
+                        print(f"⏭️ [RUMUS {i}] Tidak ada sinyal jadwal hari ini — dilewati.")
+                        continue
                 for _, sinyal in df_sinyal.iterrows():
                     ticker = str(sinyal['Ticker']).strip()
                     if ticker in saham_dimiliki:
@@ -422,7 +429,8 @@ def jalankan_bot():
                             'Lot': jumlah_lot,
                             'Total_Modal': total_modal_dikeluarkan,
                             'Target_TP': sinyal['Target_TP'],
-                            'Target_CL': sinyal['Target_CL']
+                            'Target_CL': sinyal['Target_CL'],
+                            'Mode_Beli': 'JADWAL' if mode == 'jadwal' else 'MANUAL'
                         }])], ignore_index=True)
                         saldo_sekarang -= total_modal_dikeluarkan
                         jumlah_beli += 1
