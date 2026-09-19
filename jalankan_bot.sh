@@ -24,7 +24,17 @@ echo "⏳ Memulai pembaruan data saham..."
 ./.venv/bin/python update_data.py
 
 # 3. JALANKAN BOT SIMULATOR (Menggunakan .venv juga)
-./.venv/bin/python bot_simulator.py
+# Jendela 15:20-15:35: sidang jadwal + beli otomatis
+JAM_SEKARANG=$(date +%H%M)
+if [ "$JAM_SEKARANG" -ge "1520" ] && [ "$JAM_SEKARANG" -le "1535" ]; then
+    echo "🧠 [15:20-15:35] Memulai sidang jadwal..."
+    ./.venv/bin/python sidang_jadwal.py
+    echo "🛒 [15:20-15:35] Membeli sinyal jadwal..."
+    ./.venv/bin/python beli_jadwal.py
+else
+    # Mode normal: bot simulator biasa (jual TP/CL/square-off)
+    ./.venv/bin/python bot_simulator.py
+fi
 ./.venv/bin/python bangun_buku_besar.py
 
 # ==========================================

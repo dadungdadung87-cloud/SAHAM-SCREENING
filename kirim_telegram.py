@@ -37,6 +37,27 @@ def kirim(text, cfg):
             resp = json.load(r)
         print(f"📤 Pesan {i+1}/{len(bagian)}: {'OK' if resp.get('ok') else resp}")
 
+def posisi_terbeli_hari_ini(tgl):
+    """Baca portofolio aktif yang dibeli hari ini (Mode_Beli JADWAL)."""
+    terbeli = []
+    for i in range(1, 10):
+        fp = os.path.join(DB, f"portofolio_aktif_rumus_{i}.csv")
+        if os.path.exists(fp):
+            try:
+                df = pd.read_csv(fp)
+                if 'Mode_Beli' in df.columns and 'Tanggal_Beli' in df.columns:
+                    df_hari = df[(df['Mode_Beli'] == 'JADWAL') & 
+                                 (df['Tanggal_Beli'].astype(str).str.startswith(tgl))]
+                    for _, row in df_hari.iterrows():
+                        terbeli.append({
+                            'rumus': i, 'ticker': row['Ticker'],
+                            'harga': row['Harga_Beli'], 'lot': row['Lot'],
+                            'tp': row['Target_TP'], 'cl': row['Target_CL']
+                        })
+            except Exception:
+                pass
+    return terbeli
+
 def unduh_r2(key, tmp):
     try:
         import r2_client
@@ -154,6 +175,16 @@ def utama():
                     B.append(f"📈 <b>MINGGU INI:</b> {w}W / {l}L / {len(mg)-w-l}BE | Rp {mg['Total_Return_Rp'].sum():,.0f}".replace(",", ".") + "\n")
         except Exception as e:
             print(f"⚠️ rekap mingguan: {e}")
+
+    # 9) Posisi terbeli hari ini (Mode JADWAL)
+    terbeli = posisi_terbeli_hari_ini(tgl)
+    if terbeli:
+        B.append("🛒 <b>POSISI TERBELI HARI INI (JADWAL):</b>")
+        for t in terbeli[:10]:  # batas 10 saham
+            B.append(f"• R{t['rumus']} <code>{t['ticker']}</code> {t['lot']} lot @ {t['harga']:.0f} → TP {t['tp']} / CL {t['cl']}")
+        if len(terbeli) > 10:
+            B.append(f"... dan {len(terbeli)-10} lainnya")
+        B.append("")
 
     B.append("━━━━━━━━━━━━━━━━━━")
     B.append("🔗 https://minhaz0305.streamlit.app/")
