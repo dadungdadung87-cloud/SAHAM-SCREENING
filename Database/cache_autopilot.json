@@ -1,0 +1,69 @@
+{
+    "stempel_data": "2026-09-18 23:11:01",
+    "versi": "v5.0",
+    "keranjang": {
+        "RUMUS 1": [
+            "SRSN",
+            "MOLI",
+            "BNGA",
+            "ASPI",
+            "AGII"
+        ],
+        "RUMUS 2": [
+            "IDEA",
+            "PGEO",
+            "SMKL",
+            "BYAN",
+            "POWR"
+        ],
+        "RUMUS 3": [
+            "MAPI",
+            "CRAB",
+            "BIKE",
+            "URBN",
+            "ASMI"
+        ],
+        "RUMUS 4": [
+            "CAMP",
+            "AMAR",
+            "GDST",
+            "BUKK",
+            ""
+        ],
+        "RUMUS 5": [
+            "MOLI",
+            "BNGA",
+            "MGNA",
+            "MPIX",
+            "MTEL"
+        ],
+        "RUMUS 6": [
+            "MTEL",
+            "MAPI",
+            "BNGA",
+            "TOTO",
+            "AMAR"
+        ],
+        "RUMUS 7": [
+            "INET",
+            "GOTO",
+            "BABP",
+            "DADA",
+            "MAXI"
+        ],
+        "RUMUS 8": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "RUMUS 9": [
+            "CTBN",
+            "",
+            "",
+            "",
+            ""
+        ]
+    }
+}
