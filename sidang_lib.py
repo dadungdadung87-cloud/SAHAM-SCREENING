@@ -6,7 +6,6 @@
 import os, json, re, time
 import pandas as pd
 
-MAX_CHANGE_BELI = 20.0   # saringan keras: change > ini tidak boleh masuk daftar belanja
 VERSI_SIDANG = "v5.0"
 DIR_DB = "Database"
 
@@ -125,8 +124,6 @@ def jalankan_sidang(daftar_rumus, df_data, api_key, log=print):
 
     def sidang_satu(i):
         df_target = daftar_rumus[i]
-        if not df_target.empty and 'Change (%)' in df_target.columns:
-            df_target = df_target[pd.to_numeric(df_target['Change (%)'], errors='coerce') <= MAX_CHANGE_BELI]
         n = len(df_target)
         if n == 0:
             return i, [], n

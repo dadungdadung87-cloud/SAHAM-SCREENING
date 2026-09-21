@@ -528,8 +528,6 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
     def sidang_satu_rumus(i):
         try:
             df_target = daftar_rumus[i]
-            if not df_target.empty and 'Change (%)' in df_target.columns:
-                df_target = df_target[pd.to_numeric(df_target['Change (%)'], errors='coerce') <= MAX_CHANGE_BELI]
             n_kandidat = len(df_target)
             saham_valid = df_target['Ticker'].tolist()
             df_seleksi = df_data[df_data['Ticker'].isin(saham_valid)].copy()
