@@ -33,6 +33,11 @@ if [ "$JAM_SEKARANG" -ge "1520" ] && [ "$JAM_SEKARANG" -le "1535" ]; then
     ./.venv/bin/python beli_jadwal.py
     echo "📲 [15:36] Mengirim ringkasan Telegram..."
     ./.venv/bin/python kirim_telegram.py
+elif [ "$JAM_SEKARANG" -ge "1600" ] && [ "$JAM_SEKARANG" -le "1610" ]; then
+    echo "🌆 [16:00-16:10] Memulai sidang sore (referensi)..."
+    ./.venv/bin/python sidang_sore.py
+    echo "📲 [16:05] Mengirim Telegram sore (referensi)..."
+    ./.venv/bin/python kirim_telegram_sore.py
 else
     # Mode normal: bot simulator biasa (jual TP/CL/square-off)
     ./.venv/bin/python bot_simulator.py
