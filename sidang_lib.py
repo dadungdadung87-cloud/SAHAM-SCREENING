@@ -111,7 +111,7 @@ def hitung_rumus(df):
                 (df.get('Posisi Entry', '') == 'Dekat Support (Low Risk)') & (df.get('Momentum', '') == 'Positif')].copy()
     return out
 
-def jalankan_sidang(daftar_rumus, df_data, api_key, log=print):
+def jalankan_sidang(daftar_rumus, df_data, api_key, log=print, mode_tulis=True):
     """Sidang headless: tulis sinyal (+kolom Stempel), cache, snapshot; upload R2.
     Kembalikan (keranjang, error atau None)."""
     import concurrent.futures
@@ -153,13 +153,14 @@ def jalankan_sidang(daftar_rumus, df_data, api_key, log=print):
             baris.append({"Ticker": t, "Target_TP": int(round(harga * 1.05)),
                           "Target_CL": int(round(harga * 0.97)), "Stempel": stempel_beli})
         if baris:
-            fs = os.path.join(DIR_DB, f"sinyal_ai_rumus_{i}.csv")
-            pd.DataFrame(baris).to_csv(fs, index=False)
-            try:
-                import r2_client
-                r2_client.upload_arsip(fs, f"Database/sinyal_ai_rumus_{i}.csv")
-            except Exception:
-                pass
+            if mode_tulis:
+                fs = os.path.join(DIR_DB, f"sinyal_ai_rumus_{i}.csv")
+                pd.DataFrame(baris).to_csv(fs, index=False)
+                try:
+                    import r2_client
+                    r2_client.upload_arsip(fs, f"Database/sinyal_ai_rumus_{i}.csv")
+                except Exception:
+                    pass
         return i, [b["Ticker"] for b in baris], n
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as ex:
