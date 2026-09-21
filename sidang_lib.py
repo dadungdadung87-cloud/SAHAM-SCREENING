@@ -1,6 +1,6 @@
 # ==========================================
 # 🧠 SIDANG LIB — sidang autopilot headless (cron laptop)
-# Aturan IDENTIK dengan app.py web: rumus v5.0 + MAX_CHANGE_BELI.
+# Aturan IDENTIK dengan app.py web: rumus v5.0.
 # Jika ubah rumus/ambang: ubah DI SINI dan DI app.py.
 # ==========================================
 import os, json, re, time
