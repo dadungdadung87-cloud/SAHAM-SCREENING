@@ -152,7 +152,7 @@ def inisialisasi_database(rumus_id):
     file_hist = os.path.join(DIR_DB, f"histori_transaksi_rumus_{rumus_id}.csv")
     
     if not os.path.exists(file_porto):
-        pd.DataFrame(columns=['Tanggal_Beli', 'Ticker', 'Harga_Beli', 'Lot', 'Total_Modal', 'Target_TP', 'Target_CL', 'Mode_Beli']).to_csv(file_porto, index=False)
+        pd.DataFrame(columns=['Tanggal_Beli', 'Ticker', 'Harga_Beli', 'Lot', 'Total_Modal', 'Target_TP', 'Target_CL', 'Mode_Beli', 'Change_Beli']).to_csv(file_porto, index=False)
         
     if not os.path.exists(file_hist):
         pd.DataFrame(columns=['Tanggal_Beli', 'Tanggal_Jual', 'Ticker', 'Harga_Beli', 'Harga_Jual', 'Status', 'Total_Return_Rp', 'Return_%']).to_csv(file_hist, index=False)
@@ -324,7 +324,9 @@ def jalankan_bot():
                     'Harga_Jual': harga_jual,
                     'Status': status_jual,
                     'Total_Return_Rp': round(profit_rp, 2),
-                    'Return_%': round(profit_pct, 2)
+                    'Return_%': round(profit_pct, 2),
+                    'Mode_Beli': posisi.get('Mode_Beli', 'MANUAL'),
+                    'Change_Beli': posisi.get('Change_Beli', 0)
                 })
                 print(f"⚠️ [RUMUS {i}] SUSPEND_FORCE_EXIT: {ticker} | Jual paksa @ Rp {harga_jual} (harga beli) | {profit_pct:.2f}% (fee only)")
                 continue  # skip evaluasi TP/CL/square-off/liquidate
@@ -374,7 +376,9 @@ def jalankan_bot():
                     'Harga_Jual': harga_jual,
                     'Status': status_jual,
                     'Total_Return_Rp': round(profit_rp, 2),
-                    'Return_%': round(profit_pct, 2)
+                    'Return_%': round(profit_pct, 2),
+                    'Mode_Beli': posisi.get('Mode_Beli', 'MANUAL'),
+                    'Change_Beli': posisi.get('Change_Beli', 0)
                 })
                 print(f"💰 [RUMUS {i}] JUAL: {ticker} @ Rp {harga_jual} | {status_jual} | {profit_pct:.2f}%")
             else:
@@ -422,6 +426,10 @@ def jalankan_bot():
                     if alokasi_dana >= harga_1_lot_plus_fee:
                         jumlah_lot = int(alokasi_dana // harga_1_lot_plus_fee)
                         total_modal_dikeluarkan = jumlah_lot * harga_1_lot_plus_fee
+                        try:
+                            change_beli = float(df_market[df_market['Ticker'] == ticker]['Change (%)'].values[0])
+                        except Exception:
+                            change_beli = 0.0
                         df_porto = pd.concat([df_porto, pd.DataFrame([{
                             'Tanggal_Beli': now.strftime("%Y-%m-%d %H:%M"),
                             'Ticker': ticker,
@@ -430,11 +438,14 @@ def jalankan_bot():
                             'Total_Modal': total_modal_dikeluarkan,
                             'Target_TP': sinyal['Target_TP'],
                             'Target_CL': sinyal['Target_CL'],
-                            'Mode_Beli': 'JADWAL' if mode == 'jadwal' else 'MANUAL'
+                            'Mode_Beli': 'JADWAL' if mode == 'jadwal' else 'MANUAL',
+                            'Change_Beli': change_beli
                         }])], ignore_index=True)
                         saldo_sekarang -= total_modal_dikeluarkan
                         jumlah_beli += 1
                         print(f"🛒 [RUMUS {i}] BELI: {ticker} @ Rp {harga_beli} | {jumlah_lot} Lot")
+                        if change_beli >= 20:
+                            print(f"🚀 [RUMUS {i}] BELI-SAAT-ARA: {ticker} change {change_beli:+.1f}% — simulasi beli di harga ARA")
                     else:
                         print(f"   ↳ {ticker}: saldo tidak cukup (sisa Rp {saldo_sekarang:,.0f}) — lewati.")
                 if jumlah_beli > 0:
