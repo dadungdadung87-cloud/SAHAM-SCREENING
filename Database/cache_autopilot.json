@@ -1,55 +1,55 @@
 {
-    "stempel_data": "2026-09-21 17:55:04",
+    "stempel_data": "2026-09-22 15:20:04",
     "versi": "v5.0",
     "keranjang": {
         "RUMUS 1": [
-            "TRUE",
-            "BAJA",
-            "CSMI",
-            "GDST",
-            "IRSX"
+            "BPTR",
+            "IDEA",
+            "BSSR",
+            "AGAR",
+            "AYLS"
         ],
         "RUMUS 2": [
-            "ULTJ",
             "IDEA",
-            "ERAA",
-            "MOLI",
+            "JECX",
+            "SMLE",
+            "HBAT",
             "MAPA"
         ],
         "RUMUS 3": [
-            "BAJA",
-            "GDST",
-            "VERN",
-            "TOTL",
-            "TGUK"
-        ],
-        "RUMUS 4": [
-            "AISA",
-            "",
-            "",
+            "BSSR",
+            "HADE",
+            "TGUK",
             "",
             ""
         ],
+        "RUMUS 4": [
+            "BPTR",
+            "PAMG",
+            "ASMI",
+            "HOPE",
+            "FUJI"
+        ],
         "RUMUS 5": [
-            "TRUE",
-            "BAJA",
-            "AISA",
-            "GDST",
-            "CSMI"
+            "DSFI",
+            "AYLS",
+            "NASI",
+            "BSSR",
+            "AGAR"
         ],
         "RUMUS 6": [
-            "ULTJ",
+            "GLVA",
             "JECX",
-            "CARS",
-            "GGRP",
-            "BCIC"
+            "SUPA",
+            "",
+            ""
         ],
         "RUMUS 7": [
-            "BULL",
+            "BIPI",
             "GOTO",
-            "DADA",
+            "MAXI",
             "BABP",
-            "MAXI"
+            "DADA"
         ],
         "RUMUS 8": [
             "",
@@ -59,10 +59,10 @@
             ""
         ],
         "RUMUS 9": [
-            "MKAP",
-            "MYOR",
-            "ROTI",
-            "CASS",
+            "",
+            "",
+            "",
+            "",
             ""
         ]
     }
