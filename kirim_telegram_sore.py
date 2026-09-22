@@ -53,13 +53,16 @@ def utama():
     change = dict(zip(df["Ticker"], pd.to_numeric(df["Change (%)"], errors="coerce")))
 
     tmp_s = os.path.join(DB, "radar_snapshot_sore.json")
-    unduh_r2("Database/radar_snapshot_sore.json", tmp_s)
-    keranjang, stempel = {}, None
-    if os.path.exists(tmp_s):
+    def _baca(path):
         try:
-            sn = json.load(open(tmp_s))
-            keranjang, stempel = sn.get("keranjang") or {}, sn.get("stempel_data")
-        except Exception: pass
+            sn = json.load(open(path))
+            return sn.get("keranjang") or {}, sn.get("stempel_data")
+        except Exception:
+            return {}, None
+    keranjang, stempel = (_baca(tmp_s) if os.path.exists(tmp_s) else ({}, None))
+    if (not keranjang) or (stempel and stempel[:10] != tgl):
+        if unduh_r2("Database/radar_snapshot_sore.json", tmp_s):
+            keranjang, stempel = _baca(tmp_s)
 
     B = [f"🌆 <b>SCREENING SORE (REFERENSI)</b> — {now.strftime('%d %b %Y, %H:%M')} WIB"]
     B.append("⚠️ <i>Hanya untuk analisa — TIDAK dicetak sebagai daftar belanja</i>")
