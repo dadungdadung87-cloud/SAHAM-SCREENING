@@ -1,13 +1,13 @@
 {
-    "stempel_data": "2026-09-22 16:00:05",
+    "stempel_data": "2026-09-22 16:05:04",
     "versi": "v5.0",
     "keranjang": {
         "RUMUS 1": [
+            "BPTR",
+            "DFAM",
             "IDEA",
             "BSSR",
-            "AGAR",
-            "BPTR",
-            "DFAM"
+            "AGAR"
         ],
         "RUMUS 2": [
             "IDEA",
@@ -38,10 +38,10 @@
             "CSMI"
         ],
         "RUMUS 6": [
-            "GLVA",
             "JECX",
-            "MAYA",
+            "GLVA",
             "SUPA",
+            "MAYA",
             "SATU"
         ],
         "RUMUS 7": [
