@@ -27,6 +27,8 @@ if [ "$JAM_SEKARANG" -ge "1520" ] && [ "$JAM_SEKARANG" -le "1535" ]; then
         else
             echo "❌ Sidang jadwal gagal — dicoba lagi siklus berikutnya."
         fi
+    else
+        echo "⏭️ Sidang pagi sudah jalan hari ini, dilewati."
     fi
 elif [ "$JAM_SEKARANG" -ge "1600" ] && [ "$JAM_SEKARANG" -le "1610" ]; then
     if [ ! -f "$FLAG_SORE" ]; then
@@ -36,6 +38,8 @@ elif [ "$JAM_SEKARANG" -ge "1600" ] && [ "$JAM_SEKARANG" -le "1610" ]; then
         else
             echo "❌ Sidang/Telegram sore gagal — dicoba lagi siklus berikutnya."
         fi
+    else
+        echo "⏭️ Sidang sore sudah jalan hari ini, dilewati."
     fi
 else
     ./.venv/bin/python bot_simulator.py
