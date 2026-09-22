@@ -174,12 +174,20 @@ def jalankan_sidang(daftar_rumus, df_data, api_key, log=print, mode_tulis=True):
         with open(os.path.join(DIR_DB, "cache_autopilot.json"), "w") as f:
             json.dump({"stempel_data": stempel_data, "versi": VERSI_SIDANG, "keranjang": keranjang}, f, indent=4)
         snap = {"stempel_data": stempel_data, "versi": VERSI_SIDANG, "keranjang": keranjang,
-                "waktu": _wb_now().strftime("%Y-%m-%d %H:%M:%S")}
-        ps = os.path.join(DIR_DB, "radar_snapshot.json")
+                "waktu": _wb_now().strftime("%Y-%m-%d %H:%M:%S"), "mode": "sore" if not mode_tulis else "pagi"}
+        nama_snap = "radar_snapshot_sore.json" if not mode_tulis else "radar_snapshot.json"
+        ps = os.path.join(DIR_DB, nama_snap)
         with open(ps, "w") as f:
             json.dump(snap, f)
-        import r2_client
-        r2_client.upload_arsip(ps, "Database/radar_snapshot.json")
+        log(f"✅ {nama_snap} ditulis lokal")
+        try:
+            import r2_client
+            r2_client.upload_arsip(ps, f"Database/{nama_snap}")
+            log(f"✅ {nama_snap} ter-upload ke R2")
+        except Exception as e2:
+            log(f"⚠️ upload R2 gagal (file lokal tetap ada): {e2}")
     except Exception as e:
-        log(f"⚠️ cache/snapshot: {e}")
+        log(f"❌ GAGAL tulis snapshot: {e}")
+        import traceback
+        log(traceback.format_exc())
     return keranjang, None
