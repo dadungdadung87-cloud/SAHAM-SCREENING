@@ -1,33 +1,33 @@
 {
-    "stempel_data": "2026-09-23 16:00:04",
-    "versi": "v5.0",
+    "stempel_data": "2026-09-23 17:55:04",
+    "versi": "v5.1",
     "keranjang": {
         "RUMUS 1": [
             "DEWI",
             "SMLE",
             "MPXL",
-            "PGEO",
-            "CARS"
+            "EMMI",
+            "MDKA"
         ],
         "RUMUS 2": [
             "UNSP",
-            "COIN",
+            "MAPI",
             "MAYA",
             "BSSR",
-            "BAJA"
+            "INTD"
         ],
         "RUMUS 3": [
             "DEWI",
             "LAPD",
-            "PKPK",
-            "TAXI",
-            "BAPI"
+            "HADE",
+            "BAPI",
+            "PKPK"
         ],
         "RUMUS 4": [
             "MPXL",
             "UNSP",
-            "PPRO",
-            "ASLC",
+            "",
+            "",
             ""
         ],
         "RUMUS 5": [
@@ -35,21 +35,21 @@
             "SMLE",
             "LAPD",
             "PGEO",
-            "SAPX"
+            "PKPK"
         ],
         "RUMUS 6": [
             "PGEO",
-            "CARS",
-            "ARNA",
+            "SGER",
             "BSSR",
-            "MAYA"
+            "MAYA",
+            "NATO"
         ],
         "RUMUS 7": [
-            "BUMI",
-            "BNBR",
-            "GOTO",
-            "BABP",
-            "MAXI"
+            "CUAN",
+            "CARE",
+            "",
+            "",
+            ""
         ],
         "RUMUS 8": [
             "",
@@ -59,9 +59,9 @@
             ""
         ],
         "RUMUS 9": [
-            "ROTI",
-            "RGAS",
             "MYOR",
+            "",
+            "",
             "",
             ""
         ]
