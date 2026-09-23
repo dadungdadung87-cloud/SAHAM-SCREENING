@@ -1,12 +1,12 @@
 # ==========================================
 # 🧠 SIDANG LIB — sidang autopilot headless (cron laptop)
-# Aturan IDENTIK dengan app.py web: rumus v5.1.
+# Aturan IDENTIK dengan app.py web: rumus v5.2.
 # Jika ubah rumus/ambang: ubah DI SINI dan DI app.py.
 # ==========================================
 import os, json, re, time
 import pandas as pd
 
-VERSI_SIDANG = "v5.1"
+VERSI_SIDANG = "v5.2"
 DIR_DB = "Database"
 
 def _wb_now():
@@ -81,7 +81,7 @@ def _parse_top5(mentah, valid_set):
     return hasil[:5]
 
 def hitung_rumus(df):
-    """Rumus v5.1 — identik dengan app.py PART 12."""
+    """Rumus v5.2 — identik dengan app.py PART 12."""
     out = {i: pd.DataFrame() for i in range(1, 10)}
     if df is None or df.empty or 'Tekanan Bandar' not in df.columns:
         return out
@@ -95,23 +95,25 @@ def hitung_rumus(df):
                  (df.get('Sinyal Cuci Barang', '') == 'Jarum Bawah (Sinyal Pantulan Kuat)')) & vwap_kuat & akumulasi_pro].copy()
     out[3] = df[vwap_kuat & (df.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)') &
                 (df.get('Status Open', '') == 'Open = Low (Bullish Kuat)') & (df.get('Rekomendasi', '') == 'BELI')].copy()
-    out[4] = df[(df.get('MA Cross', '') == 'Golden Cross') & (df.get('Vol Breakout', '') == 'Tembus MA20') &
-                (df.get('MA Signal', '') == 'Uptrend') & vwap_kuat &
-                (df.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)')].copy()
+    out[4] = df[((df.get('MA Cross', '') == 'Golden Cross') |
+                 (df.get('MACD', '').isin(['Strong Bullish', 'Bullish MACD']))) &
+                (df.get('Vol Breakout', '') == 'Tembus MA20') & (df.get('MA Signal', '') == 'Uptrend') & vwap_kuat &
+                ((df.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)') | akumulasi_pro)].copy()
     out[5] = df[(df.get('Kelas Transaksi', '') == 'Ritel Aktif (5M - 50M)') & (df.get('Vol Breakout', '') == 'Tembus MA20') &
                 vwap_kuat & (df.get('MA Signal', '') == 'Uptrend') &
                 ((df.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)') | akumulasi_pro)].copy()
     out[6] = df[(df.get('RVOL (Anomali Vol)', '').isin(['Anomali Tinggi (150-300%)', 'Ledakan Ekstrem (> 300%)'])) &
                 (df.get('OBV Trend', '') == 'Akumulasi (Naik)') & (change_num <= 5.0) &
                 (df.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)')].copy()
-    out[7] = df[(df.get('Prediksi Machine Learning', '') == '🔥 ANOMALI BANDAR (Siap Ledakan)') &
-                (df.get('Status Stochastic', '').isin(['Oversold (Jenuh Jual - Peluang)', 'Golden Cross (Awal Bullish)'])) & vwap_kuat].copy()
+    out[7] = df[(df.get('Prediksi Machine Learning', '') == '🔥 ANOMALI BANDAR (Siap Ledakan)') & vwap_kuat &
+                ((df.get('Status Stochastic', '').isin(['Oversold (Jenuh Jual - Peluang)', 'Golden Cross (Awal Bullish)'])) |
+                 (df.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)'))].copy()
     out[8] = df[((df.get('Status Sentimen', '') == 'Sentimen Positif 📰') |
                  (df.get('Status Akuisisi', '').isin(['RENCANA AKUISISI', 'DALAM AKUISISI']))) &
                 (df.get('MA Signal', '') == 'Uptrend') & (df.get('Rekomendasi', '') == 'BELI')].copy()
-    out[9] = df[(df.get('MACD', '').isin(['Strong Bullish', 'Bullish MACD'])) &
-                (df.get('Risk/Reward Ratio', '').isin(['Sangat Menarik (> 1:3)', 'Ideal (1:2)'])) &
-                (df.get('Posisi Entry', '') == 'Dekat Support (Low Risk)') & (df.get('Momentum', '') == 'Positif') & vwap_ok].copy()
+    out[9] = df[(df.get('MACD', '').isin(['Strong Bullish', 'Bullish MACD'])) & (df.get('Momentum', '') == 'Positif') & vwap_ok &
+                ((df.get('Risk/Reward Ratio', '').isin(['Sangat Menarik (> 1:3)', 'Ideal (1:2)'])) |
+                 (df.get('Posisi Entry', '') == 'Dekat Support (Low Risk)'))].copy()
     return out
 
 def jalankan_sidang(daftar_rumus, df_data, api_key, log=print, mode_tulis=True):
