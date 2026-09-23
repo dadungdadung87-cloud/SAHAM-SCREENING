@@ -645,7 +645,7 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
 import r2_client
 import tempfile
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=300, show_spinner=False)
 def _muat_arsip_r2():
     keys = r2_client.list_arsip()
     keys.sort(reverse=True)
@@ -893,7 +893,7 @@ def manual_override(): st.session_state.preset_selector = "Matikan Preset (Manua
 
 SUMBER_DATA = "❓"
 
-@st.cache_data(ttl=10)
+@st.cache_data(ttl=300, show_spinner=False)
 def load_data_saham():
     global SUMBER_DATA
     df = None
@@ -924,6 +924,67 @@ if not df_hasil.empty and 'Volume' in df_hasil.columns and 'Harga (Rp)' in df_ha
     df_hasil['Value Transaksi'] = df_hasil['Harga (Rp)'] * df_hasil['Volume'] * 100
 
 
+# ==========================================
+# 🗄️ LAPISAN CACHE 300 DETIK (satu fungsi per sumber)
+# Pindah tab instan setelah muat pertama; unduhan R2 <=1x per 5 menit.
+# ==========================================
+@st.cache_data(ttl=300, show_spinner=False)
+def muat_portofolio_arena(rumus_id):
+    fp = os.path.join("Database", f"portofolio_aktif_rumus_{rumus_id}.csv")
+    if not os.path.exists(fp):
+        return pd.DataFrame()
+    try:
+        return pd.read_csv(fp)
+    except Exception:
+        return pd.DataFrame()
+
+@st.cache_data(ttl=300, show_spinner=False)
+def muat_histori_arena(rumus_id):
+    fh = os.path.join("Database", f"histori_transaksi_rumus_{rumus_id}.csv")
+    if not os.path.exists(fh):
+        return pd.DataFrame()
+    try:
+        return pd.read_csv(fh)
+    except Exception:
+        return pd.DataFrame()
+
+@st.cache_data(ttl=300, show_spinner=False)
+def muat_sinyal_arena(rumus_id):
+    fs = os.path.join("Database", f"sinyal_ai_rumus_{rumus_id}.csv")
+    if not os.path.exists(fs):
+        return pd.DataFrame()
+    try:
+        return pd.read_csv(fs)
+    except Exception:
+        return pd.DataFrame()
+
+@st.cache_data(ttl=300, show_spinner=False)
+def muat_keranjang_radar(stempel_now, versi_sidang):
+    """Baca cache_autopilot.json + sinyal per arena (Radar Live). Ter-cache ttl 300."""
+    try:
+        fp = os.path.join("Database", "cache_autopilot.json")
+        if os.path.exists(fp):
+            with open(fp) as f:
+                cm = json.load(f)
+            if cm.get("versi") == versi_sidang and cm.get("keranjang") and cm.get("stempel_data") == stempel_now:
+                return cm["keranjang"], "cache_cocok"
+    except Exception:
+        pass
+    ker, ada = {}, False
+    for i in range(1, 10):
+        fs = f"Database/sinyal_ai_rumus_{i}.csv"
+        if os.path.exists(fs):
+            try:
+                ds = pd.read_csv(fs)
+                ker[f"RUMUS {i}"] = (ds["Ticker"].tolist() + ["", "", "", "", ""])[:5]
+                ada = True
+            except Exception:
+                ker[f"RUMUS {i}"] = ["", "", "", "", ""]
+        else:
+            ker[f"RUMUS {i}"] = ["", "", "", "", ""]
+    return (ker if ada else None), "sinyal"
+
+
 # =====================================================================
 # >>> PART 08 : HEADER & SIDEBAR <<<
 # =====================================================================
@@ -941,6 +1002,10 @@ st.sidebar.caption(f"📡 Sumber Data: {SUMBER_DATA}")
 if st.sidebar.button("🔃 Sync & Muat Ulang Data Server", use_container_width=True):
     with st.spinner("Menarik data terbaru dari Cloudflare R2..."):
         time.sleep(1)
+    st.cache_data.clear()
+    st.rerun()
+
+if st.sidebar.button("🔄 Refresh Sekarang", use_container_width=True, help="Bersihkan cache tampilan agar data terbaru termuat tanpa pindah tab."):
     st.cache_data.clear()
     st.rerun()
 
@@ -1503,6 +1568,7 @@ if not df_hasil.empty:
                                                 with open(FILE_CACHE_AUTOPILOT, "w") as f:
                                                     json.dump({"stempel_data": stempel_data, "versi": VERSI_SIDANG, "keranjang": keranjang_spreadsheet}, f, indent=4)
                                             except: pass
+                                            muat_keranjang_radar.clear()
                                             # S2a — simpan snapshot untuk Telegram
                                             simpan_snapshot_radar(keranjang_spreadsheet, stempel_data)
                                             status_teks.success("🎉 MISSION ACCOMPLISHED! SELURUH RUMUS BERHASIL DISARING!")
@@ -1719,6 +1785,7 @@ if not df_hasil.empty:
                                             with open(FILE_CACHE_AUTOPILOT, "w") as f:
                                                 json.dump({"stempel_data": stempel_data, "versi": VERSI_SIDANG, "keranjang": keranjang_spreadsheet}, f, indent=4)
                                         except: pass
+                                        muat_keranjang_radar.clear()
                                         # S2b — simpan snapshot untuk Telegram
                                         simpan_snapshot_radar(keranjang_spreadsheet, stempel_data)
                                         status_teks.success("🎉 MISSION ACCOMPLISHED! Daftar belanja baru tercetak & ter-upload ke R2.")
@@ -1745,31 +1812,8 @@ if not df_hasil.empty:
 
                     stempel_now = str(df_hasil["Terakhir Update"].iloc[0]) if (not df_hasil.empty and "Terakhir Update" in df_hasil.columns) else "tanpa_stempel"
 
-                    def _muat_keranjang_ai():
-                        try:
-                            if os.path.exists(FILE_CACHE_AUTOPILOT):
-                                with open(FILE_CACHE_AUTOPILOT) as f:
-                                    cm = json.load(f)
-                                if cm.get("versi") == VERSI_SIDANG and cm.get("keranjang") and cm.get("stempel_data") == stempel_now:
-                                    return cm["keranjang"], "cache_cocok"
-                        except Exception:
-                            pass
-                        ker, ada = {}, False
-                        for i in range(1, 10):
-                            fs = f"Database/sinyal_ai_rumus_{i}.csv"
-                            if os.path.exists(fs):
-                                try:
-                                    ds = pd.read_csv(fs)
-                                    ker[f"RUMUS {i}"] = (ds["Ticker"].tolist() + ["", "", "", "", ""])[:5]
-                                    ada = True
-                                except Exception:
-                                    ker[f"RUMUS {i}"] = ["", "", "", "", ""]
-                            else:
-                                ker[f"RUMUS {i}"] = ["", "", "", "", ""]
-                        return (ker if ada else None), "sinyal"
-
                     auto_sidang_radar = st.checkbox("🤖 Auto-sidang ulang saat data berubah (pakai kuota AI)", key="auto_sidang_radar")
-                    keranjang_radar, sumber_radar = _muat_keranjang_ai()
+                    keranjang_radar, sumber_radar = muat_keranjang_radar(stempel_now, VERSI_SIDANG)
 
                     if auto_sidang_radar and sumber_radar != "cache_cocok":
                         GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
@@ -1783,6 +1827,7 @@ if not df_hasil.empty:
                                             json.dump({"stempel_data": stempel_now, "versi": VERSI_SIDANG, "keranjang": keranjang_radar}, f, indent=4)
                                     except Exception:
                                         pass
+                                    muat_keranjang_radar.clear()
                                     # S3 — simpan snapshot untuk Telegram
                                     simpan_snapshot_radar(keranjang_radar, stempel_now)
                                     sumber_radar = "sidang_baru"
@@ -1812,7 +1857,7 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
 # >>> PART 13 : TAB 4 - PORTOFOLIO BOT (+ KURASI DAFTAR BELANJA) <<<
 # =====================================================================
     with tab4:
-        @st.cache_data(ttl=60)
+        @st.cache_data(ttl=300, show_spinner=False)
         def _sedot_porto_r2():
             try:
                 import r2_client
@@ -1837,6 +1882,7 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
                     else:
                         st.success("✅ Bot selesai! Berikut log eksekusinya:")
                         st.code(proses_bot.stdout[-2500:], language="bash")
+                        st.cache_data.clear()
                         time.sleep(1)
                         st.rerun()
                 except Exception as e:
@@ -1859,6 +1905,7 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
                     ok = r2_client.download_database()
                 if ok:
                     st.success("✅ Data portofolio terbaru berhasil ditarik!")
+                    st.cache_data.clear()
                     time.sleep(1)
                     st.rerun()
                 else:
@@ -1885,6 +1932,7 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
                         except Exception: pass
                     st.session_state["konfirmasi_sapu_sinyal"] = False
                     st.success(f"🧹 Selesai: {terhapus} file lokal dibuang + seluruh objek sinyal di R2 dihapus. Daftar belanja kini kosong.")
+                    st.cache_data.clear()
                     time.sleep(1)
                     st.rerun()
             with col_batal:
@@ -1910,8 +1958,8 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
 
         MODAL_AWAL = 100000000.0 
         
-        df_porto = pd.read_csv(file_porto) if os.path.exists(file_porto) else pd.DataFrame()
-        df_hist = pd.read_csv(file_hist) if os.path.exists(file_hist) else pd.DataFrame()
+        df_porto = muat_portofolio_arena(nomor_rumus)
+        df_hist = muat_histori_arena(nomor_rumus)
 
         total_profit_rp = df_hist['Total_Return_Rp'].sum() if not df_hist.empty and 'Total_Return_Rp' in df_hist.columns else 0
         modal_terpakai = df_porto['Total_Modal'].sum() if not df_porto.empty and 'Total_Modal' in df_porto.columns else 0
@@ -1963,7 +2011,7 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
         
         with sub1:
             if os.path.exists(FILE_SINYAL):
-                df_sinyal = pd.read_csv(FILE_SINYAL)
+                df_sinyal = muat_sinyal_arena(nomor_rumus)
                 st.success("🔥 Sinyal AI (Kertas Belanja) diterima! Menunggu eksekusi MANUAL Anda lewat tombol 🛒 di atas — cron tidak akan membelinya.")
                 st.dataframe(df_sinyal, use_container_width=True, hide_index=True)
             else:
