@@ -12,7 +12,7 @@
 # PART 09 : FORMATTER & PEWARNAAN TABEL
 # PART 10 : TAB 1 - MARKET OVERVIEW
 # PART 11 : TAB 2 - SCREENER UTAMA
-# PART 12 : TAB 3 - ASISTEN AI (RUMUS v5.1 + RADAR LIVE)
+# PART 12 : TAB 3 - ASISTEN AI (RUMUS v5.2 + RADAR LIVE)
 # PART 13 : TAB 4 - PORTOFOLIO BOT (+ KURASI)
 # PART 14 : TAB 5 - DETEKTIF LEDAKAN
 # =====================================================================
@@ -1350,9 +1350,9 @@ if not df_hasil.empty:
 
 
 # =====================================================================
-# >>> PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS v5.1 + RADAR LIVE + TELEGRAM SNAPSHOT) <<<
+# >>> PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS v5.2 + RADAR LIVE + TELEGRAM SNAPSHOT) <<<
 # =====================================================================
-    VERSI_SIDANG = "v5.1"
+    VERSI_SIDANG = "v5.2"
     MAX_CHANGE_BELI = 20.0  # saringan keras BSJP (sinkron dengan sidang_lib.py)
     FILE_CACHE_AUTOPILOT = "Database/cache_autopilot.json"
 
@@ -1375,7 +1375,7 @@ if not df_hasil.empty:
         if 'Tekanan Bandar' not in df_hasil.columns:
             st.warning("⏳ **Fitur Radar belum menerima data terbaru.** Harap jalankan 'update_data.py'.")
         else:
-            # --- SUSUNAN RUMUS v5.1: 1-5 remap, 6-9 rumus baru ---
+            # --- SUSUNAN RUMUS v5.2: 1-5 remap, 6-9 rumus baru ---
             df_v1 = df_v2 = df_v3 = df_v4 = df_v5 = df_v6 = df_v7 = df_v8 = df_v9 = pd.DataFrame()
             if not df_hasil.empty:
                 vwap_ok = (df_hasil.get('Posisi VWAP', '') != 'Di Bawah VWAP (Lemah)')
@@ -1405,12 +1405,13 @@ if not df_hasil.empty:
                            (df_hasil.get('Rekomendasi', '') == 'BELI'))
                 df_v3 = df_hasil[cond_v3].copy()
 
-                # RUMUS 4: Golden Cross Muda (tetap)
-                cond_v4 = ((df_hasil.get('MA Cross', '') == 'Golden Cross') &
+                # RUMUS 4: Golden Cross Muda (longgarkan v5.2)
+                cond_v4 = (((df_hasil.get('MA Cross', '') == 'Golden Cross') |
+                            (df_hasil.get('MACD', '').isin(['Strong Bullish', 'Bullish MACD']))) &
                            (df_hasil.get('Vol Breakout', '') == 'Tembus MA20') &
                            (df_hasil.get('MA Signal', '') == 'Uptrend') &
                            vwap_kuat &
-                           (df_hasil.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)'))
+                           ((df_hasil.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)') | akumulasi_pro))
                 df_v4 = df_hasil[cond_v4].copy()
 
                 # RUMUS 5: Momentum Likuid Sehat (eks R6)
@@ -1428,10 +1429,11 @@ if not df_hasil.empty:
                            (df_hasil.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)'))
                 df_v6 = df_hasil[cond_v6].copy()
 
-                # RUMUS 7: BARU — Anomali Machine Learning
+# RUMUS 7: BARU — Anomali Machine Learning (longgarkan v5.2)
                 cond_v7 = ((df_hasil.get('Prediksi Machine Learning', '') == '🔥 ANOMALI BANDAR (Siap Ledakan)') &
-                           (df_hasil.get('Status Stochastic', '').isin(['Oversold (Jenuh Jual - Peluang)', 'Golden Cross (Awal Bullish)'])) &
-                           vwap_kuat)
+                           vwap_kuat &
+                           ((df_hasil.get('Status Stochastic', '').isin(['Oversold (Jenuh Jual - Peluang)', 'Golden Cross (Awal Bullish)'])) |
+                            (df_hasil.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)')))
                 df_v7 = df_hasil[cond_v7].copy()
 
                 # RUMUS 8: BARU — Katalis Sentimen & Akuisisi
@@ -1441,12 +1443,12 @@ if not df_hasil.empty:
                            (df_hasil.get('Rekomendasi', '') == 'BELI'))
                 df_v8 = df_hasil[cond_v8].copy()
 
-                # RUMUS 9: BARU — MACD Momentum Terukur
+# RUMUS 9: BARU — MACD Momentum Terukur (longgarkan v5.2)
                 cond_v9 = ((df_hasil.get('MACD', '').isin(['Strong Bullish', 'Bullish MACD'])) &
-                           (df_hasil.get('Risk/Reward Ratio', '').isin(['Sangat Menarik (> 1:3)', 'Ideal (1:2)'])) &
-                           (df_hasil.get('Posisi Entry', '') == 'Dekat Support (Low Risk)') &
                            (df_hasil.get('Momentum', '') == 'Positif') &
-                           vwap_ok)
+                           vwap_ok &
+                           ((df_hasil.get('Risk/Reward Ratio', '').isin(['Sangat Menarik (> 1:3)', 'Ideal (1:2)'])) |
+                            (df_hasil.get('Posisi Entry', '') == 'Dekat Support (Low Risk)')))
                 df_v9 = df_hasil[cond_v9].copy()
 
             tab_screener, tab_ai = st.tabs(["🎯 Screener Spesial", "🧠 Asisten AI"])
@@ -2131,12 +2133,12 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
                 1: [("Smart Money A/D", ap), ("Bandar Akumulasi Kuat", get("Status Bandar") == "Akumulasi Kuat"), ("VWAP kuat", vk), ("Supply tidak banjir", "Banjir" not in get("Kondisi Supply"))],
                 2: [("Hammer/Jarum Bawah", get("Pola Candle") == "Hammer (Potensi Reversal)" or get("Sinyal Cuci Barang") == "Jarum Bawah (Sinyal Pantulan Kuat)"), ("VWAP kuat", vk), ("Smart Money A/D", ap)],
                 3: [("VWAP kuat", vk), ("Tekanan HAKA", get("Tekanan Bandar") == "Dominan Beli (Hajar Kanan)"), ("Open=Low", get("Status Open") == "Open = Low (Bullish Kuat)"), ("Rekomendasi BELI", get("Rekomendasi") == "BELI")],
-                4: [("Golden Cross", get("MA Cross") == "Golden Cross"), ("Tembus MA20", get("Vol Breakout") == "Tembus MA20"), ("Uptrend", get("MA Signal") == "Uptrend"), ("VWAP kuat", vk), ("Tekanan HAKA", get("Tekanan Bandar") == "Dominan Beli (Hajar Kanan)")],
+                4: [("Golden Cross/MACD bullish", get("MA Cross") == "Golden Cross" or get("MACD") in ("Strong Bullish", "Bullish MACD")), ("Tembus MA20", get("Vol Breakout") == "Tembus MA20"), ("Uptrend", get("MA Signal") == "Uptrend"), ("VWAP kuat", vk), ("Tekanan HAKA / Smart Money", get("Tekanan Bandar") == "Dominan Beli (Hajar Kanan)" or ap)],
                 5: [("Ritel Aktif", get("Kelas Transaksi") == "Ritel Aktif (5M - 50M)"), ("Tembus MA20", get("Vol Breakout") == "Tembus MA20"), ("VWAP kuat", vk), ("Uptrend", get("MA Signal") == "Uptrend"), ("Tekanan HAKA / Smart Money", get("Tekanan Bandar") == "Dominan Beli (Hajar Kanan)" or ap)],
                 6: [("RVOL anomali tinggi", get("RVOL (Anomali Vol)") in ("Anomali Tinggi (150-300%)", "Ledakan Ekstrem (> 300%)")), ("OBV Akumulasi", get("OBV Trend") == "Akumulasi (Naik)"), ("Change ≤ 5%", _ch <= 5.0), ("Tekanan HAKA", get("Tekanan Bandar") == "Dominan Beli (Hajar Kanan)")],
-                7: [("ML Anomali Bandar", get("Prediksi Machine Learning") == "🔥 ANOMALI BANDAR (Siap Ledakan)"), ("Stochastic peluang", get("Status Stochastic") in ("Oversold (Jenuh Jual - Peluang)", "Golden Cross (Awal Bullish)")), ("VWAP kuat", vk)],
+                7: [("ML Anomali Bandar", get("Prediksi Machine Learning") == "🔥 ANOMALI BANDAR (Siap Ledakan)"), ("VWAP kuat", vk), ("Stochastic peluang / Tekanan HAKA", get("Status Stochastic") in ("Oversold (Jenuh Jual - Peluang)", "Golden Cross (Awal Bullish)") or get("Tekanan Bandar") == "Dominan Beli (Hajar Kanan)")],
                 8: [("Katalis sentimen/akuisisi", get("Status Sentimen") == "Sentimen Positif 📰" or get("Status Akuisisi") in ("RENCANA AKUISISI", "DALAM AKUISISI")), ("Uptrend", get("MA Signal") == "Uptrend"), ("Rekomendasi BELI", get("Rekomendasi") == "BELI")],
-                9: [("MACD bullish", get("MACD") in ("Strong Bullish", "Bullish MACD")), ("R/R menarik", get("Risk/Reward Ratio") in ("Sangat Menarik (> 1:3)", "Ideal (1:2)")), ("Dekat Support", get("Posisi Entry") == "Dekat Support (Low Risk)"), ("Momentum Positif", get("Momentum") == "Positif"), ("VWAP tidak lemah", vo)],
+                9: [("MACD bullish", get("MACD") in ("Strong Bullish", "Bullish MACD")), ("Momentum Positif", get("Momentum") == "Positif"), ("VWAP tidak lemah", vo), ("R/R menarik / Dekat Support", get("Risk/Reward Ratio") in ("Sangat Menarik (> 1:3)", "Ideal (1:2)") or get("Posisi Entry") == "Dekat Support (Low Risk)")],
             }
             return {i: [lab for lab, ok in pairs if not ok] for i, pairs in cek.items() if any(not ok for _, ok in pairs)}
 
