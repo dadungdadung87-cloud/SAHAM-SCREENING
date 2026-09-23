@@ -9,3 +9,4 @@ telegram_config.json
 kirim_telegram.py.lokal
 kirim_telegram.py.backup
 logs/
+telegram_opencode.json
