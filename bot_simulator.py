@@ -159,10 +159,15 @@ def inisialisasi_database(rumus_id):
         
     return file_porto, file_hist
 
-def cek_saldo_tersedia(df_porto):
+def cek_saldo_tersedia(df_porto, df_history=None):
+    """Saldo = MODAL_AWAL + profit realized - modal terpasang.
+    Profit ikut agar kas > 100jt bisa dideploy (BAGIAN 3.6)."""
+    modal = MODAL_AWAL
+    if df_history is not None and not df_history.empty and 'Total_Return_Rp' in df_history.columns:
+        modal += pd.to_numeric(df_history['Total_Return_Rp'], errors='coerce').fillna(0).sum()
     if df_porto.empty:
-        return MODAL_AWAL
-    return MODAL_AWAL - df_porto['Total_Modal'].sum()
+        return modal
+    return modal - pd.to_numeric(df_porto['Total_Modal'], errors='coerce').fillna(0).sum()
 
 # ==========================================
 # 🤖 MESIN EKSEKUSI UTAMA (MODE BSJP)
@@ -396,7 +401,7 @@ def jalankan_bot():
         # >>> LIQUIDATE: skip beli agar tidak langsung beli ulang sinyal lama
         # ==========================================
         if (mode == "manual" or mode == "jadwal") and mode_beli_aktif and os.path.exists(file_sinyal) and not liquidate:
-            saldo_sekarang = cek_saldo_tersedia(df_porto)
+            saldo_sekarang = cek_saldo_tersedia(df_porto, df_history)
             saham_dimiliki = df_porto['Ticker'].tolist() if not df_porto.empty else []
             jumlah_beli = 0
             try:
@@ -408,6 +413,9 @@ def jalankan_bot():
                     if df_sinyal.empty:
                         print(f"⏭️ [RUMUS {i}] Tidak ada sinyal jadwal hari ini — dilewati.")
                         continue
+                # --- FASE B v5.1: alokasi beli dinamis (saldo / N sinyal valid) ---
+                # Pass 1: kumpulkan sinyal valid (belum dimiliki, ada di market, harga > 0)
+                sinyal_valid = []
                 for _, sinyal in df_sinyal.iterrows():
                     ticker = str(sinyal['Ticker']).strip()
                     if ticker in saham_dimiliki:
@@ -421,20 +429,30 @@ def jalankan_bot():
                     if harga_beli <= 0:
                         print(f"   ↳ {ticker}: harga tidak valid (0) — lewati.")
                         continue
-                    alokasi_dana = min(20000000, saldo_sekarang)
-                    harga_1_lot_plus_fee = (harga_beli * 100) * (1 + FEE_BELI)
-                    if alokasi_dana >= harga_1_lot_plus_fee:
-                        jumlah_lot = int(alokasi_dana // harga_1_lot_plus_fee)
-                        total_modal_dikeluarkan = jumlah_lot * harga_1_lot_plus_fee
-                        try:
-                            change_beli = float(df_market[df_market['Ticker'] == ticker]['Change (%)'].values[0])
-                        except Exception:
-                            change_beli = 0.0
+                    try:
+                        change_beli = float(df_market[df_market['Ticker'] == ticker]['Change (%)'].values[0])
+                    except Exception:
+                        change_beli = 0.0
+                    sinyal_valid.append((ticker, harga_beli, sinyal, change_beli))
+                # Pass 2: alokasi dinamis saldo / N, dengan pagar saldo tersisa
+                N = len(sinyal_valid)
+                if N == 0:
+                    print(f"⚠️ [RUMUS {i}] TIDAK ada pembelian — kertas belanja DIPERTAHANKAN.")
+                else:
+                    alokasi_rencana = saldo_sekarang / N
+                    for ticker, harga_beli, sinyal, change_beli in sinyal_valid:
+                        harga_1_lot_plus_fee = (harga_beli * 100) * (1 + FEE_BELI)
+                        lot = int(alokasi_rencana // harga_1_lot_plus_fee)
+                        lot = min(lot, int(saldo_sekarang // harga_1_lot_plus_fee))
+                        if lot < 1:
+                            print(f"   ↳ {ticker}: lot < 1 (alokasi Rp {alokasi_rencana:,.0f}/sinyal tak cukup) — lewati.")
+                            continue
+                        total_modal_dikeluarkan = lot * harga_1_lot_plus_fee
                         df_porto = pd.concat([df_porto, pd.DataFrame([{
                             'Tanggal_Beli': now.strftime("%Y-%m-%d %H:%M"),
                             'Ticker': ticker,
                             'Harga_Beli': harga_beli,
-                            'Lot': jumlah_lot,
+                            'Lot': lot,
                             'Total_Modal': total_modal_dikeluarkan,
                             'Target_TP': sinyal['Target_TP'],
                             'Target_CL': sinyal['Target_CL'],
@@ -443,11 +461,9 @@ def jalankan_bot():
                         }])], ignore_index=True)
                         saldo_sekarang -= total_modal_dikeluarkan
                         jumlah_beli += 1
-                        print(f"🛒 [RUMUS {i}] BELI: {ticker} @ Rp {harga_beli} | {jumlah_lot} Lot")
+                        print(f"🛒 [RUMUS {i}] BELI: {ticker} @ Rp {harga_beli} | {lot} Lot (alokasi Rp {alokasi_rencana:,.0f}/sinyal)")
                         if change_beli >= 20:
                             print(f"🚀 [RUMUS {i}] BELI-SAAT-ARA: {ticker} change {change_beli:+.1f}% — simulasi beli di harga ARA")
-                    else:
-                        print(f"   ↳ {ticker}: saldo tidak cukup (sisa Rp {saldo_sekarang:,.0f}) — lewati.")
                 if jumlah_beli > 0:
                     os.remove(file_sinyal)
                     print(f"🔥 [RUMUS {i}] Kertas belanja dibakar ({jumlah_beli} saham dibeli).")
