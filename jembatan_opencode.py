@@ -18,7 +18,7 @@ TANYA = os.path.join(BASE, "TANYA_OPENCODE.md")
 MARK  = os.path.join(BASE, ".tanya_terkirim.hash")
 LOCK  = os.path.join(BASE, ".bridge.lock")
 
-POLL = 25
+POLL = 5
 BACKOFF_MAX = 60
 _running = True
 WIB = timezone(timedelta(hours=7))
@@ -75,7 +75,11 @@ def _suntik_tmux(tmux, n):
     """Kirim (n-1) Down lalu Enter ke tmux session untuk memilih opsi ke-N."""
     if not tmux:
         return False
-    if subprocess.run(["tmux", "has-session", "-t", tmux], capture_output=True).returncode != 0:
+    try:
+        if subprocess.run(["tmux", "has-session", "-t", tmux], capture_output=True).returncode != 0:
+            return False
+    except FileNotFoundError:
+        _log("tmux tidak terpasang; suntikan dilewati dengan aman.")
         return False
     for _ in range(max(0, n - 1)):
         subprocess.run(["tmux", "send-keys", "-t", tmux, "Down"])
