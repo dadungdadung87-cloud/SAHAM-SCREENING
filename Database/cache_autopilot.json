@@ -1,52 +1,52 @@
 {
-    "stempel_data": "2026-09-24 15:20:02",
+    "stempel_data": "2026-09-24 16:00:02",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
             "BIPP",
-            "ASLI",
-            "SDMU",
             "UNSP",
+            "WAPO",
+            "ASLI",
             "MEJA"
         ],
         "RUMUS 2": [
             "UNSP",
-            "IRSX",
-            "GULA",
+            "CARS",
+            "ASLC",
             "BKDP",
-            "DEWI"
+            "MOLI"
         ],
         "RUMUS 3": [
             "BIPP",
             "MEJA",
-            "HADE",
-            "PCAR",
-            "ANDI"
+            "GWSA",
+            "PACK",
+            "WMPP"
         ],
         "RUMUS 4": [
             "BIPP",
             "ASLI",
-            "SDMU",
             "UNSP",
-            "MEJA"
+            "MEJA",
+            "PART"
         ],
         "RUMUS 5": [
             "BIPP",
+            "LAND",
             "UNSP",
-            "WAPO",
-            "SDMU",
-            "MEJA"
+            "MEJA",
+            "PART"
         ],
         "RUMUS 6": [
-            "PANS",
-            "JAST",
-            "PURA",
+            "EMMI",
+            "CARS",
+            "KINO",
             "BBMD",
-            "STAA"
+            "PURA"
         ],
         "RUMUS 7": [
-            "SRSN",
             "DSSA",
+            "",
             "",
             "",
             ""
@@ -59,11 +59,11 @@
             ""
         ],
         "RUMUS 9": [
-            "BAPA",
+            "BMBL",
             "JECX",
-            "TCPI",
+            "BAPA",
             "CMNT",
-            "TAMA"
+            "TCPI"
         ]
     }
 }
