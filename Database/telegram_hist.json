@@ -123,5 +123,32 @@
     "SMLE",
     "TAXI",
     "UNSP"
+  ],
+  "2026-09-24": [
+    "ANDI",
+    "ASLI",
+    "BAPA",
+    "BBMD",
+    "BIPP",
+    "BKDP",
+    "CMNT",
+    "DEWI",
+    "DSSA",
+    "GULA",
+    "HADE",
+    "IRSX",
+    "JAST",
+    "JECX",
+    "MEJA",
+    "PANS",
+    "PCAR",
+    "PURA",
+    "SDMU",
+    "SRSN",
+    "STAA",
+    "TAMA",
+    "TCPI",
+    "UNSP",
+    "WAPO"
   ]
 }
