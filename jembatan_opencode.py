@@ -1,30 +1,32 @@
 # ==========================================
-# 🌉 BRIDGE OPENCODE <-> TELEGRAM v2 (DUAL-CHANNEL)
-# Perilaku (PROMPT_OPENCODE_V52 BAGIAN 3.2):
-#  - Baca telegram_opencode.json (BOT_TOKEN, CHAT_ID, TMUX_SESSION).
-#  - CHAT_ID kosong/0 -> bind ke chat pertama yang mengirim pesan, simpan ke config.
-#  - TANYA_OPENCODE.md baru (hash) -> kirim ke TG (escape HTML), tandai hash.
-#  - TANYA hilang tapi hash ada -> kirim "sudah dijawab di laptop", hapus hash.
-#  - Balasan ANGKA saat ada pertanyaan tertunda -> suntik (N-1) Down lalu Enter ke tmux.
-#  - Balasan bukan angka -> balas "balas dengan angka opsi".
-#  - Graceful shutdown (SIGINT/SIGTERM), retry/backoff ringan, log tanpa secrets.
+# 🌉 BRIDGE OPENCODE <-> TELEGRAM v2.1 (ROBUST)
+# Perilaku (PROMPT_OPENCODE_FIX BAGIAN 3.1):
+#  - Lock file (fcntl.flock) di awal main(); instance kedua keluar sendiri.
+#  - Pada HTTPError 409: tunggu 5s lalu retry; jangan backoff panjang; jangan keluar.
+#  - HTTPError lain: backoff eksponensial <=60s.
+#  - Semua fitur dual-channel v2 tetap (TANYA->TG, angka->tmux).
+#  - Graceful shutdown SIGINT/SIGTERM; log ber-timestamp; tanpa secrets.
 # ==========================================
-import os, sys, json, time, hashlib, signal
+import os, sys, json, time, hashlib, signal, fcntl
 import subprocess
 import urllib.request, urllib.parse, urllib.error
+from datetime import datetime, timezone, timedelta
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 CFG   = os.path.join(BASE, "telegram_opencode.json")
 TANYA = os.path.join(BASE, "TANYA_OPENCODE.md")
 MARK  = os.path.join(BASE, ".tanya_terkirim.hash")
+LOCK  = os.path.join(BASE, ".bridge.lock")
 
-POLL = 25
+POLL = 5
 BACKOFF_MAX = 60
 _running = True
+WIB = timezone(timedelta(hours=7))
 
 
 def _log(msg):
-    print(f"[bridge] {msg}", flush=True)
+    ts = datetime.now(WIB).strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{ts}] {msg}", flush=True)
 
 
 def _load_cfg():
@@ -73,7 +75,11 @@ def _suntik_tmux(tmux, n):
     """Kirim (n-1) Down lalu Enter ke tmux session untuk memilih opsi ke-N."""
     if not tmux:
         return False
-    if subprocess.run(["tmux", "has-session", "-t", tmux], capture_output=True).returncode != 0:
+    try:
+        if subprocess.run(["tmux", "has-session", "-t", tmux], capture_output=True).returncode != 0:
+            return False
+    except FileNotFoundError:
+        _log("tmux tidak terpasang; suntikan dilewati dengan aman.")
         return False
     for _ in range(max(0, n - 1)):
         subprocess.run(["tmux", "send-keys", "-t", tmux, "Down"])
@@ -87,8 +93,26 @@ def _shutdown(signum, frame):
     _log(f"menerima sinyal {signum}, memulai shutdown mulus ...")
 
 
+def _acquire_lock():
+    """Ambil lock eksklusif. Instance kedua keluar sendiri."""
+    try:
+        f = open(LOCK, "w")
+        fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        f.write(str(os.getpid()))
+        f.flush()
+        return f
+    except (OSError, IOError):
+        return None
+
+
 def main():
     global _running
+
+    lf = _acquire_lock()
+    if lf is None:
+        _log("instance lain aktif (.bridge.lock tertahan); keluar.")
+        sys.exit(1)
+
     cfg = _load_cfg()
     token = cfg["BOT_TOKEN"]
     chat_id = cfg.get("CHAT_ID") or 0
@@ -99,7 +123,7 @@ def main():
     signal.signal(signal.SIGINT, _shutdown)
     signal.signal(signal.SIGTERM, _shutdown)
 
-    _log(f"bridge v2 start | chat_id={'<bind>' if not chat_id else chat_id} | tmux={tmux}")
+    _log(f"bridge v2.1 start | chat_id={'<bind>' if not chat_id else chat_id} | tmux={tmux}")
 
     while _running:
         try:
@@ -111,7 +135,7 @@ def main():
                     cfg["CHAT_ID"] = cid
                     _save_cfg(cfg)
                     _log(f"terikat ke chat {cid}")
-                    kirim(token, chat_id, "🔗 <b>Bridge v2 terikat ke chat ini.</b>\nKirim angka untuk memilih opsi saat ada pertanyaan tertunda.")
+                    kirim(token, chat_id, "🔗 <b>Bridge v2.1 terikat ke chat ini.</b>\nKirim angka untuk memilih opsi saat ada pertanyaan tertunda.")
                 else:
                     time.sleep(5)
                     continue
@@ -120,13 +144,11 @@ def main():
             h_now = _file_hash()
             h_mark = open(MARK).read().strip() if os.path.exists(MARK) else None
             if h_now is not None and h_now != h_mark:
-                # pertanyaan baru / berubah -> kirim
                 isi = open(TANYA, encoding="utf-8").read()[:3500]
                 kirim(token, chat_id, "❓ <b>OPENCODE BERTANYA</b>\n<pre>" + _esc(isi) + "</pre>\nBalas <b>angka</b> pilihan opsi Anda.")
                 open(MARK, "w").write(h_now)
                 _log("TANYA baru dikirim ke Telegram.")
             elif h_now is None and h_mark is not None:
-                # pertanyaan hilang tapi sudah pernah dikirim -> beri tahu
                 kirim(token, chat_id, "ℹ️ Pertanyaan sudah dijawab/dihilangkan di laptop.")
                 if os.path.exists(MARK):
                     os.remove(MARK)
@@ -136,7 +158,11 @@ def main():
             try:
                 r = tg("getUpdates", token, timeout=POLL, offset=last_update + 1)
             except urllib.error.HTTPError as e:
-                _log(f"HTTPError getUpdates {e.code}; backoff {backoff}s")
+                if e.code == 409:
+                    _log("HTTP 409 (terminated/conflict); tunggu 5s lalu retry.")
+                    time.sleep(5)
+                    continue
+                _log(f"HTTPError {e.code}; backoff {backoff}s")
                 time.sleep(backoff); backoff = min(backoff * 2, BACKOFF_MAX); continue
             backoff = 3
             tunda = os.path.exists(TANYA)
@@ -148,7 +174,6 @@ def main():
                 teks = (m.get("text") or "").strip()
                 if not teks:
                     continue
-                # Balasan ANGKA saat ada pertanyaan tertunda -> suntik tmux
                 if tunda and teks.isdigit():
                     n = int(teks)
                     ok = _suntik_tmux(tmux, n)
@@ -163,7 +188,16 @@ def main():
             time.sleep(backoff)
             backoff = min(backoff * 2, BACKOFF_MAX)
 
-    _log("bridge v2 berhenti.")
+    if lf:
+        try:
+            fcntl.flock(lf, fcntl.LOCK_UN)
+        except Exception:
+            pass
+    try:
+        os.remove(LOCK)
+    except Exception:
+        pass
+    _log("bridge v2.1 berhenti.")
 
 
 if __name__ == "__main__":

@@ -174,7 +174,6 @@ def cek_saldo_tersedia(df_porto, df_history=None):
 # ==========================================
 def jalankan_bot():
     now = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=7)  # WIB (UTC+7): laptop & Cloud pakai jam yang sama
-    tanggal_hari_ini = now.strftime('%Y-%m-%d')
     jam_sekarang = now.time()
     jam_square_off = datetime.strptime("15:30", "%H:%M").time()
     
@@ -278,25 +277,15 @@ def jalankan_bot():
         porto_baru = []
         history_baru = []
         
-        # ==========================================
+# ==========================================
         # FASE A: MODE JUAL (CABUT SAHAM DARI GUDANG)
+        # INVARIANT: TP/CL WAJIB menjual kapan pun tersentuh selama jam bursa,
+        # meski posisi dibeli hari ini. Aturan "beli hari ini tahan" HANYA berlaku
+        # untuk square-off (di bawah, via is_square_off_time).
         # ==========================================
         for idx, posisi in df_porto.iterrows():
             ticker = posisi['Ticker']
-            tgl_beli_saham = str(posisi['Tanggal_Beli']).split()[0]
-            
-            # >>> LIQUIDATE: bypass aturan 'beli hari ini tahan'
-            if tgl_beli_saham == tanggal_hari_ini and not liquidate:
-                # Cek apakah ticker ada di market dulu — kalau suspend, JANGAN ditahan
-                try:
-                    _ = df_market[df_market['Ticker'] == ticker]['Harga (Rp)'].values[0]
-                    # Ticker ada + beli hari ini → tahan sesuai aturan BSJP
-                    porto_baru.append(posisi)
-                    continue
-                except:
-                    # Ticker TIDAK ada (suspend/delisting) → paksa jual, abaikan aturan tahan
-                    print(f"⚠️ [RUMUS {i}] {ticker}: SUSPEND / DELETED terdeteksi — aturan 'beli hari ini tahan' dilewati.")
-            
+
             # Cek apakah ticker masih ada di market
             try:
                 harga_sekarang = df_market[df_market['Ticker'] == ticker]['Harga (Rp)'].values[0]
@@ -306,13 +295,13 @@ def jalankan_bot():
                 ticker_ada = False
                 harga_jual = posisi['Harga_Beli']  # jual di harga beli → loss hanya fee
                 status_jual = "SUSPEND_FORCE_EXIT ⚠️"
-                
+
                 # Hitung profit (akan rugi sebesar fee beli+jual)
                 nilai_jual_kotor = harga_jual * posisi['Lot'] * 100
                 nilai_jual_bersih = nilai_jual_kotor - (nilai_jual_kotor * FEE_JUAL)
                 profit_rp = nilai_jual_bersih - posisi['Total_Modal']
                 profit_pct = (profit_rp / posisi['Total_Modal']) * 100
-                
+
                 # Anti-duplikasi histori
                 sudah_ada = False
                 if not df_history.empty:
@@ -320,7 +309,7 @@ def jalankan_bot():
                 if sudah_ada:
                     print(f"⚠️ [RUMUS {i}] {ticker} sudah ada di histori — duplikat SUSPEND dicegah.")
                     continue
-                
+
                 history_baru.append({
                     'Tanggal_Beli': posisi['Tanggal_Beli'],
                     'Tanggal_Jual': now.strftime("%Y-%m-%d %H:%M"),
@@ -335,12 +324,12 @@ def jalankan_bot():
                 })
                 print(f"⚠️ [RUMUS {i}] SUSPEND_FORCE_EXIT: {ticker} | Jual paksa @ Rp {harga_jual} (harga beli) | {profit_pct:.2f}% (fee only)")
                 continue  # skip evaluasi TP/CL/square-off/liquidate
-                
+
             # >>> Flow normal: ticker ada → evaluasi TP/CL/square-off/liquidate
             terjual = False
             status_jual = ""
             harga_jual = 0
-            
+
             # >>> LIQUIDATE: jual paksa semua posisi
             if liquidate:
                 terjual = True
@@ -358,7 +347,7 @@ def jalankan_bot():
                 terjual = True
                 status_jual = "CUT_LOSS ✂️"
                 harga_jual = harga_sekarang
-                
+
             if terjual:
                 # >>> ANTI-DUPLIKASI: posisi yang sudah tercatat di histori tidak dicatat lagi
                 sudah_ada = False
