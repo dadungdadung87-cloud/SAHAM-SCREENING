@@ -174,6 +174,7 @@ def cek_saldo_tersedia(df_porto, df_history=None):
 # ==========================================
 def jalankan_bot():
     now = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=7)  # WIB (UTC+7): laptop & Cloud pakai jam yang sama
+    tanggal_hari_ini = now.strftime('%Y-%m-%d')
     jam_sekarang = now.time()
     jam_square_off = datetime.strptime("15:30", "%H:%M").time()
     
@@ -285,6 +286,7 @@ def jalankan_bot():
         # ==========================================
         for idx, posisi in df_porto.iterrows():
             ticker = posisi['Ticker']
+            tgl_beli_saham = str(posisi['Tanggal_Beli']).split()[0]
 
             # Cek apakah ticker masih ada di market
             try:
@@ -335,7 +337,7 @@ def jalankan_bot():
                 terjual = True
                 status_jual = "LIQUIDATE MANUAL 🧨"
                 harga_jual = harga_sekarang
-            elif is_square_off_time:
+            elif is_square_off_time and tgl_beli_saham != tanggal_hari_ini:
                 terjual = True
                 status_jual = "AUTO_SQUARE_OFF 🧹"
                 harga_jual = harga_sekarang
