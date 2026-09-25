@@ -150,5 +150,26 @@
     "TCPI",
     "UNSP",
     "WAPO"
+  ],
+  "2026-09-25": [
+    "ARGO",
+    "ARII",
+    "ASLI",
+    "CTBN",
+    "GTRA",
+    "KDSI",
+    "MDKA",
+    "MEJA",
+    "MKAP",
+    "MMIX",
+    "MRAT",
+    "PACK",
+    "PCAR",
+    "PSKT",
+    "TAMU",
+    "UNSP",
+    "UVCR",
+    "WAPO",
+    "WINR"
   ]
 }
