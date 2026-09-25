@@ -1,3 +1,1 @@
-Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL,Mode_Beli,Change_Beli
-2026-09-25 07:23,PCAR,51.0,3915,19996449.750000004,54,49,MANUAL,8.51063829787234
-2026-09-25 07:23,ANDI,23.0,8682,19998552.9,24,22,MANUAL,9.523809523809524
+Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL
