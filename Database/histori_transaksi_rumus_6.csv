@@ -1,1 +1,2 @@
-Tanggal_Beli,Tanggal_Jual,Ticker,Harga_Beli,Harga_Jual,Status,Total_Return_Rp,Return_%
+Tanggal_Beli,Tanggal_Jual,Ticker,Harga_Beli,Harga_Jual,Status,Total_Return_Rp,Return_%,Mode_Beli,Change_Beli
+2026-09-25 07:23,2026-09-25 09:22,EMMI,434.0,420.0,CUT_LOSS ✂️,-722246.0,-3.61,MANUAL,3.333333333333333
