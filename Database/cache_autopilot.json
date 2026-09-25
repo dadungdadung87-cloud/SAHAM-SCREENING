@@ -1,52 +1,52 @@
 {
-    "stempel_data": "2026-09-25 15:20:04",
+    "stempel_data": "2026-09-25 16:00:03",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
             "ASLI",
             "UVCR",
             "MEJA",
-            "WAPO",
-            "PCAR"
+            "MBTO",
+            "WAPO"
         ],
         "RUMUS 2": [
+            "PEGE",
             "MDKA",
-            "ARII",
             "PSKT",
-            "KDSI",
-            "MRAT"
+            "ARNA",
+            "ARII"
         ],
         "RUMUS 3": [
-            "PACK",
             "PCAR",
+            "PACK",
             "WINR",
-            "TAMU",
-            "ARGO"
+            "ARGO",
+            "SHID"
         ],
         "RUMUS 4": [
-            "MEJA",
-            "WAPO",
-            "PCAR",
             "ASLI",
-            "UVCR"
+            "UVCR",
+            "MEJA",
+            "MBTO",
+            "WAPO"
         ],
         "RUMUS 5": [
-            "MEJA",
             "UVCR",
+            "MEJA",
+            "MBTO",
             "WAPO",
-            "UNSP",
-            "MMIX"
+            "TMPO"
         ],
         "RUMUS 6": [
-            "",
-            "",
-            "",
-            "",
-            ""
+            "PEGE",
+            "PMJS",
+            "PSAT",
+            "BTPN",
+            "MRAT"
         ],
         "RUMUS 7": [
+            "PEGE",
             "MMIX",
-            "",
             "",
             "",
             ""
@@ -59,8 +59,8 @@
             ""
         ],
         "RUMUS 9": [
+            "ROTI",
             "MKAP",
-            "GTRA",
             "CTBN",
             "",
             ""
