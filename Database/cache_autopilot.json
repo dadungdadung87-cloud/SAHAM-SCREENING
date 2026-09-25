@@ -1,51 +1,51 @@
 {
-    "stempel_data": "2026-09-24 16:00:02",
+    "stempel_data": "2026-09-25 15:20:04",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "BIPP",
-            "UNSP",
-            "WAPO",
             "ASLI",
-            "MEJA"
+            "UVCR",
+            "MEJA",
+            "WAPO",
+            "PCAR"
         ],
         "RUMUS 2": [
-            "UNSP",
-            "CARS",
-            "ASLC",
-            "BKDP",
-            "MOLI"
+            "MDKA",
+            "ARII",
+            "PSKT",
+            "KDSI",
+            "MRAT"
         ],
         "RUMUS 3": [
-            "BIPP",
-            "MEJA",
-            "GWSA",
             "PACK",
-            "WMPP"
+            "PCAR",
+            "WINR",
+            "TAMU",
+            "ARGO"
         ],
         "RUMUS 4": [
-            "BIPP",
-            "ASLI",
-            "UNSP",
             "MEJA",
-            "PART"
+            "WAPO",
+            "PCAR",
+            "ASLI",
+            "UVCR"
         ],
         "RUMUS 5": [
-            "BIPP",
-            "LAND",
-            "UNSP",
             "MEJA",
-            "PART"
+            "UVCR",
+            "WAPO",
+            "UNSP",
+            "MMIX"
         ],
         "RUMUS 6": [
-            "EMMI",
-            "CARS",
-            "KINO",
-            "BBMD",
-            "PURA"
+            "",
+            "",
+            "",
+            "",
+            ""
         ],
         "RUMUS 7": [
-            "DSSA",
+            "MMIX",
             "",
             "",
             "",
@@ -59,11 +59,11 @@
             ""
         ],
         "RUMUS 9": [
-            "BMBL",
-            "JECX",
-            "BAPA",
-            "CMNT",
-            "TCPI"
+            "MKAP",
+            "GTRA",
+            "CTBN",
+            "",
+            ""
         ]
     }
 }
