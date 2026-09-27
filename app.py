@@ -782,16 +782,188 @@ st.set_page_config(page_title="Screener Saham IHSG", layout="wide", initial_side
 
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-    .stDataFrame { border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-    h1 { font-weight: 800; background: -webkit-linear-gradient(#38bdf8, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; padding-bottom: 10px; }
-    .metric-container { border-radius: 10px; padding: 15px; text-align: center; border: 1px solid #334155; background-color: #1e293b; color: #f8fafc; margin-bottom: 20px; }
-    .bandar-box { border-left: 5px solid #ef4444; background-color: #2a1111; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-    .bandar-box-green { border-left: 5px solid #22c55e; background-color: #0f291e; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-    .stTabs [data-baseweb="tab-list"] { gap: 24px; }
-    .stTabs [data-baseweb="tab"] { height: 50px; font-weight: 600; }
-    .view-mode-container { background-color: #0f172a; padding: 10px 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #334155; }
+    /* ==========================================
+       DESIGN SYSTEM — AlgoTrade Screener
+       Konsisten, lega, modern
+       ========================================== */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    :root {
+        --bg-primary: #0f172a;
+        --bg-secondary: #1e293b;
+        --bg-tertiary: #334155;
+        --border-color: #334155;
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --accent-blue: #38bdf8;
+        --accent-indigo: #3b82f6;
+        --success: #22c55e;
+        --danger: #ef4444;
+        --warning: #eab308;
+        --radius-sm: 6px;
+        --radius-md: 10px;
+        --radius-lg: 14px;
+        --shadow-sm: 0 2px 6px rgba(0,0,0,0.2);
+        --shadow-md: 0 4px 14px rgba(0,0,0,0.25);
+    }
+
+    html, body, [class*="css"] {
+        font-family: 'Inter', system-ui, sans-serif;
+        color: var(--text-secondary);
+    }
+
+    /* ===== TYPOGRAPHY HIERARCHY ===== */
+    h1 {
+        font-weight: 800;
+        font-size: 2.1rem;
+        background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        padding-bottom: 8px;
+        margin-bottom: 8px;
+        letter-spacing: -0.02em;
+    }
+    h2, h3 { color: var(--text-primary); font-weight: 700; letter-spacing: -0.01em; }
+    h4 { color: var(--text-primary); font-weight: 600; margin-top: 4px; }
+    .stMarkdown p { color: var(--text-secondary); line-height: 1.55; }
+
+    /* ===== DATAFRAME (TABEL) — LEGA & MODERN ===== */
+    .stDataFrame {
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border-color);
+    }
+    /* Header tabel: tebal, uppercase, accent */
+    .stDataFrame thead tr th {
+        font-weight: 700 !important;
+        font-size: 0.78rem !important;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        background-color: #1e293b !important;
+        color: var(--text-primary) !important;
+        padding: 12px 14px !important;
+        border-bottom: 2px solid var(--accent-blue) !important;
+    }
+    /* Cell body: lega vertikal & horizontal */
+    .stDataFrame tbody td {
+        padding: 10px 14px !important;
+        font-size: 0.9rem !important;
+        border-bottom: 1px solid #2d3b54 !important;
+    }
+    /* Zebra striping lembut */
+    .stDataFrame tbody tr:nth-child(even) { background-color: rgba(30, 41, 59, 0.35); }
+    .stDataFrame tbody tr:hover { background-color: rgba(56, 189, 248, 0.08); transition: background 0.15s ease; }
+    /* Angka rata kanan */
+    .stDataFrame tbody td[data-col="Harga (Rp)"],
+    .stDataFrame tbody td[data-col="Volume"],
+    .stDataFrame tbody td[data-col="Change (%)"] { text-align: right !important; }
+
+    /* ===== METRIC CONTAINER (Top Gainer/Loser dll) ===== */
+    .metric-container {
+        border-radius: var(--radius-md);
+        padding: 18px 14px;
+        text-align: center;
+        border: 1px solid var(--border-color);
+        background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+        color: var(--text-primary);
+        margin-bottom: 18px;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .metric-container:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+    /* ===== CALL-OUT BOXES ===== */
+    .bandar-box {
+        border-left: 5px solid var(--danger);
+        background: linear-gradient(90deg, rgba(239,68,68,0.08) 0%, transparent 100%);
+        padding: 14px 16px;
+        border-radius: var(--radius-sm);
+        margin-bottom: 14px;
+        color: var(--text-secondary);
+    }
+    .bandar-box-green {
+        border-left: 5px solid var(--success);
+        background: linear-gradient(90deg, rgba(34,197,94,0.08) 0%, transparent 100%);
+        padding: 14px 16px;
+        border-radius: var(--radius-sm);
+        margin-bottom: 14px;
+        color: var(--text-secondary);
+    }
+
+    /* ===== TABS — KONSISTEN & CLEAR ACTIVE STATE ===== */
+    .stTabs [data-baseweb="tab-list"] { gap: 8px; border-bottom: 2px solid var(--bg-tertiary); }
+    .stTabs [data-baseweb="tab"] {
+        height: 46px;
+        font-weight: 600;
+        font-size: 0.92rem;
+        padding: 0 18px;
+        border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+        transition: all 0.18s ease;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: rgba(56, 189, 248, 0.12) !important;
+        border-bottom: 3px solid var(--accent-blue) !important;
+        color: var(--text-primary) !important;
+    }
+
+    /* ===== VIEW MODE CONTAINER ===== */
+    .view-mode-container {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        padding: 12px 18px;
+        border-radius: var(--radius-md);
+        margin-bottom: 14px;
+        border: 1px solid var(--border-color);
+    }
+
+    /* ===== SIDEBAR ===== */
+    section[data-testid="stSidebar"] {
+        background-color: #0b1426;
+        border-right: 1px solid var(--border-color);
+    }
+    section[data-testid="stSidebar"] .stMarkdown h1 { font-size: 1.1rem; color: var(--accent-blue); }
+
+    /* ===== BUTTONS — SERAGAM ===== */
+    .stButton > button {
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        font-size: 0.88rem;
+        transition: all 0.15s ease;
+        border: 1px solid var(--border-color);
+    }
+    .stButton > button:hover {
+        border-color: var(--accent-blue);
+        background-color: rgba(56, 189, 248, 0.08);
+        transform: translateY(-1px);
+    }
+
+    /* ===== SELECTBOX & INPUT ===== */
+    .stSelectbox, .stNumberInput, .stTextInput {
+        margin-bottom: 8px;
+    }
+
+    /* ===== EXPANDER ===== */
+    .streamlit-expander {
+        border-radius: var(--radius-md) !important;
+        border: 1px solid var(--border-color) !important;
+        overflow: hidden;
+    }
+
+    /* ===== SPACING UNIFORM ANTAR SEKSI ===== */
+    .stMarkdown hr { margin: 18px 0; border-color: var(--bg-tertiary); }
+    .stVerticalBlock > div { gap: 0.6rem; }
+
+    /* ===== ALERT/INFO/WARNING KONSISTEN ===== */
+    .stAlert { border-radius: var(--radius-md) !important; }
+
+    /* ===== DOWNLOAD BUTTON ===== */
+    .stDownloadButton > button {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border: 1px solid var(--accent-blue);
+        color: var(--accent-blue);
+    }
     </style>
 """, unsafe_allow_html=True)
 
