@@ -838,7 +838,12 @@ DEFAULT_CONFIG = {
         "Status Sentimen": {"label": "📰 Sentimen Berita", "options": ["Semua", "Sentimen Positif 📰", "Sentimen Negatif ⚠️", "Netral / Sepi Berita"]},
         "Prediksi Machine Learning": {"label": "🧠 AI Machine Learning", "options": ["Semua", "🔥 ANOMALI BANDAR (Siap Ledakan)", "⚠️ Anomali (Sudah Terbang)", "Biasa / Mengikuti Pasar"]},
         "Kondisi Supply": {"label": "🏜️ Supply & Demand", "options": ["Semua", "Supply Kering (Siap Pump) 🏜️", "Supply Banjir (Distribusi) 🌊", "Normal / Sedang Transisi"]},
-        "Status Fibonacci": {"label": "📏 Level Fibonacci", "options": ["Semua", "Golden Rebound Fibo 61.8% (Golden Ratio) 🎯", "Dekat Support Fibo 61.8% (Golden Ratio)", "Golden Rebound Fibo 50.0% 🎯", "Golden Rebound Fibo 38.2% 🎯", "Mengambang (Jauh dari Fibo)"]}
+        "Status Fibonacci": {"label": "📏 Level Fibonacci", "options": ["Semua", "Golden Rebound Fibo 61.8% (Golden Ratio) 🎯", "Dekat Support Fibo 61.8% (Golden Ratio)", "Golden Rebound Fibo 50.0% 🎯", "Golden Rebound Fibo 38.2% 🎯", "Mengambang (Jauh dari Fibo)"]},
+        "Trend MA (5,20,50)": {"label": "🛤️ Tren MA Trio", "options": ["Semua", "Perfect Uptrend (5>20>50)", "Awal Reversal (5>20)", "Strong Downtrend (5<20<50)", "Konsolidasi / Transisi"]},
+        "Status Gap": {"label": "🌅 Status Gap", "options": ["Semua", "Gap Up", "Gap Down", "Normal"]},
+        "Vol Breakout MA20": {"label": "🔊 Volume Breakout", "options": ["Semua", "Tembus MA20", "Normal"]},
+        "Streak Harian": {"label": "🔥 Streak Harian", "options": ["Semua", "Naik Beruntun", "Turun Beruntun", "Sideways / Stagnan"]},
+        "Kelas Perubahan": {"label": "📊 Kelas Perubahan", "options": ["Semua", "🚀 ARA (> +10%)", "📈 Naik Kuat (+5% s/d +10%)", "🌿 Naik Tipis (0 s/d +5%)", "💤 Stagnan (0%)", "🔻 Turun Tipis (-5% s/d 0%)", "🩸 Turun Tajam (< -5%)"]}
     }
 }
 
@@ -846,8 +851,16 @@ if not os.path.exists(FILE_CONFIG):
     with open(FILE_CONFIG, "w") as f: json.dump(DEFAULT_CONFIG, f, indent=4)
 else:
     with open(FILE_CONFIG, "r") as f: cek_config = json.load(f)
-    if "Status Fibonacci" not in cek_config.get("MASTER_FILTERS", {}):
-        with open(FILE_CONFIG, "w") as f: json.dump(DEFAULT_CONFIG, f, indent=4)
+    if "Status Fibonacci" not in cek_config.get("MASTER_FILTERS", {}) or "Kelas Perubahan" not in cek_config.get("MASTER_FILTERS", {}):
+        # Merge: pertahankan perubahan user, tambah entry baru jika belum ada
+        master_lama = cek_config.get("MASTER_FILTERS", {})
+        master_gabungan = dict(DEFAULT_CONFIG["MASTER_FILTERS"])
+        # Override dengan custom user (label/options lama) bila ada
+        for k, v in master_lama.items():
+            if k in master_gabungan:
+                master_gabungan[k] = v
+        cek_config["MASTER_FILTERS"] = master_gabungan
+        with open(FILE_CONFIG, "w") as f: json.dump(cek_config, f, indent=4)
 
 with open(FILE_CONFIG, "r") as f: WEB_CONFIG = json.load(f)
 
@@ -1243,18 +1256,40 @@ if not df_hasil.empty:
             st.session_state["batas_harga_min"] = 0
             st.session_state["batas_harga_max"] = 0
 
-        with st.expander("🛠️ Buka Panel Filter Lengkap", expanded=False):
+        # ==========================================
+        # DEFINISI GRUP FILTER (untuk layout rapih)
+        # ==========================================
+        GRUP_FILTER = [
+            ("🏢 Fundamental & Likuiditas", ["Kategori", "Valuasi", "Kelas Transaksi", "Likuiditas", "Status Akuisisi", "Status Sentimen"]),
+            ("📈 Teknikal Klasik", ["RSI (14D)", "MA Signal", "Trend MA (5,20,50)", "MA Cross", "MACD", "Status Stochastic", "Status BB"]),
+            ("🎯 Entry, Exit & Risiko", ["Risk/Reward Ratio", "Posisi Entry", "Status Open", "Status Gap", "Sinyal Cuci Barang", "Pola Candle", "Risiko"]),
+            ("🕵️ Bandarmologi & Volume", ["Status Bandar", "Tekanan Bandar", "OBV Trend", "Kekuatan A/D", "RVOL (Anomali Vol)", "Karakter Gorengan", "Vol Breakout MA20"]),
+            ("🌊 Siklus & Behavior", ["Fase Siklus Bandar", "Kondisi Supply", "Streak Harian", "Kelas Perubahan", "Prediksi Machine Learning", "Total Score", "Rekomendasi"])
+        ]
+
+        with st.expander("🛠️ Buka Panel Filter Lengkap (Dikelompokkan)", expanded=False):
             st.button("🔄 Reset Semua Filter ke Bawaan (Semua)", on_click=reset_semua_filter, use_container_width=True)
+
+            # Helper render 1 grup pakai 3 kolom
+            def _render_grup(nama_grup, daftar_key, col_count=3):
+                st.markdown(f"**{nama_grup}**")
+                cols = st.columns(col_count)
+                hasil = {}
+                for idx, db_key in enumerate(daftar_key):
+                    if db_key not in MASTER_FILTERS:
+                        continue
+                    info = MASTER_FILTERS[db_key]
+                    with cols[idx % col_count]:
+                        val_sekarang = st.session_state.get(f"main_{db_key}", info["options"][0])
+                        idx_opsi = info["options"].index(val_sekarang) if val_sekarang in info["options"] else 0
+                        hasil[db_key] = st.selectbox(info["label"], info["options"], index=idx_opsi, key=f"main_{db_key}", on_change=manual_override)
+                return hasil
+
             st.markdown("---")
-            
-            col_f1, col_f2, col_f3, col_f4 = st.columns(4)
             filter_terpilih = {}
-            for idx, (db_key, info) in enumerate(MASTER_FILTERS.items()):
-                target_col = col_f1 if idx % 4 == 0 else (col_f2 if idx % 4 == 1 else (col_f3 if idx % 4 == 2 else col_f4))
-                with target_col:
-                    val_sekarang = st.session_state.get(f"main_{db_key}", info["options"][0])
-                    idx_opsi = info["options"].index(val_sekarang) if val_sekarang in info["options"] else 0
-                    filter_terpilih[db_key] = st.selectbox(info["label"], info["options"], index=idx_opsi, key=f"main_{db_key}", on_change=manual_override)
+            for nama_grup, daftar_key in GRUP_FILTER:
+                filter_terpilih.update(_render_grup(nama_grup, daftar_key, col_count=3))
+                st.markdown("")
 
         col_search, col_broker, col_min, col_max = st.columns([1.5, 1.5, 1, 1])
         with col_search: 
@@ -1279,17 +1314,72 @@ if not df_hasil.empty:
         if max_price > 0:
             df_filtered = df_filtered[df_filtered["Harga (Rp)"] <= max_price]
         
+        # ==========================================
+        # APPLY FILTER (handle field baru = string match)
+        # ==========================================
+        # Daftar field yang pakai string match (bukan exact equality)
+        MATCH_CONTAINS_FIELDS = {
+            "Streak Harian": {"Naik Beruntun": "Naik", "Turun Beruntun": "Turun", "Sideways / Stagnan": "Sideways"},
+            "Status Gap": {"Gap Up": "Gap Up", "Gap Down": "Gap Down", "Normal": "Normal"},
+            "Kelas Perubahan": {
+                "🚀 ARA (> +10%)": "ara_10",
+                "📈 Naik Kuat (+5% s/d +10%)": "up_5_10",
+                "🌿 Naik Tipis (0 s/d +5%)": "up_0_5",
+                "💤 Stagnan (0%)": "stag",
+                "🔻 Turun Tipis (-5% s/d 0%)": "dn_5_0",
+                "🩸 Turun Tajam (< -5%)": "dn_lt5"
+            }
+        }
+        
         for db_key, nilai in filter_terpilih.items():
-            if nilai != "Semua":
-                if db_key == "RSI (14D)":
-                    if "RSI (14D)" in df_filtered.columns: df_filtered = df_filtered[df_filtered["RSI (14D)"] > 50] if "Bullish" in nilai else df_filtered[df_filtered["RSI (14D)"] <= 50]
-                elif db_key == "Total Score":
-                    if "Total Score" in df_filtered.columns: df_filtered = df_filtered[df_filtered["Total Score"] == int(nilai)]
-                elif db_key == "Kategori" and nilai == "Mid Cap (Lapis 2) + Small Cap (Lapis 3)":
-                    if "Kategori" in df_filtered.columns:
-                        df_filtered = df_filtered[df_filtered["Kategori"].isin(["Mid Cap (Lapis 2)", "Small Cap (Lapis 3)"])]
-                elif db_key in df_filtered.columns: 
-                    df_filtered = df_filtered[df_filtered[db_key] == nilai]
+            if nilai == "Semua":
+                continue
+            if db_key == "RSI (14D)":
+                if "RSI (14D)" in df_filtered.columns:
+                    df_filtered = df_filtered[df_filtered["RSI (14D)"] > 50] if "Bullish" in nilai else df_filtered[df_filtered["RSI (14D)"] <= 50]
+                continue
+            if db_key == "Total Score":
+                if "Total Score" in df_filtered.columns:
+                    df_filtered = df_filtered[df_filtered["Total Score"] == int(nilai)]
+                continue
+            if db_key == "Kategori" and nilai == "Mid Cap (Lapis 2) + Small Cap (Lapis 3)":
+                if "Kategori" in df_filtered.columns:
+                    df_filtered = df_filtered[df_filtered["Kategori"].isin(["Mid Cap (Lapis 2)", "Small Cap (Lapis 3)"])]
+                continue
+            if db_key == "Vol Breakout MA20":
+                if "Vol Breakout" in df_filtered.columns:
+                    df_filtered = df_filtered[df_filtered["Vol Breakout"] == nilai]
+                continue
+            if db_key == "Streak Harian":
+                if "Streak Harian" in df_filtered.columns:
+                    pola = MATCH_CONTAINS_FIELDS["Streak Harian"].get(nilai, "")
+                    if pola:
+                        df_filtered = df_filtered[df_filtered["Streak Harian"].astype(str).str.contains(pola, na=False, case=False)]
+                continue
+            if db_key == "Status Gap":
+                if "Status Gap" in df_filtered.columns:
+                    pola = MATCH_CONTAINS_FIELDS["Status Gap"].get(nilai, "")
+                    if pola:
+                        df_filtered = df_filtered[df_filtered["Status Gap"].astype(str).str.contains(pola, na=False, case=False)]
+                continue
+            if db_key == "Kelas Perubahan":
+                if "Change (%)" in df_filtered.columns:
+                    chg = pd.to_numeric(df_filtered["Change (%)"], errors="coerce")
+                    if nilai == "🚀 ARA (> +10%)":
+                        df_filtered = df_filtered[chg > 10]
+                    elif nilai == "📈 Naik Kuat (+5% s/d +10%)":
+                        df_filtered = df_filtered[(chg >= 5) & (chg <= 10)]
+                    elif nilai == "🌿 Naik Tipis (0 s/d +5%)":
+                        df_filtered = df_filtered[(chg > 0) & (chg < 5)]
+                    elif nilai == "💤 Stagnan (0%)":
+                        df_filtered = df_filtered[chg == 0]
+                    elif nilai == "🔻 Turun Tipis (-5% s/d 0%)":
+                        df_filtered = df_filtered[(chg <= 0) & (chg >= -5)]
+                    elif nilai == "🩸 Turun Tajam (< -5%)":
+                        df_filtered = df_filtered[chg < -5]
+                continue
+            if db_key in df_filtered.columns: 
+                df_filtered = df_filtered[df_filtered[db_key] == nilai]
 
         if not df_filtered.empty:
             st.caption(f"Menampilkan **{len(df_filtered)}** saham yang lolos filter dari total **{len(df_hasil)}** saham.")
