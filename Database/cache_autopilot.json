@@ -1,5 +1,5 @@
 {
-    "stempel_data": "2026-09-28 15:20:03",
+    "stempel_data": "2026-09-28 16:00:05",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
@@ -10,18 +10,18 @@
             "PPRO"
         ],
         "RUMUS 2": [
-            "MIRA",
-            "MEJA",
-            "SEMA",
             "VIVA",
-            "SGER"
+            "SGER",
+            "SEMA",
+            "MEJA",
+            "SNLK"
         ],
         "RUMUS 3": [
             "BLTA",
+            "ASMI",
             "TAMU",
             "PBRX",
-            "BSWD",
-            "IFSH"
+            "BSWD"
         ],
         "RUMUS 4": [
             "BTEK",
@@ -31,18 +31,18 @@
             "PPRO"
         ],
         "RUMUS 5": [
+            "BLTA",
             "UVCR",
             "MEJA",
-            "SGER",
-            "CBRE",
-            "AYLS"
+            "ELTY",
+            "CBRE"
         ],
         "RUMUS 6": [
+            "BDKR",
             "SGER",
             "PTBA",
-            "PRIM",
-            "",
-            ""
+            "DAAZ",
+            "ALII"
         ],
         "RUMUS 7": [
             "",
@@ -60,9 +60,9 @@
         ],
         "RUMUS 9": [
             "PRAY",
+            "PEVE",
             "TCPI",
-            "UNVR",
-            "",
+            "PUDP",
             ""
         ]
     }
