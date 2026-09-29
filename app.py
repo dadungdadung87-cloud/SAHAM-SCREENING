@@ -2331,6 +2331,90 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
         st.caption("Angka dihitung LOKAL dari arsip intraday R2 (snapshot 5-menitan) + Buku Besar Harian (50 hari, gzip ±1MB). AI gratis hanya menyusun narasi — tidak berhitung.")
         st.caption("🔒 **Pagar keamanan:** Tab ini hanya MEMBACA & MENGANALISIS — tidak pernah membeli, menjual, atau mengubah portofolio/sinyal Anda.")
 
+        # ==========================================
+        # ALPHA SCAN PRO — 8 FITUR CANGGIH
+        # ==========================================
+        import sys as _sys
+        _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        try:
+            from services import alpha_features as af
+            ALPHA_OK = True
+        except Exception:
+            ALPHA_OK = False
+        if ALPHA_OK:
+            with st.expander("🚀 AlphaScan Pro — Analisis Canggih", expanded=False):
+                sub1, sub2 = st.tabs(["📊 Pasar", "🎯 Risiko & Performa"])
+
+                # ---- SUB TAB: PASAR ----
+                with sub1:
+                    # 1. MARKET BREADTH
+                    mb = af.market_breadth(df_hasil)
+                    if mb:
+                        c1, c2, c3, c4 = st.columns(4)
+                        c1.metric("🟢 Advance", mb["advance"])
+                        c2.metric("🔴 Decline", mb["decline"])
+                        c3.metric("📈 A/D Line", mb["ad_line"])
+                        c4.metric("🧭 Status", mb["status"])
+                        st.caption(f"A/D Ratio (Adv/Dec): {mb['ratio']}")
+                    st.markdown("---")
+                    # 2. SECTOR ROTATION
+                    sr = af.sector_rotation(df_hasil)
+                    if sr:
+                        st.markdown("#### 🌐 Arus Dana per Kategori")
+                        for kat, pct in sr:
+                            bar = "█" * int(pct/3)
+                            st.markdown(f"`{kat}` **{pct}%** {bar}")
+                        st.markdown("---")
+                    # 3. PRE-MARKET GAP SCANNER
+                    gs = af.premarket_gap_scanner(df_hasil, 2.0)
+                    if gs:
+                        gc1, gc2 = st.columns(2)
+                        with gc1:
+                            st.markdown("##### ⬆️ Gap Up >2%")
+                            if not gs["gap_up"].empty: st.dataframe(gs["gap_up"], hide_index=True, use_container_width=True)
+                            else: st.info("Tidak ada")
+                        with gc2:
+                            st.markdown("##### ⬇️ Gap Down >2%")
+                            if not gs["gap_down"].empty: st.dataframe(gs["gap_down"], hide_index=True, use_container_width=True)
+                            else: st.info("Tidak ada")
+
+                # ---- SUB TAB: RISIKO & PERFORMA ----
+                with sub2:
+                    # 4. POSITION SIZING CALCULATOR
+                    st.markdown("#### 🧮 Position Sizing Calculator")
+                    ps_c1, ps_c2, ps_c3, ps_c4 = st.columns(4)
+                    modal_ps = ps_c1.number_input("Modal (Rp)", value=100000000, step=10000000, key="ps_modal")
+                    risk_ps = ps_c2.number_input("Risk %", value=2.0, step=0.5, key="ps_risk")
+                    entry_ps = ps_c3.number_input("Entry Price", value=1000.0, step=50.0, key="ps_entry")
+                    atr_ps = ps_c4.number_input("ATR", value=50.0, step=10.0, key="ps_atr")
+                    hasil_ps = af.position_sizing(modal_ps, risk_ps, entry_ps, atr_ps)
+                    if hasil_ps:
+                        st.success(f"Lot optimal: **{hasil_ps['lot']}** | SL: Rp {hasil_ps['sl']:,.0f} | TP: Rp {hasil_ps['tp_atr15']:,.0f} | Modal keluar Rp Rp {hasil_ps['modal_keluar']:,.0f}")
+
+                    st.markdown("---")
+                    # 5. STRATEGY LEADERBOARD
+                    st.markdown("#### 🏆 Leaderboard Rumus BSJP")
+                    lb = af.strategy_leaderboard()
+                    if lb is not None:
+                        st.dataframe(lb, use_container_width=True, hide_index=True)
+                    else:
+                        st.info("Belum ada data histori transaksi.")
+
+                    st.markdown("---")
+                    # 6. DRAWDOWN ANALYSIS
+                    st.markdown("#### 📉 Drawdown Analysis")
+                    rd_c1, rd_c2 = st.columns([1, 3])
+                    with rd_c1:
+                        rumus_dd = st.selectbox("Pilih Rumus", [f"R{i}" for i in range(1, 10)], key="dd_rumus")
+                    rumus_id = int(rumus_dd[1])
+                    dd = af.drawdown_analysis(rumus_id)
+                    if dd:
+                        st.warning(f"Max Drawdown: **{dd['max_drawdown_pct']}%** | Equity sekarang: Rp {dd['equity_now']:,.0f} | Peak: Rp {dd['peak']:,.0f}")
+                    else:
+                        st.info(f"Belum ada histori untuk {rumus_dd}.")
+
+        st.markdown("---")
+
         HARI_INI = (datetime.utcnow() + pd.Timedelta(hours=7)).strftime("%Y-%m-%d")
         lb = muat_buku_besar()
         tgl_opsi = sorted(lb["Tanggal"].astype(str).unique(), reverse=True) if not lb.empty else []
