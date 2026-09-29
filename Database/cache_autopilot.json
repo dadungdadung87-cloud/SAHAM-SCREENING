@@ -1,26 +1,26 @@
 {
-    "stempel_data": "2026-09-29 15:20:04",
+    "stempel_data": "2026-09-29 16:00:04",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
             "SEMA",
             "BIKE",
-            "BDKR",
             "MTLA",
-            "IFSH"
+            "BDKR",
+            "ALDO"
         ],
         "RUMUS 2": [
             "MTLA",
             "IFSH",
-            "MGRO",
-            "SONA",
-            "DAAZ"
+            "SOSS",
+            "DAAZ",
+            "DEWI"
         ],
         "RUMUS 3": [
-            "MLIA",
             "ALDO",
             "NEST",
             "SMIL",
+            "",
             ""
         ],
         "RUMUS 4": [
@@ -32,21 +32,21 @@
         ],
         "RUMUS 5": [
             "SEMA",
-            "TAXI",
-            "VIVA",
-            "MEJA",
-            "CSMI"
+            "PPRO",
+            "UVCR",
+            "CSMI",
+            "RSCH"
         ],
         "RUMUS 6": [
+            "PTBA",
             "BDKR",
-            "DAAZ",
-            "CMNP",
-            "MTMH",
-            "UFOE"
+            "BSSR",
+            "BINA",
+            "DAAZ"
         ],
         "RUMUS 7": [
-            "UVCR",
-            "CPRO",
+            "BSBK",
+            "",
             "",
             "",
             ""
@@ -60,9 +60,9 @@
         ],
         "RUMUS 9": [
             "PEVE",
+            "SCNP",
+            "CMNT",
             "TCPI",
-            "",
-            "",
             ""
         ]
     }
