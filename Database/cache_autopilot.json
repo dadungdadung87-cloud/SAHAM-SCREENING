@@ -1,51 +1,51 @@
 {
-    "stempel_data": "2026-09-29 16:00:04",
+    "stempel_data": "2026-09-30 15:20:04",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
+            "MEJA",
             "SEMA",
-            "BIKE",
-            "MTLA",
-            "BDKR",
-            "ALDO"
+            "TEBE",
+            "SONA",
+            "BSWD"
         ],
         "RUMUS 2": [
-            "MTLA",
-            "IFSH",
-            "SOSS",
-            "DAAZ",
-            "DEWI"
-        ],
-        "RUMUS 3": [
-            "ALDO",
-            "NEST",
-            "SMIL",
-            "",
-            ""
-        ],
-        "RUMUS 4": [
-            "SEMA",
-            "BIKE",
-            "MTLA",
-            "IFSH",
-            "BDKR"
-        ],
-        "RUMUS 5": [
-            "SEMA",
-            "PPRO",
-            "UVCR",
-            "CSMI",
-            "RSCH"
-        ],
-        "RUMUS 6": [
-            "PTBA",
-            "BDKR",
-            "BSSR",
-            "BINA",
+            "BMBL",
+            "URBN",
+            "DGNS",
+            "SMMT",
             "DAAZ"
         ],
+        "RUMUS 3": [
+            "MEJA",
+            "BSWD",
+            "AIMS",
+            "MKAP",
+            "BLTZ"
+        ],
+        "RUMUS 4": [
+            "MEJA",
+            "SEMA",
+            "TEBE",
+            "SMLE",
+            "SONA"
+        ],
+        "RUMUS 5": [
+            "MEJA",
+            "SEMA",
+            "SMLE",
+            "PCAR",
+            "DEWI"
+        ],
+        "RUMUS 6": [
+            "BINA",
+            "KDSI",
+            "BTPN",
+            "BNII",
+            "AMFG"
+        ],
         "RUMUS 7": [
-            "BSBK",
+            "",
             "",
             "",
             "",
@@ -59,11 +59,11 @@
             ""
         ],
         "RUMUS 9": [
-            "PEVE",
+            "EURO",
+            "SILO",
+            "IKBI",
             "SCNP",
-            "CMNT",
-            "TCPI",
-            ""
+            "IFII"
         ]
     }
 }
