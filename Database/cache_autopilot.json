@@ -1,54 +1,54 @@
 {
-    "stempel_data": "2026-10-01 15:20:04",
+    "stempel_data": "2026-10-01 16:00:05",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
+            "GEMS",
+            "SONA",
+            "BSWD",
             "CSMI",
-            "TEBE",
-            "SAPX",
-            "AKKU",
-            "SONA"
+            "TEBE"
         ],
         "RUMUS 2": [
-            "SRSN",
-            "TOWR",
+            "AIMS",
             "PEVE",
-            "SMMT",
-            "DAAZ"
+            "DAAZ",
+            "BDKR",
+            "BINA"
         ],
         "RUMUS 3": [
+            "BSWD",
             "CSMI",
-            "SAPX",
             "ASPI",
-            "ENRG",
-            "BSWD"
+            "BLTZ",
+            ""
         ],
         "RUMUS 4": [
             "CSMI",
             "TEBE",
-            "SAPX",
-            "AKKU",
-            "ASPI"
+            "GEMS",
+            "ROCK",
+            "SONA"
         ],
         "RUMUS 5": [
             "CSMI",
             "BEKS",
-            "SAPX",
             "ASPI",
-            "CCSI"
+            "CCSI",
+            "RSCH"
         ],
         "RUMUS 6": [
             "BDMN",
             "LPGI",
-            "",
-            "",
+            "SMMA",
+            "IRRA",
             ""
         ],
         "RUMUS 7": [
             "RSCH",
-            "UVCR",
             "DSSA",
-            "SRSN",
+            "",
+            "",
             ""
         ],
         "RUMUS 8": [
@@ -59,11 +59,11 @@
             ""
         ],
         "RUMUS 9": [
-            "IKBI",
+            "SCNP",
             "IFII",
+            "PGLI",
             "CMNT",
-            "",
-            ""
+            "BUKA"
         ]
     }
 }
