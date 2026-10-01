@@ -1,54 +1,54 @@
 {
-    "stempel_data": "2026-09-30 15:55:04",
+    "stempel_data": "2026-10-01 15:20:04",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "PPRO",
-            "MEJA",
-            "PCAR",
-            "SEMA",
-            "SMLE"
+            "CSMI",
+            "TEBE",
+            "SAPX",
+            "AKKU",
+            "SONA"
         ],
         "RUMUS 2": [
-            "MTLA",
-            "BDKR",
-            "MAPI",
+            "SRSN",
+            "TOWR",
+            "PEVE",
             "SMMT",
-            "URBN"
+            "DAAZ"
         ],
         "RUMUS 3": [
-            "MEJA",
+            "CSMI",
+            "SAPX",
             "ASPI",
-            "BSWD",
-            "AIMS",
-            "MKAP"
+            "ENRG",
+            "BSWD"
         ],
         "RUMUS 4": [
-            "MEJA",
-            "SMLE",
-            "SEMA",
+            "CSMI",
             "TEBE",
+            "SAPX",
+            "AKKU",
             "ASPI"
         ],
         "RUMUS 5": [
-            "MEJA",
-            "SMLE",
-            "SEMA",
+            "CSMI",
+            "BEKS",
+            "SAPX",
             "ASPI",
-            "PCAR"
+            "CCSI"
         ],
         "RUMUS 6": [
-            "MTLA",
-            "BINA",
-            "WGSH",
-            "IPCM",
-            "KDSI"
+            "BDMN",
+            "LPGI",
+            "",
+            "",
+            ""
         ],
         "RUMUS 7": [
-            "MTLA",
-            "",
-            "",
-            "",
+            "RSCH",
+            "UVCR",
+            "DSSA",
+            "SRSN",
             ""
         ],
         "RUMUS 8": [
@@ -59,10 +59,10 @@
             ""
         ],
         "RUMUS 9": [
-            "EURO",
-            "SILO",
             "IKBI",
             "IFII",
+            "CMNT",
+            "",
             ""
         ]
     }
