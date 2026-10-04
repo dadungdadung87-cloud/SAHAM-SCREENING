@@ -1,3 +1,1 @@
-Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL,Mode_Beli,Change_Beli
-2026-10-02 15:23,MMIX,940.0,283,26641903.0,987,912,JADWAL,2.73224043715847
-2026-10-02 15:23,COCO,111.0,2404,26724426.600000005,117,108,JADWAL,0.0
+Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL
