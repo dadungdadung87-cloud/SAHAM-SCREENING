@@ -1,4 +1,9 @@
 #!/bin/bash
+# ==========================================
+# ⚠️ MODE FULL-MANUAL: bot TIDAK PERNAH membeli/menjual otomatis.
+# Semua eksekusi beli/jual hanya lewat tombol di web Tab 4.
+# Cron ini hanya: update data -> sidang AI -> telegram -> buku besar.
+# ==========================================
 exec 200>/tmp/bot_simulator.lock
 flock -n 200 || { echo "⏳ Siklus dilewati: bot sebelumnya masih berjalan."; exit 0; }
 
@@ -14,13 +19,25 @@ echo "⏳ Memulai pembaruan data saham..."
 JAM_SEKARANG=$(date +%H%M)
 FLAG_PAGI="/tmp/bsjp_pagi_$(date +%F)"
 FLAG_SORE="/tmp/bsjp_sore_$(date +%F)"
+FLAG_FUND="/tmp/exodus_fund_$(date +%F)"
+
+if [ "$JAM_SEKARANG" -ge "1615" ] && [ "$JAM_SEKARANG" -le "1645" ]; then
+    if [ ! -f "$FLAG_FUND" ]; then
+        echo "🧪 [16:15-16:45] Tarik fundamental exodus (Stockbit)..."
+        if ./.venv/bin/python fetcher_exodus.py fundamental; then
+            touch "$FLAG_FUND"
+        else
+            echo "⚠️ Fundamental exodus gagal (token mati?) — dicoba lagi siklus berikutnya."
+        fi
+    else
+        echo "⏭️ Fundamental exodus sudah jalan hari ini, dilewati."
+    fi
+fi
 
 if [ "$JAM_SEKARANG" -ge "1520" ] && [ "$JAM_SEKARANG" -le "1535" ]; then
     if [ ! -f "$FLAG_PAGI" ]; then
-        echo "🧠 [15:20-15:35] Sidang jadwal..."
+        echo "🧠 [15:20-15:35] Sidang jadwal (hanya bikin sinyal — TIDAK membeli)..."
         if ./.venv/bin/python sidang_jadwal.py; then
-            echo "🛒 [15:20-15:35] Beli jadwal..."
-            ./.venv/bin/python beli_jadwal.py
             echo "📲 [15:36] Telegram pagi..."
             ./.venv/bin/python kirim_telegram.py
             touch "$FLAG_PAGI"
@@ -38,11 +55,9 @@ elif [ "$JAM_SEKARANG" -ge "1600" ] && [ "$JAM_SEKARANG" -le "1610" ]; then
         else
             echo "❌ Sidang/Telegram sore gagal — dicoba lagi siklus berikutnya."
         fi
-    else
-        echo "⏭️ Sidang sore sudah jalan hari ini, dilewati."
     fi
 else
-    ./.venv/bin/python bot_simulator.py
+    echo "🔒 Mode full-manual: cron tidak mengeksekusi beli/jual apa pun."
 fi
 
 ./.venv/bin/python bangun_buku_besar.py

@@ -1108,6 +1108,66 @@ df_hasil = load_data_saham()
 if not df_hasil.empty and 'Volume' in df_hasil.columns and 'Harga (Rp)' in df_hasil.columns:
     df_hasil['Value Transaksi'] = df_hasil['Harga (Rp)'] * df_hasil['Volume'] * 100
 
+# ==========================================
+# 🧪 MERGE FUNDAMENTAL EXODUS (Stockbit Screener — sesi sendiri, via fetcher_exodus.py)
+# Kolom tambahan: Market Cap, PE (TTM), PBV, P/S, Earnings Yield, Dividend Yield,
+#                 Piotroski F-Score, EPS Rating, RS Rating, BVPS, PEG
+# Sumber: R2 Database/fundamental_exodus.csv (hasil fetch harian) / lokal.
+# ==========================================
+KOLOM_FUND_EXODUS = {
+    "Market Cap": "Mkt Cap (Exodus)",
+    "Current PE Ratio (TTM)": "PE TTM (Exodus)",
+    "Current Price to Book Value": "PBV (Exodus)",
+    "Current Price to Sales (TTM)": "P/S TTM (Exodus)",
+    "Earnings Yield (TTM)": "Earnings Yield",
+    "Dividend Yield": "Div Yield",
+    "Piotroski F-Score": "F-Score",
+    "EPS Rating": "EPS Rating",
+    "Relative Strength Rating": "RS Rating",
+    "Current Book Value Per Share": "BVPS (Exodus)",
+    "PEG Ratio": "PEG",
+}
+
+@st.cache_data(ttl=1800, show_spinner=False)
+def _muat_fundamental_exodus():
+    """Unduh CSV fundamental dari R2; fallback lokal. Return DataFrame (boleh kosong)."""
+    import tempfile as _tf
+    try:
+        import r2_client
+        tmp = os.path.join(_tf.gettempdir(), "fundamental_exodus.csv")
+        if r2_client.download_arsip("Database/fundamental_exodus.csv", tmp):
+            return pd.read_csv(tmp)
+    except Exception:
+        pass
+    fp = os.path.join("Database", "fundamental_exodus.csv")
+    if os.path.exists(fp):
+        try:
+            return pd.read_csv(fp)
+        except Exception:
+            pass
+    return pd.DataFrame()
+
+SUMBER_FUND = ""
+try:
+    if not df_hasil.empty:
+        df_fund = _muat_fundamental_exodus()
+        if not df_fund.empty and "Ticker" in df_fund.columns:
+            df_fund = df_fund.rename(columns=KOLOM_FUND_EXODUS)
+            kolom_baru = [c for c in KOLOM_FUND_EXODUS.values() if c in df_fund.columns]
+            df_fund = df_fund[["Ticker"] + kolom_baru].copy()
+            df_fund["Ticker"] = df_fund["Ticker"].astype(str).str.upper().str.strip()
+            df_hasil["Ticker"] = df_hasil["Ticker"].astype(str).str.upper().str.strip()
+            # Numeric-kan agar filter/format web aman
+            for c in kolom_baru:
+                df_fund[c] = pd.to_numeric(df_fund[c], errors="coerce")
+            df_hasil = df_hasil.merge(df_fund, on="Ticker", how="left")
+            stempel_fund = df_fund["Diambil"].iloc[0] if "Diambil" in df_fund.columns else "?"
+            SUMBER_FUND = f"🧪 Fundamental Exodus: {len(df_fund)} saham (per {stempel_fund})"
+        else:
+            SUMBER_FUND = "🧪 Fundamental Exodus: belum ada (jalankan fetcher_exodus.py fundamental)"
+except Exception as e:
+    SUMBER_FUND = f"🧪 Fundamental Exodus: gagal dimuat ({str(e)[:60]})"
+
 
 # ==========================================
 # 🗄️ LAPISAN CACHE 300 DETIK (satu fungsi per sumber)
@@ -1183,6 +1243,8 @@ if not df_hasil.empty and "Terakhir Update" in df_hasil.columns:
     """, unsafe_allow_html=True)
 
 st.sidebar.caption(f"📡 Sumber Data: {SUMBER_DATA}")
+if SUMBER_FUND:
+    st.sidebar.caption(SUMBER_FUND)
 
 if st.sidebar.button("🔃 Sync & Muat Ulang Data Server", use_container_width=True):
     with st.spinner("Menarik data terbaru dari Cloudflare R2..."):
@@ -1571,8 +1633,10 @@ if not df_hasil.empty:
             kolom_ringkasan = ["Ticker", "Harga (Rp)", "Change (%)", "Value Transaksi", "Volume", "Broksum", "Rekomendasi", "Status Open", "Posisi VWAP", "Total Score", "Auto Trading Plan"]
             kolom_bandar = ["Ticker", "Harga (Rp)", "Change (%)", "Value Transaksi", "Broksum", "Fase Siklus Bandar", "Kekuatan A/D", "Status Bandar", "RVOL (Anomali Vol)", "Karakter Gorengan", "Tekanan Bandar", "OBV Trend", "Kondisi Supply", "Prediksi Machine Learning"]
             kolom_teknikal = ["Ticker", "Harga (Rp)", "Change (%)", "Value Transaksi", "Auto Trading Plan", "Risk/Reward Ratio", "Status Fibonacci", "Sinyal Cuci Barang", "Posisi Entry", "Pola Candle", "Trend MA (5,20,50)", "MA Signal", "Status BB", "RSI (14D)", "MACD", "Status Stochastic"]
-            kolom_fundamental = ["Ticker", "Harga (Rp)", "Value Transaksi", "Kategori", "Valuasi", "PER (x)", "PBV (x)", "Kelas Transaksi", "Likuiditas", "Status Sentimen"]
-            kolom_semua = ["Ticker", "Value Transaksi", "Broksum", "Status Open", "Risk/Reward Ratio", "Status Fibonacci", "Auto Trading Plan", "Streak Harian", "Sinyal Cuci Barang", "Kategori", "Kelas Transaksi", "Valuasi", "Harga (Rp)", "PER (x)", "PBV (x)", "Harga MA20", "Posisi VWAP", "Support", "Resistance", "Posisi Entry", "Pola Candle", "Change (%)", "Volume", "RVOL (Anomali Vol)", "Vol Breakout", "Status Gap", "Fase Siklus Bandar", "Karakter Gorengan", "Tekanan Bandar", "Kekuatan A/D", "Status Bandar", "OBV Trend", "RSI (14D)", "Momentum", "Trend MA (5,20,50)", "MA Signal", "MA Cross", "MACD", "Status Stochastic", "Status BB", "Risiko", "Likuiditas", "Status Sentimen", "Prediksi Machine Learning", "Kondisi Supply", "Total Score", "Rekomendasi"]
+            kolom_fundamental = ["Ticker", "Harga (Rp)", "Value Transaksi", "Kategori", "Valuasi", "PER (x)", "PBV (x)", "Kelas Transaksi", "Likuiditas", "Status Sentimen",
+                                 "Mkt Cap (Exodus)", "PE TTM (Exodus)", "PBV (Exodus)", "P/S TTM (Exodus)", "Earnings Yield", "Div Yield", "F-Score", "EPS Rating", "RS Rating", "BVPS (Exodus)", "PEG"]
+            kolom_semua = ["Ticker", "Value Transaksi", "Broksum", "Status Open", "Risk/Reward Ratio", "Status Fibonacci", "Auto Trading Plan", "Streak Harian", "Sinyal Cuci Barang", "Kategori", "Kelas Transaksi", "Valuasi", "Harga (Rp)", "PER (x)", "PBV (x)", "Harga MA20", "Posisi VWAP", "Support", "Resistance", "Posisi Entry", "Pola Candle", "Change (%)", "Volume", "RVOL (Anomali Vol)", "Vol Breakout", "Status Gap", "Fase Siklus Bandar", "Karakter Gorengan", "Tekanan Bandar", "Kekuatan A/D", "Status Bandar", "OBV Trend", "RSI (14D)", "Momentum", "Trend MA (5,20,50)", "MA Signal", "MA Cross", "MACD", "Status Stochastic", "Status BB", "Risiko", "Likuiditas", "Status Sentimen", "Prediksi Machine Learning", "Kondisi Supply", "Total Score", "Rekomendasi",
+                             "Mkt Cap (Exodus)", "PE TTM (Exodus)", "PBV (Exodus)", "P/S TTM (Exodus)", "Earnings Yield", "Div Yield", "F-Score", "EPS Rating", "RS Rating", "BVPS (Exodus)", "PEG"]
             
             if "Ringkasan" in mode_tampilan: kolom_pilih = kolom_ringkasan
             elif "Bandarmologi" in mode_tampilan: kolom_pilih = kolom_bandar
@@ -1589,6 +1653,20 @@ if not df_hasil.empty:
             if "Value Transaksi" in df_tampil.columns: format_dict["Value Transaksi"] = format_singkat_rp
             for col in ["PER (x)", "PBV (x)"]:
                 if col in df_tampil.columns: format_dict[col] = format_desimal
+            def _fund_num(v):
+                # 0/NaN = data N/A di Stockbit → tampil "-", selain itu 2 desimal
+                if pd.isna(v) or v == 0: return "-"
+                return f"{v:,.2f}"
+
+            def _fund_int(v):
+                if pd.isna(v) or v == 0: return "-"
+                return f"{v:.0f}"
+
+            for col in ["PE TTM (Exodus)", "PBV (Exodus)", "P/S TTM (Exodus)", "Earnings Yield", "Div Yield", "BVPS (Exodus)", "PEG"]:
+                if col in df_tampil.columns: format_dict[col] = _fund_num
+            for col in ["F-Score", "EPS Rating", "RS Rating"]:
+                if col in df_tampil.columns: format_dict[col] = _fund_int
+            if "Mkt Cap (Exodus)" in df_tampil.columns: format_dict["Mkt Cap (Exodus)"] = format_singkat_rp
             if "RSI (14D)" in df_tampil.columns: format_dict["RSI (14D)"] = "{:.0f}"
 
             styler_obj = df_tampil[kolom_ada].style.format(format_dict)
@@ -2132,25 +2210,48 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
 
         st.markdown("## 🤖 Monitor Bot Simulator")
         
-        # >>> PAGAR STRATEGI: beli = manual saja, jual = otomatis
-        st.info("🔒 **Pagar strategi:** BELI hanya lewat tombol di bawah ini (manual). Cron laptop TIDAK pernah membeli — ia hanya mengurus JUAL (TP/CL/square-off) saat jam bursa. Daftar belanja yang tidak Anda inginkan bisa disapu bersih di bagian **Kurasi** bawah.")
-        if st.button("🛒 Eksekusi Pembelian Bot Sekarang!", type="primary", use_container_width=True):
-            with st.spinner("Bot mengeksekusi pembelian dengan harga terakhir..."):
-                import subprocess
-                import sys
-                try:
-                    proses_bot = subprocess.run([sys.executable, "bot_simulator.py", "--manual"], capture_output=True, text=True)
-                    if proses_bot.returncode != 0:
-                        st.error("❌ Bot gagal dijalankan. Log error:")
-                        st.code(proses_bot.stderr, language="bash")
-                    else:
-                        st.success("✅ Bot selesai! Berikut log eksekusinya:")
-                        st.code(proses_bot.stdout[-2500:], language="bash")
-                        st.cache_data.clear()
-                        time.sleep(1)
-                        st.rerun()
-                except Exception as e:
-                    st.error(f"Sistem web gagal memanggil file bot: {e}")
+        # >>> MODE FULL-MANUAL: BELI & JUAL hanya lewat tombol di bawah.
+        # Cron laptop & sidang TIDAK pernah mengeksekusi transaksi apa pun.
+        st.info("🔒 **Mode full-manual:** Semua eksekusi otomatis (beli jadwal, TP/CL, square-off) sudah DIMATIKAN. Gunakan tombol 🛒 BELI untuk mewujudkan daftar belanja, dan tombol 💸 JUAL untuk menjual seluruh posisi (TP/CL/square-off dievaluasi saat itu juga).")
+        col_beli, col_jual = st.columns(2)
+        with col_beli:
+            if st.button("🛒 EKSEKUSI BELI Semua Sinyal!", type="primary", use_container_width=True,
+                         help="Beli seluruh kertas belanja yang lolos kurasi (alokasi saldo dinamis per rumus). Tidak ada penjualan."):
+                with st.spinner("Bot mengeksekusi pembelian dengan harga terakhir..."):
+                    import subprocess
+                    import sys
+                    try:
+                        proses_bot = subprocess.run([sys.executable, "bot_simulator.py", "--beli-only"], capture_output=True, text=True)
+                        if proses_bot.returncode != 0:
+                            st.error("❌ Bot beli gagal dijalankan. Log error:")
+                            st.code(proses_bot.stderr, language="bash")
+                        else:
+                            st.success("✅ Pembelian selesai! Log eksekusi:")
+                            st.code(proses_bot.stdout[-2500:], language="bash")
+                            st.cache_data.clear()
+                            time.sleep(1)
+                            st.rerun()
+                    except Exception as e:
+                        st.error(f"Sistem web gagal memanggil file bot: {e}")
+        with col_jual:
+            if st.button("💸 EKSEKUSI JUAL Semua Sinyal TP/CL!", use_container_width=True,
+                         help="Evaluasi seluruh posisi: TP (+5%), CL (-3%), square-off, dan suspend dijual sekarang. Tidak ada pembelian."):
+                with st.spinner("Bot mengeksekusi penjualan (TP/CL/square-off)..."):
+                    import subprocess
+                    import sys
+                    try:
+                        proses_bot = subprocess.run([sys.executable, "bot_simulator.py", "--jual-only"], capture_output=True, text=True)
+                        if proses_bot.returncode != 0:
+                            st.error("❌ Bot jual gagal dijalankan. Log error:")
+                            st.code(proses_bot.stderr, language="bash")
+                        else:
+                            st.success("✅ Evaluasi jual selesai! Log eksekusi:")
+                            st.code(proses_bot.stdout[-2500:], language="bash")
+                            st.cache_data.clear()
+                            time.sleep(1)
+                            st.rerun()
+                    except Exception as e:
+                        st.error(f"Sistem web gagal memanggil file bot: {e}")
         
         col_backup, col_restore = st.columns(2)
         with col_backup:
@@ -2276,7 +2377,7 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
         with sub1:
             if os.path.exists(FILE_SINYAL):
                 df_sinyal = muat_sinyal_arena(nomor_rumus)
-                st.success("🔥 Sinyal AI (Kertas Belanja) diterima! Menunggu eksekusi MANUAL Anda lewat tombol 🛒 di atas — cron tidak akan membelinya.")
+                st.success("🔥 Sinyal AI (Kertas Belanja) diterima! Tunggu Anda menekan tombol 🛒 **EKSEKUSI BELI** di atas — tidak ada eksekusi otomatis.")
                 st.dataframe(df_sinyal, use_container_width=True, hide_index=True)
             else:
                 st.info(f"KOSONG. Belum ada sinyal masuk untuk {pilihan_arena}, atau bot sudah membelinya dan membakar kertas belanja.")

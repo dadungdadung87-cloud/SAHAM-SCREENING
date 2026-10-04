@@ -181,9 +181,17 @@ def jalankan_bot():
     print(f"[{now.strftime('%H:%M:%S')}] Membangunkan Bot Simulator AI...")
 
     # ----------------------------------------------------
-    # 🔑 DETEKSI MODE: manual / cron / liquidate
+    # 🔑 DETEKSI MODE: manual / cron / jadwal / beli-only / jual-only / liquidate
     # ----------------------------------------------------
     mode = "jadwal" if "--jadwal" in sys.argv[1:] else ("manual" if "--manual" in sys.argv[1:] else "cron")
+    if "--beli-only" in sys.argv[1:]:
+        mode = "manual"
+        beli_only = True
+    elif "--jual-only" in sys.argv[1:]:
+        mode = "manual"
+        beli_only = False
+    else:
+        beli_only = None  # None = perilaku klasik (beli+jual sesuai mode)
     liquidate = "--liquidate" in sys.argv[1:]
     if liquidate:
         print("🧨 MODE LIQUIDATE: SEMUA posisi dijual paksa sekarang (aturan 'beli hari ini tahan' dilewati).")
@@ -267,6 +275,15 @@ def jalankan_bot():
     if is_square_off_time:
         print("🧹 WAKTU SQUARE OFF / SORE HARI! Evaluasi jual paksa diaktifkan.")
 
+    # >>> MODE PENUH-MANUAL: --jual-only / --beli-only memutus semua otomatisasi.
+    # Tidak dipakai cron; dipanggil dari tombol web Tab 4 (BELI/JUAL manual).
+    if beli_only is not None:
+        is_square_off_time = bool(not beli_only)  # jual-only = square-off aktif; beli-only = mati
+        if not beli_only:
+            print("🔒 MODE JUAL-ONLY: evaluasi jual saja (TP/CL/square-off), TIDAK ada pembelian.")
+        else:
+            print("🛒 MODE BELI-ONLY: eksekusi sinyal saja, TIDAK ada penjualan.")
+
     # MENYAPU RUMUS 1 SAMPAI 9
     for i in range(1, 10):
         file_porto, file_hist = inisialisasi_database(i)
@@ -332,6 +349,44 @@ def jalankan_bot():
             status_jual = ""
             harga_jual = 0
 
+            # >>> BELI-ONLY: lewati seluruh evaluasi jual (posisi aman)
+            if beli_only is True:
+                porto_baru.append(posisi)
+                continue
+
+            # >>> JUAL-ONLY: tombol manual — aturan 'beli hari ini tahan' DILEWATI.
+            # Semua posisi (termasuk yang dibeli hari ini) dievaluasi paksa:
+            # TP/CL tersentuh → jual; sisanya square-off (sesuai tombol JUAL).
+            if beli_only is False and not liquidate:
+                if harga_sekarang >= posisi['Target_TP']:
+                    terjual = True; status_jual = "TAKE_PROFIT 🎯 (manual)"; harga_jual = harga_sekarang
+                elif harga_sekarang <= posisi['Target_CL']:
+                    terjual = True; status_jual = "CUT_LOSS ✂️ (manual)"; harga_jual = harga_sekarang
+                else:
+                    terjual = True; status_jual = "AUTO_SQUARE_OFF 🧹 (manual)"; harga_jual = harga_sekarang
+                if terjual:
+                    sudah_ada = False
+                    if not df_history.empty:
+                        sudah_ada = ((df_history['Ticker'] == ticker) & (df_history['Tanggal_Beli'] == posisi['Tanggal_Beli'])).any()
+                    if sudah_ada:
+                        print(f"⚠️ [RUMUS {i}] {ticker} sudah ada di histori — duplikat penjualan dicegah.")
+                        continue
+                    nilai_jual_kotor = harga_jual * posisi['Lot'] * 100
+                    nilai_jual_bersih = nilai_jual_kotor - (nilai_jual_kotor * FEE_JUAL)
+                    profit_rp = nilai_jual_bersih - posisi['Total_Modal']
+                    profit_pct = (profit_rp / posisi['Total_Modal']) * 100
+                    history_baru.append({
+                        'Tanggal_Beli': posisi['Tanggal_Beli'],
+                        'Tanggal_Jual': now.strftime("%Y-%m-%d %H:%M"),
+                        'Ticker': ticker, 'Harga_Beli': posisi['Harga_Beli'], 'Harga_Jual': harga_jual,
+                        'Status': status_jual, 'Total_Return_Rp': round(profit_rp, 2),
+                        'Return_%': round(profit_pct, 2),
+                        'Mode_Beli': posisi.get('Mode_Beli', 'MANUAL'),
+                        'Change_Beli': posisi.get('Change_Beli', 0)
+                    })
+                    print(f"💰 [RUMUS {i}] JUAL: {ticker} @ Rp {harga_jual} | {status_jual} | {profit_pct:.2f}%")
+                continue
+
             # >>> LIQUIDATE: jual paksa semua posisi
             if liquidate:
                 terjual = True
@@ -391,7 +446,7 @@ def jalankan_bot():
         # FASE B: MODE BELI (MASUKKAN SAHAM KE GUDANG)
         # >>> LIQUIDATE: skip beli agar tidak langsung beli ulang sinyal lama
         # ==========================================
-        if (mode == "manual" or mode == "jadwal") and mode_beli_aktif and os.path.exists(file_sinyal) and not liquidate:
+        if (mode == "manual" or mode == "jadwal") and beli_only is not False and mode_beli_aktif and os.path.exists(file_sinyal) and not liquidate:
             saldo_sekarang = cek_saldo_tersedia(df_porto, df_history)
             saham_dimiliki = df_porto['Ticker'].tolist() if not df_porto.empty else []
             jumlah_beli = 0
@@ -463,8 +518,8 @@ def jalankan_bot():
             except Exception as e:
                 print(f"⚠️ Gagal membaca sinyal Rumus {i}: {e}")
         elif os.path.exists(file_sinyal):
-            if mode != "manual":
-                print(f" 📝 [RUMUS {i}] Sinyal antre — menunggu eksekusi manual Anda (mode beli manual).")
+            if beli_only is False:
+                print(f" 📝 [RUMUS {i}] Sinyal antre — mode jual-only, pembelian dilewati.")
             elif not mode_beli_aktif:
                 print(f" [RUMUS {i}] Sinyal ditahan (data basi) — akan dieksekusi saat data segar.")
 

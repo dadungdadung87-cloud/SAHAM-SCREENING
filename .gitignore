@@ -9,3 +9,5 @@ token_stockbit.txt
 kirim_telegram.py.lokal
 kirim_telegram.py.backup
 logs/
+Database/cache_exodus/
+token_stockbit.txt.bak
