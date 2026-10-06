@@ -125,7 +125,7 @@ def susun_blok(df, stempel, tgl_hari):
 
 def halaman(titel, isi, tanggal_slug, indeks=False):
     aff = footer_affiliate()
-    nav = "" if indeks else f'<p><a class="back" href="{SITE_URL}artikel/">&larr; Semua artikel</a></p>'
+    nav = "" if indeks else f'<p><a class="back" href="{SITE_URL}">&larr; Beranda</a></p>'
     return f"""<!DOCTYPE html>
 <html lang="id">
 <head>
@@ -217,6 +217,11 @@ def utama():
     <h2>Apa ini?</h2>
     <p>{html.escape(SITE_DESC)} Setiap hari bursa, sistem memindai <strong>900+ saham IHSG</strong>:
     skor teknikal, tekanan beli/jual, anomali volume (RVOL), fase Wyckoff, hingga fundamental (PE, PBV, F-Score) — lalu meringkasnya di sini, gratis.</p>
+    <h2>Lihat Hasil Publik</h2>
+    <p><a class="back" href="{SITE_URL}market.html">📊 Market Overview</a> ·
+    <a class="back" href="{SITE_URL}screener.html">🔍 Screener</a> ·
+    <a class="back" href="{SITE_URL}radar.html">🤖 Radar AI</a> ·
+    <a class="back" href="{SITE_URL}detektif.html">🕵️ Detektif Ledakan</a></p>
     <h2>Yang Kamu Dapat di App</h2>
     <ul>
       <li>🔍 <strong>Screener 40+ filter</strong> — gabungkan sendiri kriteria trading-mu</li>
@@ -229,6 +234,14 @@ def utama():
     with open(os.path.join(BASE, "docs", "index.html"), "w") as f:
         f.write(halaman(f"Beranda | {SITE_NAME}", isi_idx, tgl_hari, indeks=True))
     print("✅ Landing page: docs/index.html diperbarui")
+
+    # Halaman publik tab non-portfolio dibuat terpisah agar pengunjung tidak perlu
+    # masuk ke Streamlit hanya untuk membaca ringkasan hasil screening.
+    try:
+        import buat_halaman_publik
+        buat_halaman_publik.main()
+    except Exception as e:
+        print(f"⚠️ Halaman publik tab gagal dibuat: {e}")
 
 
 if __name__ == "__main__":
