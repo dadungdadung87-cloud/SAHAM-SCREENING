@@ -1,54 +1,54 @@
 {
-    "stempel_data": "2026-10-05 16:00:04",
+    "stempel_data": "2026-10-06 15:20:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "CSMI",
-            "MITI",
-            "PCAR",
-            "AKKU",
-            "MBSS"
+            "POLA",
+            "ASMI",
+            "MEJA",
+            "KDTN",
+            "BEKS"
         ],
         "RUMUS 2": [
-            "SMLE",
-            "FLMC",
-            "POLA",
-            "RSCH",
-            "KING"
+            "NAYZ",
+            "PGLI",
+            "IFSH",
+            "MARK",
+            "JECX"
         ],
         "RUMUS 3": [
             "CSMI",
-            "MITI",
-            "NAYZ",
-            "AKKU",
-            "KDTN"
+            "BLTZ",
+            "IATA",
+            "PRIM",
+            "GTRA"
         ],
         "RUMUS 4": [
-            "CSMI",
-            "MITI",
-            "PCAR",
-            "AKKU",
-            "MBSS"
+            "POLA",
+            "ASMI",
+            "MEJA",
+            "KDTN",
+            "PGLI"
         ],
         "RUMUS 5": [
+            "POLA",
             "BEKS",
-            "MITI",
-            "PCAR",
-            "SMIL",
-            "MBSS"
+            "MEJA",
+            "KDTN",
+            "NAYZ"
         ],
         "RUMUS 6": [
-            "SMIL",
-            "NEST",
-            "PTBA",
+            "PGLI",
             "BDMN",
-            "MTMH"
+            "PTBA",
+            "PRIM",
+            "PRDA"
         ],
         "RUMUS 7": [
-            "SMIL",
-            "BULL",
-            "GOTO",
+            "PGLI",
+            "MMIX",
             "BUMI",
+            "BIPI",
             ""
         ],
         "RUMUS 8": [
@@ -59,11 +59,11 @@
             ""
         ],
         "RUMUS 9": [
-            "IRRA",
+            "EAST",
+            "SCNP",
+            "AHAP",
             "SIDO",
-            "BTON",
-            "PSGO",
-            "BOGA"
+            "DEWA"
         ]
     }
 }
