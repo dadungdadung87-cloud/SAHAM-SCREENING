@@ -1,1 +1,2 @@
-Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL
+Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL,Mode_Beli,Change_Beli
+2026-10-05 18:03,GOTO,29.0,34293,99598874.55,32,29,MANUAL,-3.333333333333333

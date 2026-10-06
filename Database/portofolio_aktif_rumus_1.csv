@@ -1,1 +1,2 @@
-Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL
+Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL,Mode_Beli,Change_Beli
+2026-10-05 18:03,MBSS,4400.0,45,19829700.0,4578,4229,MANUAL,21.21212121212121
