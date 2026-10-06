@@ -13,7 +13,7 @@ import pandas as pd
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE)
-from konfig_situs import (SITE_URL, SITE_NAME, SITE_DESC, APP_URL, ADSENSE_CLIENT,
+from konfig_situs import (SITE_URL, SITE_NAME, SITE_DESC, ADSENSE_CLIENT,
                           ADSENSE_SLOT_ATAS, ADSENSE_SLOT_TENGAH, ADSENSE_SLOT_BAWAH,
                           BROKER_REF, TELEGRAM_URL, SEO_KEYWORDS)
 
@@ -168,12 +168,10 @@ ul.artikel-list{{list-style:none;padding:0}}ul.artikel-list li{{padding:10px 0;b
 <header><h1><a href="{SITE_URL}">{html.escape(SITE_NAME)}</a></h1>
 <p>{html.escape(SITE_DESC)}</p></header>
 {nav}
-<a class="cta" href="{html.escape(APP_URL)}" target="_blank" rel="noopener">🚀 Buka Screener Interaktif (Gratis)</a>
-<div class="ad">{adsense_unit(ADSENSE_SLOT_ATAS)}</div>
+    <div class="ad">{adsense_unit(ADSENSE_SLOT_ATAS)}</div>
 {isi}
 <div class="ad">{adsense_unit(ADSENSE_SLOT_TENGAH)}</div>
-<a class="cta" href="{html.escape(APP_URL)}" target="_blank" rel="noopener">📊 Cek Data Lengkap & Filter Mandiri di App</a>
-<div class="ad">{adsense_unit(ADSENSE_SLOT_BAWAH)}</div>
+    <div class="ad">{adsense_unit(ADSENSE_SLOT_BAWAH)}</div>
 <div class="afil"><strong>Bekal trading kamu:</strong> {aff}</div>
 <footer>Disclaimer: seluruh konten bersifat informasi &amp; edukasi, bukan rekomendasi jual-beli efek.
 Data berasal dari pemantauan otomatis dan dapat berubah. Do Your Own Research.</footer>
@@ -222,7 +220,7 @@ def utama():
     <a class="back" href="{SITE_URL}screener.html">🔍 Screener</a> ·
     <a class="back" href="{SITE_URL}radar.html">🤖 Radar AI</a> ·
     <a class="back" href="{SITE_URL}detektif.html">🕵️ Detektif Ledakan</a></p>
-    <h2>Yang Kamu Dapat di App</h2>
+    <h2>Fitur Analisis Publik</h2>
     <ul>
       <li>🔍 <strong>Screener 40+ filter</strong> — gabungkan sendiri kriteria trading-mu</li>
       <li>🤖 <strong>Radar AI per strategi</strong> — kandidat saham tersaring tiap hari</li>

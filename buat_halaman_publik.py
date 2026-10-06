@@ -10,7 +10,7 @@ import pandas as pd
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE)
-from konfig_situs import SITE_URL, SITE_NAME, SITE_DESC, APP_URL  # noqa: E402
+from konfig_situs import SITE_URL, SITE_NAME, SITE_DESC  # noqa: E402
 
 OUT = os.path.join(BASE, "docs")
 WIB = timezone(timedelta(hours=7))
@@ -76,7 +76,7 @@ code{{color:var(--blue);font-weight:700}}.muted{{color:#94a3b8}}.notice{{border-
 footer{{margin-top:42px;border-top:1px solid var(--line);padding-top:14px;color:#94a3b8;font-size:.85rem}}
 @media(max-width:600px){{.wrap{{padding:12px}}h1{{font-size:1.35rem}}}}
 </style></head><body><div class="wrap"><header><h1>{esc(SITE_NAME)}</h1><p>{esc(SITE_DESC)}</p></header>
-<nav>{nav}</nav><main>{body}</main><a class="cta" href="{esc(APP_URL)}" target="_blank" rel="noopener">Buka aplikasi interaktif</a>
+<nav>{nav}</nav><main>{body}</main>
 <footer>Data edukasi, bukan rekomendasi jual-beli efek. Data dapat berubah dan harus diverifikasi.</footer></div></body></html>"""
 
 
