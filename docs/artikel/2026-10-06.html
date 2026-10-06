@@ -11,11 +11,15 @@
 :root{--bg:#0f172a;--card:#1e293b;--line:#334155;--txt:#cbd5e1;--hi:#f8fafc;--acc:#38bdf8;--up:#22c55e;--dn:#ef4444}
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);line-height:1.65}
-.wrap{max-width:860px;margin:0 auto;padding:24px 16px}
-header{border-bottom:1px solid var(--line);padding:18px 0}
-header h1{margin:0;font-size:1.4rem;color:var(--hi)}
-header h1 a{color:var(--acc);text-decoration:none}
-h2{color:var(--hi);margin-top:34px}
+ .wrap{max-width:1040px;margin:0 auto;padding:24px 18px}
+ header{padding:26px 0 12px}
+ header h1{margin:0;font-size:clamp(1.8rem,4vw,3.2rem);line-height:1.1;color:var(--hi);letter-spacing:-.04em}
+ header h1 a{color:var(--acc);text-decoration:none}
+ header p{max-width:700px;color:#94a3b8;font-size:1.02rem}
+ .topnav{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0;margin:12px 0 26px}
+ .topnav a{color:#94a3b8;text-decoration:none;padding:7px 11px;border-radius:7px;font-size:.9rem}
+ .topnav a:hover,.topnav a.active{background:var(--card);color:var(--acc)}
+ h2{color:var(--hi);margin-top:34px}
 p{margin:.6em 0}
 code{background:var(--card);padding:2px 8px;border-radius:6px;color:var(--acc);font-weight:600}
 .tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin:14px 0}
@@ -33,27 +37,45 @@ font-weight:700;padding:14px;border-radius:12px;text-decoration:none;margin:28px
 .kosong{color:#94a3b8;font-style:italic}
 .back{color:var(--acc)}
 footer{margin-top:48px;border-top:1px solid var(--line);padding-top:16px;font-size:.85rem;color:#94a3b8}
-ul.artikel-list{list-style:none;padding:0}ul.artikel-list li{padding:10px 0;border-bottom:1px solid var(--line)}
+ ul.artikel-list{list-style:none;padding:0}ul.artikel-list li{padding:10px 0;border-bottom:1px solid var(--line)}
+ .hero{background:radial-gradient(circle at 90% 0%,rgba(56,189,248,.2),transparent 38%),linear-gradient(145deg,#172a46,#101827);border:1px solid #2b5171;border-radius:18px;padding:30px;margin:8px 0 24px;box-shadow:0 18px 50px rgba(0,0,0,.2)}
+ .hero .eyebrow{color:var(--acc);font-size:.78rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+ .hero h2{font-size:clamp(1.5rem,3.5vw,2.4rem);margin:9px 0 10px;max-width:760px}
+ .hero p{max-width:700px;color:#cbd5e1;font-size:1.02rem}
+ .hero-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+ .hero-links a{background:var(--acc);color:#07111f;text-decoration:none;font-weight:800;padding:10px 14px;border-radius:9px}
+ .hero-links a.alt{background:transparent;color:var(--txt);border:1px solid var(--line)}
+ .feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0 28px}
+ .feature{background:rgba(30,41,59,.58);border:1px solid var(--line);border-radius:12px;padding:15px}
+ .feature b{display:block;color:var(--hi);margin:7px 0 4px}.feature span{font-size:.88rem;color:#94a3b8}
+ @media(max-width:700px){.feature-grid{grid-template-columns:repeat(2,1fr)}.hero{padding:22px 18px}}
+ @media(max-width:420px){.feature-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body><div class="wrap">
 <header><h1><a href="https://dadungdadung87-cloud.github.io/SAHAM-SCREENING/">AlgoTrade Screener IHSG</a></h1>
 <p>Screener saham IHSG gratis: detektor akumulasi bandar, anomali volume, dan radar BSJP — diperbarui otomatis setiap hari bursa.</p></header>
-<p><a class="back" href="https://dadungdadung87-cloud.github.io/SAHAM-SCREENING/">&larr; Beranda</a></p>
+<nav class="topnav">
+      <a class="active" href="https://dadungdadung87-cloud.github.io/SAHAM-SCREENING/">Beranda</a>
+      <a href="https://dadungdadung87-cloud.github.io/SAHAM-SCREENING/market.html">Market</a>
+      <a href="https://dadungdadung87-cloud.github.io/SAHAM-SCREENING/screener.html">Screener</a>
+      <a href="https://dadungdadung87-cloud.github.io/SAHAM-SCREENING/radar.html">Radar AI</a>
+      <a href="https://dadungdadung87-cloud.github.io/SAHAM-SCREENING/detektif.html">Detektif</a>
+    </nav><p><a class="back" href="https://dadungdadung87-cloud.github.io/SAHAM-SCREENING/">&larr; Beranda</a></p>
     <div class="ad"></div>
 
     <h2>Kondisi Pasar IHSG Selasa, 6 Oktober 2026</h2>
-    <p>Dari <strong>835</strong> saham yang dipantau: <span class="up">478 naik</span>,
-    <span class="down">203 turun</span>, 154 stagnan.
-    Sentimen pasar: <strong>Sangat Bullish 🔥</strong>. Data diambil pukul 10:40 WIB.</p>
+    <p>Dari <strong>835</strong> saham yang dipantau: <span class="up">508 naik</span>,
+    <span class="down">197 turun</span>, 130 stagnan.
+    Sentimen pasar: <strong>Sangat Bullish 🔥</strong>. Data diambil pukul 11:55 WIB.</p>
     <h2>Saham Penguat Teratas</h2>
-<div class='tbl'><table><thead><tr><th>Ticker</th><th>Harga (Rp)</th><th>Change (%)</th><th>Volume</th><th>Total Score</th></tr></thead><tbody><tr><td><code>TRUE</code></td><td>59.00</td><td>28.26</td><td>285573000</td><td>5</td></tr><tr><td><code>BLTZ</code></td><td>4.500.00</td><td>25.00</td><td>58800</td><td>10</td></tr><tr><td><code>CSIS</code></td><td>208.00</td><td>23.81</td><td>12912200</td><td>7</td></tr><tr><td><code>IFSH</code></td><td>2.010.00</td><td>21.45</td><td>841800</td><td>10</td></tr><tr><td><code>ALKA</code></td><td>6.800.00</td><td>19.30</td><td>552600</td><td>8</td></tr><tr><td><code>CSMI</code></td><td>486.00</td><td>17.96</td><td>63999700</td><td>8</td></tr><tr><td><code>PKPK</code></td><td>6.800.00</td><td>16.24</td><td>8531600</td><td>9</td></tr><tr><td><code>AIMS</code></td><td>825.00</td><td>16.20</td><td>3501100</td><td>8</td></tr><tr><td><code>ENZO</code></td><td>68.00</td><td>15.25</td><td>15131700</td><td>4</td></tr><tr><td><code>IATA</code></td><td>108.00</td><td>14.89</td><td>584412000</td><td>5</td></tr></tbody></table></div>
+<div class='tbl'><table><thead><tr><th>Ticker</th><th>Harga (Rp)</th><th>Change (%)</th><th>Volume</th><th>Total Score</th></tr></thead><tbody><tr><td><code>ASMI</code></td><td>32.00</td><td>28.00</td><td>147339900</td><td>10</td></tr><tr><td><code>CSIS</code></td><td>212.00</td><td>26.19</td><td>18170900</td><td>7</td></tr><tr><td><code>TRUE</code></td><td>58.00</td><td>26.09</td><td>327254200</td><td>6</td></tr><tr><td><code>BLTZ</code></td><td>4.500.00</td><td>25.00</td><td>58800</td><td>10</td></tr><tr><td><code>IFSH</code></td><td>2.060.00</td><td>24.47</td><td>1253800</td><td>10</td></tr><tr><td><code>BEKS</code></td><td>36.00</td><td>20.00</td><td>449891300</td><td>9</td></tr><tr><td><code>ALKA</code></td><td>6.825.00</td><td>19.74</td><td>585500</td><td>8</td></tr><tr><td><code>IATA</code></td><td>112.00</td><td>19.15</td><td>1175868700</td><td>7</td></tr><tr><td><code>GMTD</code></td><td>1.195.00</td><td>18.91</td><td>281200</td><td>7</td></tr><tr><td><code>BTEK</code></td><td>13.00</td><td>18.18</td><td>323353500</td><td>5</td></tr></tbody></table></div>
 <h2>Saham Pelemah Teratas</h2>
-<div class='tbl'><table><thead><tr><th>Ticker</th><th>Harga (Rp)</th><th>Change (%)</th><th>Volume</th><th>Total Score</th></tr></thead><tbody><tr><td><code>ROCK</code></td><td>3.150.00</td><td>-14.86</td><td>266600</td><td>6</td></tr><tr><td><code>WAPO</code></td><td>300.00</td><td>-14.77</td><td>5995300</td><td>5</td></tr><tr><td><code>FORU</code></td><td>128.00</td><td>-7.91</td><td>952080600</td><td>3</td></tr><tr><td><code>BALI</code></td><td>1.535.00</td><td>-7.53</td><td>97000</td><td>6</td></tr><tr><td><code>EMMI</code></td><td>390.00</td><td>-6.70</td><td>3647100</td><td>2</td></tr><tr><td><code>TFCO</code></td><td>815.00</td><td>-5.23</td><td>18900</td><td>1</td></tr><tr><td><code>MLIA</code></td><td>208.00</td><td>-4.59</td><td>127600</td><td>2</td></tr><tr><td><code>MDIA</code></td><td>148.00</td><td>-4.52</td><td>80307500</td><td>0</td></tr><tr><td><code>IKBI</code></td><td>565.00</td><td>-4.24</td><td>109500</td><td>5</td></tr><tr><td><code>PGLI</code></td><td>318.00</td><td>-4.22</td><td>3755600</td><td>7</td></tr></tbody></table></div>
+<div class='tbl'><table><thead><tr><th>Ticker</th><th>Harga (Rp)</th><th>Change (%)</th><th>Volume</th><th>Total Score</th></tr></thead><tbody><tr><td><code>ROCK</code></td><td>3.150.00</td><td>-14.86</td><td>280600</td><td>6</td></tr><tr><td><code>WAPO</code></td><td>300.00</td><td>-14.77</td><td>6881100</td><td>5</td></tr><tr><td><code>SOFA</code></td><td>224.00</td><td>-9.68</td><td>17255600</td><td>2</td></tr><tr><td><code>FORU</code></td><td>127.00</td><td>-8.63</td><td>1154824900</td><td>3</td></tr><tr><td><code>BALI</code></td><td>1.525.00</td><td>-8.13</td><td>115700</td><td>5</td></tr><tr><td><code>EMMI</code></td><td>394.00</td><td>-5.74</td><td>3807800</td><td>3</td></tr><tr><td><code>PTSP</code></td><td>1.095.00</td><td>-5.19</td><td>27300</td><td>0</td></tr><tr><td><code>PGLI</code></td><td>318.00</td><td>-4.22</td><td>3823500</td><td>7</td></tr><tr><td><code>PLAN</code></td><td>70.00</td><td>-4.11</td><td>4355400</td><td>4</td></tr><tr><td><code>DADA</code></td><td>24.00</td><td>-4.00</td><td>93115800</td><td>2</td></tr></tbody></table></div>
 <h2>Volume Terbesar</h2>
-<div class='tbl'><table><thead><tr><th>Ticker</th><th>Harga (Rp)</th><th>Change (%)</th><th>Volume</th><th>Total Score</th></tr></thead><tbody><tr><td><code>GOTO</code></td><td>32.00</td><td>10.34</td><td>2419617508</td><td>4</td></tr><tr><td><code>FORU</code></td><td>128.00</td><td>-7.91</td><td>952080600</td><td>3</td></tr><tr><td><code>BUMI</code></td><td>182.00</td><td>2.25</td><td>858776800</td><td>3</td></tr><tr><td><code>IATA</code></td><td>108.00</td><td>14.89</td><td>584412000</td><td>5</td></tr><tr><td><code>COCO</code></td><td>132.00</td><td>0.00</td><td>315109900</td><td>4</td></tr><tr><td><code>DEWA</code></td><td>364.00</td><td>5.20</td><td>307272000</td><td>4</td></tr><tr><td><code>TRUE</code></td><td>59.00</td><td>28.26</td><td>285573000</td><td>5</td></tr><tr><td><code>BNBR</code></td><td>75.00</td><td>2.74</td><td>266827400</td><td>2</td></tr><tr><td><code>SRSN</code></td><td>142.00</td><td>-0.70</td><td>235546500</td><td>5</td></tr><tr><td><code>ASLI</code></td><td>510.00</td><td>4.94</td><td>215667900</td><td>8</td></tr></tbody></table></div>
+<div class='tbl'><table><thead><tr><th>Ticker</th><th>Harga (Rp)</th><th>Change (%)</th><th>Volume</th><th>Total Score</th></tr></thead><tbody><tr><td><code>GOTO</code></td><td>32.00</td><td>10.34</td><td>3152642408</td><td>4</td></tr><tr><td><code>BUMI</code></td><td>184.00</td><td>3.37</td><td>1199237800</td><td>3</td></tr><tr><td><code>IATA</code></td><td>112.00</td><td>19.15</td><td>1175868700</td><td>7</td></tr><tr><td><code>FORU</code></td><td>127.00</td><td>-8.63</td><td>1154824900</td><td>3</td></tr><tr><td><code>BEKS</code></td><td>36.00</td><td>20.00</td><td>449891300</td><td>9</td></tr><tr><td><code>DEWA</code></td><td>368.00</td><td>6.36</td><td>392092700</td><td>4</td></tr><tr><td><code>COCO</code></td><td>134.00</td><td>1.52</td><td>387784700</td><td>5</td></tr><tr><td><code>BNBR</code></td><td>77.00</td><td>5.48</td><td>382006800</td><td>3</td></tr><tr><td><code>BULL</code></td><td>376.00</td><td>6.21</td><td>360109500</td><td>4</td></tr><tr><td><code>BIPI</code></td><td>130.00</td><td>2.36</td><td>334240800</td><td>2</td></tr></tbody></table></div>
 <h2>Kandidat Akumulasi Senyap (RVOL Tinggi, Belum Terbang)</h2><p>Saham dengan lonjakan volume dibanding rata-rata, harga masih naik tipis — pola yang sering muncul sebelum saham menguat.</p>
-<div class='tbl'><table><thead><tr><th>Ticker</th><th>Harga (Rp)</th><th>Change (%)</th><th>Volume</th><th>Total Score</th></tr></thead><tbody><tr><td><code>ASLI</code></td><td>510.00</td><td>4.94</td><td>215667900</td><td>8</td></tr><tr><td><code>KKES</code></td><td>72.00</td><td>2.86</td><td>92811100</td><td>4</td></tr><tr><td><code>CGAS</code></td><td>149.00</td><td>1.36</td><td>4315300</td><td>6</td></tr><tr><td><code>SOTS</code></td><td>650.00</td><td>3.17</td><td>3404600</td><td>8</td></tr><tr><td><code>INDS</code></td><td>252.00</td><td>3.28</td><td>2568300</td><td>5</td></tr><tr><td><code>PRDA</code></td><td>2.930.00</td><td>1.74</td><td>957100</td><td>6</td></tr><tr><td><code>LPIN</code></td><td>438.00</td><td>1.39</td><td>493600</td><td>7</td></tr></tbody></table></div>
+<div class='tbl'><table><thead><tr><th>Ticker</th><th>Harga (Rp)</th><th>Change (%)</th><th>Volume</th><th>Total Score</th></tr></thead><tbody><tr><td><code>ASLI</code></td><td>505.00</td><td>3.91</td><td>259997600</td><td>8</td></tr><tr><td><code>KKES</code></td><td>71.00</td><td>1.43</td><td>97999300</td><td>4</td></tr><tr><td><code>FOLK</code></td><td>187.00</td><td>4.47</td><td>37014900</td><td>2</td></tr><tr><td><code>ELIT</code></td><td>284.00</td><td>3.65</td><td>26004200</td><td>4</td></tr><tr><td><code>ARTO</code></td><td>805.00</td><td>4.55</td><td>21977100</td><td>2</td></tr><tr><td><code>ISEA</code></td><td>78.00</td><td>1.30</td><td>7328800</td><td>3</td></tr><tr><td><code>ISSP</code></td><td>416.00</td><td>1.46</td><td>5084300</td><td>6</td></tr><tr><td><code>CGAS</code></td><td>149.00</td><td>1.36</td><td>4990900</td><td>6</td></tr><tr><td><code>SOTS</code></td><td>635.00</td><td>0.79</td><td>3670200</td><td>7</td></tr><tr><td><code>INDS</code></td><td>256.00</td><td>4.92</td><td>2721800</td><td>6</td></tr></tbody></table></div>
 <div class="ad"></div>
     <div class="ad"></div>
 <div class="afil"><strong>Bekal trading kamu:</strong> <a href="https://stockbit.com/" target="_blank" rel="sponsored noopener">Stockbit</a><span class="afil-desk">Watchlist, broker summary &amp; komunitas trader.</span><a href="https://ajaib.co.id/" target="_blank" rel="sponsored noopener">Ajaib</a><span class="afil-desk">Trading saham &amp; reksadana, registrasi cepat.</span></div>
