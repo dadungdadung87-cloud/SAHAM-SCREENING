@@ -181,10 +181,14 @@ def jalankan_bot():
     print(f"[{now.strftime('%H:%M:%S')}] Membangunkan Bot Simulator AI...")
 
     # ----------------------------------------------------
-    # 🔑 DETEKSI MODE: manual / cron / jadwal / beli-only / jual-only / liquidate
+    # 🔑 DETEKSI MODE: manual / cron / jadwal / beli-only / jual-only / tp-sl-only / liquidate
     # ----------------------------------------------------
     mode = "jadwal" if "--jadwal" in sys.argv[1:] else ("manual" if "--manual" in sys.argv[1:] else "cron")
-    if "--beli-only" in sys.argv[1:]:
+    tp_sl_only = "--tp-sl-only" in sys.argv[1:]
+    if tp_sl_only:
+        mode = "cron"
+        beli_only = False
+    elif "--beli-only" in sys.argv[1:]:
         mode = "manual"
         beli_only = True
     elif "--jual-only" in sys.argv[1:]:
@@ -277,7 +281,10 @@ def jalankan_bot():
 
     # >>> MODE PENUH-MANUAL: --jual-only / --beli-only memutus semua otomatisasi.
     # Tidak dipakai cron; dipanggil dari tombol web Tab 4 (BELI/JUAL manual).
-    if beli_only is not None:
+    if tp_sl_only:
+        is_square_off_time = False
+        print("🎯 MODE TP/SL-ONLY: hanya menjual posisi yang menyentuh Target_TP atau Target_CL.")
+    elif beli_only is not None:
         is_square_off_time = bool(not beli_only)  # jual-only = square-off aktif; beli-only = mati
         if not beli_only:
             print("🔒 MODE JUAL-ONLY: evaluasi jual saja (TP/CL/square-off), TIDAK ada pembelian.")
@@ -352,6 +359,47 @@ def jalankan_bot():
             # >>> BELI-ONLY: lewati seluruh evaluasi jual (posisi aman)
             if beli_only is True:
                 porto_baru.append(posisi)
+                continue
+
+            # >>> TP/SL-ONLY: posisi yang belum menyentuh target tetap disimpan.
+            # Penjualan sore untuk posisi tersebut dilakukan lewat tombol JUAL di web.
+            if tp_sl_only:
+                if harga_sekarang >= posisi['Target_TP']:
+                    terjual = True
+                    status_jual = "TAKE_PROFIT 🎯 (auto TP)"
+                    harga_jual = harga_sekarang
+                elif harga_sekarang <= posisi['Target_CL']:
+                    terjual = True
+                    status_jual = "CUT_LOSS ✂️ (auto SL)"
+                    harga_jual = harga_sekarang
+                else:
+                    porto_baru.append(posisi)
+                    continue
+
+                sudah_ada = False
+                if not df_history.empty:
+                    sudah_ada = ((df_history['Ticker'] == ticker) & (df_history['Tanggal_Beli'] == posisi['Tanggal_Beli'])).any()
+                if sudah_ada:
+                    print(f"⚠️ [RUMUS {i}] {ticker} sudah ada di histori — duplikat TP/SL dicegah.")
+                    continue
+
+                nilai_jual_kotor = harga_jual * posisi['Lot'] * 100
+                nilai_jual_bersih = nilai_jual_kotor - (nilai_jual_kotor * FEE_JUAL)
+                profit_rp = nilai_jual_bersih - posisi['Total_Modal']
+                profit_pct = (profit_rp / posisi['Total_Modal']) * 100
+                history_baru.append({
+                    'Tanggal_Beli': posisi['Tanggal_Beli'],
+                    'Tanggal_Jual': now.strftime("%Y-%m-%d %H:%M"),
+                    'Ticker': ticker,
+                    'Harga_Beli': posisi['Harga_Beli'],
+                    'Harga_Jual': harga_jual,
+                    'Status': status_jual,
+                    'Total_Return_Rp': round(profit_rp, 2),
+                    'Return_%': round(profit_pct, 2),
+                    'Mode_Beli': posisi.get('Mode_Beli', 'MANUAL'),
+                    'Change_Beli': posisi.get('Change_Beli', 0)
+                })
+                print(f"💰 [RUMUS {i}] JUAL: {ticker} @ Rp {harga_jual} | {status_jual} | {profit_pct:.2f}%")
                 continue
 
             # >>> JUAL-ONLY: tombol manual — aturan 'beli hari ini tahan' DILEWATI.
@@ -446,7 +494,7 @@ def jalankan_bot():
         # FASE B: MODE BELI (MASUKKAN SAHAM KE GUDANG)
         # >>> LIQUIDATE: skip beli agar tidak langsung beli ulang sinyal lama
         # ==========================================
-        if (mode == "manual" or mode == "jadwal") and beli_only is not False and mode_beli_aktif and os.path.exists(file_sinyal) and not liquidate:
+        if (mode == "manual" or mode == "jadwal") and not tp_sl_only and beli_only is not False and mode_beli_aktif and os.path.exists(file_sinyal) and not liquidate:
             saldo_sekarang = cek_saldo_tersedia(df_porto, df_history)
             saham_dimiliki = df_porto['Ticker'].tolist() if not df_porto.empty else []
             jumlah_beli = 0

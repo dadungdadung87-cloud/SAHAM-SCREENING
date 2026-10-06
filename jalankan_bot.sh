@@ -1,8 +1,7 @@
 #!/bin/bash
 # ==========================================
-# ⚠️ MODE FULL-MANUAL: bot TIDAK PERNAH membeli/menjual otomatis.
-# Semua eksekusi beli/jual hanya lewat tombol di web Tab 4.
-# Cron ini hanya: update data -> sidang AI -> telegram -> buku besar.
+# ⚠️ MODE BELI MANUAL: pembelian hanya lewat tombol web Tab 4.
+# Cron otomatis hanya memeriksa TP/SL; posisi lain dijual lewat tombol JUAL sore.
 # ==========================================
 exec 200>/tmp/bot_simulator.lock
 flock -n 200 || { echo "⏳ Siklus dilewati: bot sebelumnya masih berjalan."; exit 0; }
@@ -57,7 +56,8 @@ elif [ "$JAM_SEKARANG" -ge "1600" ] && [ "$JAM_SEKARANG" -le "1610" ]; then
         fi
     fi
 else
-    echo "🔒 Mode full-manual: cron tidak mengeksekusi beli/jual apa pun."
+    echo "🎯 Auto TP/SL: memeriksa posisi yang menyentuh Target_TP/Target_CL..."
+    ./.venv/bin/python bot_simulator.py --tp-sl-only
 fi
 
 ./.venv/bin/python bangun_buku_besar.py

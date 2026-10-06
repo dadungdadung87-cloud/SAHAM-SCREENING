@@ -2210,9 +2210,8 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
 
         st.markdown("## 🤖 Monitor Bot Simulator")
         
-        # >>> MODE FULL-MANUAL: BELI & JUAL hanya lewat tombol di bawah.
-        # Cron laptop & sidang TIDAK pernah mengeksekusi transaksi apa pun.
-        st.info("🔒 **Mode full-manual:** Semua eksekusi otomatis (beli jadwal, TP/CL, square-off) sudah DIMATIKAN. Gunakan tombol 🛒 BELI untuk mewujudkan daftar belanja, dan tombol 💸 JUAL untuk menjual seluruh posisi (TP/CL/square-off dievaluasi saat itu juga).")
+        # >>> MODE CAMPURAN TERKONTROL: TP/SL otomatis, pembelian dan jual sore manual.
+        st.info("🎯 **Mode terkontrol:** posisi otomatis dijual hanya jika menyentuh Target_TP atau Target_CL. Posisi yang belum menyentuh TP/SL tidak dijual oleh cron. Gunakan 🛒 BELI untuk pembelian manual, lalu 💸 JUAL SORE untuk menutup posisi yang masih tersisa.")
         col_beli, col_jual = st.columns(2)
         with col_beli:
             if st.button("🛒 EKSEKUSI BELI Semua Sinyal!", type="primary", use_container_width=True,
@@ -2234,8 +2233,8 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
                     except Exception as e:
                         st.error(f"Sistem web gagal memanggil file bot: {e}")
         with col_jual:
-            if st.button("💸 EKSEKUSI JUAL Semua Sinyal TP/CL!", use_container_width=True,
-                         help="Evaluasi seluruh posisi: TP (+5%), CL (-3%), square-off, dan suspend dijual sekarang. Tidak ada pembelian."):
+            if st.button("💸 JUAL SORE Semua Posisi!", use_container_width=True,
+                         help="Menutup semua posisi yang belum tersentuh TP/SL. Tidak ada pembelian."):
                 with st.spinner("Bot mengeksekusi penjualan (TP/CL/square-off)..."):
                     import subprocess
                     import sys
@@ -2245,13 +2244,48 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
                             st.error("❌ Bot jual gagal dijalankan. Log error:")
                             st.code(proses_bot.stderr, language="bash")
                         else:
-                            st.success("✅ Evaluasi jual selesai! Log eksekusi:")
+                            st.success("✅ Jual sore selesai! Log eksekusi:")
                             st.code(proses_bot.stdout[-2500:], language="bash")
                             st.cache_data.clear()
                             time.sleep(1)
                             st.rerun()
                     except Exception as e:
                         st.error(f"Sistem web gagal memanggil file bot: {e}")
+
+        st.markdown("---")
+        st.markdown("### 🔄 Reset Semua Arena Portfolio")
+        st.warning("Reset akan mengarsipkan lalu mengosongkan seluruh posisi, histori transaksi, dan sinyal 9 rumus. Setiap arena kembali memiliki saldo awal Rp100.000.000. Tindakan ini tidak dapat dibatalkan dari web.")
+        if st.session_state.get("konfirmasi_reset_porto"):
+            st.error("Konfirmasi terakhir: seluruh data aktif Tab Portfolio akan dikosongkan dan kondisi kosong dikirim ke R2.")
+            reset_ya, reset_batal = st.columns(2)
+            with reset_ya:
+                if st.button("✅ YA, RESET KE Rp100 JUTA", type="primary", use_container_width=True, key="reset_porto_ya"):
+                    import subprocess
+                    import sys
+                    try:
+                        hasil_reset = subprocess.run(
+                            [sys.executable, "reset_porto.py", "--yes"],
+                            capture_output=True, text=True, timeout=120
+                        )
+                        if hasil_reset.returncode != 0:
+                            st.error("❌ Reset gagal.")
+                            st.code(hasil_reset.stderr or hasil_reset.stdout, language="bash")
+                        else:
+                            st.session_state["konfirmasi_reset_porto"] = False
+                            st.success("✅ Selesai: 9 arena kembali kosong dengan saldo Rp100.000.000 per arena.")
+                            st.code(hasil_reset.stdout[-2500:], language="bash")
+                            st.cache_data.clear()
+                            time.sleep(1)
+                            st.rerun()
+                    except Exception as e:
+                        st.error(f"Sistem web gagal menjalankan reset: {e}")
+            with reset_batal:
+                if st.button("↩️ Batal Reset", use_container_width=True, key="reset_porto_batal"):
+                    st.session_state["konfirmasi_reset_porto"] = False
+                    st.rerun()
+        elif st.button("🔄 Reset Portfolio ke Kondisi Awal", use_container_width=True, key="reset_porto_mulai"):
+            st.session_state["konfirmasi_reset_porto"] = True
+            st.rerun()
         
         col_backup, col_restore = st.columns(2)
         with col_backup:
@@ -2377,7 +2411,7 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
         with sub1:
             if os.path.exists(FILE_SINYAL):
                 df_sinyal = muat_sinyal_arena(nomor_rumus)
-                st.success("🔥 Sinyal AI (Kertas Belanja) diterima! Tunggu Anda menekan tombol 🛒 **EKSEKUSI BELI** di atas — tidak ada eksekusi otomatis.")
+                st.success("🔥 Sinyal AI (Kertas Belanja) diterima! Tunggu Anda menekan tombol 🛒 **EKSEKUSI BELI** di atas — pembelian tetap manual.")
                 st.dataframe(df_sinyal, use_container_width=True, hide_index=True)
             else:
                 st.info(f"KOSONG. Belum ada sinyal masuk untuk {pilihan_arena}, atau bot sudah membelinya dan membakar kertas belanja.")
