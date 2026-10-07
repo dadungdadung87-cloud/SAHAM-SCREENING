@@ -1,1 +1,3 @@
 Tanggal_Beli,Tanggal_Jual,Ticker,Harga_Beli,Harga_Jual,Status,Total_Return_Rp,Return_%,Mode_Beli,Change_Beli
+2026-10-06 21:43,2026-10-07 09:20,KDTN,655.0,585.0,CUT_LOSS ✂️ (auto SL),-2202328.0,-11.04,MANUAL,23.58490566037736
+2026-10-06 21:43,2026-10-07 09:20,BEKS,36.0,38.0,TAKE_PROFIT 🎯 (auto TP),1026749.7,5.13,MANUAL,20.0
