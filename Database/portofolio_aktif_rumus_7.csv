@@ -1,3 +1,1 @@
-Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL,Mode_Beli,Change_Beli
-2026-10-06 21:43,BIPI,132.0,1891,24998641.8,139,128,MANUAL,3.937007874015748
-2026-10-06 21:43,BUMI,184.0,1356,24987825.6,193,178,MANUAL,3.3707865168539324
+Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL

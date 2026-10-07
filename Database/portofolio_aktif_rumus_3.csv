@@ -1,3 +1,1 @@
-Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL,Mode_Beli,Change_Beli
-2026-10-06 21:43,CSMI,515.0,387,19960395.75,541,500,MANUAL,25.0
-2026-10-06 21:43,PRDA,2980.0,67,19995949.0,3129,2891,MANUAL,3.4722222222222223
+Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL
