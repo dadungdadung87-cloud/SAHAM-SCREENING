@@ -1,55 +1,55 @@
 {
-    "stempel_data": "2026-10-06 16:00:01",
+    "stempel_data": "2026-10-07 15:20:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "BTEK",
-            "POLA",
             "ASMI",
+            "POLA",
             "MEJA",
-            "KDTN"
+            "PCAR",
+            "AKKU"
         ],
         "RUMUS 2": [
+            "REAL",
+            "SMLE",
             "NAYZ",
-            "IFSH",
-            "JECX",
-            "GEMS",
-            "DAAZ"
+            "BDMN",
+            "KLBF"
         ],
         "RUMUS 3": [
+            "PGLI",
             "CSMI",
-            "BLTZ",
-            "IATA",
-            "IKAI",
-            "PRIM"
+            "MPXL",
+            "WIDI",
+            "IDEA"
         ],
         "RUMUS 4": [
-            "BTEK",
-            "POLA",
             "ASMI",
+            "POLA",
             "MEJA",
-            "KDTN"
+            "PCAR",
+            "AKKU"
         ],
         "RUMUS 5": [
-            "BTEK",
+            "ASMI",
             "POLA",
             "MEJA",
-            "BEKS",
-            "KDTN"
+            "PCAR",
+            "MPXL"
         ],
         "RUMUS 6": [
-            "BUVA",
-            "PTBA",
-            "MAPI",
-            "TOWR",
-            "SGER"
+            "BDMN",
+            "ISSP",
+            "KDSI",
+            "MTMH",
+            "AMFG"
         ],
         "RUMUS 7": [
+            "VIVA",
+            "RSCH",
             "MMIX",
-            "BIPI",
-            "SQMI",
-            "BUMI",
-            "BNBR"
+            "TRUE",
+            "BTEK"
         ],
         "RUMUS 8": [
             "",
@@ -59,11 +59,11 @@
             ""
         ],
         "RUMUS 9": [
-            "SCNP",
-            "BMBL",
-            "EAST",
-            "SPTO",
-            "AHAP"
+            "FORU",
+            "SMSM",
+            "ITIC",
+            "ASJT",
+            "PRAY"
         ]
     }
 }
