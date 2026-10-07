@@ -125,7 +125,15 @@ def susun_blok(df, stempel, tgl_hari):
 
 def halaman(titel, isi, tanggal_slug, indeks=False):
     aff = footer_affiliate()
-    nav = "" if indeks else f'<p><a class="back" href="{SITE_URL}">&larr; Beranda</a></p>'
+    nav = f'''<nav class="topnav">
+      <a class="active" href="{SITE_URL}">Beranda</a>
+      <a href="{SITE_URL}market.html">Market</a>
+      <a href="{SITE_URL}screener.html">Screener</a>
+      <a href="{SITE_URL}radar.html">Radar AI</a>
+      <a href="{SITE_URL}detektif.html">Detektif</a>
+    </nav>'''
+    if not indeks:
+        nav += f'<p><a class="back" href="{SITE_URL}">&larr; Beranda</a></p>'
     return f"""<!DOCTYPE html>
 <html lang="id">
 <head>
@@ -139,11 +147,15 @@ def halaman(titel, isi, tanggal_slug, indeks=False):
 :root{{--bg:#0f172a;--card:#1e293b;--line:#334155;--txt:#cbd5e1;--hi:#f8fafc;--acc:#38bdf8;--up:#22c55e;--dn:#ef4444}}
 *{{box-sizing:border-box}}
 body{{margin:0;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);line-height:1.65}}
-.wrap{{max-width:860px;margin:0 auto;padding:24px 16px}}
-header{{border-bottom:1px solid var(--line);padding:18px 0}}
-header h1{{margin:0;font-size:1.4rem;color:var(--hi)}}
-header h1 a{{color:var(--acc);text-decoration:none}}
-h2{{color:var(--hi);margin-top:34px}}
+ .wrap{{max-width:1040px;margin:0 auto;padding:24px 18px}}
+ header{{padding:26px 0 12px}}
+ header h1{{margin:0;font-size:clamp(1.8rem,4vw,3.2rem);line-height:1.1;color:var(--hi);letter-spacing:-.04em}}
+ header h1 a{{color:var(--acc);text-decoration:none}}
+ header p{{max-width:700px;color:#94a3b8;font-size:1.02rem}}
+ .topnav{{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0;margin:12px 0 26px}}
+ .topnav a{{color:#94a3b8;text-decoration:none;padding:7px 11px;border-radius:7px;font-size:.9rem}}
+ .topnav a:hover,.topnav a.active{{background:var(--card);color:var(--acc)}}
+ h2{{color:var(--hi);margin-top:34px}}
 p{{margin:.6em 0}}
 code{{background:var(--card);padding:2px 8px;border-radius:6px;color:var(--acc);font-weight:600}}
 .tbl{{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin:14px 0}}
@@ -161,7 +173,19 @@ font-weight:700;padding:14px;border-radius:12px;text-decoration:none;margin:28px
 .kosong{{color:#94a3b8;font-style:italic}}
 .back{{color:var(--acc)}}
 footer{{margin-top:48px;border-top:1px solid var(--line);padding-top:16px;font-size:.85rem;color:#94a3b8}}
-ul.artikel-list{{list-style:none;padding:0}}ul.artikel-list li{{padding:10px 0;border-bottom:1px solid var(--line)}}
+ ul.artikel-list{{list-style:none;padding:0}}ul.artikel-list li{{padding:10px 0;border-bottom:1px solid var(--line)}}
+ .hero{{background:radial-gradient(circle at 90% 0%,rgba(56,189,248,.2),transparent 38%),linear-gradient(145deg,#172a46,#101827);border:1px solid #2b5171;border-radius:18px;padding:30px;margin:8px 0 24px;box-shadow:0 18px 50px rgba(0,0,0,.2)}}
+ .hero .eyebrow{{color:var(--acc);font-size:.78rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}}
+ .hero h2{{font-size:clamp(1.5rem,3.5vw,2.4rem);margin:9px 0 10px;max-width:760px}}
+ .hero p{{max-width:700px;color:#cbd5e1;font-size:1.02rem}}
+ .hero-links{{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}}
+ .hero-links a{{background:var(--acc);color:#07111f;text-decoration:none;font-weight:800;padding:10px 14px;border-radius:9px}}
+ .hero-links a.alt{{background:transparent;color:var(--txt);border:1px solid var(--line)}}
+ .feature-grid{{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0 28px}}
+ .feature{{background:rgba(30,41,59,.58);border:1px solid var(--line);border-radius:12px;padding:15px}}
+ .feature b{{display:block;color:var(--hi);margin:7px 0 4px}}.feature span{{font-size:.88rem;color:#94a3b8}}
+ @media(max-width:700px){{.feature-grid{{grid-template-columns:repeat(2,1fr)}}.hero{{padding:22px 18px}}}}
+ @media(max-width:420px){{.feature-grid{{grid-template-columns:1fr}}}}
 </style>
 </head>
 <body><div class="wrap">
@@ -212,21 +236,20 @@ def utama():
 
     # Indeks landing page utama selalu diperbarui
     isi_idx = f"""
-    <h2>Apa ini?</h2>
-    <p>{html.escape(SITE_DESC)} Setiap hari bursa, sistem memindai <strong>900+ saham IHSG</strong>:
-    skor teknikal, tekanan beli/jual, anomali volume (RVOL), fase Wyckoff, hingga fundamental (PE, PBV, F-Score) — lalu meringkasnya di sini, gratis.</p>
-    <h2>Lihat Hasil Publik</h2>
-    <p><a class="back" href="{SITE_URL}market.html">📊 Market Overview</a> ·
-    <a class="back" href="{SITE_URL}screener.html">🔍 Screener</a> ·
-    <a class="back" href="{SITE_URL}radar.html">🤖 Radar AI</a> ·
-    <a class="back" href="{SITE_URL}detektif.html">🕵️ Detektif Ledakan</a></p>
-    <h2>Fitur Analisis Publik</h2>
-    <ul>
-      <li>🔍 <strong>Screener 40+ filter</strong> — gabungkan sendiri kriteria trading-mu</li>
-      <li>🤖 <strong>Radar AI per strategi</strong> — kandidat saham tersaring tiap hari</li>
-      <li>🌋 <strong>Deteksi anomali volume</strong> — jejak akumulasi bandar sebelum harga terbang</li>
-      <li>🧪 <strong>Data fundamental</strong> — PE, PBV, Piotroski F-Score, RS Rating</li>
-    </ul>
+    <section class="hero">
+      <div class="eyebrow">IHSG MARKET INTELLIGENCE</div>
+      <h2>Data pasar yang ringkas, tajam, dan mudah dipahami.</h2>
+      <p>Analisis harian 900+ saham IHSG dalam satu tempat: momentum, volume, fase bandar, radar AI, dan fundamental. Buka data publiknya tanpa login dan tanpa melewati dashboard yang rumit.</p>
+      <div class="hero-links"><a href="{SITE_URL}market.html">Lihat Market Hari Ini</a><a class="alt" href="{SITE_URL}screener.html">Jelajahi Screener</a></div>
+    </section>
+    <div class="feature-grid">
+      <div class="feature">📊<b>Market Overview</b><span>Sentimen, gainers, losers, dan volume.</span></div>
+      <div class="feature">🔍<b>Screener</b><span>Kandidat berdasarkan score dan momentum.</span></div>
+      <div class="feature">🤖<b>Radar AI</b><span>Snapshot kandidat dari sembilan rumus.</span></div>
+      <div class="feature">🕵️<b>Detektif</b><span>RVOL, supply, dan anomali pergerakan.</span></div>
+    </div>
+    <h2>Jelajahi Analisis Publik</h2>
+    <p>Semua halaman diperbarui otomatis mengikuti data screening terbaru. Gunakan sebagai bahan riset awal, bukan sebagai instruksi transaksi.</p>
     {tabel_indeks()}
     """
     with open(os.path.join(BASE, "docs", "index.html"), "w") as f:
