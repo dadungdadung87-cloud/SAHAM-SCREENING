@@ -37,6 +37,8 @@ from datetime import datetime
 from openai import OpenAI
 import google.generativeai as genai
 
+import r2_client
+
 # REFRESH OTOMATIS UNTUK RADAR LIVE (TAB 3)
 try:
     from streamlit_autorefresh import st_autorefresh
@@ -642,7 +644,6 @@ def jalankan_sidang_autopilot(daftar_rumus, df_data, api_key, progress_bar=None,
 # =====================================================================
 # >>> PART 04 : SISTEM ARSIP CERDAS (DATA HARIAN) — R2 + LOKAL <<<
 # =====================================================================
-import r2_client
 import tempfile
 
 @st.cache_data(ttl=300, show_spinner=False)
@@ -783,187 +784,262 @@ st.set_page_config(page_title="Screener Saham IHSG", layout="wide", initial_side
 st.markdown("""
     <style>
     /* ==========================================
-       DESIGN SYSTEM — AlgoTrade Screener
-       Konsisten, lega, modern
+       DESIGN SYSTEM v6 — AlgoTrade Screener Pro
+       Premium fintech look: deep navy, glass cards,
+       emerald/cyan accents, refined typography
        ========================================== */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap');
 
     :root {
-        --bg-primary: #0f172a;
-        --bg-secondary: #1e293b;
-        --bg-tertiary: #334155;
-        --border-color: #334155;
-        --text-primary: #f8fafc;
-        --text-secondary: #cbd5e1;
-        --text-muted: #94a3b8;
-        --accent-blue: #38bdf8;
-        --accent-indigo: #3b82f6;
-        --success: #22c55e;
-        --danger: #ef4444;
-        --warning: #eab308;
-        --radius-sm: 6px;
-        --radius-md: 10px;
-        --radius-lg: 14px;
-        --shadow-sm: 0 2px 6px rgba(0,0,0,0.2);
-        --shadow-md: 0 4px 14px rgba(0,0,0,0.25);
+        --bg-primary: #0a0f1e;
+        --bg-secondary: #101830;
+        --bg-tertiary: #1a2440;
+        --border-color: #233152;
+        --border-soft: #1c2942;
+        --text-primary: #f1f5f9;
+        --text-secondary: #b8c4d9;
+        --text-muted: #7c8aa5;
+        --accent-blue: #22d3ee;
+        --accent-indigo: #6366f1;
+        --accent-emerald: #34d399;
+        --success: #10b981;
+        --danger: #f43f5e;
+        --warning: #f59e0b;
+        --radius-sm: 8px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
+        --shadow-sm: 0 2px 8px rgba(2,6,23,0.45);
+        --shadow-md: 0 8px 24px rgba(2,6,23,0.55);
+        --shadow-glow: 0 0 24px rgba(34,211,238,0.15);
     }
 
-    html, body, [class*="css"] {
-        font-family: 'Inter', system-ui, sans-serif;
+    /* ===== APP BACKGROUND — subtle radial glow ===== */
+    .stApp {
+        background:
+            radial-gradient(1200px 500px at 15% -5%, rgba(34,211,238,0.07) 0%, transparent 55%),
+            radial-gradient(900px 450px at 90% 0%, rgba(99,102,241,0.08) 0%, transparent 50%),
+            linear-gradient(180deg, #0a0f1e 0%, #0c1327 100%);
+        background-attachment: fixed;
+    }
+
+    html, body, [class*="css"], .stApp {
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
         color: var(--text-secondary);
     }
+    code, pre, [data-testid="stMarkdownContainer"] code, .stCode {
+        font-family: 'JetBrains Mono', monospace !important;
+    }
 
-    /* ===== TYPOGRAPHY HIERARCHY ===== */
+    /* ===== HEADER BANNER ===== */
+    .main-header {
+        background: linear-gradient(135deg, rgba(34,211,238,0.10) 0%, rgba(99,102,241,0.12) 55%, rgba(16,24,48,0.4) 100%);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 22px 28px;
+        margin-bottom: 18px;
+        box-shadow: var(--shadow-md), var(--shadow-glow);
+        position: relative;
+        overflow: hidden;
+    }
+    .main-header::before {
+        content: "";
+        position: absolute; inset: 0 0 auto 0; height: 3px;
+        background: linear-gradient(90deg, #22d3ee, #6366f1, #34d399);
+    }
+
+    /* ===== TYPOGRAPHY ===== */
     h1 {
         font-weight: 800;
-        font-size: 2.1rem;
-        background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+        font-size: 2.05rem;
+        letter-spacing: -0.02em;
+        background: linear-gradient(100deg, #67e8f9 0%, #a5b4fc 60%, #6ee7b7 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        padding-bottom: 8px;
-        margin-bottom: 8px;
-        letter-spacing: -0.02em;
+        padding-bottom: 6px;
+        margin-bottom: 6px;
     }
-    h2, h3 { color: var(--text-primary); font-weight: 700; letter-spacing: -0.01em; }
-    h4 { color: var(--text-primary); font-weight: 600; margin-top: 4px; }
-    .stMarkdown p { color: var(--text-secondary); line-height: 1.55; }
+    h2 { color: var(--text-primary); font-weight: 700; letter-spacing: -0.01em;
+         border-left: 4px solid var(--accent-blue); padding-left: 12px; }
+    h3 { color: var(--text-primary); font-weight: 700; }
+    h4 { color: var(--text-secondary); font-weight: 600; margin-top: 4px; }
+    .stMarkdown p { color: var(--text-secondary); line-height: 1.6; }
+    a { color: var(--accent-blue); }
 
-    /* ===== DATAFRAME (TABEL) — LEGA & MODERN ===== */
+    /* ===== ANIMASI HALUS ===== */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    [data-testid="stVerticalBlock"] > div { animation: fadeUp 0.35s ease both; }
+
+    /* ===== DATAFRAME (TABEL) ===== */
     .stDataFrame {
         border-radius: var(--radius-lg);
         overflow: hidden;
         box-shadow: var(--shadow-md);
         border: 1px solid var(--border-color);
+        background: var(--bg-secondary);
     }
-    /* Header tabel: tebal, uppercase, accent */
     .stDataFrame thead tr th {
         font-weight: 700 !important;
-        font-size: 0.78rem !important;
+        font-size: 0.75rem !important;
         text-transform: uppercase;
-        letter-spacing: 0.04em;
-        background-color: #1e293b !important;
-        color: var(--text-primary) !important;
+        letter-spacing: 0.06em;
+        background-color: var(--bg-tertiary) !important;
+        color: var(--accent-blue) !important;
         padding: 12px 14px !important;
-        border-bottom: 2px solid var(--accent-blue) !important;
+        border-bottom: 2px solid rgba(34,211,238,0.4) !important;
     }
-    /* Cell body: lega vertikal & horizontal */
     .stDataFrame tbody td {
         padding: 10px 14px !important;
-        font-size: 0.9rem !important;
-        border-bottom: 1px solid #2d3b54 !important;
+        font-size: 0.88rem !important;
+        border-bottom: 1px solid var(--border-soft) !important;
     }
-    /* Zebra striping lembut */
-    .stDataFrame tbody tr:nth-child(even) { background-color: rgba(30, 41, 59, 0.35); }
-    .stDataFrame tbody tr:hover { background-color: rgba(56, 189, 248, 0.08); transition: background 0.15s ease; }
-    /* Angka rata kanan */
-    .stDataFrame tbody td[data-col="Harga (Rp)"],
-    .stDataFrame tbody td[data-col="Volume"],
-    .stDataFrame tbody td[data-col="Change (%)"] { text-align: right !important; }
+    .stDataFrame tbody tr:nth-child(even) { background-color: rgba(26,36,64,0.4); }
+    .stDataFrame tbody tr:hover { background-color: rgba(34,211,238,0.07) !important; transition: background 0.15s ease; }
 
-    /* ===== METRIC CONTAINER (Top Gainer/Loser dll) ===== */
+    /* ===== METRIC CARDS ===== */
     .metric-container {
-        border-radius: var(--radius-md);
-        padding: 18px 14px;
+        border-radius: var(--radius-lg);
+        padding: 20px 14px;
         text-align: center;
         border: 1px solid var(--border-color);
-        background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+        background: linear-gradient(160deg, var(--bg-secondary) 0%, var(--bg-primary) 130%);
         color: var(--text-primary);
         margin-bottom: 18px;
         box-shadow: var(--shadow-sm);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        position: relative;
+        overflow: hidden;
     }
-    .metric-container:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .metric-container::after {
+        content: "";
+        position: absolute; top: 0; left: 0; right: 0; height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(34,211,238,0.55), transparent);
+    }
+    .metric-container:hover { transform: translateY(-3px); box-shadow: var(--shadow-md), var(--shadow-glow); border-color: rgba(34,211,238,0.4); }
+    .metric-container h3 { font-size: 0.92rem; color: var(--text-muted); font-weight: 600; }
+    .metric-container h2 { font-size: 1.9rem; border: none; padding: 0; color: var(--text-primary); }
+
+    /* ===== ST.METRIC (native) ===== */
+    [data-testid="stMetric"] {
+        background: linear-gradient(160deg, var(--bg-secondary) 0%, var(--bg-primary) 130%);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        padding: 14px 16px;
+        box-shadow: var(--shadow-sm);
+    }
+    [data-testid="stMetricLabel"] p { color: var(--text-muted) !important; font-size: 0.82rem !important; }
+    [data-testid="stMetricValue"] { color: var(--text-primary); font-weight: 700; }
 
     /* ===== CALL-OUT BOXES ===== */
     .bandar-box {
-        border-left: 5px solid var(--danger);
-        background: linear-gradient(90deg, rgba(239,68,68,0.08) 0%, transparent 100%);
-        padding: 14px 16px;
+        border-left: 4px solid var(--danger);
+        background: linear-gradient(90deg, rgba(244,63,94,0.09) 0%, transparent 100%);
+        padding: 14px 18px;
         border-radius: var(--radius-sm);
         margin-bottom: 14px;
         color: var(--text-secondary);
     }
     .bandar-box-green {
-        border-left: 5px solid var(--success);
-        background: linear-gradient(90deg, rgba(34,197,94,0.08) 0%, transparent 100%);
-        padding: 14px 16px;
+        border-left: 4px solid var(--accent-emerald);
+        background: linear-gradient(90deg, rgba(16,185,129,0.09) 0%, transparent 100%);
+        padding: 14px 18px;
         border-radius: var(--radius-sm);
         margin-bottom: 14px;
         color: var(--text-secondary);
     }
 
-    /* ===== TABS — KONSISTEN & CLEAR ACTIVE STATE ===== */
-    .stTabs [data-baseweb="tab-list"] { gap: 8px; border-bottom: 2px solid var(--bg-tertiary); }
+    /* ===== TABS — pill modern ===== */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 10px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 2px;
+    }
     .stTabs [data-baseweb="tab"] {
         height: 46px;
         font-weight: 600;
         font-size: 0.92rem;
-        padding: 0 18px;
-        border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+        padding: 0 20px;
+        border-radius: var(--radius-sm);
+        color: var(--text-muted);
         transition: all 0.18s ease;
     }
+    .stTabs [data-baseweb="tab"]:hover { color: var(--text-primary); background: rgba(34,211,238,0.06); }
     .stTabs [aria-selected="true"] {
-        background-color: rgba(56, 189, 248, 0.12) !important;
+        background: linear-gradient(135deg, rgba(34,211,238,0.14) 0%, rgba(99,102,241,0.14) 100%) !important;
         border-bottom: 3px solid var(--accent-blue) !important;
         color: var(--text-primary) !important;
+        box-shadow: 0 4px 14px rgba(34,211,238,0.10);
     }
 
-    /* ===== VIEW MODE CONTAINER ===== */
+    /* ===== EXPANDER / VIEW MODE ===== */
     .view-mode-container {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
         padding: 12px 18px;
         border-radius: var(--radius-md);
         margin-bottom: 14px;
         border: 1px solid var(--border-color);
     }
-
-    /* ===== SIDEBAR ===== */
-    section[data-testid="stSidebar"] {
-        background-color: #0b1426;
-        border-right: 1px solid var(--border-color);
-    }
-    section[data-testid="stSidebar"] .stMarkdown h1 { font-size: 1.1rem; color: var(--accent-blue); }
-
-    /* ===== BUTTONS — SERAGAM ===== */
-    .stButton > button {
-        border-radius: var(--radius-sm);
-        font-weight: 600;
-        font-size: 0.88rem;
-        transition: all 0.15s ease;
-        border: 1px solid var(--border-color);
-    }
-    .stButton > button:hover {
-        border-color: var(--accent-blue);
-        background-color: rgba(56, 189, 248, 0.08);
-        transform: translateY(-1px);
-    }
-
-    /* ===== SELECTBOX & INPUT ===== */
-    .stSelectbox, .stNumberInput, .stTextInput {
-        margin-bottom: 8px;
-    }
-
-    /* ===== EXPANDER ===== */
     .streamlit-expander {
         border-radius: var(--radius-md) !important;
         border: 1px solid var(--border-color) !important;
         overflow: hidden;
+        background: var(--bg-secondary);
     }
 
-    /* ===== SPACING UNIFORM ANTAR SEKSI ===== */
-    .stMarkdown hr { margin: 18px 0; border-color: var(--bg-tertiary); }
-    .stVerticalBlock > div { gap: 0.6rem; }
+    /* ===== SIDEBAR ===== */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #080d1a 0%, #0d1528 100%);
+        border-right: 1px solid var(--border-color);
+    }
+    section[data-testid="stSidebar"] .stMarkdown h1 { font-size: 1.05rem; color: var(--accent-blue); }
 
-    /* ===== ALERT/INFO/WARNING KONSISTEN ===== */
-    .stAlert { border-radius: var(--radius-md) !important; }
-
-    /* ===== DOWNLOAD BUTTON ===== */
+    /* ===== BUTTONS ===== */
+    .stButton > button {
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        font-size: 0.88rem;
+        transition: all 0.16s ease;
+        border: 1px solid var(--border-color);
+        background: var(--bg-secondary);
+        color: var(--text-secondary);
+    }
+    .stButton > button:hover {
+        border-color: var(--accent-blue);
+        color: var(--text-primary);
+        background-color: rgba(34,211,238,0.08);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(34,211,238,0.12);
+    }
+    .stButton > button[kind="primary"], .stButton > button[data-testid="baseButton-primary"] {
+        background: linear-gradient(135deg, #0891b2 0%, #4f46e5 100%) !important;
+        border: none !important;
+        color: #fff !important;
+        box-shadow: 0 4px 16px rgba(34,211,238,0.25);
+    }
+    .stButton > button[kind="primary"]:hover { filter: brightness(1.12); transform: translateY(-1px); }
     .stDownloadButton > button {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        border: 1px solid var(--accent-blue);
+        background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+        border: 1px solid rgba(34,211,238,0.45);
         color: var(--accent-blue);
     }
+
+    /* ===== INPUT ===== */
+    .stSelectbox, .stNumberInput, .stTextInput { margin-bottom: 8px; }
+    [data-baseweb="input"], [data-baseweb="select"] > div {
+        background-color: var(--bg-secondary) !important;
+        border-color: var(--border-color) !important;
+    }
+
+    /* ===== SPACING & ALERTS ===== */
+    .stMarkdown hr { margin: 20px 0; border-color: var(--border-soft); }
+    .stVerticalBlock > div { gap: 0.6rem; }
+    .stAlert { border-radius: var(--radius-md) !important; border: 1px solid var(--border-color); }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 8px; border: 2px solid var(--bg-primary); }
+    ::-webkit-scrollbar-thumb:hover { background: #2c3d63; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -1306,9 +1382,14 @@ with st.sidebar.expander("🛠️ Manajemen Preset Kustom"):
                 st.rerun()
         else: st.info("Belum ada preset kustom.")
 
-st.title("⚡ AlgoTrade Screener - IHSG Ultimate")
-st.markdown("Detektor Jejak Bandar, Anomali Volume, & Strategi BSJP.")
-st.markdown("---")
+st.markdown("""
+<div class="main-header">
+  <h1 style="margin:0 0 6px 0;">⚡ AlgoTrade Screener <span style="font-weight:500;opacity:.85;">Pro</span></h1>
+  <p style="margin:0;color:var(--text-secondary);font-size:0.98rem;">
+    Detektor Jejak Bandar · Anomali Volume · Strategi BSJP — <span style="color:var(--accent-blue);font-weight:600;">IHSG Ultimate</span>
+  </p>
+</div>
+""", unsafe_allow_html=True)
 
 
 # =====================================================================
@@ -1874,7 +1955,6 @@ if not df_hasil.empty:
                                 }
                                 
                                 stempel_data = str(df_hasil["Terakhir Update"].iloc[0]) if "Terakhir Update" in df_hasil.columns else "tanpa_stempel"
-                                FILE_CACHE_AUTOPILOT = "Database/cache_autopilot.json"
                                 
                                 keranjang_spreadsheet = None
                                 if not paksa_sidang and os.path.exists(FILE_CACHE_AUTOPILOT):
