@@ -1,55 +1,55 @@
 {
-    "stempel_data": "2026-10-07 16:00:00",
+    "stempel_data": "2026-10-08 15:15:04",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "ASMI",
-            "POLA",
-            "MEJA",
-            "PCAR",
-            "AKKU"
-        ],
-        "RUMUS 2": [
-            "KREN",
-            "NAYZ",
-            "MBSS",
-            "MRAT",
-            "FMII"
-        ],
-        "RUMUS 3": [
-            "CSMI",
-            "MPXL",
-            "GEMS",
-            "BTPN",
-            "PGLI"
-        ],
-        "RUMUS 4": [
-            "ASMI",
-            "POLA",
-            "MEJA",
-            "PCAR",
-            "AKKU"
-        ],
-        "RUMUS 5": [
-            "ASMI",
-            "POLA",
-            "MEJA",
-            "PCAR",
+            "PURA",
+            "WIDI",
+            "PGLI",
+            "AIMS",
             "MPXL"
         ],
+        "RUMUS 2": [
+            "IDEA",
+            "AMFG",
+            "UVCR",
+            "HADE",
+            "PLAN"
+        ],
+        "RUMUS 3": [
+            "MPXL",
+            "ARII",
+            "PGLI",
+            "PEVE",
+            "MCAS"
+        ],
+        "RUMUS 4": [
+            "PURA",
+            "IDEA",
+            "MPXL",
+            "WIDI",
+            "PGLI"
+        ],
+        "RUMUS 5": [
+            "KREN",
+            "IDEA",
+            "MPXL",
+            "SMLE",
+            "MMIX"
+        ],
         "RUMUS 6": [
-            "GEMS",
-            "SMKM",
-            "BMBL",
-            "ISSP",
-            "JECX"
+            "INCI",
+            "MMIX",
+            "NEST",
+            "ESTI",
+            "BFIN"
         ],
         "RUMUS 7": [
+            "INCI",
             "MMIX",
             "RSCH",
-            "MBSS",
-            "TRUE",
-            "BTEK"
+            "DADA",
+            ""
         ],
         "RUMUS 8": [
             "",
@@ -59,11 +59,11 @@
             ""
         ],
         "RUMUS 9": [
+            "CINT",
+            "PSSI",
             "FORU",
-            "JELI",
-            "SMSM",
-            "ITIC",
-            "MDLA"
+            "FILM",
+            "BRNA"
         ]
     }
 }
