@@ -315,41 +315,10 @@ def jalankan_bot():
             # Cek apakah ticker masih ada di market
             try:
                 harga_sekarang = df_market[df_market['Ticker'] == ticker]['Harga (Rp)'].values[0]
-                ticker_ada = True
             except:
-                # >>> SUSPEND_FORCE_EXIT: ticker tidak ditemukan = suspend/delisting
-                ticker_ada = False
-                harga_jual = posisi['Harga_Beli']  # jual di harga beli → loss hanya fee
-                status_jual = "SUSPEND_FORCE_EXIT ⚠️"
-
-                # Hitung profit (akan rugi sebesar fee beli+jual)
-                nilai_jual_kotor = harga_jual * posisi['Lot'] * 100
-                nilai_jual_bersih = nilai_jual_kotor - (nilai_jual_kotor * FEE_JUAL)
-                profit_rp = nilai_jual_bersih - posisi['Total_Modal']
-                profit_pct = (profit_rp / posisi['Total_Modal']) * 100
-
-                # Anti-duplikasi histori
-                sudah_ada = False
-                if not df_history.empty:
-                    sudah_ada = ((df_history['Ticker'] == ticker) & (df_history['Tanggal_Beli'] == posisi['Tanggal_Beli'])).any()
-                if sudah_ada:
-                    print(f"⚠️ [RUMUS {i}] {ticker} sudah ada di histori — duplikat SUSPEND dicegah.")
-                    continue
-
-                history_baru.append({
-                    'Tanggal_Beli': posisi['Tanggal_Beli'],
-                    'Tanggal_Jual': now.strftime("%Y-%m-%d %H:%M"),
-                    'Ticker': ticker,
-                    'Harga_Beli': posisi['Harga_Beli'],
-                    'Harga_Jual': harga_jual,
-                    'Status': status_jual,
-                    'Total_Return_Rp': round(profit_rp, 2),
-                    'Return_%': round(profit_pct, 2),
-                    'Mode_Beli': posisi.get('Mode_Beli', 'MANUAL'),
-                    'Change_Beli': posisi.get('Change_Beli', 0)
-                })
-                print(f"⚠️ [RUMUS {i}] SUSPEND_FORCE_EXIT: {ticker} | Jual paksa @ Rp {harga_jual} (harga beli) | {profit_pct:.2f}% (fee only)")
-                continue  # skip evaluasi TP/CL/square-off/liquidate
+                # Ticker tidak ditemukan (suspend/delisting) — dijual MANUAL saja lewat tombol JUAL SORE
+                porto_baru.append(posisi)
+                continue
 
             # >>> Flow normal: ticker ada → evaluasi TP/CL/square-off/liquidate
             terjual = False
