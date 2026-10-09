@@ -1,54 +1,54 @@
 {
-    "stempel_data": "2026-10-08 16:00:03",
+    "stempel_data": "2026-10-09 15:20:04",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "BLTA",
-            "MPXL",
-            "WIDI",
-            "PGLI",
-            "AIMS"
+            "PCAR",
+            "STRK",
+            "TEBE",
+            "DKHH",
+            "OMED"
         ],
         "RUMUS 2": [
-            "IDEA",
-            "DGNS",
-            "INCI",
-            "DEWI",
-            "BDKR"
+            "NAYZ",
+            "KKES",
+            "JECX",
+            "ASMI",
+            "TAXI"
         ],
         "RUMUS 3": [
-            "BLTA",
-            "MPXL",
-            "KLBF",
-            "MCAS",
-            "ARII"
+            "SOSS",
+            "KLAS",
+            "FLMC",
+            "KBAG",
+            "GTBO"
         ],
         "RUMUS 4": [
-            "BLTA",
-            "IDEA",
-            "MPXL",
-            "WIDI",
-            "PGLI"
+            "PCAR",
+            "NAYZ",
+            "STRK",
+            "DKHH",
+            "TEBE"
         ],
         "RUMUS 5": [
-            "BLTA",
+            "PCAR",
+            "NAYZ",
+            "TEBE",
             "IDEA",
-            "MPXL",
-            "VICI",
-            "GEMS"
+            "POLA"
         ],
         "RUMUS 6": [
-            "VICI",
-            "DGNS",
-            "INCI",
-            "MMIX",
-            "ULTJ"
+            "TEBE",
+            "OMED",
+            "JECX",
+            "BPFI",
+            "MBAP"
         ],
         "RUMUS 7": [
-            "INCI",
-            "GEMS",
+            "TEBE",
             "MMIX",
-            "DADA",
+            "DEWA",
+            "",
             ""
         ],
         "RUMUS 8": [
@@ -59,11 +59,11 @@
             ""
         ],
         "RUMUS 9": [
-            "PSSI",
-            "FORU",
-            "TCPI",
-            "UDNG",
-            "MIKA"
+            "MAHA",
+            "EAST",
+            "MTDL",
+            "SCCO",
+            "BTON"
         ]
     }
 }
