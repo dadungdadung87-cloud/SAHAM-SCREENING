@@ -90,6 +90,7 @@ def hitung_rumus(df):
     akumulasi_pro = (df.get('Kekuatan A/D', '') == 'Akumulasi Pro (Smart Money)')
     change_num = pd.to_numeric(df.get('Change (%)', 0), errors='coerce')
     supply_banjir = df['Kondisi Supply'].astype(str).str.contains('Banjir', na=False) if 'Kondisi Supply' in df.columns else False
+    score_num = pd.to_numeric(df.get('Total Score', 0), errors='coerce')
     out[1] = df[akumulasi_pro & (df.get('Status Bandar', '') == 'Akumulasi Kuat') & vwap_kuat & ~supply_banjir].copy()
     out[2] = df[((df.get('Pola Candle', '') == 'Hammer (Potensi Reversal)') |
                  (df.get('Sinyal Cuci Barang', '') == 'Jarum Bawah (Sinyal Pantulan Kuat)')) & vwap_kuat & akumulasi_pro].copy()
@@ -102,18 +103,22 @@ def hitung_rumus(df):
     out[5] = df[(df.get('Kelas Transaksi', '') == 'Ritel Aktif (5M - 50M)') & (df.get('Vol Breakout', '') == 'Tembus MA20') &
                 vwap_kuat & (df.get('MA Signal', '') == 'Uptrend') &
                 ((df.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)') | akumulasi_pro)].copy()
-    out[6] = df[(df.get('RVOL (Anomali Vol)', '').isin(['Anomali Tinggi (150-300%)', 'Ledakan Ekstrem (> 300%)'])) &
-                (df.get('OBV Trend', '') == 'Akumulasi (Naik)') & (change_num <= 5.0) &
-                (df.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)')].copy()
-    out[7] = df[(df.get('Prediksi Machine Learning', '') == '🔥 ANOMALI BANDAR (Siap Ledakan)') & vwap_kuat &
-                ((df.get('Status Stochastic', '').isin(['Oversold (Jenuh Jual - Peluang)', 'Golden Cross (Awal Bullish)'])) |
-                 (df.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)'))].copy()
-    out[8] = df[((df.get('Status Sentimen', '') == 'Sentimen Positif 📰') |
-                 (df.get('Status Akuisisi', '').isin(['RENCANA AKUISISI', 'DALAM AKUISISI']))) &
-                (df.get('MA Signal', '') == 'Uptrend') & (df.get('Rekomendasi', '') == 'BELI')].copy()
-    out[9] = df[(df.get('MACD', '').isin(['Strong Bullish', 'Bullish MACD'])) & (df.get('Momentum', '') == 'Positif') & vwap_ok &
-                ((df.get('Risk/Reward Ratio', '').isin(['Sangat Menarik (> 1:3)', 'Ideal (1:2)'])) |
-                 (df.get('Posisi Entry', '') == 'Dekat Support (Low Risk)'))].copy()
+    # RUMUS 6 — Uptrend Akumulasi (catch rate 49%)
+    out[6] = df[(df.get('MA Signal', '') == 'Uptrend') &
+                (score_num >= 5) &
+                (df.get('Likuiditas', '') == '> 1 Miliar')].copy()
+    # RUMUS 7 — Mark-Up Pesta (catch rate 46%)
+    out[7] = df[(df.get('Fase Siklus Bandar', '') == 'Mark-Up (Fase Pesta)') &
+                (df.get('Trend MA (5,20,50)', '') == 'Perfect Uptrend (5>20>50)') &
+                (df.get('MA Signal', '') == 'Uptrend')].copy()
+    # RUMUS 8 — MACD Breakout Volume (catch rate 42%)
+    out[8] = df[(df.get('MACD', '') == 'Strong Bullish') &
+                (df.get('Vol Breakout', '') == 'Tembus MA20') &
+                (df.get('MA Signal', '') == 'Uptrend')].copy()
+    # RUMUS 9 — AD Akumulasi Skor Tinggi (catch rate 41%)
+    out[9] = df[(df.get('Kekuatan A/D', '') == 'Akumulasi Pro (Smart Money)') &
+                (df.get('MA Signal', '') == 'Uptrend') &
+                (score_num >= 5)].copy()
     return out
 
 def jalankan_sidang(daftar_rumus, df_data, api_key, log=print, mode_tulis=True):
