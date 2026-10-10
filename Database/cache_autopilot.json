@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-10-09 15:20:04",
+    "stempel_data": "2026-10-09 17:55:04",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
             "PCAR",
             "STRK",
-            "TEBE",
-            "DKHH",
-            "OMED"
+            "TOWR",
+            "SEMA",
+            "AKKU"
         ],
         "RUMUS 2": [
             "NAYZ",
-            "KKES",
+            "AKKU",
             "JECX",
-            "ASMI",
-            "TAXI"
+            "GWSA",
+            "DKFT"
         ],
         "RUMUS 3": [
+            "SMIL",
+            "BDMN",
             "SOSS",
-            "KLAS",
             "FLMC",
-            "KBAG",
-            "GTBO"
+            "INDS"
         ],
         "RUMUS 4": [
-            "PCAR",
             "NAYZ",
+            "PCAR",
             "STRK",
-            "DKHH",
-            "TEBE"
+            "TOWR",
+            "SEMA"
         ],
         "RUMUS 5": [
-            "PCAR",
             "NAYZ",
-            "TEBE",
-            "IDEA",
+            "PCAR",
+            "STRK",
+            "TOWR",
             "POLA"
         ],
         "RUMUS 6": [
-            "TEBE",
-            "OMED",
-            "JECX",
-            "BPFI",
-            "MBAP"
+            "NAYZ",
+            "STRK",
+            "PCAR",
+            "IKAI",
+            "TOWR"
         ],
         "RUMUS 7": [
-            "TEBE",
-            "MMIX",
-            "DEWA",
-            "",
-            ""
+            "NAYZ",
+            "PCAR",
+            "IKAI",
+            "SEMA",
+            "DKHH"
         ],
         "RUMUS 8": [
-            "",
-            "",
-            "",
-            "",
-            ""
+            "NAYZ",
+            "PCAR",
+            "STRK",
+            "IKAI",
+            "TOWR"
         ],
         "RUMUS 9": [
-            "MAHA",
-            "EAST",
-            "MTDL",
-            "SCCO",
-            "BTON"
+            "NAYZ",
+            "STRK",
+            "PCAR",
+            "TOWR",
+            "SEMA"
         ]
     }
 }
