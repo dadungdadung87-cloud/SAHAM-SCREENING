@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-10-09 17:55:04",
+    "stempel_data": "2026-10-12 15:15:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "PCAR",
+            "DKHH",
+            "BIKE",
+            "TFCO",
             "STRK",
-            "TOWR",
-            "SEMA",
-            "AKKU"
+            "ZONE"
         ],
         "RUMUS 2": [
-            "NAYZ",
-            "AKKU",
-            "JECX",
-            "GWSA",
-            "DKFT"
+            "DUTI",
+            "FMII",
+            "DRMA",
+            "GLVA",
+            ""
         ],
         "RUMUS 3": [
-            "SMIL",
-            "BDMN",
-            "SOSS",
-            "FLMC",
-            "INDS"
+            "LOPI",
+            "BTON",
+            "IFSH",
+            "CMRY",
+            "GTBO"
         ],
         "RUMUS 4": [
-            "NAYZ",
-            "PCAR",
+            "DKHH",
+            "BIKE",
+            "TFCO",
             "STRK",
-            "TOWR",
-            "SEMA"
+            "ZONE"
         ],
         "RUMUS 5": [
+            "STRK",
+            "DKHH",
             "NAYZ",
             "PCAR",
-            "STRK",
-            "TOWR",
-            "POLA"
+            "BIKE"
         ],
         "RUMUS 6": [
-            "NAYZ",
             "STRK",
-            "PCAR",
-            "IKAI",
-            "TOWR"
+            "DKHH",
+            "BIKE",
+            "ASPI",
+            "ZONE"
         ],
         "RUMUS 7": [
-            "NAYZ",
-            "PCAR",
-            "IKAI",
-            "SEMA",
-            "DKHH"
+            "DKHH",
+            "BIKE",
+            "ASPI",
+            "IFSH",
+            "TFCO"
         ],
         "RUMUS 8": [
-            "NAYZ",
-            "PCAR",
+            "DKHH",
+            "BIKE",
             "STRK",
-            "IKAI",
-            "TOWR"
+            "TFCO",
+            "ASPI"
         ],
         "RUMUS 9": [
-            "NAYZ",
+            "DKHH",
+            "BIKE",
             "STRK",
-            "PCAR",
-            "TOWR",
-            "SEMA"
+            "TFCO",
+            "PCAR"
         ]
     }
 }
