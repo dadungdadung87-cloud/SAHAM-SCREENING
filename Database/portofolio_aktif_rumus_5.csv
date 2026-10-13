@@ -1,1 +1,2 @@
-Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL
+Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL,Mode_Beli,Change_Beli
+2026-10-13 07:18,TOWR,458.0,448,20549177.6,481,444,MANUAL,0.0

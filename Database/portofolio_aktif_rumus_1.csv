@@ -1,1 +1,2 @@
-Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL
+Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL,Mode_Beli,Change_Beli
+2026-10-13 07:18,ASPI,1090.0,190,20741065.0,1144,1057,MANUAL,11.224489795918368
