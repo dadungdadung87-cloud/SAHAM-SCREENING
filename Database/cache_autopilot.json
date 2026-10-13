@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-10-12 16:00:01",
+    "stempel_data": "2026-10-13 15:15:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "STRK",
-            "DKHH",
-            "ASPI",
             "BIKE",
-            "MINE"
+            "BOLA",
+            "TFCO",
+            "DKHH",
+            "SBMA"
         ],
         "RUMUS 2": [
-            "OMED",
+            "BIKE",
             "NINE",
-            "TCPI",
-            "DRMA",
-            "DUTI"
+            "SMIL",
+            "SMGR",
+            "RSCH"
         ],
         "RUMUS 3": [
-            "MINE",
-            "PKPK",
-            "LOPI",
-            "IFSH",
-            "GTBO"
+            "TFCO",
+            "BATR",
+            "SHID",
+            "NICK",
+            "APLI"
         ],
         "RUMUS 4": [
-            "STRK",
-            "DKHH",
             "BIKE",
-            "ASPI",
-            "PCAR"
+            "BOLA",
+            "TFCO",
+            "DKHH",
+            "SBMA"
         ],
         "RUMUS 5": [
-            "STRK",
-            "DKHH",
             "BIKE",
-            "PCAR",
-            "NAYZ"
+            "DKHH",
+            "PWON",
+            "HATM",
+            "TCPI"
         ],
         "RUMUS 6": [
-            "STRK",
-            "DKHH",
             "BIKE",
-            "ASPI",
-            "ZONE"
+            "DKHH",
+            "SBMA",
+            "PWON",
+            "HATM"
         ],
         "RUMUS 7": [
-            "BIKE",
-            "ASPI",
             "DKHH",
-            "TFCO",
-            "PKPK"
+            "SBMA",
+            "SMIL",
+            "BIKE",
+            "BOLA"
         ],
         "RUMUS 8": [
-            "STRK",
-            "DKHH",
-            "ASPI",
             "BIKE",
-            "MINE"
+            "BOLA",
+            "DKHH",
+            "SBMA",
+            "PWON"
         ],
         "RUMUS 9": [
-            "ASPI",
+            "DKHH",
+            "SBMA",
+            "PWON",
             "BIKE",
-            "",
-            "",
-            ""
+            "TCPI"
         ]
     }
 }
