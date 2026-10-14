@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-10-13 15:55:02",
+    "stempel_data": "2026-10-14 15:10:02",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "DKHH",
-            "HATM",
-            "BIKE",
-            "BOLA",
-            "SBMA"
+            "TFCO",
+            "STRK",
+            "PWON",
+            "MANG",
+            "BIKE"
         ],
         "RUMUS 2": [
-            "BIKE",
-            "NINE",
-            "AKKU",
-            "SMGR",
-            "SMIL"
+            "AMFG",
+            "PORT",
+            "DEWI",
+            "LPGI",
+            "HERO"
         ],
         "RUMUS 3": [
             "TFCO",
-            "AMOR",
-            "SHID",
-            "NICK",
-            "KDSI"
+            "STRK",
+            "PWON",
+            "BIKE",
+            "TRON"
         ],
         "RUMUS 4": [
-            "DKHH",
-            "HATM",
+            "STRK",
+            "PWON",
             "BIKE",
-            "BOLA",
-            "TFCO"
+            "MANG",
+            "ALDO"
         ],
         "RUMUS 5": [
-            "DKHH",
-            "HATM",
+            "STRK",
+            "PWON",
             "BIKE",
-            "TCPI",
-            "PWON"
+            "TRON",
+            "MMIX"
         ],
         "RUMUS 6": [
-            "DKHH",
-            "SBMA",
-            "HATM",
+            "STRK",
+            "PWON",
             "BIKE",
-            "PICO"
+            "ALDO",
+            "PRDA"
         ],
         "RUMUS 7": [
-            "DKHH",
-            "SBMA",
+            "TFCO",
+            "STRK",
             "BIKE",
-            "PICO",
-            "BOLA"
+            "ALDO",
+            "PRDA"
         ],
         "RUMUS 8": [
-            "DKHH",
-            "SBMA",
+            "TFCO",
+            "STRK",
+            "PWON",
             "BIKE",
-            "BOLA",
-            "ARII"
+            "ALDO"
         ],
         "RUMUS 9": [
-            "DKHH",
-            "HATM",
+            "STRK",
+            "PWON",
             "BIKE",
-            "BOLA",
-            "TFCO"
+            "MANG",
+            "ALDO"
         ]
     }
 }
