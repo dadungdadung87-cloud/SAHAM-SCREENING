@@ -89,36 +89,39 @@ def hitung_rumus(df):
     vwap_kuat = (df.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)')
     akumulasi_pro = (df.get('Kekuatan A/D', '') == 'Akumulasi Pro (Smart Money)')
     change_num = pd.to_numeric(df.get('Change (%)', 0), errors='coerce')
-    supply_banjir = df['Kondisi Supply'].astype(str).str.contains('Banjir', na=False) if 'Kondisi Supply' in df.columns else False
     score_num = pd.to_numeric(df.get('Total Score', 0), errors='coerce')
-    out[1] = df[akumulasi_pro & (df.get('Status Bandar', '') == 'Akumulasi Kuat') & vwap_kuat & ~supply_banjir].copy()
+    supply_banjir = df['Kondisi Supply'].astype(str).str.contains('Banjir', na=False) if 'Kondisi Supply' in df.columns else False
+    # Pagar zona mati (bukti 122 trade: change 10-20% winrate 0%): RUMUS 1-5 hanya < 7%
+    pagar_7 = (change_num < 7.0)
+    pola_sisir_aktif = df.get('Pola Sisir', '').astype(str).str.contains('Pola Sisir', na=False) if 'Pola Sisir' in df.columns else pd.Series(False, index=df.index)
+    vol_tembus = (df.get('Vol Breakout', '') == 'Tembus MA20')
+    haka = (df.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)')
+    mark_up = (df.get('Fase Siklus Bandar', '') == 'Mark-Up (Fase Pesta)')
+    macd_bull = (df.get('MACD', '') == 'Strong Bullish')
+    out[1] = df[akumulasi_pro & (df.get('Status Bandar', '') == 'Akumulasi Kuat') & vwap_kuat & ~supply_banjir & pagar_7].copy()
     out[2] = df[((df.get('Pola Candle', '') == 'Hammer (Potensi Reversal)') |
-                 (df.get('Sinyal Cuci Barang', '') == 'Jarum Bawah (Sinyal Pantulan Kuat)')) & vwap_kuat & akumulasi_pro].copy()
-    out[3] = df[vwap_kuat & (df.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)') &
-                (df.get('Status Open', '') == 'Open = Low (Bullish Kuat)') & (df.get('Rekomendasi', '') == 'BELI')].copy()
+                 (df.get('Sinyal Cuci Barang', '') == 'Jarum Bawah (Sinyal Pantulan Kuat)')) & vwap_kuat & akumulasi_pro & pagar_7].copy()
+    out[3] = df[vwap_kuat & haka &
+                (df.get('Status Open', '') == 'Open = Low (Bullish Kuat)') & (df.get('Rekomendasi', '') == 'BELI') & pagar_7].copy()
     out[4] = df[((df.get('MA Cross', '') == 'Golden Cross') |
                  (df.get('MACD', '').isin(['Strong Bullish', 'Bullish MACD']))) &
-                (df.get('Vol Breakout', '') == 'Tembus MA20') & (df.get('MA Signal', '') == 'Uptrend') & vwap_kuat &
-                ((df.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)') | akumulasi_pro)].copy()
-    out[5] = df[(df.get('Kelas Transaksi', '') == 'Ritel Aktif (5M - 50M)') & (df.get('Vol Breakout', '') == 'Tembus MA20') &
-                vwap_kuat & (df.get('MA Signal', '') == 'Uptrend') &
-                ((df.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)') | akumulasi_pro)].copy()
-    # RUMUS 6 — Uptrend Akumulasi (catch rate 49%)
-    out[6] = df[(df.get('MA Signal', '') == 'Uptrend') &
-                (score_num >= 5) &
-                (df.get('Likuiditas', '') == '> 1 Miliar')].copy()
-    # RUMUS 7 — Mark-Up Pesta (catch rate 46%)
-    out[7] = df[(df.get('Fase Siklus Bandar', '') == 'Mark-Up (Fase Pesta)') &
-                (df.get('Trend MA (5,20,50)', '') == 'Perfect Uptrend (5>20>50)') &
-                (df.get('MA Signal', '') == 'Uptrend')].copy()
-    # RUMUS 8 — MACD Breakout Volume (catch rate 42%)
-    out[8] = df[(df.get('MACD', '') == 'Strong Bullish') &
-                (df.get('Vol Breakout', '') == 'Tembus MA20') &
-                (df.get('MA Signal', '') == 'Uptrend')].copy()
-    # RUMUS 9 — AD Akumulasi Skor Tinggi (catch rate 41%)
-    out[9] = df[(df.get('Kekuatan A/D', '') == 'Akumulasi Pro (Smart Money)') &
-                (df.get('MA Signal', '') == 'Uptrend') &
-                (score_num >= 5)].copy()
+                vol_tembus & (df.get('MA Signal', '') == 'Uptrend') & vwap_kuat &
+                (haka | akumulasi_pro) & pagar_7].copy()
+    # RUMUS 5 — Pola Sisir Naik (spike berulang, struktur masih utuh) + pagar 7%
+    out[5] = df[pola_sisir_aktif & (df.get('MA Signal', '') == 'Uptrend') & vwap_ok & pagar_7].copy()
+    # RUMUS 6 — Uptrend Akumulasi (bebas, diperkuat: vol + supply + konfirmasi)
+    out[6] = df[(df.get('MA Signal', '') == 'Uptrend') & (score_num >= 5) &
+                (df.get('Likuiditas', '') == '> 1 Miliar') & vol_tembus & ~supply_banjir &
+                (haka | akumulasi_pro)].copy()
+    # RUMUS 7 — Mark-Up Pesta diperkuat (bebas, wajib vol + supply sehat)
+    out[7] = df[mark_up & (df.get('Trend MA (5,20,50)', '') == 'Perfect Uptrend (5>20>50)') &
+                vol_tembus & ~supply_banjir & (haka | akumulasi_pro | macd_bull)].copy()
+    # RUMUS 8 — MACD Breakout Volume diperkuat (bebas, wajib supply sehat + konfirmasi)
+    out[8] = df[macd_bull & vol_tembus & (df.get('MA Signal', '') == 'Uptrend') & ~supply_banjir &
+                (haka | akumulasi_pro)].copy()
+    # RUMUS 9 — AD Akumulasi Skor Tinggi diperkuat (bebas, wajib vol + konfirmasi momentum)
+    out[9] = df[akumulasi_pro & (df.get('MA Signal', '') == 'Uptrend') & (score_num >= 5) &
+                vol_tembus & (mark_up | macd_bull)].copy()
     return out
 
 def jalankan_sidang(daftar_rumus, df_data, api_key, log=print, mode_tulis=True):
