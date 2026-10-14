@@ -1,3 +1,1 @@
-Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL,Mode_Beli,Change_Beli
-2026-10-13 22:39,DKHH,97.0,1973,19166807.15,101,93,MANUAL,19.753086419753085
-2026-10-13 22:39,PWON,278.0,688,19155089.6,294,272,MANUAL,3.731343283582089
+Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL
