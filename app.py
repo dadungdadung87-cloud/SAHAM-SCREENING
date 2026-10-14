@@ -2596,36 +2596,42 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
             k5.metric("💀 Trade Terburuk", f"{worst['Return_%']:+.2f}%", delta=f"{worst['Ticker']} (R{int(str(worst['Rumus'])[1:])})" if worst is not None else "-")
 
             sub_arena, sub_semua, sub_peringkat, sub_status = st.tabs(
-                ["🏟️ Per Arena", "📋 Semua Transaksi", "🏅 Leaderboard Rumus", "🧾 Breakdown Status"])
+                ["🏟️ Semua Arena (Lapis 2)", "📋 Semua Transaksi", "🏅 Leaderboard Rumus", "🧾 Breakdown Status"])
 
             with sub_arena:
-                pilih = st.selectbox("Pilih Arena:", [f"R{i}" for i in range(1, 10)])
-                id_pilih = int(pilih[1:])
-                df_a = df_riwayat[df_riwayat["Rumus"] == pilih].copy()
-                if df_a.empty:
-                    st.info(f"Belum ada transaksi untuk {pilih}.")
-                else:
-                    rp_a = df_a["Total_Return_Rp"].sum()
-                    w_a = int((df_a["Return_%"] > 0).sum())
-                    l_a = int((df_a["Return_%"] < 0).sum())
-                    a1, a2, a3 = st.columns(3)
-                    a1.metric(f"Saldo {pilih}", f"Rp {1e8 + rp_a:,.0f}".replace(",", "."))
-                    a2.metric("P/L Terealisasi", f"Rp {rp_a:,.0f}".replace(",", "."), delta_color="normal" if rp_a >= 0 else "inverse")
-                    a3.metric("W/L", f"{w_a}W / {l_a}L")
-                hist_a = muat_histori_arena(id_pilih)
-                if not hist_a.empty and "Tanggal_Jual" in hist_a.columns:
-                    hist_a = hist_a.sort_values("Tanggal_Jual", ascending=False)
-                sty = hist_a.style
-                kol_w = [c for c in ["Total_Return_Rp", "Return_%"] if c in hist_a.columns]
-                def _warnai(v):
+                # 9 rumus ditampilkan berjejer vertikal — tanpa dropdown
+                def _warnai2(v):
                     if isinstance(v, (int, float)) and not pd.isna(v):
                         return "color:#22c55e;font-weight:600" if v > 0 else ("color:#ef4444;font-weight:600" if v < 0 else "")
                     return ""
-                if kol_w:
-                    sty = sty.map(_warnai, subset=kol_w) if hasattr(sty, "map") else sty.applymap(_warnai, subset=kol_w)
-                fmt = {c: "Rp {:,.0f}" for c in ["Harga_Beli", "Harga_Jual", "Total_Return_Rp"] if c in hist_a.columns}
-                if "Return_%" in hist_a.columns: fmt["Return_%"] = "{:+.2f}%"
-                st.dataframe(sty.format(fmt) if fmt else sty, use_container_width=True, hide_index=True)
+                for i in range(1, 10):
+                    df_a = df_riwayat[df_riwayat["Rumus"] == f"R{i}"].copy()
+                    rp_a = df_a["Total_Return_Rp"].sum()
+                    w_a = int((df_a["Return_%"] > 0).sum())
+                    l_a = int((df_a["Return_%"] < 0).sum())
+                    n_a = len(df_a)
+                    warna_pl = "#22c55e" if rp_a > 0 else ("#ef4444" if rp_a < 0 else "#94a3b8")
+                    ikon = "🟢" if rp_a > 0 else ("🔴" if rp_a < 0 else "⚪")
+                    st.markdown(
+                        f"""<div style="display:flex;justify-content:space-between;align-items:center;background:#1e293b;
+                        border:1px solid #334155;border-left:5px solid {warna_pl};border-radius:8px;padding:9px 14px;margin:10px 0 4px;">
+                        <span style="font-weight:800;color:#f8fafc;font-size:1rem">🏛️ ARENA {i} — Lapis 2: Histori Transaksi</span>
+                        <span style="color:{warna_pl};font-weight:700">{ikon} Rp {rp_a:,.0f} &nbsp;|&nbsp; {n_a} trade &nbsp;|&nbsp; {w_a}W/{l_a}L</span>
+                        </div>""",
+                        unsafe_allow_html=True)
+                    if df_a.empty:
+                        st.info(f"Belum ada transaksi untuk Arena {i}.")
+                        continue
+                    hist_a = muat_histori_arena(i)
+                    if not hist_a.empty and "Tanggal_Jual" in hist_a.columns:
+                        hist_a = hist_a.sort_values("Tanggal_Jual", ascending=False)
+                    sty = hist_a.style
+                    kol_w = [c for c in ["Total_Return_Rp", "Return_%"] if c in hist_a.columns]
+                    if kol_w:
+                        sty = sty.map(_warnai2, subset=kol_w) if hasattr(sty, "map") else sty.applymap(_warnai2, subset=kol_w)
+                    fmt = {c: "Rp {:,.0f}" for c in ["Harga_Beli", "Harga_Jual", "Total_Return_Rp"] if c in hist_a.columns}
+                    if "Return_%" in hist_a.columns: fmt["Return_%"] = "{:+.2f}%"
+                    st.dataframe(sty.format(fmt) if fmt else sty, use_container_width=True, hide_index=True)
 
             with sub_semua:
                 c1, c2, c3, c4 = st.columns(4)
