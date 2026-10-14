@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-10-14 15:10:02",
+    "stempel_data": "2026-10-14 15:55:02",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "TFCO",
             "STRK",
+            "DKHH",
             "PWON",
-            "MANG",
-            "BIKE"
+            "SICO",
+            "BAIK"
         ],
         "RUMUS 2": [
-            "AMFG",
-            "PORT",
             "DEWI",
+            "GPSO",
+            "PORT",
             "LPGI",
-            "HERO"
+            "KDSI"
         ],
         "RUMUS 3": [
-            "TFCO",
             "STRK",
+            "PWON",
+            "SICO",
+            "BIKE",
+            "TFCO"
+        ],
+        "RUMUS 4": [
+            "STRK",
+            "DKHH",
+            "PWON",
+            "SICO",
+            "BAIK"
+        ],
+        "RUMUS 5": [
+            "STRK",
+            "DKHH",
             "PWON",
             "BIKE",
             "TRON"
         ],
-        "RUMUS 4": [
-            "STRK",
-            "PWON",
-            "BIKE",
-            "MANG",
-            "ALDO"
-        ],
-        "RUMUS 5": [
-            "STRK",
-            "PWON",
-            "BIKE",
-            "TRON",
-            "MMIX"
-        ],
         "RUMUS 6": [
             "STRK",
+            "DKHH",
             "PWON",
-            "BIKE",
-            "ALDO",
-            "PRDA"
+            "SICO",
+            "BAIK"
         ],
         "RUMUS 7": [
-            "TFCO",
             "STRK",
-            "BIKE",
-            "ALDO",
-            "PRDA"
-        ],
-        "RUMUS 8": [
-            "TFCO",
-            "STRK",
-            "PWON",
+            "DKHH",
+            "SICO",
             "BIKE",
             "ALDO"
+        ],
+        "RUMUS 8": [
+            "STRK",
+            "DKHH",
+            "PWON",
+            "SICO",
+            "BIKE"
         ],
         "RUMUS 9": [
             "STRK",
+            "DKHH",
             "PWON",
-            "BIKE",
-            "MANG",
-            "ALDO"
+            "SICO",
+            "BAIK"
         ]
     }
 }
