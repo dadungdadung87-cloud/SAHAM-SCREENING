@@ -1488,11 +1488,12 @@ def render_strategy_table(df_subset, file_name):
 # >>> PART 10 : TAB 1 - MARKET OVERVIEW <<<
 # =====================================================================
 if not df_hasil.empty:
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "📊 Market Overview", 
         "📌 Screener Utama", 
         "🤖 Asisten AI Spesial", 
         "💼 Portofolio Bot",
+        "📚 Riwayat Transaksi",
         "🕵️ Detektif Ledakan & Chat"
     ])
     
@@ -2534,9 +2535,149 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
                 st.info(f"📭 Belum ada riwayat penjualan saham untuk {pilihan_arena}.")
 
 # =====================================================================
-# >>> PART 14 : TAB 5 - DETEKTIF LEDAKAN (HANYA BACA) + CHAT AI <<<
+# >>> PART 14 : TAB 5 - RIWAYAT TRANSAKSI (9 RUMUS) + TAB 6 - DETEKTIF LEDAKAN <<<
 # =====================================================================
     with tab5:
+        st.markdown("## 📚 Riwayat Transaksi — Rekap 9 Rumus")
+        st.caption("Seluruh histori jual (TP / CL / square-off / suspend) dari 9 arena digabung, dirangkum per rumus, per saham, dan per status. Data hanya dibaca dari Database/histori_transaksi_rumus_N.csv.")
+
+        @st.cache_data(ttl=300, show_spinner=False)
+        def _muat_semua_histori():
+            bingkai = []
+            for i in range(1, 10):
+                fp = f"Database/histori_transaksi_rumus_{i}.csv"
+                if os.path.exists(fp):
+                    try:
+                        h = pd.read_csv(fp)
+                        if not h.empty:
+                            h["Rumus"] = f"R{i}"
+                            bingkai.append(h)
+                    except Exception:
+                        pass
+            return pd.concat(bingkai, ignore_index=True) if bingkai else pd.DataFrame()
+
+        df_riwayat = _muat_semua_histori()
+
+        if df_riwayat.empty:
+            st.info("📭 Belum ada histori transaksi di 9 arena. Riwayat muncul setelah ada posisi yang terjual (TP/CL/jual sore).")
+        else:
+            for kolom in ["Total_Return_Rp", "Return_%"]:
+                df_riwayat[kolom] = pd.to_numeric(df_riwayat[kolom], errors="coerce")
+            df_riwayat["Status Inti"] = df_riwayat["Status"].astype(str).str.extract(r'([A-Z_]+)')[0].fillna("LAIN")
+            df_riwayat["Hasil"] = df_riwayat["Return_%"].apply(
+                lambda x: "🟢 WIN" if x > 0 else ("🔴 LOSS" if x < 0 else "⚪ BE"))
+
+            total_rp = df_riwayat["Total_Return_Rp"].sum()
+            n_win = int((df_riwayat["Return_%"] > 0).sum())
+            n_loss = int((df_riwayat["Return_%"] < 0).sum())
+            n_be = int(len(df_riwayat) - n_win - n_loss)
+            winrate = (n_win / len(df_riwayat) * 100) if len(df_riwayat) else 0.0
+            gp = df_riwayat.loc[df_riwayat["Total_Return_Rp"] > 0, "Total_Return_Rp"].sum()
+            gl = abs(df_riwayat.loc[df_riwayat["Total_Return_Rp"] < 0, "Total_Return_Rp"].sum())
+            pf = (gp / gl) if gl > 0 else float("inf")
+            best = df_riwayat.loc[df_riwayat["Return_%"].idxmax()] if df_riwayat["Return_%"].notna().any() else None
+            worst = df_riwayat.loc[df_riwayat["Return_%"].idxmin()] if df_riwayat["Return_%"].notna().any() else None
+
+            k1, k2, k3, k4, k5 = st.columns(5)
+            k1.metric("💰 Total P/L Semua Arena",
+                      f"Rp {total_rp:,.0f}".replace(",", "."),
+                      delta=f"{'+' if total_rp >= 0 else ''}{total_rp / 9e8 * 100:.2f}% dari modal 900jt",
+                      delta_color="normal" if total_rp >= 0 else "inverse")
+            k2.metric("🎯 Winrate", f"{winrate:.1f}%", delta=f"{n_win}W / {n_loss}L / {n_be}BE", delta_color="off")
+            k3.metric("⚖️ Profit Factor", "∞" if pf == float("inf") else f"{pf:.2f}")
+            k4.metric("🏆 Trade Terbaik", f"{best['Return_%']:+.2f}%", delta=f"{best['Ticker']} (R{int(str(best['Rumus'])[1:])})" if best is not None else "-")
+            k5.metric("💀 Trade Terburuk", f"{worst['Return_%']:+.2f}%", delta=f"{worst['Ticker']} (R{int(str(worst['Rumus'])[1:])})" if worst is not None else "-")
+
+            sub_arena, sub_semua, sub_peringkat, sub_status = st.tabs(
+                ["🏟️ Per Arena", "📋 Semua Transaksi", "🏅 Leaderboard Rumus", "🧾 Breakdown Status"])
+
+            with sub_arena:
+                pilih = st.selectbox("Pilih Arena:", [f"R{i}" for i in range(1, 10)])
+                id_pilih = int(pilih[1:])
+                df_a = df_riwayat[df_riwayat["Rumus"] == pilih].copy()
+                if df_a.empty:
+                    st.info(f"Belum ada transaksi untuk {pilih}.")
+                else:
+                    rp_a = df_a["Total_Return_Rp"].sum()
+                    w_a = int((df_a["Return_%"] > 0).sum())
+                    l_a = int((df_a["Return_%"] < 0).sum())
+                    a1, a2, a3 = st.columns(3)
+                    a1.metric(f"Saldo {pilih}", f"Rp {1e8 + rp_a:,.0f}".replace(",", "."))
+                    a2.metric("P/L Terealisasi", f"Rp {rp_a:,.0f}".replace(",", "."), delta_color="normal" if rp_a >= 0 else "inverse")
+                    a3.metric("W/L", f"{w_a}W / {l_a}L")
+                hist_a = muat_histori_arena(id_pilih)
+                if not hist_a.empty and "Tanggal_Jual" in hist_a.columns:
+                    hist_a = hist_a.sort_values("Tanggal_Jual", ascending=False)
+                sty = hist_a.style
+                kol_w = [c for c in ["Total_Return_Rp", "Return_%"] if c in hist_a.columns]
+                def _warnai(v):
+                    if isinstance(v, (int, float)) and not pd.isna(v):
+                        return "color:#22c55e;font-weight:600" if v > 0 else ("color:#ef4444;font-weight:600" if v < 0 else "")
+                    return ""
+                if kol_w:
+                    sty = sty.map(_warnai, subset=kol_w) if hasattr(sty, "map") else sty.applymap(_warnai, subset=kol_w)
+                fmt = {c: "Rp {:,.0f}" for c in ["Harga_Beli", "Harga_Jual", "Total_Return_Rp"] if c in hist_a.columns}
+                if "Return_%" in hist_a.columns: fmt["Return_%"] = "{:+.2f}%"
+                st.dataframe(sty.format(fmt) if fmt else sty, use_container_width=True, hide_index=True)
+
+            with sub_semua:
+                c1, c2, c3, c4 = st.columns(4)
+                with c1:
+                    f_status = st.multiselect("Status:", sorted(df_riwayat["Status Inti"].unique()), key="rw_status")
+                with c2:
+                    f_rumus = st.multiselect("Rumus:", [f"R{i}" for i in range(1, 10)], key="rw_rumus")
+                with c3:
+                    f_hasil = st.multiselect("Hasil:", ["🟢 WIN", "🔴 LOSS", "⚪ BE"], key="rw_hasil")
+                with c4:
+                    f_ticker = st.text_input("Cari Ticker:", key="rw_ticker").upper().strip()
+                df_s = df_riwayat.copy()
+                if f_status: df_s = df_s[df_s["Status Inti"].isin(f_status)]
+                if f_rumus: df_s = df_s[df_s["Rumus"].isin(f_rumus)]
+                if f_hasil: df_s = df_s[df_s["Hasil"].isin(f_hasil)]
+                if f_ticker: df_s = df_s[df_s["Ticker"].astype(str).str.contains(f_ticker, na=False)]
+                st.caption(f"Menampilkan {len(df_s)} dari {len(df_riwayat)} transaksi.")
+                df_tampil = df_s.sort_values("Tanggal_Jual", ascending=False).drop(columns=["Status Inti"], errors="ignore")
+                fmt2 = {c: "Rp {:,.0f}" for c in ["Harga_Beli", "Harga_Jual", "Total_Return_Rp"] if c in df_tampil.columns}
+                if "Return_%" in df_tampil.columns: fmt2["Return_%"] = "{:+.2f}%"
+                st.dataframe(df_tampil.style.format(fmt2) if fmt2 else df_tampil, use_container_width=True, hide_index=True)
+                if not df_s.empty:
+                    st.download_button("📥 Download CSV", df_s.to_csv(index=False).encode(),
+                                       file_name=f"riwayat_transaksi_{datetime.now().strftime('%Y%m%d_%H%M')}.csv", mime="text/csv")
+
+            with sub_peringkat:
+                g_r = df_riwayat.groupby("Rumus").agg(
+                    Trade=("Ticker", "count"),
+                    Win=("Return_%", lambda x: int((x > 0).sum())),
+                    Loss=("Return_%", lambda x: int((x < 0).sum())),
+                    Total_PL=("Total_Return_Rp", "sum"),
+                    Rata_Return=("Return_%", "mean"),
+                    Equity=("Total_Return_Rp", lambda x: 1e8 + x.sum()),
+                ).reset_index()
+                g_r["Winrate_%"] = (g_r["Win"] / g_r["Trade"] * 100).round(1)
+                g_r = g_r.sort_values("Total_PL", ascending=False)
+                g_r["Total_PL"] = g_r["Total_PL"].map(lambda v: f"Rp {v:,.0f}".replace(",", "."))
+                g_r["Equity"] = g_r["Equity"].map(lambda v: f"Rp {v:,.0f}".replace(",", "."))
+                g_r["Rata_Return"] = g_r["Rata_Return"].map(lambda v: f"{v:+.2f}%")
+                st.dataframe(g_r, use_container_width=True, hide_index=True)
+                st.caption("Diurutkan dari P/L terbesar. Equity = modal awal Rp100jt + P/L terealisasi arena tsb.")
+
+                chart_pl = df_riwayat.groupby("Rumus")["Total_Return_Rp"].sum()
+                st.bar_chart(chart_pl)
+
+            with sub_status:
+                g_s = df_riwayat.groupby("Status Inti").agg(
+                    Jumlah=("Ticker", "count"),
+                    Total_PL=("Total_Return_Rp", "sum"),
+                    Rata_Return=("Return_%", "mean"),
+                ).reset_index().sort_values("Jumlah", ascending=False)
+                g_s["Total_PL"] = g_s["Total_PL"].map(lambda v: f"Rp {v:,.0f}".replace(",", "."))
+                g_s["Rata_Return"] = g_s["Rata_Return"].map(lambda v: f"{v:+.2f}%")
+                st.dataframe(g_s, use_container_width=True, hide_index=True)
+                st.caption("Statistik per jenis exit: TP, CL, square-off, suspend, dll.")
+
+        st.markdown("---")
+
+    with tab6:
         st.markdown("## 🕵️ Detektif Ledakan & Ruang Obrolan AI")
         st.caption("Angka dihitung LOKAL dari arsip intraday R2 (snapshot 5-menitan) + Buku Besar Harian (50 hari, gzip ±1MB). AI gratis hanya menyusun narasi — tidak berhitung.")
         st.caption("🔒 **Pagar keamanan:** Tab ini hanya MEMBACA & MENGANALISIS — tidak pernah membeli, menjual, atau mengubah portofolio/sinyal Anda.")
