@@ -28,7 +28,7 @@ BROKER_REF = [
 ]
 
 # --- Telegram (opsional, tombol komunitas) ---
-TELEGRAM_URL = ""            # contoh: "https://t.me/namachannel" — kosong = tombol disembunyikan
+TELEGRAM_URL = "https://t.me/ekongh0305"   # link Telegram pemilik
 
 # --- Kata kunci SEO ---
 SEO_KEYWORDS = "screener saham, IHSG, analisa saham hari ini, akumulasi bandar, radar BSJP, saham paling aktif, deteksi bandar, stock screening Indonesia"

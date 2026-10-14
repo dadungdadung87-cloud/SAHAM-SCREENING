@@ -187,7 +187,13 @@ def utama():
         B.append("")
 
     B.append("━━━━━━━━━━━━━━━━━━")
-    B.append("🔗 https://minhaz0305.streamlit.app/")
+    try:
+        from konfig_situs import TELEGRAM_URL, SITE_URL
+        if TELEGRAM_URL:
+            B.append(f"📢 Telegram: {TELEGRAM_URL}")
+        B.append(f"🌐 Web: {SITE_URL}")
+    except Exception:
+        pass
     kirim("\n".join(B), cfg)
     print("✅ Telegram terkirim.")
 

@@ -2,6 +2,7 @@
 # ==========================================
 # ⚠️ MODE BELI MANUAL: pembelian hanya lewat tombol web Tab 4.
 # Cron otomatis hanya memeriksa TP/SL; posisi lain dijual lewat tombol JUAL sore.
+# Data TIDAK ditarik dari Yahoo di sini — producer = DATA-CENTER (feed lokal).
 # ==========================================
 exec 200>/tmp/bot_simulator.lock
 flock -n 200 || { echo "⏳ Siklus dilewati: bot sebelumnya masih berjalan."; exit 0; }
@@ -12,26 +13,28 @@ git rebase --abort >/dev/null 2>&1
 git merge --abort >/dev/null 2>&1
 git pull --rebase origin main || git rebase --abort
 
-echo "⏳ Memulai pembaruan data saham..."
-./.venv/bin/python update_data.py
+# ==========================================
+# 📡 CONSUMER: tarik data dari DATA-CENTER feed (BUKAN dari Yahoo)
+# Producer tunggal di /home/kaltaraid/Documents/DATA-CENTER
+# ==========================================
+FEED="/home/kaltaraid/Documents/DATA-CENTER/feed"
+echo "📡 Menarik data dari DATA-CENTER feed..."
+if [ -f "$FEED/hasil_screener.csv" ]; then
+    mkdir -p Database Arsip_Data_Harian
+    # Salin atomik: .tmp dulu lalu replace
+    cp "$FEED/hasil_screener.csv" Database/hasil_screener.csv.tmp && mv Database/hasil_screener.csv.tmp Database/hasil_screener.csv
+    [ -f "$FEED/fundamental_exodus.csv" ] && cp "$FEED/fundamental_exodus.csv" Database/fundamental_exodus.csv
+    # Salin arsip intraday hari ini jika ada dan lebih baru
+    HARI=$(date +%F)
+    [ -f "$FEED/arsip/screener_${HARI}.csv" ] && cp "$FEED/arsip/screener_${HARI}.csv" "Arsip_Data_Harian/screener_${HARI}.csv"
+    echo "✅ Feed masuk ke Database/ ($(stat -c %s Database/hasil_screener.csv) bytes)"
+else
+    echo "⚠️ Feed DATA-CENTER belum tersedia — pakai data lokal terakhir (gembok data basi tetap aktif)."
+fi
 
 JAM_SEKARANG=$(date +%H%M)
 FLAG_PAGI="/tmp/bsjp_pagi_$(date +%F)"
 FLAG_SORE="/tmp/bsjp_sore_$(date +%F)"
-FLAG_FUND="/tmp/exodus_fund_$(date +%F)"
-
-if [ "$JAM_SEKARANG" -ge "1615" ] && [ "$JAM_SEKARANG" -le "1645" ]; then
-    if [ ! -f "$FLAG_FUND" ]; then
-        echo "🧪 [16:15-16:45] Tarik fundamental exodus (Stockbit)..."
-        if ./.venv/bin/python fetcher_exodus.py fundamental; then
-            touch "$FLAG_FUND"
-        else
-            echo "⚠️ Fundamental exodus gagal (token mati?) — dicoba lagi siklus berikutnya."
-        fi
-    else
-        echo "⏭️ Fundamental exodus sudah jalan hari ini, dilewati."
-    fi
-fi
 
 if [ "$JAM_SEKARANG" -ge "1520" ] && [ "$JAM_SEKARANG" -le "1535" ]; then
     if [ ! -f "$FLAG_PAGI" ]; then
