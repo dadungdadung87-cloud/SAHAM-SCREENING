@@ -229,14 +229,10 @@ def jalankan_bot():
     r2_ok = sinkron_r2_masuk()
 
     # ----------------------------------------------------
-    # 🔄 SEGARKAN DATA MARKET DARI R2 (agar sama dengan data sidang web)
+    # 🔄 JANGAN timpa data milik FEED (hasil_screener, fundamental) dengan R2!
+    # Feed = sumber kebenaran data market (dari DATA-CENTER producer).
+    # R2 hanya sumber untuk state portfolio/histori/sinyal.
     # ----------------------------------------------------
-    try:
-        import r2_client
-        r2_client.download_arsip("Database/hasil_screener.csv", FILE_MARKET)
-        print("🔄 Data market disegarkan dari R2.")
-    except Exception as e:
-        print(f"⚠️ Gagal segarkan data market dari R2: {e} — pakai file lokal.")
 
     # ----------------------------------------------------
     # 🔒 GEMBOK PAGI: SISTEM PENGAMAN ANTI-HILANG DATA

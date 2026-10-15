@@ -117,10 +117,13 @@ def upload_database(mirror=False):
         print(f"⚠️ upload_database gagal: {e}")
         return False
 
-def download_database():
-    """Download seluruh CSV dari folder Database/ R2 ke lokal (restore)"""
+def download_database(skip_feed=True):
+    """Download CSV dari R2 ke lokal (restore state portfolio/sinyal).
+    skip_feed=True: hasil_screener.csv & fundamental_exodus.csv TIDAK ditimpa
+    (keduanya milik DATA-CENTER feed — sumber kebenaran data market)."""
     client, bucket = get_r2_client()
     if not client: return False
+    feed_files = {"hasil_screener.csv", "fundamental_exodus.csv"} if skip_feed else set()
     try:
         os.makedirs("Database", exist_ok=True)
         resp = client.list_objects_v2(Bucket=bucket, Prefix="Database/")
@@ -130,6 +133,7 @@ def download_database():
             if key.endswith(".csv"):
                 nama = key.split("/")[-1]
                 if "cache_autopilot" in nama: continue
+                if nama in feed_files: continue
                 client.download_file(bucket, key, os.path.join("Database", nama))
                 n += 1
         return n > 0

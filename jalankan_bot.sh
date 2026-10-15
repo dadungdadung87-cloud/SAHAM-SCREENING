@@ -28,6 +28,18 @@ if [ -f "$FEED/hasil_screener.csv" ]; then
     HARI=$(date +%F)
     [ -f "$FEED/arsip/screener_${HARI}.csv" ] && cp "$FEED/arsip/screener_${HARI}.csv" "Arsip_Data_Harian/screener_${HARI}.csv"
     echo "✅ Feed masuk ke Database/ ($(stat -c %s Database/hasil_screener.csv) bytes)"
+    # R2 mengejar feed: upload data market terbaru agar web Streamlit selalu segar
+    ./.venv/bin/python -c "
+import r2_client
+try:
+    if r2_client.upload_arsip('Database/hasil_screener.csv', 'Database/hasil_screener.csv'):
+        print('☁️ hasil_screener ter-upload ke R2 (feed baru).')
+    if __import__('os').path.exists('Database/fundamental_exodus.csv'):
+        r2_client.upload_arsip('Database/fundamental_exodus.csv', 'Database/fundamental_exodus.csv')
+        print('☁️ fundamental_exodus ter-upload ke R2.')
+except Exception as e:
+    print(f'⚠️ Upload R2 feed gagal (biarkan siklus berikutnya): {e}')
+"
 else
     echo "⚠️ Feed DATA-CENTER belum tersedia — pakai data lokal terakhir (gembok data basi tetap aktif)."
 fi
