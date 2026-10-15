@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-10-14 15:55:02",
+    "stempel_data": "2026-10-15 15:15:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "STRK",
-            "DKHH",
             "PWON",
-            "SICO",
-            "BAIK"
+            "ACES",
+            "",
+            "",
+            ""
         ],
         "RUMUS 2": [
-            "DEWI",
-            "GPSO",
-            "PORT",
-            "LPGI",
-            "KDSI"
+            "PGJO",
+            "HATM",
+            "BUKA",
+            "DILD",
+            "SHIP"
         ],
         "RUMUS 3": [
-            "STRK",
-            "PWON",
-            "SICO",
-            "BIKE",
-            "TFCO"
+            "",
+            "",
+            "",
+            "",
+            ""
         ],
         "RUMUS 4": [
-            "STRK",
-            "DKHH",
             "PWON",
-            "SICO",
-            "BAIK"
+            "MMIX",
+            "CMRY",
+            "PGJO",
+            "PRDA"
         ],
         "RUMUS 5": [
             "STRK",
-            "DKHH",
-            "PWON",
+            "HATM",
             "BIKE",
-            "TRON"
+            "PGJO",
+            "BELI"
         ],
         "RUMUS 6": [
-            "STRK",
-            "DKHH",
-            "PWON",
-            "SICO",
-            "BAIK"
+            "PCAR",
+            "AKKU",
+            "SBMA",
+            "IDEA",
+            "PTSP"
         ],
         "RUMUS 7": [
-            "STRK",
-            "DKHH",
-            "SICO",
-            "BIKE",
-            "ALDO"
+            "PCAR",
+            "AKKU",
+            "SBMA",
+            "IDEA",
+            "DKHH"
         ],
         "RUMUS 8": [
-            "STRK",
-            "DKHH",
-            "PWON",
-            "SICO",
-            "BIKE"
+            "PCAR",
+            "AKKU",
+            "SBMA",
+            "IDEA",
+            "ALDO"
         ],
         "RUMUS 9": [
-            "STRK",
-            "DKHH",
-            "PWON",
-            "SICO",
-            "BAIK"
+            "AKKU",
+            "SBMA",
+            "IDEA",
+            "PTSP",
+            "TFCO"
         ]
     }
 }
