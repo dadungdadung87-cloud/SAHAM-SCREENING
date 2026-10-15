@@ -1,23 +1,23 @@
 {
-    "stempel_data": "2026-10-15 15:15:01",
+    "stempel_data": "2026-10-15 15:50:02",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
             "PWON",
-            "ACES",
+            "INPP",
             "",
             "",
             ""
         ],
         "RUMUS 2": [
-            "PGJO",
+            "MMIX",
+            "BIKE",
             "HATM",
-            "BUKA",
-            "DILD",
-            "SHIP"
+            "CMNT",
+            "PGJO"
         ],
         "RUMUS 3": [
-            "",
+            "CSAP",
             "",
             "",
             "",
@@ -25,45 +25,45 @@
         ],
         "RUMUS 4": [
             "PWON",
+            "BEKS",
             "MMIX",
-            "CMRY",
             "PGJO",
-            "PRDA"
+            "CTRA"
         ],
         "RUMUS 5": [
-            "STRK",
-            "HATM",
+            "BEKS",
+            "MEDS",
             "BIKE",
-            "PGJO",
-            "BELI"
+            "JECX",
+            "PGJO"
         ],
         "RUMUS 6": [
-            "PCAR",
             "AKKU",
             "SBMA",
+            "PWON",
             "IDEA",
             "PTSP"
         ],
         "RUMUS 7": [
-            "PCAR",
-            "AKKU",
-            "SBMA",
-            "IDEA",
-            "DKHH"
-        ],
-        "RUMUS 8": [
-            "PCAR",
-            "AKKU",
-            "SBMA",
-            "IDEA",
-            "ALDO"
-        ],
-        "RUMUS 9": [
             "AKKU",
             "SBMA",
             "IDEA",
             "PTSP",
-            "TFCO"
+            "ALDO"
+        ],
+        "RUMUS 8": [
+            "AKKU",
+            "SBMA",
+            "PWON",
+            "IDEA",
+            "DKHH"
+        ],
+        "RUMUS 9": [
+            "AKKU",
+            "SBMA",
+            "PWON",
+            "IDEA",
+            "ALDO"
         ]
     }
 }
