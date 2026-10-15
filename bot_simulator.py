@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import sys
+import json
 from datetime import datetime, timedelta, timezone
 import subprocess
 
@@ -544,6 +545,52 @@ def jalankan_bot():
         df_history.to_csv(file_hist, index=False)
 
     print("✅ Inspeksi 9 Arena selesai.")
+
+    # ----------------------------------------------------
+    # 📲 NOTIFIKASI TELEGRAM — ringkasan jualan otomatis sesi ini
+    # (TP/SL otomatis, jual sore, liquidate). Tidak dikirim jika tidak ada jualan.
+    # ----------------------------------------------------
+    try:
+        semua_jual = []
+        for i in range(1, 10):
+            fp_hist = os.path.join(DIR_DB, f"histori_transaksi_rumus_{i}.csv")
+            if not os.path.exists(fp_hist):
+                continue
+            try:
+                h = pd.read_csv(fp_hist)
+                j = h[h["Tanggal_Jual"].astype(str) == now.strftime("%Y-%m-%d %H:%M")]
+                for _, r in j.iterrows():
+                    semua_jual.append((i, r))
+            except Exception:
+                continue
+        if semua_jual:
+            tot_rp = sum(float(r["Total_Return_Rp"]) for _, r in semua_jual)
+            B = [f"{'🎯' if tot_rp >= 0 else '🩸'} <b>AUTO-SELL</b> — {now.strftime('%d %b %H:%M')} WIB"]
+            for i, r in semua_jual[:25]:
+                pct = float(r["Return_%"])
+                ikon = "🟢" if pct > 0 else "🔴"
+                B.append(f"{ikon} R{i} <code>{r['Ticker']}</code> @ {float(r['Harga_Jual']):,.0f} | {r['Status'][:28]} | <b>{pct:+.2f}%</b>")
+            if len(semua_jual) > 25:
+                B.append(f"... dan {len(semua_jual) - 25} lainnya")
+            B.append(f"━━━ Total: <b>Rp {tot_rp:,.0f}</b> ({len(semua_jual)} posisi)")
+            try:
+                from konfig_situs import TELEGRAM_URL as TG_LINK
+                if TG_LINK:
+                    B.append(f"📢 {TG_LINK}")
+            except Exception:
+                pass
+            _cfg = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "telegram_config.json")))
+            import urllib.request, urllib.parse as _up
+            _url = f"https://api.telegram.org/bot{_cfg['BOT_TOKEN']}/sendMessage"
+            _data = _up.urlencode({"chat_id": _cfg["CHAT_ID"], "text": "\n".join(B),
+                                   "parse_mode": "HTML", "disable_web_page_preview": "true"}).encode()
+            with urllib.request.urlopen(urllib.request.Request(_url, data=_data), timeout=30) as resp:
+                _resp = json.load(resp)
+            print(f"📲 Notifikasi {len(semua_jual)} jualan terkirim: {'OK' if _resp.get('ok') else _resp}")
+        else:
+            print("📲 Tidak ada jualan sesi ini — notifikasi dilewati.")
+    except Exception as e:
+        print(f"⚠️ Notifikasi Telegram gagal (bot tetap jalan): {e}")
     
     # ----------------------------------------------------
     # ☁️ SINKRON KELUAR: kirim state terbaru ke R2 (mirror)
