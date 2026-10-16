@@ -1,3 +1,1 @@
-Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL,Mode_Beli,Change_Beli
-2026-10-15 07:55,STRK,107.0,1866,19996149.3,112,104,MANUAL,18.88888888888889
-2026-10-15 07:55,MEDC,1545.0,129,19960395.75,1622,1499,MANUAL,6.551724137931035
+Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL
