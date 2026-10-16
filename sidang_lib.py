@@ -85,6 +85,27 @@ def hitung_rumus(df):
     out = {i: pd.DataFrame() for i in range(1, 10)}
     if df is None or df.empty or 'Tekanan Bandar' not in df.columns:
         return out
+    # --- FILTER SAHAM SUSPEND (beku / tidak diperdagangkan / delisted) ---
+    try:
+        delisted = set()
+        _fd = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                           "..", "DATA-CENTER", "Konfigurasi", "saham_delisted.txt")
+        if os.path.exists(_fd):
+            delisted = {l.strip().upper() for l in open(_fd) if l.strip()}
+    except Exception:
+        delisted = set()
+    try:
+        from suspend_helper import muat_suspended_hari_ini
+        _susp = muat_suspended_hari_ini(os.path.dirname(os.path.abspath(__file__)))
+    except Exception:
+        _susp = set()
+    _h = pd.to_numeric(df.get('Harga (Rp)', 0), errors='coerce')
+    _s = pd.to_numeric(df.get('Support', 0), errors='coerce')
+    _r = pd.to_numeric(df.get('Resistance', 0), errors='coerce')
+    _ma = pd.to_numeric(df.get('Harga MA20', 0), errors='coerce')
+    beku = (_h > 0) & (_h == _ma) & (_s == _r) & (_h == _s)
+    mask_aktif = ~(beku | df['Ticker'].astype(str).str.upper().isin(delisted | _susp))
+    df = df[mask_aktif].copy()
     vwap_ok = (df.get('Posisi VWAP', '') != 'Di Bawah VWAP (Lemah)')
     vwap_kuat = (df.get('Posisi VWAP', '') == 'Di Atas VWAP (Kuat)')
     akumulasi_pro = (df.get('Kekuatan A/D', '') == 'Akumulasi Pro (Smart Money)')

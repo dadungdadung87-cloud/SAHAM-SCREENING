@@ -1809,6 +1809,27 @@ if not df_hasil.empty:
                 # Pagar zona mati (bukti 122 trade: change 10-20% winrate 0%): RUMUS 1-5 hanya < 7%
                 pagar_7 = (change_num < 7.0)
                 pola_sisir_aktif = df_hasil.get('Pola Sisir', '').astype(str).str.contains('Pola Sisir', na=False) if 'Pola Sisir' in df_hasil.columns else pd.Series(False, index=df_hasil.index)
+                # --- FILTER SAHAM SUSPEND (beku / delisted) — tidak masuk rumus mana pun ---
+                try:
+                    _delisted = set()
+                    _fd = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                       "..", "DATA-CENTER", "Konfigurasi", "saham_delisted.txt")
+                    if os.path.exists(_fd):
+                        _delisted = {l.strip().upper() for l in open(_fd) if l.strip()}
+                except Exception:
+                    _delisted = set()
+                try:
+                    from suspend_helper import muat_suspended_hari_ini
+                    _susp = muat_suspended_hari_ini(os.path.dirname(os.path.abspath(__file__)))
+                except Exception:
+                    _susp = set()
+                _hh = pd.to_numeric(df_hasil.get('Harga (Rp)', 0), errors='coerce')
+                _ss = pd.to_numeric(df_hasil.get('Support', 0), errors='coerce')
+                _rr = pd.to_numeric(df_hasil.get('Resistance', 0), errors='coerce')
+                _mma = pd.to_numeric(df_hasil.get('Harga MA20', 0), errors='coerce')
+                _beku = (_hh > 0) & (_hh == _mma) & (_ss == _rr) & (_hh == _ss)
+                _aktif = ~(_beku | df_hasil['Ticker'].astype(str).str.upper().isin(_delisted | _susp))
+                df_hasil = df_hasil[_aktif].copy()
                 vol_tembus = (df_hasil.get('Vol Breakout', '') == 'Tembus MA20')
                 haka = (df_hasil.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)')
                 mark_up = (df_hasil.get('Fase Siklus Bandar', '') == 'Mark-Up (Fase Pesta)')
