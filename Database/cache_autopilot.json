@@ -1,48 +1,48 @@
 {
-    "stempel_data": "2026-10-16 15:10:01",
+    "stempel_data": "2026-10-16 15:55:02",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "FMII",
-            "",
-            "",
+            "MKTR",
+            "MEGA",
+            "KMTR",
             "",
             ""
         ],
         "RUMUS 2": [
-            "CMNT",
-            "CAKK",
-            "",
-            "",
+            "PTSP",
+            "MKTR",
+            "MEGA",
+            "KMTR",
             ""
         ],
         "RUMUS 3": [
-            "FMII",
+            "",
             "",
             "",
             "",
             ""
         ],
         "RUMUS 4": [
-            "FMII",
+            "PTSP",
             "BIKE",
             "",
             "",
             ""
         ],
         "RUMUS 5": [
-            "FMII",
+            "PTSP",
             "BIKE",
             "IDEA",
-            "KINO",
+            "HBAT",
             "DAYA"
         ],
         "RUMUS 6": [
             "AKKU",
             "ALDO",
             "TFCO",
-            "INTP",
-            "TIFA"
+            "PKPK",
+            "INTP"
         ],
         "RUMUS 7": [
             "AKKU",
@@ -56,14 +56,14 @@
             "ALDO",
             "TFCO",
             "IGAR",
-            "FMII"
+            "BSWD"
         ],
         "RUMUS 9": [
             "AKKU",
             "ALDO",
             "TFCO",
-            "IGAR",
-            "FMII"
+            "PKPK",
+            "PRDA"
         ]
     }
 }
