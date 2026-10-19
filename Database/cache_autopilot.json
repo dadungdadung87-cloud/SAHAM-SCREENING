@@ -1,19 +1,19 @@
 {
-    "stempel_data": "2026-10-16 15:55:02",
+    "stempel_data": "2026-10-19 15:15:00",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "MKTR",
-            "MEGA",
-            "KMTR",
+            "OLIV",
+            "",
+            "",
             "",
             ""
         ],
         "RUMUS 2": [
-            "PTSP",
-            "MKTR",
-            "MEGA",
-            "KMTR",
+            "",
+            "",
+            "",
+            "",
             ""
         ],
         "RUMUS 3": [
@@ -24,46 +24,46 @@
             ""
         ],
         "RUMUS 4": [
-            "PTSP",
-            "BIKE",
+            "BPFI",
+            "",
             "",
             "",
             ""
         ],
         "RUMUS 5": [
+            "DAYA",
+            "BPFI",
             "PTSP",
-            "BIKE",
-            "IDEA",
-            "HBAT",
-            "DAYA"
+            "BATR",
+            "CBPE"
         ],
         "RUMUS 6": [
-            "AKKU",
-            "ALDO",
-            "TFCO",
-            "PKPK",
-            "INTP"
+            "TMPO",
+            "BIKE",
+            "TRUK",
+            "ASGR",
+            "AALI"
         ],
         "RUMUS 7": [
-            "AKKU",
-            "ALDO",
-            "TFCO",
-            "IGAR",
-            "BSWD"
+            "BIKE",
+            "TRUK",
+            "BSWD",
+            "DAYA",
+            "ASGR"
         ],
         "RUMUS 8": [
-            "AKKU",
-            "ALDO",
-            "TFCO",
-            "IGAR",
-            "BSWD"
+            "BIKE",
+            "TRUK",
+            "BSWD",
+            "ARTA",
+            ""
         ],
         "RUMUS 9": [
-            "AKKU",
-            "ALDO",
-            "TFCO",
-            "PKPK",
-            "PRDA"
+            "BIKE",
+            "TRUK",
+            "BSWD",
+            "PTSP",
+            "ASGR"
         ]
     }
 }
