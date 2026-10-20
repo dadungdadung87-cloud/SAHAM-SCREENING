@@ -1,20 +1,20 @@
 {
-    "stempel_data": "2026-10-20 15:15:01",
+    "stempel_data": "2026-10-20 15:50:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
             "YULE",
             "ATIC",
-            "BKSW",
+            "ALII",
             "SPTO",
-            "ADES"
+            "DLTA"
         ],
         "RUMUS 2": [
             "CMNT",
             "MRAT",
             "BATR",
-            "BALI",
-            "MERK"
+            "CAKK",
+            "BALI"
         ],
         "RUMUS 3": [
             "SDPC",
@@ -24,46 +24,46 @@
             ""
         ],
         "RUMUS 4": [
-            "TMPO",
             "SDPC",
+            "BUKA",
+            "GPSO",
             "ATIC",
-            "",
             ""
         ],
         "RUMUS 5": [
-            "TMPO",
-            "PWON",
             "AXIO",
             "MRAT",
-            "SDPC"
+            "SDPC",
+            "BUKA",
+            "GPSO"
         ],
         "RUMUS 6": [
-            "TRUK",
             "MPXL",
+            "TRUK",
+            "ARII",
             "SOTS",
-            "STRK",
-            "DKHH"
+            "BSWD"
         ],
         "RUMUS 7": [
             "TRUK",
             "MPXL",
-            "STRK",
-            "DKHH",
-            "MKNT"
-        ],
-        "RUMUS 8": [
-            "TRUK",
-            "MPXL",
-            "SOTS",
-            "PNSE",
+            "ARII",
+            "BSWD",
             "STRK"
         ],
-        "RUMUS 9": [
-            "TRUK",
+        "RUMUS 8": [
             "MPXL",
-            "SOTS",
-            "PNSE",
-            ""
+            "STRK",
+            "DKHH",
+            "TRUK",
+            "ARII"
+        ],
+        "RUMUS 9": [
+            "MPXL",
+            "STRK",
+            "DKHH",
+            "TRUK",
+            "SOTS"
         ]
     }
 }
