@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-10-20 15:50:01",
+    "stempel_data": "2026-10-21 15:15:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "YULE",
-            "ATIC",
-            "ALII",
-            "SPTO",
-            "DLTA"
+            "AKRA",
+            "SRTG",
+            "",
+            "",
+            ""
         ],
         "RUMUS 2": [
-            "CMNT",
-            "MRAT",
-            "BATR",
-            "CAKK",
-            "BALI"
+            "BUKA",
+            "RSCH",
+            "INTP",
+            "CTRA",
+            "CMNT"
         ],
         "RUMUS 3": [
-            "SDPC",
-            "YULE",
+            "",
+            "",
             "",
             "",
             ""
         ],
         "RUMUS 4": [
-            "SDPC",
-            "BUKA",
-            "GPSO",
-            "ATIC",
-            ""
+            "PWON",
+            "BRPT",
+            "HMSP",
+            "INTP",
+            "GPRA"
         ],
         "RUMUS 5": [
-            "AXIO",
-            "MRAT",
-            "SDPC",
             "BUKA",
-            "GPSO"
+            "PWON",
+            "ARII",
+            "AKPI",
+            "RSCH"
         ],
         "RUMUS 6": [
-            "MPXL",
-            "TRUK",
-            "ARII",
-            "SOTS",
-            "BSWD"
+            "STRK",
+            "SBMA",
+            "AKKU",
+            "DKHH",
+            "CARE"
         ],
         "RUMUS 7": [
+            "SBMA",
             "TRUK",
-            "MPXL",
-            "ARII",
-            "BSWD",
-            "STRK"
+            "STRK",
+            "AXIO",
+            "PRDA"
         ],
         "RUMUS 8": [
-            "MPXL",
             "STRK",
+            "SBMA",
+            "AKKU",
             "DKHH",
-            "TRUK",
-            "ARII"
+            "TRUK"
         ],
         "RUMUS 9": [
-            "MPXL",
-            "STRK",
-            "DKHH",
+            "SBMA",
             "TRUK",
-            "SOTS"
+            "STRK",
+            "PRDA",
+            "AKKU"
         ]
     }
 }
