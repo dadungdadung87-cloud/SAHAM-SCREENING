@@ -1,20 +1,20 @@
 {
-    "stempel_data": "2026-10-21 15:15:01",
+    "stempel_data": "2026-10-21 15:55:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "AKRA",
+            "BNLI",
             "SRTG",
             "",
             "",
             ""
         ],
         "RUMUS 2": [
-            "BUKA",
-            "RSCH",
+            "SDPC",
+            "ASGR",
             "INTP",
-            "CTRA",
-            "CMNT"
+            "CMNT",
+            "MGLV"
         ],
         "RUMUS 3": [
             "",
@@ -24,46 +24,46 @@
             ""
         ],
         "RUMUS 4": [
-            "PWON",
+            "BUKA",
             "BRPT",
-            "HMSP",
-            "INTP",
-            "GPRA"
+            "PWON",
+            "AALI",
+            "INTP"
         ],
         "RUMUS 5": [
             "BUKA",
             "PWON",
-            "ARII",
-            "AKPI",
+            "BRPT",
+            "AALI",
             "RSCH"
         ],
         "RUMUS 6": [
             "STRK",
             "SBMA",
+            "PRDA",
             "AKKU",
-            "DKHH",
-            "CARE"
+            "BUKA"
         ],
         "RUMUS 7": [
-            "SBMA",
-            "TRUK",
             "STRK",
+            "SBMA",
+            "DKHH",
             "AXIO",
-            "PRDA"
+            "TRUK"
         ],
         "RUMUS 8": [
             "STRK",
             "SBMA",
-            "AKKU",
             "DKHH",
-            "TRUK"
-        ],
-        "RUMUS 9": [
-            "SBMA",
-            "TRUK",
-            "STRK",
             "PRDA",
             "AKKU"
+        ],
+        "RUMUS 9": [
+            "STRK",
+            "SBMA",
+            "TRUK",
+            "AKKU",
+            "PRDA"
         ]
     }
 }
