@@ -1,20 +1,20 @@
 {
-    "stempel_data": "2026-10-21 15:55:01",
+    "stempel_data": "2026-10-22 15:15:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "BNLI",
-            "SRTG",
-            "",
-            "",
-            ""
+            "DMAS",
+            "AALI",
+            "SGER",
+            "MBMA",
+            "BBTN"
         ],
         "RUMUS 2": [
-            "SDPC",
-            "ASGR",
-            "INTP",
+            "BBTN",
             "CMNT",
-            "MGLV"
+            "GPRA",
+            "PKPK",
+            "AYAM"
         ],
         "RUMUS 3": [
             "",
@@ -24,46 +24,46 @@
             ""
         ],
         "RUMUS 4": [
-            "BUKA",
-            "BRPT",
-            "PWON",
+            "DMAS",
             "AALI",
-            "INTP"
+            "SDPC",
+            "AXIO",
+            "PRDA"
         ],
         "RUMUS 5": [
-            "BUKA",
-            "PWON",
-            "BRPT",
+            "DMAS",
             "AALI",
-            "RSCH"
+            "SDPC",
+            "SGER",
+            "PWON"
         ],
         "RUMUS 6": [
-            "STRK",
-            "SBMA",
-            "PRDA",
-            "AKKU",
-            "BUKA"
+            "DMAS",
+            "DKHH",
+            "PTSP",
+            "AALI",
+            "BUKK"
         ],
         "RUMUS 7": [
-            "STRK",
-            "SBMA",
+            "PTSP",
+            "DMAS",
             "DKHH",
-            "AXIO",
-            "TRUK"
+            "AALI",
+            "SMLE"
         ],
         "RUMUS 8": [
-            "STRK",
-            "SBMA",
+            "PTSP",
+            "DMAS",
             "DKHH",
-            "PRDA",
-            "AKKU"
+            "AALI",
+            "PNSE"
         ],
         "RUMUS 9": [
-            "STRK",
-            "SBMA",
-            "TRUK",
-            "AKKU",
-            "PRDA"
+            "DMAS",
+            "DKHH",
+            "AALI",
+            "PNSE",
+            "SMLE"
         ]
     }
 }
