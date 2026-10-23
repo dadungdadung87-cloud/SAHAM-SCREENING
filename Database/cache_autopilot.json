@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-10-22 15:55:01",
+    "stempel_data": "2026-10-23 15:15:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "DMAS",
-            "AALI",
-            "MRAT",
-            "SGER",
-            "MBMA"
+            "PSAT",
+            "CARE",
+            "AGII",
+            "RAJA",
+            "KAQI"
         ],
         "RUMUS 2": [
-            "GPRA",
-            "PDES",
-            "BBMD",
-            "AYAM",
-            "PKPK"
+            "PTSN",
+            "SHID",
+            "MERK",
+            "TYRE",
+            "ARGO"
         ],
         "RUMUS 3": [
-            "PRDA",
-            "",
+            "AALI",
+            "BUKA",
             "",
             "",
             ""
         ],
         "RUMUS 4": [
-            "DMAS",
             "AALI",
-            "PRDA",
-            "MRAT",
-            "PWON"
+            "YULE",
+            "DKHH",
+            "BATR",
+            "AXIO"
         ],
         "RUMUS 5": [
-            "DMAS",
             "AALI",
-            "SGER",
-            "PWON",
-            "PRDA"
+            "STRK",
+            "DKHH",
+            "BUKA",
+            "BATR"
         ],
         "RUMUS 6": [
-            "DMAS",
+            "ANDI",
+            "CARE",
+            "TOBA",
             "DKHH",
-            "PTSP",
-            "AALI",
-            "BUKK"
+            "FIRE"
         ],
         "RUMUS 7": [
-            "DMAS",
-            "DKHH",
-            "AALI",
-            "SMLE",
-            "PTSP"
-        ],
-        "RUMUS 8": [
-            "DMAS",
-            "DKHH",
             "PTSP",
             "AALI",
-            "PNSE"
+            "MKNT",
+            "CBPE",
+            "STRK"
+        ],
+        "RUMUS 8": [
+            "PTSP",
+            "ANDI",
+            "AALI",
+            "DKHH",
+            "AYLS"
         ],
         "RUMUS 9": [
-            "DMAS",
-            "DKHH",
-            "SMLE",
+            "PTSP",
+            "ANDI",
             "AALI",
-            "PNSE"
+            "DKHH",
+            "AYLS"
         ]
     }
 }
