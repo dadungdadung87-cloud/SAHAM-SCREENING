@@ -1,20 +1,20 @@
 {
-    "stempel_data": "2026-10-23 15:15:01",
+    "stempel_data": "2026-10-23 15:55:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "PSAT",
-            "CARE",
-            "AGII",
+            "AALI",
             "RAJA",
-            "KAQI"
+            "GPRA",
+            "ESIP",
+            "GTSI"
         ],
         "RUMUS 2": [
-            "PTSN",
+            "BBNI",
+            "ELSA",
+            "GTRA",
             "SHID",
-            "MERK",
-            "TYRE",
-            "ARGO"
+            "MERK"
         ],
         "RUMUS 3": [
             "AALI",
@@ -24,46 +24,46 @@
             ""
         ],
         "RUMUS 4": [
+            "SGER",
+            "PWON",
             "AALI",
-            "YULE",
-            "DKHH",
-            "BATR",
-            "AXIO"
+            "BTPS",
+            "DKHH"
         ],
         "RUMUS 5": [
-            "AALI",
-            "STRK",
+            "SGER",
+            "PWON",
             "DKHH",
             "BUKA",
-            "BATR"
+            "ENAK"
         ],
         "RUMUS 6": [
-            "ANDI",
-            "CARE",
             "TOBA",
-            "DKHH",
-            "FIRE"
+            "AALI",
+            "PTSP",
+            "ANDI",
+            "WMPP"
         ],
         "RUMUS 7": [
-            "PTSP",
+            "SGER",
+            "DKHH",
             "AALI",
-            "MKNT",
-            "CBPE",
-            "STRK"
+            "PTSP",
+            "MKNT"
         ],
         "RUMUS 8": [
-            "PTSP",
             "ANDI",
+            "SGER",
+            "PWON",
             "AALI",
-            "DKHH",
-            "AYLS"
+            "ISSP"
         ],
         "RUMUS 9": [
-            "PTSP",
             "ANDI",
+            "SGER",
+            "PWON",
             "AALI",
-            "DKHH",
-            "AYLS"
+            "PTSP"
         ]
     }
 }
