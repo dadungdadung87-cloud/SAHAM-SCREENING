@@ -1244,6 +1244,28 @@ try:
 except Exception as e:
     SUMBER_FUND = f"🧪 Fundamental Exodus: gagal dimuat ({str(e)[:60]})"
 
+# ==========================================
+# 🧭 REJIM PASAR + 🎯 SKOR RUMUS (dari DATA-CETER feed)
+# ==========================================
+REJIM_PASAR = ""
+SKOR_RUMUS = {}
+try:
+    _rp = "feed/rejim.json"
+    _alt = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "DATA-CENTER", "feed", "rejim.json")
+    _pf = _rp if os.path.exists(_rp) else _alt
+    if os.path.exists(_pf):
+        REJIM_PASAR = json.load(open(_pf))
+except Exception:
+    pass
+try:
+    _se = "feed/skor_rumus.json"
+    _alt2 = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "DATA-CENTER", "feed", "skor_rumus.json")
+    _sf = _se if os.path.exists(_se) else _alt2
+    if os.path.exists(_sf):
+        SKOR_RUMUS = json.load(open(_sf)).get("ringkasan", {})
+except Exception:
+    pass
+
 
 # ==========================================
 # 🗄️ LAPISAN CACHE 300 DETIK (satu fungsi per sumber)
@@ -1319,6 +1341,19 @@ if not df_hasil.empty and "Terakhir Update" in df_hasil.columns:
     """, unsafe_allow_html=True)
 
 st.sidebar.caption(f"📡 Sumber Data: {SUMBER_DATA}")
+if REJIM_PASAR:
+    _kes = REJIM_PASAR.get("kesimpulan", "")
+    _ikon = "🟢" if _kes == "RAMAI" else ("🔴" if _kes == "HATI-HATI" else "🟡")
+    st.sidebar.markdown(
+        f"""<div style="border:1px solid #334155;border-radius:8px;padding:8px 10px;margin:4px 0;background:#0f172a">
+        <span style="font-size:11px;color:#94a3b8">🧭 REJIM PASAR: <b style="color:#f8fafc">{_kes}</b></span><br>
+        <span style="font-size:11px;color:#94a3b8">{_ikon} {REJIM_PASAR.get('naik',0)} naik / {REJIM_PASAR.get('turun',0)} turun (breadth {REJIM_PASAR.get('breadth',0)})</span>
+        </div>""", unsafe_allow_html=True)
+if SKOR_RUMUS:
+    _top3 = sorted(SKOR_RUMUS.items(), key=lambda x: -x[1].get("rate", 0))[:3]
+    _txt = " · ".join(f"{k}: {v.get('rate',0)}%" for k, v in _top3 if v.get("trades"))
+    if _txt:
+        st.sidebar.caption(f"🎯 Skor rumus (naik≥5% dlm 3 hari): {_txt}")
 if SUMBER_FUND:
     st.sidebar.caption(SUMBER_FUND)
 
@@ -1499,6 +1534,14 @@ if not df_hasil.empty:
     
     with tab1:
         st.markdown("### 📊 Ringkasan Pasar IHSG")
+        if REJIM_PASAR:
+            _kes = REJIM_PASAR.get("kesimpulan", "")
+            _warna = "#22c55e" if _kes == "RAMAI" else ("#ef4444" if _kes == "HATI-HATI" else "#eab308")
+            st.markdown(f"""<div class='bandar-box' style="border-left-color:{_warna}">
+            🧭 <b>Rejim Pasar: {_kes}</b> — breadth {REJIM_PASAR.get('breadth',0)}
+            ({REJIM_PASAR.get('naik',0)} naik / {REJIM_PASAR.get('turun',0)} turun).
+            {'Kondisi pasar mendukung strategi momentum.' if _kes=='RAMAI' else ('Pasar melemah — perketat disiplin, kecilkan posisi.' if _kes=='HATI-HATI' else 'Pasar netral, selektif dalam entry.')}
+            </div>""", unsafe_allow_html=True)
         
         total_saham = len(df_hasil)
         saham_naik = len(df_hasil[df_hasil['Change (%)'] > 0]) if 'Change (%)' in df_hasil.columns else 0
@@ -1716,7 +1759,8 @@ if not df_hasil.empty:
             kolom_bandar = ["Ticker", "Harga (Rp)", "Change (%)", "Value Transaksi", "Broksum", "Fase Siklus Bandar", "Kekuatan A/D", "Status Bandar", "RVOL (Anomali Vol)", "Karakter Gorengan", "Tekanan Bandar", "OBV Trend", "Kondisi Supply", "Prediksi Machine Learning"]
             kolom_teknikal = ["Ticker", "Harga (Rp)", "Change (%)", "Value Transaksi", "Auto Trading Plan", "Risk/Reward Ratio", "Status Fibonacci", "Sinyal Cuci Barang", "Posisi Entry", "Pola Candle", "Trend MA (5,20,50)", "MA Signal", "Status BB", "RSI (14D)", "MACD", "Status Stochastic"]
             kolom_fundamental = ["Ticker", "Harga (Rp)", "Value Transaksi", "Kategori", "Valuasi", "PER (x)", "PBV (x)", "Kelas Transaksi", "Likuiditas", "Status Sentimen",
-                                 "Mkt Cap (Exodus)", "PE TTM (Exodus)", "PBV (Exodus)", "P/S TTM (Exodus)", "Earnings Yield", "Div Yield", "F-Score", "EPS Rating", "RS Rating", "BVPS (Exodus)", "PEG"]
+                                 "Mkt Cap (Exodus)", "PE TTM (Exodus)", "PBV (Exodus)", "P/S TTM (Exodus)", "Earnings Yield", "Div Yield", "F-Score", "EPS Rating", "RS Rating", "BVPS (Exodus)", "PEG",
+                                 "Net Asing (Rp)", "Skor Broker"]
             kolom_semua = ["Ticker", "Value Transaksi", "Broksum", "Status Open", "Risk/Reward Ratio", "Status Fibonacci", "Auto Trading Plan", "Streak Harian", "Sinyal Cuci Barang", "Kategori", "Kelas Transaksi", "Valuasi", "Harga (Rp)", "PER (x)", "PBV (x)", "Harga MA20", "Posisi VWAP", "Support", "Resistance", "Posisi Entry", "Pola Candle", "Change (%)", "Volume", "RVOL (Anomali Vol)", "Vol Breakout", "Status Gap", "Fase Siklus Bandar", "Karakter Gorengan", "Tekanan Bandar", "Kekuatan A/D", "Status Bandar", "OBV Trend", "RSI (14D)", "Momentum", "Trend MA (5,20,50)", "MA Signal", "MA Cross", "MACD", "Status Stochastic", "Status BB", "Risiko", "Likuiditas", "Status Sentimen", "Prediksi Machine Learning", "Kondisi Supply", "Total Score", "Rekomendasi",
                              "Mkt Cap (Exodus)", "PE TTM (Exodus)", "PBV (Exodus)", "P/S TTM (Exodus)", "Earnings Yield", "Div Yield", "F-Score", "EPS Rating", "RS Rating", "BVPS (Exodus)", "PEG"]
             
@@ -1749,6 +1793,9 @@ if not df_hasil.empty:
             for col in ["F-Score", "EPS Rating", "RS Rating"]:
                 if col in df_tampil.columns: format_dict[col] = _fund_int
             if "Mkt Cap (Exodus)" in df_tampil.columns: format_dict["Mkt Cap (Exodus)"] = format_singkat_rp
+            if "Net Asing (Rp)" in df_tampil.columns: format_dict["Net Asing (Rp)"] = format_singkat_rp
+            for _c in ["Skor Broker"]:
+                if _c in df_tampil.columns: format_dict[_c] = _fund_num
             if "RSI (14D)" in df_tampil.columns: format_dict["RSI (14D)"] = "{:.0f}"
 
             styler_obj = df_tampil[kolom_ada].style.format(format_dict)
