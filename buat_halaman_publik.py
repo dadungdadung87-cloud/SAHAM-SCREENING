@@ -58,6 +58,7 @@ def layout(title, body):
             ("screener.html", "Screener"),
             ("radar.html", "Radar AI"),
             ("detektif.html", "Detektif"),
+            ("saham/", "Daftar Saham+Grafik"),
         ]
     )
     return f"""<!doctype html>
