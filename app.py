@@ -1091,7 +1091,12 @@ DEFAULT_CONFIG = {
         "Status Gap": {"label": "🌅 Status Gap", "options": ["Semua", "Gap Up", "Gap Down", "Normal"]},
         "Vol Breakout MA20": {"label": "🔊 Volume Breakout", "options": ["Semua", "Tembus MA20", "Normal"]},
         "Streak Harian": {"label": "🔥 Streak Harian", "options": ["Semua", "Naik Beruntun", "Turun Beruntun", "Sideways / Stagnan"]},
-        "Kelas Perubahan": {"label": "📊 Kelas Perubahan", "options": ["Semua", "🚀 ARA (> +10%)", "📈 Naik Kuat (+5% s/d +10%)", "🌿 Naik Tipis (0 s/d +5%)", "💤 Stagnan (0%)", "🔻 Turun Tipis (-5% s/d 0%)", "🩸 Turun Tajam (< -5%)"]}
+        "Kelas Perubahan": {"label": "📊 Kelas Perubahan", "options": ["Semua", "🚀 ARA (> +10%)", "📈 Naik Kuat (+5% s/d +10%)", "🌿 Naik Tipis (0 s/d +5%)", "💤 Stagnan (0%)", "🔻 Turun Tipis (-5% s/d 0%)", "🩸 Turun Tajam (< -5%)"]},
+        "Pola Sisir": {"label": "🪮 Pola Sisir (Spike Berulang)", "options": ["Semua", "Pola Sisir (Naik)", "Pola Sisir Lemah", "Tidak Ada"]},
+        "Net Asing": {"label": "🌍 Aliran Asing (Net)", "options": ["Semua", "Asing Akumulasi (+)", "Asing Distribusi (−)", "Netral (0)"]},
+        "Skor Broker Hot": {"label": "🔥 Skor Broker Panas", "options": ["Semua", "Panas (≥ 3)", "Hangat (≥ 1)", "Ada Aktivitas (> 0)"]},
+        "Likuiditas Harga": {"label": "💧 Rentang Harga", "options": ["Semua", "Penny (< Rp 200)", "Murah (Rp 200 - 1.000)", "Menengah (Rp 1.000 - 5.000)", "Mahal (> Rp 5.000)"]},
+        "RSI Zone": {"label": "📊 RSI Zona Ekstrem", "options": ["Semua", "Oversold (< 30)", "Bearish (30-50)", "Bullish (50-70)", "Overbought (> 70)"]}
     }
 }
 
@@ -1619,11 +1624,12 @@ if not df_hasil.empty:
         # DEFINISI GRUP FILTER (untuk layout rapih)
         # ==========================================
         GRUP_FILTER = [
-            ("🏢 Fundamental & Likuiditas", ["Kategori", "Valuasi", "Kelas Transaksi", "Likuiditas", "Status Akuisisi", "Status Sentimen"]),
-            ("📈 Teknikal Klasik", ["RSI (14D)", "MA Signal", "Trend MA (5,20,50)", "MA Cross", "MACD", "Status Stochastic", "Status BB"]),
+            ("🏢 Fundamental & Likuiditas", ["Kategori", "Valuasi", "Kelas Transaksi", "Likuiditas", "Likuiditas Harga", "Status Akuisisi", "Status Sentimen"]),
+            ("📈 Teknikal Klasik", ["RSI (14D)", "RSI Zone", "MA Signal", "Trend MA (5,20,50)", "MA Cross", "MACD", "Status Stochastic", "Status BB"]),
             ("🎯 Entry, Exit & Risiko", ["Risk/Reward Ratio", "Posisi Entry", "Status Open", "Status Gap", "Sinyal Cuci Barang", "Pola Candle", "Risiko"]),
             ("🕵️ Bandarmologi & Volume", ["Status Bandar", "Tekanan Bandar", "OBV Trend", "Kekuatan A/D", "RVOL (Anomali Vol)", "Karakter Gorengan", "Vol Breakout MA20"]),
-            ("🌊 Siklus & Behavior", ["Fase Siklus Bandar", "Kondisi Supply", "Streak Harian", "Kelas Perubahan", "Prediksi Machine Learning", "Total Score", "Rekomendasi"])
+            ("🌊 Siklus & Behavior", ["Fase Siklus Bandar", "Kondisi Supply", "Streak Harian", "Kelas Perubahan", "Prediksi Machine Learning", "Total Score", "Rekomendasi"]),
+            ("🆕 Filter Baru (Net Asing & Sisir)", ["Pola Sisir", "Net Asing", "Skor Broker Hot"])
         ]
 
         with st.expander("🛠️ Buka Panel Filter Lengkap (Dikelompokkan)", expanded=False):
@@ -1709,6 +1715,61 @@ if not df_hasil.empty:
                 if "Vol Breakout" in df_filtered.columns:
                     df_filtered = df_filtered[df_filtered["Vol Breakout"] == nilai]
                 continue
+            # ===== FILTER VIRTUAL BARU (dihitung dari kolom fisik) =====
+            if db_key == "Pola Sisir" and nilai != "Semua":
+                if "Pola Sisir" in df_filtered.columns:
+                    kol = df_filtered["Pola Sisir"].astype(str)
+                    if nilai == "Pola Sisir (Naik)":
+                        df_filtered = df_filtered[kol.str.contains("Pola Sisir", na=False) & ~kol.str.contains("Lemah", na=False)]
+                    elif nilai == "Pola Sisir Lemah":
+                        df_filtered = df_filtered[kol.str.contains("Lemah", na=False)]
+                    elif nilai == "Tidak Ada":
+                        df_filtered = df_filtered[~kol.str.contains("Pola Sisir", na=False)]
+                continue
+            if db_key == "Net Asing" and nilai != "Semua":
+                if "Net Asing (Rp)" in df_filtered.columns:
+                    _nf = pd.to_numeric(df_filtered["Net Asing (Rp)"], errors="coerce")
+                    if nilai == "Asing Akumulasi (+)":
+                        df_filtered = df_filtered[_nf > 0]
+                    elif nilai == "Asing Distribusi (−)":
+                        df_filtered = df_filtered[_nf < 0]
+                    elif nilai == "Netral (0)":
+                        df_filtered = df_filtered[_nf == 0]
+                continue
+            if db_key == "Skor Broker Hot" and nilai != "Semua":
+                if "Skor Broker" in df_filtered.columns:
+                    _sb = pd.to_numeric(df_filtered["Skor Broker"], errors="coerce").fillna(0)
+                    if nilai == "Panas (≥ 3)":
+                        df_filtered = df_filtered[_sb >= 3]
+                    elif nilai == "Hangat (≥ 1)":
+                        df_filtered = df_filtered[_sb >= 1]
+                    elif nilai == "Ada Aktivitas (> 0)":
+                        df_filtered = df_filtered[_sb > 0]
+                continue
+            if db_key == "Likuiditas Harga" and nilai != "Semua":
+                _hp = pd.to_numeric(df_filtered.get("Harga (Rp)"), errors="coerce")
+                if nilai == "Penny (< Rp 200)":
+                    df_filtered = df_filtered[_hp < 200]
+                elif nilai == "Murah (Rp 200 - 1.000)":
+                    df_filtered = df_filtered[(_hp >= 200) & (_hp <= 1000)]
+                elif nilai == "Menengah (Rp 1.000 - 5.000)":
+                    df_filtered = df_filtered[(_hp > 1000) & (_hp <= 5000)]
+                elif nilai == "Mahal (> Rp 5.000)":
+                    df_filtered = df_filtered[_hp > 5000]
+                continue
+            if db_key == "RSI Zone" and nilai != "Semua":
+                if "RSI (14D)" in df_filtered.columns:
+                    _rsi = pd.to_numeric(df_filtered["RSI (14D)"], errors="coerce")
+                    if nilai == "Oversold (< 30)":
+                        df_filtered = df_filtered[_rsi < 30]
+                    elif nilai == "Bearish (30-50)":
+                        df_filtered = df_filtered[(_rsi >= 30) & (_rsi <= 50)]
+                    elif nilai == "Bullish (50-70)":
+                        df_filtered = df_filtered[(_rsi > 50) & (_rsi <= 70)]
+                    elif nilai == "Overbought (> 70)":
+                        df_filtered = df_filtered[_rsi > 70]
+                continue
+            # ===== AKHIR FILTER VIRTUAL =====
             if db_key == "Streak Harian":
                 if "Streak Harian" in df_filtered.columns:
                     pola = MATCH_CONTAINS_FIELDS["Streak Harian"].get(nilai, "")
