@@ -80,7 +80,41 @@ def _parse_top5(mentah, valid_set):
                 break
     return hasil[:5]
 
-def hitung_rumus(df):
+def muat_momentum_30m(base_dir=None):
+    """Set ticker yang HARGA NAIK dalam 30 menit terakhir AKTIF (arsip intraday hari ini).
+    Basis: snapshot terakhir yang harga-nya benar-benar berubah (menghindari snapshot
+    statis pasca-tutup yang membuat perbandingan selalu sama → 0 hasil).
+    Return set ticker; set kosong jika arsip belum tersedia (graceful)."""
+    import glob as _glob
+    from datetime import datetime as _dt, timedelta as _td
+    base = base_dir or os.path.dirname(os.path.abspath(__file__))
+    files = sorted(_glob.glob(os.path.join(base, "Arsip_Data_Harian", "screener_*.csv")))
+    if not files:
+        return set()
+    try:
+        df = pd.read_csv(files[-1], usecols=["Waktu Update", "Ticker", "Harga (Rp)"])
+        df["_jam"] = df["Waktu Update"].astype(str).str[:5]
+        naik = set()
+        for t, x in df.groupby("Ticker"):
+            x = x.sort_values("_jam")
+            bergerak = x[x["Harga (Rp)"].diff().fillna(1) != 0]
+            if bergerak.empty:
+                continue
+            last_h = bergerak["_jam"].iloc[-1]
+            last_p = float(bergerak["Harga (Rp)"].iloc[-1])
+            hh, mm = int(last_h[:2]), int(last_h[3:])
+            target = (_dt(2000, 1, 1, hh, mm) - _td(minutes=30)).strftime("%H:%M")
+            kand = x[x["_jam"] <= target]
+            if kand.empty:
+                continue
+            if last_p > float(kand.iloc[-1]["Harga (Rp)"]):
+                naik.add(t)
+        return naik
+    except Exception:
+        return set()
+
+
+def hitung_rumus(df, momentum_30m=None):
     """Rumus v5.2 — identik dengan app.py PART 12."""
     out = {i: pd.DataFrame() for i in range(1, 10)}
     if df is None or df.empty or 'Tekanan Bandar' not in df.columns:
@@ -119,11 +153,20 @@ def hitung_rumus(df):
     haka = (df.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)')
     mark_up = (df.get('Fase Siklus Bandar', '') == 'Mark-Up (Fase Pesta)')
     macd_bull = (df.get('MACD', '') == 'Strong Bullish')
-    out[1] = df[akumulasi_pro & (df.get('Status Bandar', '') == 'Akumulasi Kuat') & vwap_kuat & ~supply_banjir & pagar_7].copy()
-    out[2] = df[((df.get('Pola Candle', '') == 'Hammer (Potensi Reversal)') |
-                 (df.get('Sinyal Cuci Barang', '') == 'Jarum Bawah (Sinyal Pantulan Kuat)')) & vwap_kuat & akumulasi_pro & pagar_7].copy()
-    out[3] = df[vwap_kuat & haka &
-                (df.get('Status Open', '') == 'Open = Low (Bullish Kuat)') & (df.get('Rekomendasi', '') == 'BELI') & pagar_7].copy()
+    # MOMENTUM 30 MENIT (RUMUS 1-3): saham sedang NAIK dalam 30 menit terakhir.
+    # Jika data arsip belum tersedia (set kosong), filter otomatis dilewati (graceful).
+    if momentum_30m is None:
+        momentum_30m = set()
+    mom30 = df['Ticker'].astype(str).str.upper().isin(set(momentum_30m)) if momentum_30m else pd.Series(True, index=df.index)
+    # RUMUS 1 = dasar R7 (Mark-Up Pesta) + Momentum 30M Naik
+    out[1] = df[mark_up & (df.get('Trend MA (5,20,50)', '') == 'Perfect Uptrend (5>20>50)') &
+                vol_tembus & ~supply_banjir & (haka | akumulasi_pro | macd_bull) & mom30 & pagar_7].copy()
+    # RUMUS 2 = dasar R8 (MACD Breakout Volume) + Momentum 30M Naik
+    out[2] = df[macd_bull & vol_tembus & (df.get('MA Signal', '') == 'Uptrend') & ~supply_banjir &
+                (haka | akumulasi_pro) & mom30 & pagar_7].copy()
+    # RUMUS 3 = dasar R9 (AD Akumulasi Skor Tinggi) + Momentum 30M Naik
+    out[3] = df[akumulasi_pro & (df.get('MA Signal', '') == 'Uptrend') & (score_num >= 5) &
+                vol_tembus & (mark_up | macd_bull) & mom30 & pagar_7].copy()
     out[4] = df[((df.get('MA Cross', '') == 'Golden Cross') |
                  (df.get('MACD', '').isin(['Strong Bullish', 'Bullish MACD']))) &
                 vol_tembus & (df.get('MA Signal', '') == 'Uptrend') & vwap_kuat &

@@ -17,7 +17,7 @@ def main():
     if not os.path.exists(fs):
         print("❌ hasil_screener.csv tidak ada."); sys.exit(1)
     df = pd.read_csv(fs)
-    daftar = sidang_lib.hitung_rumus(df)
+    daftar = sidang_lib.hitung_rumus(df, momentum_30m=sidang_lib.muat_momentum_30m())
     print(f"🌆 Sidang sore (referensi) dimulai ({len(df)} saham)...")
     keranjang, err = sidang_lib.jalankan_sidang(daftar, df, api_key, mode_tulis=False)
     if err:
