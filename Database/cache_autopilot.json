@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-10-23 15:55:01",
+    "stempel_data": "2026-10-26 15:15:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "AALI",
-            "RAJA",
-            "GPRA",
-            "ESIP",
-            "GTSI"
+            "WMUU",
+            "MTLA",
+            "BLES",
+            "PTSN",
+            "MMIX"
         ],
         "RUMUS 2": [
-            "BBNI",
-            "ELSA",
-            "GTRA",
-            "SHID",
-            "MERK"
+            "JSMR",
+            "ULTJ",
+            "BBMD",
+            "MPMX",
+            "CLAY"
         ],
         "RUMUS 3": [
-            "AALI",
-            "BUKA",
-            "",
+            "IDEA",
+            "MPPA",
+            "YULE",
             "",
             ""
         ],
         "RUMUS 4": [
-            "SGER",
-            "PWON",
-            "AALI",
-            "BTPS",
-            "DKHH"
+            "BBMD",
+            "WMUU",
+            "NANO",
+            "MTLA",
+            "BLES"
         ],
         "RUMUS 5": [
-            "SGER",
-            "PWON",
-            "DKHH",
-            "BUKA",
-            "ENAK"
+            "WMUU",
+            "NANO",
+            "MTLA",
+            "BLES",
+            "IDEA"
         ],
         "RUMUS 6": [
-            "TOBA",
-            "AALI",
-            "PTSP",
+            "TMPO",
             "ANDI",
-            "WMPP"
+            "WMUU",
+            "NANO",
+            "DKHH"
         ],
         "RUMUS 7": [
-            "SGER",
+            "ANDI",
             "DKHH",
-            "AALI",
-            "PTSP",
+            "MTLA",
+            "IDEA",
             "MKNT"
         ],
         "RUMUS 8": [
             "ANDI",
-            "SGER",
-            "PWON",
-            "AALI",
-            "ISSP"
+            "BBMD",
+            "DKHH",
+            "BLES",
+            "IDEA"
         ],
         "RUMUS 9": [
             "ANDI",
-            "SGER",
-            "PWON",
-            "AALI",
-            "PTSP"
+            "DKHH",
+            "MTLA",
+            "BLES",
+            "SEMA"
         ]
     }
 }
