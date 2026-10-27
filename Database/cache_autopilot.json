@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-10-27 15:15:01",
+    "stempel_data": "2026-10-27 15:55:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
+            "UNTR",
             "AALI",
-            "",
-            "",
-            "",
-            ""
-        ],
-        "RUMUS 2": [
-            "AALI",
-            "INTP",
-            "",
-            "",
-            ""
-        ],
-        "RUMUS 3": [
-            "AALI",
-            "INTP",
-            "PTSP",
-            "",
-            ""
-        ],
-        "RUMUS 4": [
-            "AALI",
-            "PSAT",
             "PWON",
             "AADI",
-            "JSMR"
+            "PTSP"
         ],
-        "RUMUS 5": [
+        "RUMUS 2": [
             "ISSP",
             "AALI",
-            "PSAT",
-            "ANDI",
+            "UNTR",
+            "PTSP",
             "PWON"
+        ],
+        "RUMUS 3": [
+            "ISSP",
+            "AALI",
+            "UNTR",
+            "PTSP",
+            "PWON"
+        ],
+        "RUMUS 4": [
+            "ISSP",
+            "JSMR",
+            "LSIP",
+            "AALI",
+            "UNTR"
+        ],
+        "RUMUS 5": [
+            "PTSP",
+            "ISSP",
+            "JSMR",
+            "LSIP",
+            "AALI"
         ],
         "RUMUS 6": [
             "TMPO",
-            "AALI",
-            "PWON",
-            "UNIQ",
-            "HMSP"
+            "PTSP",
+            "ERAL",
+            "ISSP",
+            "JSMR"
         ],
         "RUMUS 7": [
-            "PWON",
             "AALI",
+            "UNTR",
+            "PTSP",
             "AADI",
-            "SBMA",
-            "ARII"
+            "PWON"
         ],
         "RUMUS 8": [
             "TMPO",
-            "PWON",
+            "ISSP",
             "AALI",
-            "AADI",
-            "INTP"
+            "UNTR",
+            "PTSP"
         ],
         "RUMUS 9": [
             "TMPO",
-            "PWON",
+            "PTSP",
+            "ISSP",
             "AALI",
-            "UNIQ",
-            "AADI"
+            "UNTR"
         ]
     }
 }
