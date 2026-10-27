@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-10-26 15:55:01",
+    "stempel_data": "2026-10-27 15:15:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "WMUU",
-            "MTLA",
-            "PTSN",
-            "CBUT",
-            "PMJS"
-        ],
-        "RUMUS 2": [
-            "BCIP",
-            "JSMR",
-            "BBNI",
-            "ULTJ",
-            "BDMN"
-        ],
-        "RUMUS 3": [
-            "MPPA",
-            "YULE",
+            "AALI",
+            "",
             "",
             "",
             ""
         ],
+        "RUMUS 2": [
+            "AALI",
+            "INTP",
+            "",
+            "",
+            ""
+        ],
+        "RUMUS 3": [
+            "AALI",
+            "INTP",
+            "PTSP",
+            "",
+            ""
+        ],
         "RUMUS 4": [
-            "WMUU",
-            "NANO",
-            "MTLA",
-            "PTSN",
-            "CTRA"
+            "AALI",
+            "PSAT",
+            "PWON",
+            "AADI",
+            "JSMR"
         ],
         "RUMUS 5": [
-            "WMUU",
-            "NANO",
-            "MTLA",
-            "PTSN",
-            "CTRA"
+            "ISSP",
+            "AALI",
+            "PSAT",
+            "ANDI",
+            "PWON"
         ],
         "RUMUS 6": [
-            "ANDI",
             "TMPO",
-            "DKHH",
-            "BLES",
-            "WMUU"
+            "AALI",
+            "PWON",
+            "UNIQ",
+            "HMSP"
         ],
         "RUMUS 7": [
-            "ANDI",
-            "DKHH",
+            "PWON",
+            "AALI",
+            "AADI",
             "SBMA",
-            "MTLA",
-            "IDEA"
+            "ARII"
         ],
         "RUMUS 8": [
-            "ANDI",
-            "DKHH",
-            "BLES",
-            "SBMA",
-            "IDEA"
+            "TMPO",
+            "PWON",
+            "AALI",
+            "AADI",
+            "INTP"
         ],
         "RUMUS 9": [
-            "ANDI",
-            "DKHH",
-            "BLES",
-            "SBMA",
-            "MTLA"
+            "TMPO",
+            "PWON",
+            "AALI",
+            "UNIQ",
+            "AADI"
         ]
     }
 }
