@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-10-28 15:15:01",
+    "stempel_data": "2026-10-28 15:55:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
             "DMAS",
-            "AGII",
-            "MPXL",
+            "AKPI",
+            "LFLO",
             "",
             ""
         ],
         "RUMUS 2": [
             "DMAS",
-            "",
-            "",
+            "PMJS",
+            "LFLO",
             "",
             ""
         ],
         "RUMUS 3": [
             "DMAS",
-            "BTPN",
+            "LFLO",
             "",
             "",
             ""
         ],
         "RUMUS 4": [
-            "JSMR",
+            "AGII",
             "DRMA",
-            "SKBM",
-            "TMPO",
-            "ACES"
+            "LPPF",
+            "PMJS",
+            "TMPO"
         ],
         "RUMUS 5": [
-            "JSMR",
+            "AGII",
+            "DMAS",
+            "MIDI",
             "DRMA",
-            "SGER",
-            "BLES",
-            "MIDI"
+            "PMJS"
         ],
         "RUMUS 6": [
-            "DMAS",
             "UNIQ",
-            "SEMA",
-            "PBID",
-            "JSMR"
+            "PTSP",
+            "AGII",
+            "DMAS",
+            "KOKA"
         ],
         "RUMUS 7": [
-            "DMAS",
             "UNIQ",
+            "DMAS",
             "SEMA",
-            "MKNT",
-            "PTSP"
+            "PTSP",
+            "AGII"
         ],
         "RUMUS 8": [
-            "UNIQ",
             "DMAS",
+            "UNIQ",
             "PBID",
-            "PTSP",
-            "LFLO"
+            "AALI",
+            "PTSP"
         ],
         "RUMUS 9": [
             "UNIQ",
             "DMAS",
             "SEMA",
-            "PBID",
-            "PTSP"
+            "PTSP",
+            "AGII"
         ]
     }
 }
