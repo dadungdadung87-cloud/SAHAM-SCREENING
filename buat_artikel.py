@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 # ==========================================
 # 📝 GENERATOR ARTIKEL HARIAN — buat halaman artikel statis dari data screener
-# Sumber : Database/hasil_screener.csv (hasil cron update_data.py)
+# Sumber : Database/hasil_screener.csv (hasil cron jalankan_bot.sh / DATA-CENTER)
 # Output : docs/artikel/index.html (indeks) + docs/artikel/<tanggal>.html
+#          + docs/robots.txt + docs/sitemap.xml
 # Jalankan: ./.venv/bin/python buat_artikel.py            (hanya jika data hari ini belum dipublikasi)
 #           ./.venv/bin/python buat_artikel.py --force    (regenerasi hari ini)
 # Cron   : 17:10 WIB kerja (setelah update data terakhir) — proses ±2 detik, tidak mengganggu Streamlit
 # ==========================================
-import os, sys, html, glob
+import os, sys, glob
 from datetime import datetime, timezone, timedelta
 import pandas as pd
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE)
-from konfig_situs import (SITE_URL, SITE_NAME, SITE_DESC, ADSENSE_CLIENT,
-                          ADSENSE_SLOT_ATAS, ADSENSE_SLOT_TENGAH, ADSENSE_SLOT_BAWAH,
-                          BROKER_REF, TELEGRAM_URL, SEO_KEYWORDS)
+from konfig_situs import SITE_URL, SITE_NAME, SITE_DESC, SEO_KEYWORDS  # noqa: E402
+import template_situs  # noqa: E402
 
 DIR_ARTIKEL = os.path.join(BASE, "docs", "artikel")
 WIB = timezone(timedelta(hours=7))
@@ -26,31 +26,6 @@ BULAN_ID = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli",
 
 def tanggal_id(dt):
     return f"{HARI_ID[dt.weekday()]}, {dt.day} {BULAN_ID[dt.month]} {dt.year}"
-
-
-def adsense_head():
-    """Skrip AdSense hanya dimuat jika ADSENSE_CLIENT sudah diisi."""
-    if not ADSENSE_CLIENT:
-        return ""
-    return f'<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={html.escape(ADSENSE_CLIENT)}" crossorigin="anonymous"></script>'
-
-
-def adsense_unit(slot):
-    if not ADSENSE_CLIENT or not slot:
-        return ""
-    return (f'<ins class="adsbygoogle" style="display:block" data-ad-client="{html.escape(ADSENSE_CLIENT)}" '
-            f'data-ad-slot="{html.escape(slot)}" data-ad-format="auto" data-full-width-responsive="true"></ins>'
-            '<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>')
-
-
-def footer_affiliate():
-    baris = "".join(
-        f'<a href="{html.escape(b["url"])}" target="_blank" rel="sponsored noopener">{html.escape(b["nama"])}</a>'
-        f'<span class="afil-desk">{html.escape(b["deskripsi"])}</span>'
-        for b in BROKER_REF if b.get("url"))
-    tg = (f'<a href="{html.escape(TELEGRAM_URL)}" target="_blank" rel="noopener">📢 Channel Telegram</a>'
-          if TELEGRAM_URL else "")
-    return baris + tg
 
 
 def _amankan_num(v):
@@ -91,13 +66,13 @@ def susun_blok(df, stempel, tgl_hari):
             for c in kolom_ada:
                 v = r.get(c)
                 if c == "Ticker":
-                    sel.append(f"<code>{html.escape(str(v))}</code>")
+                    sel.append(f"<code>{template_situs.esc(v)}</code>")
                 elif isinstance(v, float):
                     sel.append(f"{v:,.2f}".replace(",", "."))
                 else:
-                    sel.append(html.escape(str(v)))
+                    sel.append(template_situs.esc(v))
             baris.append("<tr>" + "".join(f"<td>{s}</td>" for s in sel) + "</tr>")
-        head = "".join(f"<th>{html.escape(c)}</th>" for c in kolom_ada)
+        head = "".join(f"<th>{template_situs.esc(c)}</th>" for c in kolom_ada)
         return f"<div class='tbl'><table><thead><tr>{head}</tr></thead><tbody>{''.join(baris)}</tbody></table></div>"
 
     kolom_umum = ["Ticker", "Harga (Rp)", "Change (%)", "Volume"]
@@ -109,7 +84,7 @@ def susun_blok(df, stempel, tgl_hari):
     <h2>Kondisi Pasar IHSG {tgl_hari}</h2>
     <p>Dari <strong>{total}</strong> saham yang dipantau: <span class="up">{naik} naik</span>,
     <span class="down">{turun} turun</span>, {total - naik - turun} stagnan.
-    Sentimen pasar: <strong>{sentimen}</strong>. Data diambil pukul {html.escape(str(stempel))} WIB.</p>
+    Sentimen pasar: <strong>{sentimen}</strong>. Data diambil pukul {template_situs.esc(stempel)} WIB.</p>
     <h2>Saham Penguat Teratas</h2>""")
     bagian.append(tabel(top, kolom_umum))
     bagian.append("<h2>Saham Pelemah Teratas</h2>")
@@ -123,84 +98,13 @@ def susun_blok(df, stempel, tgl_hari):
     return "\n".join(bagian)
 
 
-def halaman(titel, isi, tanggal_slug, indeks=False):
-    aff = footer_affiliate()
-    nav = f'''<nav class="topnav">
-      <a class="active" href="{SITE_URL}">Beranda</a>
-      <a href="{SITE_URL}market.html">Market</a>
-      <a href="{SITE_URL}screener.html">Screener</a>
-      <a href="{SITE_URL}radar.html">Radar AI</a>
-      <a href="{SITE_URL}detektif.html">Detektif</a>
-      <a href="{SITE_URL}saham/">Grafik Saham</a>
-    </nav>'''
-    if not indeks:
-        nav += f'<p><a class="back" href="{SITE_URL}">&larr; Beranda</a></p>'
-    return f"""<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{html.escape(titel)} | {html.escape(SITE_NAME)}</title>
-<meta name="description" content="{html.escape(SITE_DESC)}">
-<meta name="keywords" content="{html.escape(SEO_KEYWORDS)}">
-{adsense_head()}
-<style>
-:root{{--bg:#0f172a;--card:#1e293b;--line:#334155;--txt:#cbd5e1;--hi:#f8fafc;--acc:#38bdf8;--up:#22c55e;--dn:#ef4444}}
-*{{box-sizing:border-box}}
-body{{margin:0;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);line-height:1.65}}
- .wrap{{max-width:1040px;margin:0 auto;padding:24px 18px}}
- header{{padding:26px 0 12px}}
- header h1{{margin:0;font-size:clamp(1.8rem,4vw,3.2rem);line-height:1.1;color:var(--hi);letter-spacing:-.04em}}
- header h1 a{{color:var(--acc);text-decoration:none}}
- header p{{max-width:700px;color:#94a3b8;font-size:1.02rem}}
- .topnav{{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0;margin:12px 0 26px}}
- .topnav a{{color:#94a3b8;text-decoration:none;padding:7px 11px;border-radius:7px;font-size:.9rem}}
- .topnav a:hover,.topnav a.active{{background:var(--card);color:var(--acc)}}
- h2{{color:var(--hi);margin-top:34px}}
-p{{margin:.6em 0}}
-code{{background:var(--card);padding:2px 8px;border-radius:6px;color:var(--acc);font-weight:600}}
-.tbl{{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin:14px 0}}
-table{{border-collapse:collapse;width:100%;font-size:.9rem}}
-th{{background:var(--card);color:var(--hi);text-align:left;padding:10px 12px;border-bottom:2px solid var(--acc)}}
-td{{padding:9px 12px;border-bottom:1px solid var(--line)}}
-tr:nth-child(even) td{{background:rgba(30,41,59,.4)}}
-.up{{color:var(--up);font-weight:600}}.down{{color:var(--dn);font-weight:600}}
-.cta{{display:block;text-align:center;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#0f172a;
-font-weight:700;padding:14px;border-radius:12px;text-decoration:none;margin:28px 0;font-size:1.05rem}}
-.ad{{margin:26px 0;min-height:90px}}
-.afil{{margin-top:40px;border-top:1px solid var(--line);padding-top:18px;font-size:.92rem;display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center}}
-.afil a{{color:var(--acc);font-weight:600}}
-.afil-desk{{color:#94a3b8;margin-left:6px}}
-.kosong{{color:#94a3b8;font-style:italic}}
-.back{{color:var(--acc)}}
-footer{{margin-top:48px;border-top:1px solid var(--line);padding-top:16px;font-size:.85rem;color:#94a3b8}}
- ul.artikel-list{{list-style:none;padding:0}}ul.artikel-list li{{padding:10px 0;border-bottom:1px solid var(--line)}}
- .hero{{background:radial-gradient(circle at 90% 0%,rgba(56,189,248,.2),transparent 38%),linear-gradient(145deg,#172a46,#101827);border:1px solid #2b5171;border-radius:18px;padding:30px;margin:8px 0 24px;box-shadow:0 18px 50px rgba(0,0,0,.2)}}
- .hero .eyebrow{{color:var(--acc);font-size:.78rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}}
- .hero h2{{font-size:clamp(1.5rem,3.5vw,2.4rem);margin:9px 0 10px;max-width:760px}}
- .hero p{{max-width:700px;color:#cbd5e1;font-size:1.02rem}}
- .hero-links{{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}}
- .hero-links a{{background:var(--acc);color:#07111f;text-decoration:none;font-weight:800;padding:10px 14px;border-radius:9px}}
- .hero-links a.alt{{background:transparent;color:var(--txt);border:1px solid var(--line)}}
- .feature-grid{{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0 28px}}
- .feature{{background:rgba(30,41,59,.58);border:1px solid var(--line);border-radius:12px;padding:15px}}
- .feature b{{display:block;color:var(--hi);margin:7px 0 4px}}.feature span{{font-size:.88rem;color:#94a3b8}}
- @media(max-width:700px){{.feature-grid{{grid-template-columns:repeat(2,1fr)}}.hero{{padding:22px 18px}}}}
- @media(max-width:420px){{.feature-grid{{grid-template-columns:1fr}}}}
-</style>
-</head>
-<body><div class="wrap">
-<header><h1><a href="{SITE_URL}">{html.escape(SITE_NAME)}</a></h1>
-<p>{html.escape(SITE_DESC)}</p></header>
-{nav}
-    <div class="ad">{adsense_unit(ADSENSE_SLOT_ATAS)}</div>
-{isi}
-<div class="ad">{adsense_unit(ADSENSE_SLOT_TENGAH)}</div>
-    <div class="ad">{adsense_unit(ADSENSE_SLOT_BAWAH)}</div>
-<div class="afil"><strong>Bekal trading kamu:</strong> {aff}</div>
-<footer>Disclaimer: seluruh konten bersifat informasi &amp; edukasi, bukan rekomendasi jual-beli efek.
-Data berasal dari pemantauan otomatis dan dapat berubah. Do Your Own Research.</footer>
-</div></body></html>"""
+def halaman(judul, isi, tanggal_slug, indeks=False, path_rel=""):
+    """Halaman artikel/beranda via template bersama (canonical + OG + JSON-LD otomatis)."""
+    tgl_pub = datetime.strptime(tanggal_slug, "%Y-%m-%d") if (tanggal_slug and not indeks) else None
+    return template_situs.layout(
+        judul, isi, path_rel=path_rel,
+        jenis=("website" if indeks else "article"),
+        waktu_publish=tgl_pub, active_path=("artikel/index.html" if not indeks else ""))
 
 
 def tabel_indeks():
@@ -209,7 +113,7 @@ def tabel_indeks():
     for f in files[:60]:
         nama = os.path.basename(f)[:-5]
         tgl = datetime.strptime(nama, "%Y-%m-%d")
-        li.append(f'<li>📄 <a href="artikel/{nama}.html">Ringkasan pasar {tanggal_id(tgl)}</a></li>')
+        li.append(f'<li>📄 <a href="{nama}.html">Ringkasan pasar {tanggal_id(tgl)}</a></li>')
     return f"<h2>Artikel Terbaru</h2><ul class='artikel-list'>{''.join(li) if li else '<li>Belum ada artikel.</li>'}</ul>"
 
 
@@ -232,7 +136,7 @@ def utama():
         isi = susun_blok(df, stempel, tanggal_id(now))
         judul = f"Ringkasan Pasar Saham IHSG {tanggal_id(now)}"
         with open(out_hari, "w") as f:
-            f.write(halaman(judul, isi, tgl_hari))
+            f.write(halaman(judul, isi, tgl_hari, path_rel=f"artikel/{tgl_hari}.html"))
         print(f"✅ Artikel hari ini: docs/artikel/{tgl_hari}.html ({len(df)} saham)")
 
     # Indeks landing page utama selalu diperbarui
@@ -252,10 +156,21 @@ def utama():
     <h2>Jelajahi Analisis Publik</h2>
     <p>Semua halaman diperbarui otomatis mengikuti data screening terbaru. Gunakan sebagai bahan riset awal, bukan sebagai instruksi transaksi.</p>
     {tabel_indeks()}
+    <p><a href="{SITE_URL}artikel/index.html">Lihat semua arsip artikel &rarr;</a></p>
     """
     with open(os.path.join(BASE, "docs", "index.html"), "w") as f:
-        f.write(halaman(f"Beranda | {SITE_NAME}", isi_idx, tgl_hari, indeks=True))
+        f.write(halaman("", isi_idx, tgl_hari, indeks=True))
     print("✅ Landing page: docs/index.html diperbarui")
+
+    # Halaman indeks artikel (docs/artikel/index.html) + perbaikan link di beranda
+    isi_daftar = ("<h2>Semua Artikel Harian</h2>"
+                  "<p>Arsip ringkasan pasar IHSG, terbaru di atas.</p>"
+                  + tabel_indeks())
+    with open(os.path.join(DIR_ARTIKEL, "index.html"), "w") as f:
+        f.write(halaman("Arsip Artikel", isi_daftar, tgl_hari, indeks=True, path_rel="artikel/index.html"))
+    print("✅ Indeks artikel: docs/artikel/index.html diperbarui")
+
+    tulis_robots_dan_sitemap()
 
     # Halaman publik tab non-portfolio dibuat terpisah agar pengunjung tidak perlu
     # masuk ke Streamlit hanya untuk membaca ringkasan hasil screening.
@@ -264,6 +179,34 @@ def utama():
         buat_halaman_publik.main()
     except Exception as e:
         print(f"⚠️ Halaman publik tab gagal dibuat: {e}")
+
+
+def tulis_robots_dan_sitemap():
+    """robots.txt + sitemap.xml: artikel & halaman statis yang ada di docs/."""
+    docs = os.path.join(BASE, "docs")
+    urls = [("", "daily", "1.0"), ("market.html", "daily", "0.9"),
+            ("screener.html", "daily", "0.9"), ("radar.html", "daily", "0.8"),
+            ("detektif.html", "daily", "0.8"), ("artikel/index.html", "daily", "0.8"),
+            ("saham/", "weekly", "0.6")]
+    for f in sorted(glob.glob(os.path.join(docs, "saham", "*.html"))):
+        if os.path.basename(f) != "index.html":
+            urls.append((f"saham/{os.path.basename(f)}", "weekly", "0.5"))
+    for f in sorted(glob.glob(os.path.join(DIR_ARTIKEL, "20*.html")), reverse=True)[:60]:
+        urls.append((f"artikel/{os.path.basename(f)}", "monthly", "0.7"))
+
+    with open(os.path.join(docs, "robots.txt"), "w") as f:
+        f.write(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}sitemap.xml\n")
+
+    kini = datetime.now(WIB).strftime("%Y-%m-%d")
+    entri = "".join(
+        f"<url><loc>{SITE_URL}{p}</loc><changefreq>{cf}</changefreq>"
+        f"<priority>{pr}</priority>{f'<lastmod>{kini}</lastmod>' if cf != 'monthly' else ''}</url>"
+        for p, cf, pr in urls)
+    with open(os.path.join(docs, "sitemap.xml"), "w") as f:
+        f.write('<?xml version="1.0" encoding="UTF-8"?>\n'
+                '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+                f'{entri}</urlset>\n')
+    print(f"✅ robots.txt + sitemap.xml ({len(urls)} URL)")
 
 
 if __name__ == "__main__":

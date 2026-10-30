@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://dadungdadung87-cloud.github.io/SAHAM-SCREENING/sitemap.xml
