@@ -16,6 +16,7 @@ import yfinance as yf
 BASE = "/home/kaltaraid/Documents/SAHAM-SCREENING"
 sys.path.insert(0, BASE)
 from konfig_situs import SITE_URL, SITE_NAME, SITE_DESC  # noqa: E402
+import template_situs  # noqa: E402
 
 OUT_DIR = os.path.join(BASE, "docs", "saham")
 WIB = timezone(timedelta(hours=7))
@@ -43,40 +44,28 @@ def ambil_ohlcv(ticker, periode="2y"):
 
 
 def layout_saham(kode, nama, bars_json, last):
+    """Halaman detail satu saham via template bersama; warna naik/turun via css_extra."""
     chg = last.get("chg", 0)
     warna = "#22c55e" if chg >= 0 else "#ef4444"
-    return f"""<!doctype html>
-<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{kode} {nama} — Grafik & Analisa | {SITE_NAME}</title>
-<meta name="description" content="Grafik candlestick {kode} ({nama}) 2 tahun terakhir, volume, dan ringkasan indikator teknikal. Data pasar Indonesia.">
-<script src="{CHART_JS}"></script>
-<style>
-:root{{--bg:#0b1220;--card:#152238;--line:#293b55;--txt:#cbd5e1;--hi:#f8fafc;--blue:#38bdf8;--green:#22c55e;--red:#ef4444}}
-*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--txt);font:15px system-ui,-apple-system,Segoe UI,sans-serif}}
-.wrap{{max-width:1180px;margin:auto;padding:16px}}
-header h1{{color:var(--hi);font-size:1.5rem;margin:0}}
+    css_extra = f"""
 header h1 span{{color:{warna}}}
-.sub{{color:#94a3b8;font-size:.9rem;margin:4px 0 14px}}
 .price{{font-size:2.2rem;font-weight:800;color:{warna}}}
 .price small{{font-size:1rem;color:{warna};font-weight:600}}
 #chart{{height:420px;margin:18px 0}}
-.grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0}}
-.card{{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}}
-.card b{{display:block;color:var(--hi);font-size:1.1rem}}.card small{{color:#94a3b8}}
-a.back{{color:var(--blue);text-decoration:none;display:inline-block;margin:10px 0}}
-footer{{margin-top:34px;border-top:1px solid var(--line);padding-top:12px;color:#94a3b8;font-size:.85rem}}
 @media(max-width:600px){{.price{{font-size:1.6rem}}#chart{{height:320px}}}}
-</style></head><body><div class="wrap">
-<header><a class="back" href="{SITE_URL}saham/">&larr; Daftar saham</a>
-<h1>{kode} <span>{chg:+.2f}%</span></h1>
-<div class="sub">{nama}</div>
-<div class="price">Rp {last.get('close', 0):,}<small> {chg:+.2f}%</small></div>
-</header>
+"""
+    desk = (f"Grafik candlestick {kode} 2 tahun terakhir, volume, dan ringkasan "
+            f"indikator teknikal saham {nama}. Data pasar Indonesia.")
+    isi = f"""
+<p><a class="back" href="{SITE_URL}saham/">&larr; Daftar saham</a></p>
+<header><h1>{kode} <span>{chg:+.2f}%</span></h1>
+<div class="sub">{template_situs.esc(nama)}</div>
+<div class="price">Rp {last.get('close', 0):,}<small> {chg:+.2f}%</small></div></header>
 <div id="chart"></div>
 <script>
 const bars = {bars_json};
 const chart = LightweightCharts.createChart(document.getElementById('chart'), {{
-  layout: {{ background: {{ type: 'solid', color: '#0b1220' }}, textColor: '#cbd5e1' }},
+  layout: {{ background: {{ type: 'solid', color: '#0f172a' }}, textColor: '#cbd5e1' }},
   grid: {{ vertLines: {{ color: '#1c2b45' }}, horzLines: {{ color: '#1c2b45' }} }},
   timeScale: {{ timeVisible: false }},
   crosshair: {{ mode: 0 }},
@@ -90,35 +79,34 @@ const vol = chart.addHistogramSeries({{ priceFormat: {{ type: 'volume' }}, price
 vol.setData(bars.map(b => ({{ time: b[0]/1000, value: b[5], color: b[4] >= b[1] ? '#22c55e55' : '#ef444455' }})));
 chart.timeScale().fitContent();
 </script>
-<footer>Data edukasi, bukan rekomendasi jual-beli efek. Sumber: Yahoo Finance (OHLCV harian). Do Your Own Research.</footer>
-</div></body></html>"""
+<p>Data edukasi, bukan rekomendasi jual-beli efek. Sumber: Yahoo Finance (OHLCV harian). Do Your Own Research.</p>"""
+    return template_situs.layout(
+        f"{kode} — Grafik & Analisa", isi, path_rel=f"saham/{kode}.html",
+        deskripsi=desk, active_path="saham/",
+        css_extra=css_extra, head_extra=f'<script src="{CHART_JS}"></script>')
 
 
 def layout_palette(daftar):
+    """Daftar saham via template bersama; grid ticker via css_extra."""
     item = "".join(
-        f'<a class="tk" href="{SITE_URL}saham/{r["code"]}.html"><b>{r["code"]}</b><span>{r["name"][:38]}</span></a>'
+        f'<a class="tk" href="{template_situs.esc(r["code"])}.html">'
+        f'<b>{template_situs.esc(r["code"])}</b><span>{template_situs.esc(r["name"][:38])}</span></a>'
         for r in daftar)
-    return f"""<!doctype html>
-<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Daftar Saham — Grafik & Analisa | {SITE_NAME}</title>
-<meta name="description" content="Daftar lengkap saham IDX dengan grafik candlestick 2 tahun. Pilih saham untuk melihat grafik dan analisa.">
-<style>
-:root{{--bg:#0b1220;--card:#152238;--line:#293b55;--txt:#cbd5e1;--hi:#f8fafc;--blue:#38bdf8}}
-*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--txt);font:15px system-ui,sans-serif}}
-.wrap{{max-width:1180px;margin:auto;padding:16px}}
-h1{{color:var(--hi)}}a.back{{color:var(--blue);text-decoration:none}}
-.grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin:18px 0}}
-.tk{{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 12px;text-decoration:none;color:var(--txt);display:block}}
-.tk:hover{{border-color:var(--blue)}}
-.tk b{{color:var(--blue);font-size:1.05rem;display:block}}
-.tk span{{font-size:.82rem;color:#94a3b8}}
-footer{{margin-top:30px;border-top:1px solid var(--line);padding-top:12px;color:#94a3b8;font-size:.85rem}}
-</style></head><body><div class="wrap">
-<h1>📈 Daftar Saham IDX — {len(daftar)} ticker</h1>
-<a class="back" href="{SITE_URL}">&larr; Beranda</a>
-<div class="grid">{item}</div>
-<footer>Data edukasi, bukan rekomendasi jual-beli efek.</footer>
-</div></body></html>"""
+    isi = (f"<h2>📈 Daftar Saham IDX — {len(daftar)} ticker</h2>"
+           f'<p><a href="{SITE_URL}">&larr; Beranda</a></p>'
+           f'<div class="grid tk-grid">{item}</div>'
+           f"<p>Data edukasi, bukan rekomendasi jual-beli efek.</p>")
+    css_extra = """
+.tk-grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.tk{background:rgba(30,41,59,.58);border:1px solid var(--line);border-radius:9px;padding:10px 12px;text-decoration:none;color:var(--txt);display:block}
+.tk:hover{border-color:var(--acc)}
+.tk b{color:var(--acc);font-size:1.05rem;display:block}
+.tk span{font-size:.82rem;color:#94a3b8}
+"""
+    return template_situs.layout(
+        "Daftar Saham — Grafik & Analisa", isi, path_rel="saham/",
+        deskripsi="Daftar lengkap saham IDX dengan grafik candlestick 2 tahun. Pilih saham untuk melihat grafik dan analisa.",
+        active_path="saham/", css_extra=css_extra)
 
 
 def utama(args):

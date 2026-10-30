@@ -138,7 +138,7 @@ def json_ld(jenis, judul, path_rel, waktu_publish=None):
 
 
 def layout(judul, isi, path_rel="", jenis="website", waktu_publish=None,
-           deskripsi=None, css_extra="", active_path=None):
+           deskripsi=None, css_extra="", active_path=None, head_extra=""):
     """Bangun halaman HTML lengkap.
     judul          : judul halaman TANPA nama situs (otomatis digabung, bebas bug dobel)
     path_rel       : path relatif dari root situs utk canonical/OG ("" = beranda)
@@ -146,6 +146,7 @@ def layout(judul, isi, path_rel="", jenis="website", waktu_publish=None,
     waktu_publish  : datetime (utk article:published_time & JSON-LD)
     deskripsi      : override meta description per halaman
     active_path    : path nav yang ditandai aktif (default = path_rel)
+    head_extra     : HTML tambahan di <head> (mis. <script src> eksternal)
     """
     path_rel = path_rel.lstrip("/")
     aktif = active_path if active_path is not None else path_rel
@@ -181,6 +182,7 @@ def layout(judul, isi, path_rel="", jenis="website", waktu_publish=None,
 {f'<meta property="article:published_time" content="{iso}">' if iso else ''}
 {adsense_head()}
 {json_ld(jenis, judul, path_rel, iso)}
+{head_extra}
 <style>{CSS}{css_extra}</style>
 </head>
 <body><div class="wrap">
