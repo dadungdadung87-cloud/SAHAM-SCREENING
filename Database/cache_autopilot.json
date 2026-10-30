@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-10-29 15:55:01",
+    "stempel_data": "2026-10-30 15:15:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "BLES",
-            "PNSE",
+            "",
+            "",
             "",
             "",
             ""
         ],
         "RUMUS 2": [
-            "BLES",
+            "DNET",
             "",
             "",
             "",
             ""
         ],
         "RUMUS 3": [
-            "UNIQ",
-            "BLES",
+            "DNET",
+            "CBUT",
             "",
             "",
             ""
         ],
         "RUMUS 4": [
-            "CBUT",
-            "AGII",
-            "WIIM",
-            "UNIQ",
-            "SSMS"
+            "DNET",
+            "FMII",
+            "NPGF",
+            "BINA",
+            "AWAN"
         ],
         "RUMUS 5": [
-            "CBUT",
-            "AGII",
-            "OMRE",
-            "AWAN",
-            "WIIM"
+            "FMII",
+            "NPGF",
+            "ASII",
+            "HMSP",
+            "JSMR"
         ],
         "RUMUS 6": [
-            "ASII",
-            "AGII",
-            "WIIM",
-            "BLES",
-            "SSMS"
+            "NPGF",
+            "DKFT",
+            "BINA",
+            "MARK",
+            "POWR"
         ],
         "RUMUS 7": [
             "MKNT",
-            "AGII",
-            "BLES",
+            "PTSP",
             "AXIO",
-            "PNSE"
+            "",
+            ""
         ],
         "RUMUS 8": [
-            "CBUT",
-            "AGII",
-            "ASII",
-            "BLES",
-            "PTSN"
+            "DNET",
+            "",
+            "",
+            "",
+            ""
         ],
         "RUMUS 9": [
+            "DNET",
+            "LPIN",
             "CBUT",
-            "AGII",
-            "ASII",
-            "UNIQ",
-            "BLES"
+            "",
+            ""
         ]
     }
 }
