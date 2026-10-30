@@ -1,3 +1,1 @@
-Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL,Mode_Beli,Change_Beli
-2026-10-27 15:49,JSMR,2750.0,72,19829700.0,2888,2668,MANUAL,1.851851851851852
-2026-10-27 15:49,PWON,288.0,693,19988337.6,302,279,MANUAL,1.4084507042253522
+Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL
