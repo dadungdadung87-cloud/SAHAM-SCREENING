@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-10-30 15:55:01",
+    "stempel_data": "2026-11-02 15:15:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "SDPC",
+            "",
             "",
             "",
             "",
             ""
         ],
         "RUMUS 2": [
-            "DNET",
-            "SDPC",
+            "CBUT",
+            "NFCX",
             "",
             "",
             ""
         ],
         "RUMUS 3": [
-            "DNET",
             "CBUT",
-            "PBID",
-            "SDPC",
+            "NFCX",
+            "",
+            "",
             ""
         ],
         "RUMUS 4": [
-            "WIIM",
-            "ABMM",
-            "BINA",
-            "DNET",
-            "AWAN"
+            "NPGF",
+            "MPMX",
+            "DKFT",
+            "ADMR",
+            "POWR"
         ],
         "RUMUS 5": [
-            "WIIM",
-            "ABMM",
-            "BINA",
+            "NPGF",
+            "WOMF",
             "ASII",
-            "HMSP"
+            "LSIP",
+            "DKFT"
         ],
         "RUMUS 6": [
-            "APIC",
-            "WIIM",
-            "ABMM",
-            "BINA",
+            "AKPI",
+            "DFAM",
+            "NPGF",
+            "MPMX",
             "DKFT"
         ],
         "RUMUS 7": [
-            "MKNT",
-            "PTSP",
-            "SDPC",
-            "AXIO",
+            "AKPI",
+            "JRPT",
+            "ANDI",
+            "",
             ""
         ],
         "RUMUS 8": [
-            "DNET",
-            "SDPC",
-            "",
-            "",
+            "AKPI",
+            "MPMX",
+            "CBUT",
+            "NFCX",
             ""
         ],
         "RUMUS 9": [
-            "DNET",
-            "LPIN",
+            "AKPI",
+            "MPMX",
             "CBUT",
-            "PBID",
-            "SDPC"
+            "NFCX",
+            "ROCK"
         ]
     }
 }
