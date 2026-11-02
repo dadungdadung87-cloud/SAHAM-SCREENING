@@ -1,5 +1,5 @@
 {
-    "stempel_data": "2026-11-02 15:15:01",
+    "stempel_data": "2026-11-02 15:55:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
@@ -10,60 +10,60 @@
             ""
         ],
         "RUMUS 2": [
+            "POWR",
+            "MPMX",
             "CBUT",
             "NFCX",
-            "",
-            "",
             ""
         ],
         "RUMUS 3": [
+            "POWR",
+            "MPMX",
             "CBUT",
             "NFCX",
-            "",
-            "",
             ""
         ],
         "RUMUS 4": [
+            "PGAS",
             "NPGF",
+            "POWR",
             "MPMX",
-            "DKFT",
-            "ADMR",
-            "POWR"
+            "DKFT"
         ],
         "RUMUS 5": [
+            "PGAS",
             "NPGF",
-            "WOMF",
+            "POWR",
             "ASII",
-            "LSIP",
-            "DKFT"
+            "BLES"
         ],
         "RUMUS 6": [
-            "AKPI",
             "DFAM",
+            "AKPI",
             "NPGF",
-            "MPMX",
-            "DKFT"
+            "POWR",
+            "MPMX"
         ],
         "RUMUS 7": [
             "AKPI",
+            "SMMA",
+            "BLES",
             "JRPT",
-            "ANDI",
-            "",
-            ""
+            "ANDI"
         ],
         "RUMUS 8": [
             "AKPI",
+            "POWR",
             "MPMX",
-            "CBUT",
-            "NFCX",
-            ""
+            "BLES",
+            "CBUT"
         ],
         "RUMUS 9": [
-            "AKPI",
+            "POWR",
             "MPMX",
-            "CBUT",
-            "NFCX",
-            "ROCK"
+            "AKPI",
+            "KINO",
+            "CBUT"
         ]
     }
 }
