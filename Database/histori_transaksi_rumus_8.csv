@@ -1,1 +1,2 @@
 Tanggal_Beli,Tanggal_Jual,Ticker,Harga_Beli,Harga_Jual,Status,Total_Return_Rp,Return_%,Mode_Beli,Change_Beli
+2026-11-02 16:01,2026-11-03 09:25,AKPI,635.0,605,CUT_LOSS ✂️ (auto SL),-1275874.5,-5.1,MANUAL,24.509803921568626
