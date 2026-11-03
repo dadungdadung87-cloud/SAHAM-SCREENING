@@ -12,7 +12,7 @@
 # PART 09 : FORMATTER & PEWARNAAN TABEL
 # PART 10 : TAB 1 - MARKET OVERVIEW
 # PART 11 : TAB 2 - SCREENER UTAMA
-# PART 12 : TAB 3 - ASISTEN AI (RUMUS v5.2 + RADAR LIVE)
+# PART 12 : TAB 3 - ASISTEN AI (RUMUS v6.0 + RADAR LIVE)
 # PART 13 : TAB 4 - PORTOFOLIO BOT (+ KURASI)
 # PART 14 : TAB 5 - DETEKTIF LEDAKAN
 # =====================================================================
@@ -1880,9 +1880,9 @@ if not df_hasil.empty:
 
 
 # =====================================================================
-# >>> PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS v5.2 + RADAR LIVE + TELEGRAM SNAPSHOT) <<<
+# >>> PART 12 : TAB 3 - ASISTEN AI SPESIAL (RUMUS v6.0 + RADAR LIVE + TELEGRAM SNAPSHOT) <<<
 # =====================================================================
-    VERSI_SIDANG = "v5.2"
+    VERSI_SIDANG = "v6.0"
     MAX_CHANGE_BELI = 20.0  # saringan keras BSJP (sinkron dengan sidang_lib.py)
     FILE_CACHE_AUTOPILOT = "Database/cache_autopilot.json"
 
@@ -1905,7 +1905,7 @@ if not df_hasil.empty:
         if 'Tekanan Bandar' not in df_hasil.columns:
             st.warning("⏳ **Fitur Radar belum menerima data terbaru.** Harap jalankan 'update_data.py'.")
         else:
-            # --- SUSUNAN RUMUS v5.2: 1-5 remap, 6-9 rumus baru ---
+            # --- SUSUNAN RUMUS v6.0: inti rebound dari low intraday + skor pembekal ---
             df_v1 = df_v2 = df_v3 = df_v4 = df_v5 = df_v6 = df_v7 = df_v8 = df_v9 = pd.DataFrame()
             if not df_hasil.empty:
                 vwap_ok = (df_hasil.get('Posisi VWAP', '') != 'Di Bawah VWAP (Lemah)')
@@ -1914,8 +1914,6 @@ if not df_hasil.empty:
                 change_num = pd.to_numeric(df_hasil.get('Change (%)', 0), errors='coerce')
                 supply_banjir = df_hasil['Kondisi Supply'].astype(str).str.contains('Banjir', na=False) if 'Kondisi Supply' in df_hasil.columns else False
                 score_num = pd.to_numeric(df_hasil.get('Total Score', 0), errors='coerce')
-                # Pagar zona mati (bukti 122 trade: change 10-20% winrate 0%): RUMUS 1-5 hanya < 7%
-                pagar_7 = (change_num < 7.0)
                 pola_sisir_aktif = df_hasil.get('Pola Sisir', '').astype(str).str.contains('Pola Sisir', na=False) if 'Pola Sisir' in df_hasil.columns else pd.Series(False, index=df_hasil.index)
                 # --- FILTER SAHAM SUSPEND (beku / delisted) — tidak masuk rumus mana pun ---
                 try:
@@ -1943,65 +1941,60 @@ if not df_hasil.empty:
                 mark_up = (df_hasil.get('Fase Siklus Bandar', '') == 'Mark-Up (Fase Pesta)')
                 macd_bull = (df_hasil.get('MACD', '') == 'Strong Bullish')
 
-                # RUMUS 1: Smart Money Menyelam (eks R2)
-                cond_v1 = (akumulasi_pro &
-                           (df_hasil.get('Status Bandar', '') == 'Akumulasi Kuat') &
-                           vwap_kuat &
-                           ~supply_banjir & pagar_7)
+                # --- v6.0: state rebound intraday + skor pembekal (identik sidang_lib) ---
+                try:
+                    from sidang_lib import muat_rebound_state, muat_skor_pembekal
+                    _reb_state = muat_rebound_state(os.path.dirname(os.path.abspath(__file__)))
+                    _skor_bekal = muat_skor_pembekal(os.path.dirname(os.path.abspath(__file__)))
+                except Exception:
+                    _reb_state, _skor_bekal = {}, {}
+                _tk = df_hasil['Ticker'].astype(str).str.upper()
+                _reb_pct = _tk.map({t: v[0] for t, v in _reb_state.items()}).fillna(0).astype(float)
+                reb_dini = (_reb_pct >= 3.0)     # sudah memantul >=3% dari low intraday
+                reb_besar = (_reb_pct >= 8.0)    # rebound besar (momentum kedua)
+                _sk = _tk.map(_skor_bekal).fillna(0).astype(int)
+                bekal_kuat = (_sk >= 4)          # pembekal rebound dari penutupan kemarin
+                # RUMUS 1 — Rebound Dini Pembekal (inti v6)
+                cond_v1 = (bekal_kuat & reb_dini & ~supply_banjir &
+                           (haka | akumulasi_pro | vwap_kuat))
                 df_v1 = df_hasil[cond_v1].copy()
 
-                # RUMUS 2: Pantulan Jarum Bawah (eks R3)
-                cond_v2 = (((df_hasil.get('Pola Candle', '') == 'Hammer (Potensi Reversal)') |
-                            (df_hasil.get('Sinyal Cuci Barang', '') == 'Jarum Bawah (Sinyal Pantulan Kuat)')) &
-                           vwap_kuat &
-                           akumulasi_pro & pagar_7)
+                # RUMUS 2 — Rebound Dini Luas (wajib konfirmasi teknikal)
+                cond_v2 = (reb_dini & vol_tembus & ~supply_banjir &
+                           (haka | akumulasi_pro | macd_bull))
                 df_v2 = df_hasil[cond_v2].copy()
 
-                # RUMUS 3: Tutup Kuat, Bandar Hajar (eks R1)
-                cond_v3 = (vwap_kuat &
-                           haka &
-                           (df_hasil.get('Status Open', '') == 'Open = Low (Bullish Kuat)') &
-                           (df_hasil.get('Rekomendasi', '') == 'BELI') & pagar_7)
+                # RUMUS 3 — Rebound + Sisir Aktif (lift sisir 3.1x)
+                cond_v3 = (reb_dini & pola_sisir_aktif & (vwap_ok | vwap_kuat) & ~supply_banjir)
                 df_v3 = df_hasil[cond_v3].copy()
 
-                # RUMUS 4: Golden Cross Muda (longgarkan v5.2)
-                cond_v4 = (((df_hasil.get('MA Cross', '') == 'Golden Cross') |
-                            (df_hasil.get('MACD', '').isin(['Strong Bullish', 'Bullish MACD']))) &
-                           vol_tembus &
-                           (df_hasil.get('MA Signal', '') == 'Uptrend') &
-                           vwap_kuat &
-                           (haka | akumulasi_pro) & pagar_7)
+                # RUMUS 4 — Pantulan Jarum Bawah v6 (hammer/jarum + rebound jalan)
+                cond_v4 = (((df_hasil.get('Pola Candle', '') == 'Hammer (Potensi Reversal)') |
+                            (df_hasil.get('Sinyal Cuci Barang', '') == 'Jarum Bawah (Sinyal Pantulan Kuat)')) &
+                           reb_dini & (vwap_ok | akumulasi_pro) & ~supply_banjir)
                 df_v4 = df_hasil[cond_v4].copy()
 
-                # RUMUS 5: Pola Sisir Naik (spike berulang, struktur utuh) + pagar 7%
-                cond_v5 = (pola_sisir_aktif &
-                           (df_hasil.get('MA Signal', '') == 'Uptrend') &
-                           vwap_ok & pagar_7)
+                # RUMUS 5 — Rebound Mark-Up (lift fase pesta 3.7x)
+                cond_v5 = (mark_up & reb_dini & ~supply_banjir &
+                           (haka | akumulasi_pro | vol_tembus))
                 df_v5 = df_hasil[cond_v5].copy()
 
-                # RUMUS 6 — Uptrend Akumulasi (bebas, diperkuat: vol + supply + konfirmasi)
-                cond_v6 = ((df_hasil.get('MA Signal', '') == 'Uptrend') &
-                           (score_num >= 5) &
-                           (df_hasil.get('Likuiditas', '') == '> 1 Miliar') & vol_tembus &
-                           ~supply_banjir & (haka | akumulasi_pro))
+                # RUMUS 6 — Uptrend Rebound (struktur naik + pantulan)
+                cond_v6 = ((df_hasil.get('MA Signal', '') == 'Uptrend') & reb_dini & vol_tembus &
+                           ~supply_banjir & (akumulasi_pro | (score_num >= 5)))
                 df_v6 = df_hasil[cond_v6].copy()
 
-                # RUMUS 7 — Mark-Up Pesta diperkuat (bebas, wajib vol + supply sehat)
-                cond_v7 = (mark_up &
-                           (df_hasil.get('Trend MA (5,20,50)', '') == 'Perfect Uptrend (5>20>50)') &
-                           vol_tembus & ~supply_banjir & (haka | akumulasi_pro | macd_bull))
+                # RUMUS 7 — Rebound Besar Momentum (reb>=8% + vol tembus: pyramiding)
+                cond_v7 = (reb_besar & vol_tembus & (haka | akumulasi_pro | macd_bull) & ~supply_banjir)
                 df_v7 = df_hasil[cond_v7].copy()
 
-                # RUMUS 8 — MACD Breakout Volume diperkuat (bebas, wajib supply + konfirmasi)
-                cond_v8 = (macd_bull & vol_tembus &
-                           (df_hasil.get('MA Signal', '') == 'Uptrend') & ~supply_banjir &
-                           (haka | akumulasi_pro))
+                # RUMUS 8 — MACD Bull Rebound (tren + pantulan searah)
+                cond_v8 = (macd_bull & reb_dini & (df_hasil.get('MA Signal', '') == 'Uptrend') & ~supply_banjir)
                 df_v8 = df_hasil[cond_v8].copy()
 
-                # RUMUS 9 — AD Akumulasi Skor Tinggi diperkuat (bebas, wajib vol + momentum)
-                cond_v9 = (akumulasi_pro &
-                           (df_hasil.get('MA Signal', '') == 'Uptrend') &
-                           (score_num >= 5) & vol_tembus & (mark_up | macd_bull))
+                # RUMUS 9 — AD Akumulasi Skor Tinggi v6
+                cond_v9 = (akumulasi_pro & reb_dini & (score_num >= 5) &
+                           (mark_up | macd_bull | vol_tembus))
                 df_v9 = df_hasil[cond_v9].copy()
 
             tab_screener, tab_ai = st.tabs(["🎯 Screener Spesial", "🧠 Asisten AI"])
@@ -2010,15 +2003,15 @@ if not df_hasil.empty:
                 pilihan_v = st.selectbox(
                     "Pilih Rumus Screener BSJP:",
                     [
-                        "RUMUS 1 : Smart Money Menyelam 🕵️",
-                        "RUMUS 2 : Pantulan Jarum Bawah 📌",
-                        "RUMUS 3 : Tutup Kuat, Bandar Hajar ⚡",
-                        "RUMUS 4 : Golden Cross Muda 🌱",
-                        "RUMUS 5 : Pola Sisir Naik 🪮",
-                        "RUMUS 6 : Uptrend Akumulasi 📈",
-                        "RUMUS 7 : Mark-Up Pesta 🎉",
-                        "RUMUS 8 : MACD Breakout Volume 🌊",
-                        "RUMUS 9 : AD Akumulasi Skor Tinggi 🧠"
+                        "RUMUS 1 : Rebound Dini Pembekal 🎣",
+                        "RUMUS 2 : Rebound Dini Luas 🌊",
+                        "RUMUS 3 : Rebound + Sisir Aktif 🪮",
+                        "RUMUS 4 : Pantulan Jarum Bawah v6 📌",
+                        "RUMUS 5 : Rebound Mark-Up 🎉",
+                        "RUMUS 6 : Uptrend Rebound 📈",
+                        "RUMUS 7 : Rebound Besar Momentum 🚀",
+                        "RUMUS 8 : MACD Bull Rebound ⚡",
+                        "RUMUS 9 : AD Akumulasi Rebound 🧠"
                     ]
                 )
                 

@@ -1,0 +1,41 @@
+Objective
+- Kelola pipeline SAHAM-SCREENING (sumber data Stockbit/exodus sudah live sejak Senin 2026-11-02) dan tambahkan tombol aksi di bot Telegram bridge.
+- Tugas aktif terakhir: analisa data kemarin (02-11) untuk 18 saham yang hari ini (03-11) naik ≥10% dari low intraday, lalu buat ulang rumus 1–9 (v5.2 → versi baru) di app.py tab 3 + sidang_lib.py berdasarkan hasil analisa.
+Important Details
+- User berbahasa Indonesia; jawab dalam Bahasa Indonesia.
+- Arsitektur: cron */5 9-17 1-5 → /home/kaltaraid/Documents/DATA-CENTER/jalankan_data_center.sh → update_data.py → feed/hasil_screener.csv (835 baris, 52 kolom) → bot → R2 → Streamlit (ttl=300). Cronie service di Manjaro bernama cronie.service (bukan cron).
+- Arsip intraday harian: /home/kaltaraid/Documents/DATA-CENTER/feed/arsip/screener_YYYY-MM-DD.csv (~60 MB, snapshot 5 menit 09:00–16:55, 834 ticker).
+- Kolom feed penting: Waktu Update, Ticker, Harga (Rp), Change (%), Volume, Total Score, Tekanan Bandar (nilai: 'Dominan Jual (Guyur)', 'Seimbang / Adu Mekanik', 'Dominan Beli (Hajar Kanan)', 'Tidak Ada Transaksi'), Fase Siklus Bandar (Mark-Down/Mark-Up/Accumulation/Distribution), Vol Breakout ('Tembus MA20'/'Normal'), Kekuatan A/D ('Akumulasi Pro (Smart Money)'/'Distribusi Pro (Guyuran)'/'Netral'), MACD, Pola Sisir ('Pola Sisir (Nx spike 12H)' = aktif vs 'Pola Sisir Lemah (...)' = lemah), Kondisi Supply, RSI (14D), MA Signal ('Uptrend'/'Downtren...'), Posisi VWAP, Status Open, Support, Resistance.
+- Rumus 1–9 (v5.2) didefinisikan DUPLIKAT di dua tempat yang harus tetap identik: app.py (~baris 1908–2005, blok "SUSUNAN RUMUS v5.2: 1-5 remap, 6-9 rumus baru", ada pagar_7 = change < 7.0 untuk RUMUS 1-5) dan sidang_lib.py (hitung_rumus(), VERSI_SIDANG = "v5.2", komentar butir rumus baris 149–186). Ada juga skor_rumus.json cache (app.py:1266).
+- Temuan analisa (kemarin 02-11 → hari ini 03-11): 18 saham rebound/gap-up ≥10% (BLTZ 20.9%, BSWD 19.4%, SONA, APLI, TMPO (+34.5% vs kemarin), SMMT, CBPE, TCPI, GRIA, KINO, BCAP, TIRA, IDEA, RCCC, BTEK, GOLD, MKNT (+28.6%), AIMS (+24.5%)). Full gabungan = 18 saham unik (3 kriteria: vs low / vs open / vs penutupan kemarin).
+- Hasil backtest fitur kemarin (lift vs baseline 1.8% rebound≥10%): sisir aktif km 3.1x, fase Mark-Up km 3.7x, MA Uptrend km 2.5x, chg negatif km 1.6x, "sisir+AD akum" 4.0x (n=45, winners KINO/TCPI/TMPO), "chg neg+AD akum" 1.8x (CBPE/TCPI/TMPO), skor pembekal ≥4 (6 sinyal biner) → 7% rebound≥10% (n=61). Vol Tembus MA20 kemarin BUKAN prediktor (0.17); supply selalu Normal/Sedang (0 banjir) untuk semua 18. Kesimpulan: prediktor terbaik = struktur (sisir aktif/Mark-Up/Uptrend/AD akum) kemarin, bukan volume breakout.
+- Klaster 18-an: (a) rebound oversold (kemarin dijual, RSI rendah, Downtrend), (b) continuation momentum (kemarin sudah Mark-Up/Uptrend/Akumulasi: KINO, MKNT, TMPO, TCPI, IDEA). Jam low bervariasi (09:00–15:35) — rebound tidak selalu pagi.
+- Token Stockbit kanonik: /home/kaltaraid/Documents/SAHAM-SCREENING/token_stockbit.txt (chmod 600) — exp Rabu 04-11-2026 21:12 WIB (diperbarui manual 21:13). jaga_token.py cron */10 6-18 sinkron ke DATA-CENTER + WEB-SCREENING.
+- Git: SAHAM-SCREENING repo (origin github dadungdadung87-cloud), compact file untracked; DATA-CENTER bukan repo git. Isu lama "token .bak ter-track" terbantahkan (blob tidak ada di 6.531 commit; token files gitignored). .git bengkak 283 MB (kosmetik).
+Work State
+Completed
+- Debut Stockbit sukses Senin 02-11: semua siklus 09:00–17:55 sumber STOCKBIT, tanpa sweep pagi (kondisi UMUR_HISTORY_OK_HARI=20 di update_data.py:586-593 terbukti), cache 962/962 tiket.
+- compact_saham_screeningt.md diperbarui (status debut sukses, bukti, token, isu tersisa).
+- Tombol Telegram ditambahkan ke jembatan_opencode.py (bot @Sesi_OpenCode_bot, config telegram_opencode.json, CHAT_ID terikat 997339330): menu /menu, /belanja, /reset (lowercase + @mention varian diperbaiki setelah bug /menu tidak dikenali) → 5 tombol: 📊 Status Portofolio (9 arena), 📈 Status Screener (status.json), 🔑 Status Token (fetcher_exodus.baca_token), ▶️ Jalankan Bot Simulator (konfirmasi, bot_simulator.py --manual, cooldown 5 mnt), 🗑️ Hapus & Ganti Daftar Belanja (konfirmasi → reset_porto.py --yes). Semua fungsi status diuji unit lokal OK; user konfirmasi tombol berfungsi.
+- Auto-start bridge: /home/kaltaraid/Documents/SAHAM-SCREENING/jaga_bridge.sh (pgrep guard + nohup, log ke logs/jembatan.log) + cron @reboot dan */5 * * * * (crontab lama di-backup ke ~/.cache/crontab/crontab.bak). Bridge pid aktif berjalan.
+- Analisa 18 saham selesai: data kemarin vs hari ini, profil klaster, backtest fitur prediktif (hasil di Important Details).
+Active
+- Rumus v6.0 SELESAI ditulis & teruji: sidang_lib.py VERSI_SIDANG="v6.0" (hitung_rumus baris 238–258, helper muat_rebound_state + muat_skor_pembekal), app.py PART 12 blok rumus identik (baris ~1908–1998), app.py VERSI_SIDANG sudah dinaikkan ke "v6.0" (baris 1885 + komentar header 15/1883). py_compile kedua file OK.
+- Backtest sanity check v6.0 (arsip 02-11→03-11, skrip /tmp/opencode/backtest_v6.py, winner = naik≥10% dari low 03-11 = 15 saham versi 1-kriteria): R6 Uptrend Rebound & R8 MACD Bull terbaik presisi 60% pada 14:00 (3 winner: BSWD/KINO/TMPO, 5 kandidat); R7 Rebound Besar 44.4% (4 winner termasuk BLTZ); R3 Sisir paling luas (14/15 winner jam 16:00 tapi presisi 11%); R4 Jarum Bawah 0 winner (kandidat tersaring tidak menghasilkan); R1-R2 pembekal tertangkap kecil (2-4 winner). Winner terbanyak tertangkap mulai jam 11:00-12:00.
+- Disclaimer n=1 hari tetap berlaku (overfitting risk); hasil backtest laporan ke user 04-11.
+- Arahan rumus berdasarkan bukti: harga tidak boleh menuntut "Tembus MA20" sebagai syarat awal (volume breakout muncul terlambat); fokus struktur kemarin/hari ini: Pola Sisir aktif, Fase Mark-Up/Accumulation, MA Uptrend, AD Akumulasi, supply bukan banjir, change masih rendah saat deteksi intraday. Pagar change 7% (bukti 122 trade winrate 0%) perlu ditinjau — rebound besar (TMPO +34%) terjadi dari saham yang kemarin dijual.
+Blocked
+- Presisi prediksi intraday terbatas: terbaik backtest hanya ~4–7% (lift 2–4x) — data 1 hari & 18 saham, risiko overfitting tinggi; harus disampaikan jujur ke user.
+- Percobaan deteksi dini 10:05 (skor≥4 & naik≥2% dari low pagi) menghasilkan 0 saham — entry-time model belum ketemu.
+Next Move
+1. (Selesai) 9 rumus v6.0 sudah tertulis di app.py DAN sidang_lib.py secara identik, VERSI_SIDANG = "v6.0" di keduanya, py_compile OK, backtest sanity check arsip 02-11 selesai (hasil di Active).
+2. Commit perubahan (app.py, sidang_lib.py, jembatan_opencode.py, sidang_jadwal.py, sidang_sore.py modified; compact file untracked) bila user setuju; pantau performa v6.0 live hari bursa berikutnya.
+Relevant Files
+- /home/kaltaraid/Documents/SAHAM-SCREENING/app.py: blok SUSUNAN RUMUS v5.2 di ~baris 1908–2005 (tab 3 web) — target edit utama.
+- /home/kaltaraid/Documents/SAHAM-SCREENING/sidang_lib.py: hitung_rumus() headless (harus identik dengan app.py), VERSI_SIDANG = "v5.2" baris 9.
+- /home/kaltaraid/Documents/SAHAM-SCREENING/jembatan_opencode.py: bridge Telegram dengan 5 tombol (sudah selesai & jalan).
+- /home/kaltaraid/Documents/SAHAM-SCREENING/jaga_bridge.sh: penjaga auto-start bridge (cron @reboot + */5).
+- /home/kaltaraid/Documents/DATA-CENTER/feed/arsip/screener_2026-11-02.csv & screener_2026-11-03.csv: data intraday untuk backtest rumus.
+- /home/kaltaraid/Documents/DATA-CENTER/update_data.py: producer (jangan diubah; kondisi sweep baru teruji).
+- /home/kaltaraid/Documents/SAHAM-SCREENING/compact_saham_screeningt.md: konteks project (sudah diupdate, untracked).
+- /home/kaltaraid/Documents/SAHAM-SCREENING/Database/portofolio_aktif_rumus_{1..9}.csv & histori_transaksi_rumus_{1..9}.csv: arena bot (kolom porto: Tanggal_Beli, Ticker, Harga_Beli, Lot, Total_Modal, Target_TP, Target_CL) — struktur tidak boleh berubah.
