@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-11-03 15:15:01",
+    "stempel_data": "2026-11-03 15:55:01",
     "versi": "v5.2",
     "keranjang": {
         "RUMUS 1": [
-            "",
-            "",
+            "SMMA",
+            "CLAY",
             "",
             "",
             ""
         ],
         "RUMUS 2": [
-            "",
-            "",
+            "SMMA",
+            "CLAY",
             "",
             "",
             ""
         ],
         "RUMUS 3": [
-            "",
-            "",
+            "SMMA",
+            "CLAY",
             "",
             "",
             ""
         ],
         "RUMUS 4": [
-            "MIDI",
             "NPGF",
             "NFCX",
-            "BPFI",
-            "DKFT"
+            "SMMA",
+            "DKFT",
+            "AKPI"
         ],
         "RUMUS 5": [
-            "MIDI",
             "NPGF",
-            "KINO",
-            "BPFI",
-            "DAYA"
+            "PRDA",
+            "WIIM",
+            "DKFT",
+            "AKPI"
         ],
         "RUMUS 6": [
-            "BSWD",
             "TMPO",
-            "MIDI",
-            "MPMX",
-            ""
+            "NPGF",
+            "KINO",
+            "BSWD",
+            "MPMX"
         ],
         "RUMUS 7": [
             "BSWD",
-            "JRPT",
-            "",
-            "",
-            ""
+            "KINO",
+            "INTP",
+            "PBID",
+            "SMMA"
         ],
         "RUMUS 8": [
-            "BSWD",
             "TMPO",
-            "NFCX",
+            "KINO",
+            "BSWD",
             "MPMX",
-            ""
+            "PBID"
         ],
         "RUMUS 9": [
             "BSWD",
-            "NFCX",
+            "KINO",
             "MPMX",
-            "AKPI",
-            ""
+            "PBID",
+            "AKPI"
         ]
     }
 }
