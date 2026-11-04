@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-11-03 15:55:01",
-    "versi": "v5.2",
+    "stempel_data": "2026-11-04 15:15:01",
+    "versi": "v6.0",
     "keranjang": {
         "RUMUS 1": [
-            "SMMA",
-            "CLAY",
-            "",
-            "",
-            ""
+            "AKPI",
+            "ANDI",
+            "INTP",
+            "PBID",
+            "MYOH"
         ],
         "RUMUS 2": [
-            "SMMA",
-            "CLAY",
-            "",
-            "",
-            ""
+            "TMPO",
+            "BUVA",
+            "ANTM",
+            "PSAB",
+            "AKPI"
         ],
         "RUMUS 3": [
-            "SMMA",
-            "CLAY",
-            "",
-            "",
-            ""
+            "TMPO",
+            "PGAS",
+            "ADMR",
+            "LIVE",
+            "GRIA"
         ],
         "RUMUS 4": [
-            "NPGF",
-            "NFCX",
-            "SMMA",
-            "DKFT",
-            "AKPI"
+            "OMRE",
+            "ERAL",
+            "MYOH",
+            "MTLA",
+            "OBMD"
         ],
         "RUMUS 5": [
-            "NPGF",
-            "PRDA",
-            "WIIM",
-            "DKFT",
-            "AKPI"
+            "TMPO",
+            "AKPI",
+            "ANDI",
+            "INTP",
+            "PBID"
         ],
         "RUMUS 6": [
             "TMPO",
-            "NPGF",
-            "KINO",
-            "BSWD",
-            "MPMX"
+            "AKPI",
+            "OMRE",
+            "GRIA",
+            "BOBA"
         ],
         "RUMUS 7": [
-            "BSWD",
-            "KINO",
-            "INTP",
-            "PBID",
-            "SMMA"
+            "TMPO",
+            "OMRE",
+            "GRIA",
+            "BOBA",
+            "ANJT"
         ],
         "RUMUS 8": [
             "TMPO",
-            "KINO",
-            "BSWD",
-            "MPMX",
-            "PBID"
+            "AKPI",
+            "ANDI",
+            "MBAP",
+            "BTPS"
         ],
         "RUMUS 9": [
-            "BSWD",
-            "KINO",
-            "MPMX",
-            "PBID",
-            "AKPI"
+            "TMPO",
+            "AKPI",
+            "OMRE",
+            "GRIA",
+            "BOBA"
         ]
     }
 }
