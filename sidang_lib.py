@@ -6,7 +6,7 @@
 import os, json, re, time
 import pandas as pd
 
-VERSI_SIDANG = "v6.0"
+VERSI_SIDANG = "v6.1"
 DIR_DB = "Database"
 
 def _wb_now():
@@ -119,6 +119,30 @@ def _b64d(s):
     return base64.urlsafe_b64decode(s + "=" * (-len(s) % 4))
 
 
+def muat_open_state(base_dir=None):
+    """Pct kenaikan dari HARGA PEMBUKAAN intraday HARI INI (snapshot pertama arsip).
+    Return {ticker: (pct_dari_open, harga_open)}. Bukti 04-11: 20 winner naik>=10%
+    dari open; rebound dari low saja buta sepanjang pagi (low pagi = harga pagi)."""
+    import glob as _glob
+    base = base_dir or os.path.dirname(os.path.abspath(__file__))
+    files = sorted(_glob.glob(os.path.join(base, "Arsip_Data_Harian", "screener_*.csv")))
+    if not files:
+        return {}
+    try:
+        df = pd.read_csv(files[-1], usecols=["Waktu Update", "Ticker", "Harga (Rp)"])
+        if df.empty:
+            return {}
+        p = df.pivot_table(index="Ticker", columns="Waktu Update", values="Harga (Rp)", aggfunc="first")
+        if p.empty:
+            return {}
+        openp = p.iloc[:, 0]
+        akhir = p.ffill(axis=1).iloc[:, -1]
+        pct = ((akhir - openp) / openp * 100).replace([float("inf"), float("-inf")], 0).fillna(0)
+        return {t: (float(pct[t]), float(openp[t])) for t in p.index if openp[t] > 0}
+    except Exception:
+        return {}
+
+
 def muat_rebound_state(base_dir=None):
     """Hitung state rebound intraday HARI INI per ticker dari arsip 5-menit.
     Return dict {ticker: (pct_dari_low, low_sejauh_ini)} atau {} jika arsip belum ada.
@@ -174,13 +198,16 @@ def muat_skor_pembekal(base_dir=None):
 
 
 def hitung_rumus(df, momentum_30m=None):
-    """Rumus v6.0 — identik dengan app.py PART 12. Wajib argumen momentum_30m (dict rebound
-    dari muat_rebound_state) dan skor_pembekal (dari muat_skor_pembekal)."""
+    """Rumus v6.1 — identik dengan app.py PART 12. Wajib argumen momentum_30m (gabungan
+    rebound-dari-low + naik-dari-open dari muat_rebound_state & muat_open_state)."""
     out = {i: pd.DataFrame() for i in range(1, 10)}
     if df is None or df.empty or 'Tekanan Bandar' not in df.columns:
         return out
     if momentum_30m is None:
-        momentum_30m = muat_rebound_state()
+        _reb = muat_rebound_state()
+        _opn = muat_open_state()
+        momentum_30m = {t: (_reb.get(t, (0, 0))[0] if t in _reb else _opn.get(t, (0, 0))[0], 0)
+                        for t in set(_reb) | set(_opn)}
     if isinstance(momentum_30m, (set, list)):
         momentum_30m = {}
     reb_pct = {t: v[0] for t, v in momentum_30m.items()} if isinstance(momentum_30m, dict) else {}
@@ -217,17 +244,17 @@ def hitung_rumus(df, momentum_30m=None):
     haka = (df.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)')
     mark_up = (df.get('Fase Siklus Bandar', '') == 'Mark-Up (Fase Pesta)')
     macd_bull = (df.get('MACD', '') == 'Strong Bullish')
-    # --- v6.0 INTI BARU: REBOUND DARI LOW INTRADAY (bukan dari open) ---
-    # Bukti 03-11: 18 winner naik>=10%; mayoritas rebound dari low, bukan dari open.
-    # Rebound dini (naik>=3% dari low) = prediktor terkuat antar-hari (Senin: 24.3%, Selasa: 11%).
+    # --- v6.1 INTI BARU: GATE INTRADAY GANDA (rebound dari low ATAU naik dari open) ---
+    # Bukti 04-11: 20 winner naik>=10% dari open; mayoritas Downtrend + bekal 1-2.
+    # Konfirmasi intraday hari ini > struktur kemarin; rebate low buta sepanjang pagi.
     tk = df['Ticker'].astype(str).str.upper()
     _reb = tk.map(reb_pct).fillna(0).astype(float)
-    reb_dini = (_reb >= 3.0)        # sudah memantul >=3% dari low intraday
-    reb_besar = (_reb >= 8.0)       # rebound sudah besar (sarana trailing, bukan entry awal)
-    # --- v6.0 SKOR PEMBEKAL dari penutupan kemarin (skor 0-6) ---
+    reb_dini = (_reb >= 3.0)        # gate intraday: rebound dari low ATAU naik dari open
+    reb_besar = (_reb >= 8.0)       # momentum kedua / pyramiding
+    # --- v6.1: pembekal kemarin hanya PELUNAK (bukan syarat wajib) ---
     _sk = tk.map(skor_pembekal).fillna(0).astype(int)
-    bekal_kuat = (_sk >= 4)         # 7.9% jadi winner vs baseline 1.8% (bukti 03-11)
-    bekal_min = (_sk >= 3)
+    bekal_kuat = (_sk >= 4)
+    bekal_min = (_sk >= 2)
     # MOMENTUM 30 MENIT legacy (tidak lagi dipakai wajib; dipertahankan utk kompatibilitas)
     if isinstance(momentum_30m, dict) and momentum_30m:
         mom_set = set(momentum_30m.keys())
@@ -235,27 +262,34 @@ def hitung_rumus(df, momentum_30m=None):
         mom_set = set()
     mom30 = tk.isin(mom_set) if mom_set else pd.Series(True, index=df.index)
 
-    # RUMUS 1 — Rebound Dini Pembekal (inti v6): pembekal kuat + mulai memantul dari low
-    out[1] = df[bekal_kuat & reb_dini & ~supply_banjir & (haka | akumulasi_pro | vwap_kuat)].copy()
-    # RUMUS 2 — Rebound Dini Luas (tanpa syarat pembekal, wajib konfirmasi teknikal)
-    out[2] = df[reb_dini & vol_tembus & ~supply_banjir & (haka | akumulasi_pro | macd_bull)].copy()
-    # RUMUS 3 — Rebound + Sisir Aktif (sisir = lift 3.1x kemarin, konfirmasi rebound)
-    out[3] = df[reb_dini & pola_sisir_aktif & (vwap_ok | vwap_kuat) & ~supply_banjir].copy()
-    # RUMUS 4 — Pantulan Jarum Bawah v6 (hammer/jarum bawah + rebound sudah jalan)
-    out[4] = df[((df.get('Pola Candle', '') == 'Hammer (Potensi Reversal)') |
-                 (df.get('Sinyal Cuci Barang', '') == 'Jarum Bawah (Sinyal Pantulan Kuat)')) &
-                reb_dini & (vwap_ok | akumulasi_pro) & ~supply_banjir].copy()
-    # RUMUS 5 — Rebound Mark-Up (fase pesta + rebound: lift markup 3.7x)
-    out[5] = df[mark_up & reb_dini & ~supply_banjir & (haka | akumulasi_pro | vol_tembus)].copy()
-    # RUMUS 6 — Uptrend Rebound (struktur uptrend + rebound dini, kandidat lanjutan)
-    out[6] = df[(df.get('MA Signal', '') == 'Uptrend') & reb_dini & vol_tembus &
-                ~supply_banjir & (akumulasi_pro | (score_num >= 5))].copy()
-    # RUMUS 7 — Rebound Besar Momentum (reb>=8% + vol tembus: momentum kedua / pyramiding)
+    # --- v6.1: kolom intraday hari ini (bukan struktur kemarin) ---
+    supply_kering = df['Kondisi Supply'].astype(str).str.contains('Kering', na=False) if 'Kondisi Supply' in df.columns else pd.Series(False, index=df.index)
+    marubozu = (df.get('Pola Candle', '') == 'Marubozu (Strong Bullish)')
+    hammer = (df.get('Pola Candle', '') == 'Hammer (Potensi Reversal)') | \
+             (df.get('Sinyal Cuci Barang', '') == 'Jarum Bawah (Sinyal Pantulan Kuat)')
+    haka = (df.get('Tekanan Bandar', '') == 'Dominan Beli (Hajar Kanan)')
+    # --- v6.1 PERBAIKAN BUG: sisir AKTIF hanya "spike 12H"; filter lama (contains) ikut
+    # menangkap "Pola Sisir Lemah" sehingga tidak menyeleksi apa pun ---
+    sisir_aktif = df.get('Pola Sisir', '').astype(str).str.contains('spike 12H', na=False) if 'Pola Sisir' in df.columns else pd.Series(False, index=df.index)
+
+    # RUMUS 1 — Hajar Kanan Momentum (inti v6.1): beli dominan + gate intraday
+    out[1] = df[haka & reb_dini & ~supply_banjir & (vwap_kuat | marubozu)].copy()
+    # RUMUS 2 — Marubozu Breakout: candle kekuatan penuh + vol tembus MA20
+    out[2] = df[marubozu & reb_dini & vol_tembus & ~supply_banjir].copy()
+    # RUMUS 3 — Sisir Aktif Breakout (fix bug: benar-benar hanya sisir spike 12H)
+    out[3] = df[sisir_aktif & reb_dini & ~supply_banjir].copy()
+    # RUMUS 4 — Pantulan Hammer: jarum bawah/hammer + pembekal kemarin (pelunak)
+    out[4] = df[hammer & reb_dini & (bekal_min | akumulasi_pro) & vwap_ok & ~supply_banjir].copy()
+    # RUMUS 5 — Akumulasi Pro Turnaround: smart money naik walau fase masih jelek
+    out[5] = df[akumulasi_pro & reb_dini & haka & ~supply_banjir].copy()
+    # RUMUS 6 — Mark-Up Kontinu: fase pesta + gate intraday (struktur kemarin valid saat fase benar)
+    out[6] = df[mark_up & reb_dini & ~supply_banjir & (haka | vol_tembus)].copy()
+    # RUMUS 7 — Momentum Besar (reb>=8%): pyramiding, konfirmasi ganda
     out[7] = df[reb_besar & vol_tembus & (haka | akumulasi_pro | macd_bull) & ~supply_banjir].copy()
-    # RUMUS 8 — MACD Bull Rebound (MACD kuat + rebound: tren + pantulan searah)
-    out[8] = df[macd_bull & reb_dini & (df.get('MA Signal', '') == 'Uptrend') & ~supply_banjir].copy()
-    # RUMUS 9 — AD Akumulasi Skor Tinggi v6 (akumulasi pro + skor tinggi + rebound)
-    out[9] = df[akumulasi_pro & reb_dini & (score_num >= 5) & (mark_up | macd_bull | vol_tembus)].copy()
+    # RUMUS 8 — MACD Bull Rebound: tren balik + gate intraday
+    out[8] = df[macd_bull & reb_dini & (haka | akumulasi_pro) & ~supply_banjir].copy()
+    # RUMUS 9 — Skor Tinggi Konfirmasi: total score tinggi + konfirmasi intraday
+    out[9] = df[(score_num >= 5) & reb_dini & (haka | vol_tembus | macd_bull) & ~supply_banjir].copy()
     return out
 
 def jalankan_sidang(daftar_rumus, df_data, api_key, log=print, mode_tulis=True):
