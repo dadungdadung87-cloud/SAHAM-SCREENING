@@ -28,6 +28,8 @@ if [ -f "$FEED/hasil_screener.csv" ]; then
     HARI=$(date +%F)
     [ -f "$FEED/arsip/screener_${HARI}.csv" ] && cp "$FEED/arsip/screener_${HARI}.csv" "Arsip_Data_Harian/screener_${HARI}.csv"
     echo "✅ Feed masuk ke Database/ ($(stat -c %s Database/hasil_screener.csv) bytes)"
+    # State intraday ringkas utk web cloud (ikut auto-commit git)
+    ./.venv/bin/python buat_state_intraday.py || echo "⚠️ state_intraday gagal (biarkan siklus berikutnya)"
     # R2 mengejar feed: upload data market terbaru agar web Streamlit selalu segar
     ./.venv/bin/python -c "
 import r2_client

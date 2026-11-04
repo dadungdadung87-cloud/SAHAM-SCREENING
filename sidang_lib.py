@@ -152,7 +152,9 @@ def muat_open_state(base_dir=None):
     dari open; rebound dari low saja buta sepanjang pagi (low pagi = harga pagi)."""
     f = _arsip_hari_ini(base_dir)
     if not f:
-        return {}
+        # Cloud tanpa arsip: langsung state file producer
+        s = _muat_state_file(base_dir)
+        return {t: (float(v), 0.0) for t, v in (s.get("open") or {}).items()}
     try:
         df = pd.read_csv(f, usecols=["Waktu Update", "Ticker", "Harga (Rp)"])
         if df.empty:
@@ -165,7 +167,33 @@ def muat_open_state(base_dir=None):
         pct = ((akhir - openp) / openp * 100).replace([float("inf"), float("-inf")], 0).fillna(0)
         return {t: (float(pct[t]), float(openp[t])) for t in p.index if openp[t] > 0}
     except Exception:
-        return {}
+        pass
+    # Fallback cloud: state hasil producer (commit git) — open = % dari harga pembukaan
+    s = _muat_state_file(base_dir)
+    return {t: (float(v), 0.0) for t, v in (s.get("open") or {}).items()}
+
+
+def _muat_state_file(base_dir=None):
+    """State intraday hasil komputasi producer (Database/state_intraday.json).
+    Jalur data utama untuk deployment cloud: file ikut auto-commit git, jadi tidak
+    butuh R2 credentials maupun arsip 60MB. Fallback R2 untuk kasus lama."""
+    base = base_dir or os.path.dirname(os.path.abspath(__file__))
+    p = os.path.join(base, "Database", "state_intraday.json")
+    if os.path.exists(p):
+        try:
+            with open(p) as f:
+                return json.load(f)
+        except Exception:
+            pass
+    try:
+        import r2_client, tempfile
+        tmp = os.path.join(tempfile.gettempdir(), "state_intraday.json")
+        if r2_client.download_arsip("Database/state_intraday.json", tmp):
+            with open(tmp) as f:
+                return json.load(f)
+    except Exception:
+        pass
+    return {}
 
 
 def muat_rebound_state(base_dir=None):
@@ -175,7 +203,9 @@ def muat_rebound_state(base_dir=None):
     bukan kenaikan dari harga pembukaan (bukti 18 winner 03-11)."""
     f = _arsip_hari_ini(base_dir)
     if not f:
-        return {}
+        # Cloud tanpa arsip: langsung state file producer
+        s = _muat_state_file(base_dir)
+        return {t: (float(v), 0.0) for t, v in (s.get("reb") or {}).items()}
     try:
         df = pd.read_csv(f, usecols=["Waktu Update", "Ticker", "Harga (Rp)"])
         if df.empty:
@@ -188,7 +218,10 @@ def muat_rebound_state(base_dir=None):
         pct = ((akhir - low) / low * 100).replace([float("inf"), float("-inf")], 0).fillna(0)
         return {t: (float(pct[t]), float(low[t])) for t in p.index if low[t] > 0}
     except Exception:
-        return {}
+        pass
+    # Fallback cloud: state hasil producer (commit git) — reb = % dari low
+    s = _muat_state_file(base_dir)
+    return {t: (float(v), 0.0) for t, v in (s.get("reb") or {}).items()}
 
 
 def muat_skor_pembekal(base_dir=None):
@@ -197,7 +230,9 @@ def muat_skor_pembekal(base_dir=None):
     Skor 0-6 per ticker; {} jika arsip kemarin tidak ada (graceful)."""
     f = _arsip_hari_ini(base_dir, hari_lalu=True)
     if not f:
-        return {}
+        # Cloud tanpa arsip: langsung state file producer
+        s = _muat_state_file(base_dir)
+        return {t: int(v) for t, v in (s.get("bekal") or {}).items()}
     try:
         cols = ["Waktu Update", "Ticker", "Change (%)", "Tekanan Bandar", "Pola Sisir",
                 "Fase Siklus Bandar", "Kekuatan A/D", "MA Signal"]
@@ -215,7 +250,10 @@ def muat_skor_pembekal(base_dir=None):
                 + (~S(d["Tekanan Bandar"], "Guyur")).astype(int))
         return {t: int(skor[t]) for t in d.index}
     except Exception:
-        return {}
+        pass
+    # Fallback cloud: bekal dari state file producer
+    s = _muat_state_file(base_dir)
+    return {t: int(v) for t, v in (s.get("bekal") or {}).items()}
 
 
 def hitung_rumus(df, momentum_30m=None):
