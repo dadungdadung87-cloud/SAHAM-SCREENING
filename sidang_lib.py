@@ -119,17 +119,42 @@ def _b64d(s):
     return base64.urlsafe_b64decode(s + "=" * (-len(s) % 4))
 
 
+def _arsip_hari_ini(base_dir=None, hari_lalu=False):
+    """Path arsip intraday terbaru, dengan fallback R2 untuk deployment cloud
+    (Streamlit Cloud tidak punya arsip lokal — R2 di-refresh jalankan_bot.sh).
+    hari_lalu=True mengambil arsip H-1 (untuk skor pembekal). Return path atau None."""
+    from datetime import datetime, timedelta
+    base = base_dir or os.path.dirname(os.path.abspath(__file__))
+    wib = datetime.utcnow() + timedelta(hours=7)
+    if wib.weekday() >= 5:  # Sabtu/Minggu: bursa tutup, pakai Jumat
+        wib = wib - timedelta(days=(wib.weekday() - 4))
+    target = (wib - timedelta(days=1 if hari_lalu else 0)).strftime("%Y-%m-%d")
+    nama = f"screener_{target}.csv"
+    lokal = os.path.join(base, "Arsip_Data_Harian", nama)
+    if os.path.exists(lokal):
+        return lokal
+    # Fallback cloud: unduh dari R2 (cache lokal agar tidak download tiap rerun)
+    cache = os.path.join(base, "Arsip_Data_Harian", f".r2_{nama}")
+    if os.path.exists(cache):
+        return cache
+    try:
+        import r2_client
+        if r2_client.download_arsip(f"Arsip_Data_Harian/{nama}", cache):
+            return cache
+    except Exception:
+        pass
+    return None
+
+
 def muat_open_state(base_dir=None):
     """Pct kenaikan dari HARGA PEMBUKAAN intraday HARI INI (snapshot pertama arsip).
     Return {ticker: (pct_dari_open, harga_open)}. Bukti 04-11: 20 winner naik>=10%
     dari open; rebound dari low saja buta sepanjang pagi (low pagi = harga pagi)."""
-    import glob as _glob
-    base = base_dir or os.path.dirname(os.path.abspath(__file__))
-    files = sorted(_glob.glob(os.path.join(base, "Arsip_Data_Harian", "screener_*.csv")))
-    if not files:
+    f = _arsip_hari_ini(base_dir)
+    if not f:
         return {}
     try:
-        df = pd.read_csv(files[-1], usecols=["Waktu Update", "Ticker", "Harga (Rp)"])
+        df = pd.read_csv(f, usecols=["Waktu Update", "Ticker", "Harga (Rp)"])
         if df.empty:
             return {}
         p = df.pivot_table(index="Ticker", columns="Waktu Update", values="Harga (Rp)", aggfunc="first")
@@ -148,13 +173,11 @@ def muat_rebound_state(base_dir=None):
     Return dict {ticker: (pct_dari_low, low_sejauh_ini)} atau {} jika arsip belum ada.
     pct_dari_low = (harga_snapshot_terakhir - low_intraday) / low * 100 —
     bukan kenaikan dari harga pembukaan (bukti 18 winner 03-11)."""
-    import glob as _glob
-    base = base_dir or os.path.dirname(os.path.abspath(__file__))
-    files = sorted(_glob.glob(os.path.join(base, "Arsip_Data_Harian", "screener_*.csv")))
-    if not files:
+    f = _arsip_hari_ini(base_dir)
+    if not f:
         return {}
     try:
-        df = pd.read_csv(files[-1], usecols=["Waktu Update", "Ticker", "Harga (Rp)"])
+        df = pd.read_csv(f, usecols=["Waktu Update", "Ticker", "Harga (Rp)"])
         if df.empty:
             return {}
         p = df.pivot_table(index="Ticker", columns="Waktu Update", values="Harga (Rp)", aggfunc="last")
@@ -172,15 +195,13 @@ def muat_skor_pembekal(base_dir=None):
     """Skor 'pembekal rebound' dari snapshot penutupan HARI SEBELUMNYA (bukti 03-11:
     sisir aktif 3.1x, markup 3.7x, uptrend 2.5x, chg-neg 1.6x; skor>=4 => 7.9% rebound>=10%).
     Skor 0-6 per ticker; {} jika arsip kemarin tidak ada (graceful)."""
-    import glob as _glob
-    base = base_dir or os.path.dirname(os.path.abspath(__file__))
-    files = sorted(_glob.glob(os.path.join(base, "Arsip_Data_Harian", "screener_*.csv")))
-    if len(files) < 2:
+    f = _arsip_hari_ini(base_dir, hari_lalu=True)
+    if not f:
         return {}
     try:
         cols = ["Waktu Update", "Ticker", "Change (%)", "Tekanan Bandar", "Pola Sisir",
                 "Fase Siklus Bandar", "Kekuatan A/D", "MA Signal"]
-        df = pd.read_csv(files[-2], usecols=cols)
+        df = pd.read_csv(f, usecols=cols)
         if df.empty:
             return {}
         last = df["Waktu Update"].max()

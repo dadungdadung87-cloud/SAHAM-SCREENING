@@ -37,6 +37,16 @@ try:
     if __import__('os').path.exists('Database/fundamental_exodus.csv'):
         r2_client.upload_arsip('Database/fundamental_exodus.csv', 'Database/fundamental_exodus.csv')
         print('☁️ fundamental_exodus ter-upload ke R2.')
+    # Arsip intraday: hari ini (gate rumus v6.1) + kemarin (skor pembekal) untuk web cloud
+    import os
+    _a = f'Arsip_Data_Harian/screener_{__import__(\"datetime\").date.today()}.csv'
+    if os.path.exists(_a) and r2_client.upload_arsip(_a, _a):
+        print(f'☁️ {_a} ter-upload ke R2.')
+    import datetime as _dt
+    _km = (_dt.date.today() - _dt.timedelta(days=1)).strftime('%Y-%m-%d')
+    _ak = f'Arsip_Data_Harian/screener_{_km}.csv'
+    if os.path.exists(_ak) and r2_client.upload_arsip(_ak, _ak):
+        print(f'☁️ {_ak} ter-upload ke R2 (pembekal).')
 except Exception as e:
     print(f'⚠️ Upload R2 feed gagal (biarkan siklus berikutnya): {e}')
 "
