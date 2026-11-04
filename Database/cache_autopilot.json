@@ -1,67 +1,67 @@
 {
-    "stempel_data": "2026-11-04 15:15:01",
+    "stempel_data": "2026-11-04 15:55:01",
     "versi": "v6.0",
     "keranjang": {
         "RUMUS 1": [
+            "DKFT",
             "AKPI",
             "ANDI",
-            "INTP",
-            "PBID",
-            "MYOH"
+            "NPGF",
+            "ASPR"
         ],
         "RUMUS 2": [
             "TMPO",
-            "BUVA",
-            "ANTM",
-            "PSAB",
-            "AKPI"
+            "DKFT",
+            "AKPI",
+            "GRIA",
+            "BOBA"
         ],
         "RUMUS 3": [
             "TMPO",
-            "PGAS",
-            "ADMR",
-            "LIVE",
-            "GRIA"
+            "DKFT",
+            "AKPI",
+            "GRIA",
+            "BOBA"
         ],
         "RUMUS 4": [
-            "OMRE",
+            "AIMS",
+            "KING",
+            "AMOR",
             "ERAL",
-            "MYOH",
-            "MTLA",
-            "OBMD"
+            "APLN"
         ],
         "RUMUS 5": [
             "TMPO",
             "AKPI",
-            "ANDI",
-            "INTP",
-            "PBID"
+            "BBMD",
+            "PRIM",
+            "ANDI"
         ],
         "RUMUS 6": [
             "TMPO",
+            "DKFT",
             "AKPI",
-            "OMRE",
             "GRIA",
             "BOBA"
         ],
         "RUMUS 7": [
             "TMPO",
-            "OMRE",
             "GRIA",
             "BOBA",
-            "ANJT"
+            "ANTM",
+            "AIMS"
         ],
         "RUMUS 8": [
             "TMPO",
+            "DKFT",
             "AKPI",
-            "ANDI",
-            "MBAP",
-            "BTPS"
+            "BBMD",
+            "MBAP"
         ],
         "RUMUS 9": [
             "TMPO",
+            "DKFT",
             "AKPI",
-            "OMRE",
             "GRIA",
             "BOBA"
         ]
