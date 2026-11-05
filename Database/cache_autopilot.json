@@ -1,25 +1,25 @@
 {
-    "stempel_data": "2026-11-05 15:15:01",
+    "stempel_data": "2026-11-05 15:55:01",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
             "MKNT",
+            "UVCR",
             "INOV",
-            "LPIN",
-            "ALKA",
-            "UVCR"
+            "KLBF",
+            "LPIN"
         ],
         "RUMUS 2": [
+            "UVCR",
             "LPIN",
-            "ALKA",
             "CSRA",
-            "BAJA",
-            "UVCR"
+            "FUJI",
+            "BAJA"
         ],
         "RUMUS 3": [
             "INOV",
-            "ALKA",
             "CSRA",
+            "FUJI",
             "HBAT",
             "AIMS"
         ],
@@ -27,29 +27,29 @@
             "MKNT",
             "AIMS",
             "MYOH",
-            "AMAN",
-            "BIRD"
+            "OLIV",
+            "MKTR"
         ],
         "RUMUS 5": [
             "MKNT",
             "INOV",
-            "LPIN",
             "UVCR",
-            "ALKA"
+            "LPIN",
+            "CSRA"
         ],
         "RUMUS 6": [
             "MKNT",
             "INOV",
             "LPIN",
             "AIMS",
-            "DGNS"
+            "ARTA"
         ],
         "RUMUS 7": [
             "MKNT",
             "INOV",
-            "ALKA",
-            "HBAT",
-            "BAJA"
+            "UVCR",
+            "FUJI",
+            "HBAT"
         ],
         "RUMUS 8": [
             "MKNT",
@@ -61,9 +61,9 @@
         "RUMUS 9": [
             "MKNT",
             "INOV",
-            "LPIN",
             "UVCR",
-            "ALKA"
+            "KLBF",
+            "FUJI"
         ]
     }
 }
