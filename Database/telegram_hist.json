@@ -1,25 +1,4 @@
 {
-  "2026-09-25": [
-    "ARGO",
-    "ARII",
-    "ASLI",
-    "CTBN",
-    "GTRA",
-    "KDSI",
-    "MDKA",
-    "MEJA",
-    "MKAP",
-    "MMIX",
-    "MRAT",
-    "PACK",
-    "PCAR",
-    "PSKT",
-    "TAMU",
-    "UNSP",
-    "UVCR",
-    "WAPO",
-    "WINR"
-  ],
   "2026-09-28": [
     "AYLS",
     "BLTA",
@@ -655,5 +634,22 @@
     "PGAS",
     "PSAB",
     "TMPO"
+  ],
+  "2026-11-05": [
+    "AIMS",
+    "ALKA",
+    "AMAN",
+    "ASBI",
+    "BAJA",
+    "BIRD",
+    "CSRA",
+    "DGNS",
+    "HBAT",
+    "INOV",
+    "LPIN",
+    "MKNT",
+    "MYOH",
+    "UVCR",
+    "WOMF"
   ]
 }

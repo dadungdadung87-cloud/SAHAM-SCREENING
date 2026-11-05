@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-11-04 15:55:01",
-    "versi": "v6.0",
+    "stempel_data": "2026-11-05 15:15:01",
+    "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
-            "DKFT",
-            "AKPI",
-            "ANDI",
-            "NPGF",
-            "ASPR"
+            "MKNT",
+            "INOV",
+            "LPIN",
+            "ALKA",
+            "UVCR"
         ],
         "RUMUS 2": [
-            "TMPO",
-            "DKFT",
-            "AKPI",
-            "GRIA",
-            "BOBA"
+            "LPIN",
+            "ALKA",
+            "CSRA",
+            "BAJA",
+            "UVCR"
         ],
         "RUMUS 3": [
-            "TMPO",
-            "DKFT",
-            "AKPI",
-            "GRIA",
-            "BOBA"
-        ],
-        "RUMUS 4": [
-            "AIMS",
-            "KING",
-            "AMOR",
-            "ERAL",
-            "APLN"
-        ],
-        "RUMUS 5": [
-            "TMPO",
-            "AKPI",
-            "BBMD",
-            "PRIM",
-            "ANDI"
-        ],
-        "RUMUS 6": [
-            "TMPO",
-            "DKFT",
-            "AKPI",
-            "GRIA",
-            "BOBA"
-        ],
-        "RUMUS 7": [
-            "TMPO",
-            "GRIA",
-            "BOBA",
-            "ANTM",
+            "INOV",
+            "ALKA",
+            "CSRA",
+            "HBAT",
             "AIMS"
         ],
+        "RUMUS 4": [
+            "MKNT",
+            "AIMS",
+            "MYOH",
+            "AMAN",
+            "BIRD"
+        ],
+        "RUMUS 5": [
+            "MKNT",
+            "INOV",
+            "LPIN",
+            "UVCR",
+            "ALKA"
+        ],
+        "RUMUS 6": [
+            "MKNT",
+            "INOV",
+            "LPIN",
+            "AIMS",
+            "DGNS"
+        ],
+        "RUMUS 7": [
+            "MKNT",
+            "INOV",
+            "ALKA",
+            "HBAT",
+            "BAJA"
+        ],
         "RUMUS 8": [
-            "TMPO",
-            "DKFT",
-            "AKPI",
-            "BBMD",
-            "MBAP"
+            "MKNT",
+            "INOV",
+            "LPIN",
+            "WOMF",
+            "ASBI"
         ],
         "RUMUS 9": [
-            "TMPO",
-            "DKFT",
-            "AKPI",
-            "GRIA",
-            "BOBA"
+            "MKNT",
+            "INOV",
+            "LPIN",
+            "UVCR",
+            "ALKA"
         ]
     }
 }
