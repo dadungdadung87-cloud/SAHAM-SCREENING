@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-11-06 15:15:02",
+    "stempel_data": "2026-11-06 15:55:01",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
-            "NASI",
-            "ENAK",
+            "NATO",
+            "ALII",
+            "LSIP",
             "AIMS",
-            "YUPI",
-            "ICBP"
+            "APIC"
         ],
         "RUMUS 2": [
             "AIMS",
             "DUTI",
             "POLU",
-            "SAGE",
+            "",
             ""
         ],
         "RUMUS 3": [
-            "NASI",
-            "ENAK",
-            "BAJA",
+            "NATO",
+            "ALII",
             "AIMS",
-            "YUPI"
+            "APIC",
+            "ASPR"
         ],
         "RUMUS 4": [
-            "AEGS",
-            "CSRA",
-            "BPTR",
-            "INDO",
-            "FORE"
+            "BREN",
+            "CARE",
+            "ANDI",
+            "SSTM",
+            "INDO"
         ],
         "RUMUS 5": [
-            "NASI",
-            "AIMS",
-            "YUPI",
-            "ICBP",
-            "LSIP"
+            "NATO",
+            "ALII",
+            "UNVR",
+            "RMKE",
+            "ICBP"
         ],
         "RUMUS 6": [
             "AIMS",
-            "POLA",
+            "ASPR",
             "ASGR",
-            "SMAR",
+            "PBID",
             "AKPI"
         ],
         "RUMUS 7": [
-            "NASI",
-            "ENAK",
+            "NATO",
+            "APIC",
+            "DUTI",
             "YUPI",
-            "BAJA",
-            "AISA"
+            "SMDM"
         ],
         "RUMUS 8": [
             "AIMS",
             "ASPR",
-            "AKPI",
+            "BOGA",
             "PBID",
-            "ASBI"
+            "AKPI"
         ],
         "RUMUS 9": [
-            "NASI",
-            "ENAK",
+            "NATO",
+            "ALII",
+            "LSIP",
             "AIMS",
-            "YUPI",
-            "BAJA"
+            "ICBP"
         ]
     }
 }
