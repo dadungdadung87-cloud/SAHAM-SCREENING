@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-11-05 15:55:01",
+    "stempel_data": "2026-11-06 15:15:02",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
-            "MKNT",
-            "UVCR",
-            "INOV",
-            "KLBF",
-            "LPIN"
+            "NASI",
+            "ENAK",
+            "AIMS",
+            "YUPI",
+            "ICBP"
         ],
         "RUMUS 2": [
-            "UVCR",
-            "LPIN",
-            "CSRA",
-            "FUJI",
-            "BAJA"
+            "AIMS",
+            "DUTI",
+            "POLU",
+            "SAGE",
+            ""
         ],
         "RUMUS 3": [
-            "INOV",
-            "CSRA",
-            "FUJI",
-            "HBAT",
-            "AIMS"
+            "NASI",
+            "ENAK",
+            "BAJA",
+            "AIMS",
+            "YUPI"
         ],
         "RUMUS 4": [
-            "MKNT",
-            "AIMS",
-            "MYOH",
-            "OLIV",
-            "MKTR"
+            "AEGS",
+            "CSRA",
+            "BPTR",
+            "INDO",
+            "FORE"
         ],
         "RUMUS 5": [
-            "MKNT",
-            "INOV",
-            "UVCR",
-            "LPIN",
-            "CSRA"
+            "NASI",
+            "AIMS",
+            "YUPI",
+            "ICBP",
+            "LSIP"
         ],
         "RUMUS 6": [
-            "MKNT",
-            "INOV",
-            "LPIN",
             "AIMS",
-            "ARTA"
+            "POLA",
+            "ASGR",
+            "SMAR",
+            "AKPI"
         ],
         "RUMUS 7": [
-            "MKNT",
-            "INOV",
-            "UVCR",
-            "FUJI",
-            "HBAT"
+            "NASI",
+            "ENAK",
+            "YUPI",
+            "BAJA",
+            "AISA"
         ],
         "RUMUS 8": [
-            "MKNT",
-            "INOV",
-            "LPIN",
-            "WOMF",
+            "AIMS",
+            "ASPR",
+            "AKPI",
+            "PBID",
             "ASBI"
         ],
         "RUMUS 9": [
-            "MKNT",
-            "INOV",
-            "UVCR",
-            "KLBF",
-            "FUJI"
+            "NASI",
+            "ENAK",
+            "AIMS",
+            "YUPI",
+            "BAJA"
         ]
     }
 }
