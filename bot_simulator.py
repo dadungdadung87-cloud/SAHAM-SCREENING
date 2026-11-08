@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import sys
+import glob
 import json
 from datetime import datetime, timedelta, timezone
 import subprocess
@@ -13,6 +14,42 @@ FEE_BELI = 0.0015         # 0.15%
 FEE_JUAL = 0.0025         # 0.25%
 FILE_MARKET = "Database/hasil_screener.csv"
 DIR_DB = "Database"       
+
+# ==========================================
+# 🧊 HELPER SAHAM SUSPEND
+# ==========================================
+def harga_terakhir_dari_arsip(ticker, base_dir="."):
+    """Harga jual realistis untuk saham suspend: harga penutupan
+    terakhir yang tercatat di arsip intraday (feed hanya 1 snapshot/hari,
+    jadi cari di arsip hari-hari sebelumnya). Return 0 jika tidak ketemu."""
+    files = sorted(glob.glob(os.path.join(base_dir, "Arsip_Data_Harian", "screener_*.csv")), reverse=True)
+    for f in files[:7]:
+        try:
+            df = pd.read_csv(f, usecols=["Ticker", "Harga (Rp)", "Volume"])
+            df = df[df["Ticker"].astype(str) == str(ticker)]
+            df = df[pd.to_numeric(df["Volume"], errors="coerce") > 0]
+            if not df.empty:
+                return float(df["Harga (Rp)"].iloc[-1])
+        except Exception:
+            continue
+    return 0.0
+
+def hitung_harga_jual_suspend(posisi, df_market, base_dir="."):
+    """Harga jual untuk posisi suspend: harga penutupan terakhir yang sah
+    (dari arsip). Return (harga, keterangan). 0 = benar-benar tidak ada data."""
+    ticker = posisi['Ticker']
+    # 1) Jika kebetulan ada di data market (misal sesekali muncul), pakai itu
+    try:
+        h = float(df_market[df_market['Ticker'] == ticker]['Harga (Rp)'].values[0])
+        if h > 0:
+            return h, ""
+    except Exception:
+        pass
+    # 2) Fallback: harga penutupan terakhir di arsip intraday
+    h_arsip = harga_terakhir_dari_arsip(ticker, base_dir)
+    ket = " @harga penutupan terakhir" if h_arsip > 0 else " (harga penutupan tidak ditemukan — lot dihapus tanpa nilai)"
+    return h_arsip, ket
+
 
 # ==========================================
 # ☁️ FUNGSI SINKRON R2
@@ -310,10 +347,45 @@ def jalankan_bot():
             tgl_beli_saham = str(posisi['Tanggal_Beli']).split()[0]
 
             # Cek apakah ticker masih ada di market
+            harga_sekarang = None
             try:
-                harga_sekarang = df_market[df_market['Ticker'] == ticker]['Harga (Rp)'].values[0]
-            except:
-                # Ticker tidak ditemukan (suspend/delisting) — dijual MANUAL saja lewat tombol JUAL SORE
+                _h = df_market[df_market['Ticker'] == ticker]['Harga (Rp)'].values[0]
+                if pd.notna(_h) and float(_h) > 0:
+                    harga_sekarang = float(_h)
+            except Exception:
+                harga_sekarang = None
+
+            if harga_sekarang is None:
+                # Ticker tidak ada / harga tidak valid di feed (suspend/delisting).
+                # >>> JUAL-ONLY / LIQUIDATE: jual tetap dieksekusi pakai harga
+                # penutupan terakhir dari arsip, agar tombol JUAL SORE benar-benar
+                # mengosongkan porto tanpa kecuali.
+                if (beli_only is False and not liquidate) or liquidate:
+                    harga_jual, ket = hitung_harga_jual_suspend(posisi, df_market)
+                    status_jual = "LIQUIDATE SUSPEND 🧨" if liquidate else "SUSPEND_SQUARE_OFF 🧊 (manual)"
+                    sudah_ada = False
+                    if not df_history.empty:
+                        sudah_ada = ((df_history['Ticker'] == ticker) & (df_history['Tanggal_Beli'] == posisi['Tanggal_Beli'])).any()
+                    if sudah_ada:
+                        print(f"⚠️ [RUMUS {i}] {ticker} (suspend) sudah ada di histori — duplikat dicegah.")
+                        continue
+                    nilai_jual_kotor = harga_jual * posisi['Lot'] * 100
+                    nilai_jual_bersih = nilai_jual_kotor - (nilai_jual_kotor * FEE_JUAL)
+                    profit_rp = (nilai_jual_bersih - posisi['Total_Modal']) if harga_jual > 0 else 0.0
+                    profit_pct = (profit_rp / posisi['Total_Modal']) * 100 if harga_jual > 0 else 0.0
+                    history_baru.append({
+                        'Tanggal_Beli': posisi['Tanggal_Beli'],
+                        'Tanggal_Jual': now.strftime("%Y-%m-%d %H:%M"),
+                        'Ticker': ticker, 'Harga_Beli': posisi['Harga_Beli'], 'Harga_Jual': harga_jual,
+                        'Status': status_jual, 'Total_Return_Rp': round(profit_rp, 2),
+                        'Return_%': round(profit_pct, 2),
+                        'Mode_Beli': posisi.get('Mode_Beli', 'MANUAL'),
+                        'Change_Beli': posisi.get('Change_Beli', 0)
+                    })
+                    print(f"🧊 [RUMUS {i}] JUAL: {ticker} (SUSPEND) @ Rp {harga_jual:,.0f}{ket} | {profit_pct:.2f}%")
+                    continue
+                # Mode lain (cron / tp-sl-only / beli-only): posisi suspend ditahan,
+                # alert Telegram (kirim_telegram.py) yang memberi tahu user.
                 porto_baru.append(posisi)
                 continue
 
