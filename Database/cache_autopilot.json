@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-11-06 15:55:01",
+    "stempel_data": "2026-11-09 15:15:01",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
-            "NATO",
-            "ALII",
-            "LSIP",
-            "AIMS",
-            "APIC"
+            "HRME",
+            "SRTG",
+            "SOTS",
+            "TGUK",
+            "PGAS"
         ],
         "RUMUS 2": [
-            "AIMS",
-            "DUTI",
-            "POLU",
-            "",
-            ""
+            "CBRE",
+            "IBOS",
+            "SOTS",
+            "PTSP",
+            "AKSI"
         ],
         "RUMUS 3": [
-            "NATO",
-            "ALII",
-            "AIMS",
-            "APIC",
-            "ASPR"
+            "HRME",
+            "SOTS",
+            "NASI",
+            "AKPI",
+            "TGUK"
         ],
         "RUMUS 4": [
-            "BREN",
-            "CARE",
-            "ANDI",
-            "SSTM",
-            "INDO"
+            "WIRG",
+            "BABY",
+            "UANG",
+            "CHEM",
+            "SSTM"
         ],
         "RUMUS 5": [
-            "NATO",
-            "ALII",
-            "UNVR",
-            "RMKE",
-            "ICBP"
+            "HRME",
+            "SRTG",
+            "SOTS",
+            "TGUK",
+            "PGAS"
         ],
         "RUMUS 6": [
-            "AIMS",
-            "ASPR",
-            "ASGR",
+            "AKPI",
+            "UNIQ",
             "PBID",
-            "AKPI"
+            "PTSP",
+            "ANDI"
         ],
         "RUMUS 7": [
-            "NATO",
-            "APIC",
-            "DUTI",
-            "YUPI",
-            "SMDM"
+            "TGUK",
+            "HRME",
+            "SOTS",
+            "KJEN",
+            "PTSP"
         ],
         "RUMUS 8": [
-            "AIMS",
-            "ASPR",
-            "BOGA",
+            "PGAS",
+            "ASII",
+            "UNIQ",
             "PBID",
-            "AKPI"
+            "ASPR"
         ],
         "RUMUS 9": [
-            "NATO",
-            "ALII",
-            "LSIP",
-            "AIMS",
-            "ICBP"
+            "HRME",
+            "SRTG",
+            "SOTS",
+            "NASI",
+            "AKPI"
         ]
     }
 }
