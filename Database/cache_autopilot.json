@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-11-09 15:15:01",
+    "stempel_data": "2026-11-09 15:55:00",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
             "HRME",
+            "ALII",
             "SRTG",
             "SOTS",
-            "TGUK",
-            "PGAS"
+            "BAJA"
         ],
         "RUMUS 2": [
-            "CBRE",
-            "IBOS",
             "SOTS",
             "PTSP",
-            "AKSI"
+            "IRSX",
+            "IBOS",
+            "CBRE"
         ],
         "RUMUS 3": [
             "HRME",
+            "ALII",
+            "BAJA",
             "SOTS",
-            "NASI",
-            "AKPI",
-            "TGUK"
+            "PBID"
         ],
         "RUMUS 4": [
-            "WIRG",
+            "OLIV",
             "BABY",
-            "UANG",
-            "CHEM",
-            "SSTM"
+            "PJAA",
+            "PGUN",
+            "WOWS"
         ],
         "RUMUS 5": [
             "HRME",
+            "ALII",
             "SRTG",
             "SOTS",
-            "TGUK",
-            "PGAS"
+            "PBID"
         ],
         "RUMUS 6": [
+            "PBID",
             "AKPI",
             "UNIQ",
-            "PBID",
             "PTSP",
             "ANDI"
         ],
         "RUMUS 7": [
-            "TGUK",
             "HRME",
             "SOTS",
-            "KJEN",
+            "BAJA",
+            "AKPI",
             "PTSP"
         ],
         "RUMUS 8": [
-            "PGAS",
-            "ASII",
-            "UNIQ",
             "PBID",
-            "ASPR"
+            "PGAS",
+            "ASPR",
+            "CBUT",
+            "ASBI"
         ],
         "RUMUS 9": [
             "HRME",
+            "ALII",
             "SRTG",
-            "SOTS",
-            "NASI",
-            "AKPI"
+            "BAJA",
+            "SOTS"
         ]
     }
 }
