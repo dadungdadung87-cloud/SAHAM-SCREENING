@@ -1372,55 +1372,59 @@ if st.sidebar.button("🔄 Refresh Sekarang", use_container_width=True, help="Be
     st.cache_data.clear()
     st.rerun()
 
-st.sidebar.title("⚙️ Preset Filter Cepat")
-st.sidebar.info("Gunakan **'BSJP (Beli Sore 15:30)'** untuk mencari saham yang mantap dibeli sebelum penutupan bursa!")
+# >>> UI preset disembunyikan (user tidak memakai). Set True untuk memunculkan lagi.
+PRESET_UI_TAMPIL = False
 
-opsi_preset = ["Matikan Preset (Manual)"] + list(daftar_preset_aktif.keys())
-idx_default = opsi_preset.index(st.session_state.preset_selector) if st.session_state.preset_selector in opsi_preset else 0
-st.sidebar.selectbox("📌 Pilih Preset Aktif:", opsi_preset, index=idx_default, key="preset_selector", on_change=apply_preset)
+if PRESET_UI_TAMPIL:
+    st.sidebar.title("⚙️ Preset Filter Cepat")
+    st.sidebar.info("Gunakan **'BSJP (Beli Sore 15:30)'** untuk mencari saham yang mantap dibeli sebelum penutupan bursa!")
 
-kustom_presets = {}
-if os.path.exists(FILE_PRESET):
-    try:
-        with open(FILE_PRESET, "r") as f: kustom_presets = json.load(f)
-    except: pass
+    opsi_preset = ["Matikan Preset (Manual)"] + list(daftar_preset_aktif.keys())
+    idx_default = opsi_preset.index(st.session_state.preset_selector) if st.session_state.preset_selector in opsi_preset else 0
+    st.sidebar.selectbox("📌 Pilih Preset Aktif:", opsi_preset, index=idx_default, key="preset_selector", on_change=apply_preset)
 
-with st.sidebar.expander("🛠️ Manajemen Preset Kustom"):
-    tab_edit, tab_hapus = st.tabs(["📝 Buat/Edit", "🗑️ Hapus"])
-    with tab_edit:
-        opsi_edit = ["-- Buat Baru --"] + list(kustom_presets.keys())
-        pilih_edit = st.selectbox("Pilih Preset:", opsi_edit, key="select_edit")
-        if pilih_edit == "-- Buat Baru --":
-            nama_preset_baru = st.text_input("Nama Preset Baru:", placeholder="Contoh: Strategi X", key="nama_baru")
-            nilai_awal = {k: info['options'][0] for k, info in MASTER_FILTERS.items()}
-        else:
-            nama_preset_baru = st.text_input("Simpan sebagai:", value=pilih_edit, key="nama_edit")
-            nilai_awal = kustom_presets[pilih_edit]
+    kustom_presets = {}
+    if os.path.exists(FILE_PRESET):
+        try:
+            with open(FILE_PRESET, "r") as f: kustom_presets = json.load(f)
+        except: pass
 
-        kustom_input = {}
-        for k, info in MASTER_FILTERS.items():
-            val_awal = nilai_awal.get(k, info['options'][0])
-            idx_awal = info['options'].index(val_awal) if val_awal in info['options'] else 0
-            kustom_input[k] = st.selectbox(f"P-{info['label']}", info['options'], index=idx_awal, key=f"edit_{k}")
+    with st.sidebar.expander("🛠️ Manajemen Preset Kustom"):
+        tab_edit, tab_hapus = st.tabs(["📝 Buat/Edit", "🗑️ Hapus"])
+        with tab_edit:
+            opsi_edit = ["-- Buat Baru --"] + list(kustom_presets.keys())
+            pilih_edit = st.selectbox("Pilih Preset:", opsi_edit, key="select_edit")
+            if pilih_edit == "-- Buat Baru --":
+                nama_preset_baru = st.text_input("Nama Preset Baru:", placeholder="Contoh: Strategi X", key="nama_baru")
+                nilai_awal = {k: info['options'][0] for k, info in MASTER_FILTERS.items()}
+            else:
+                nama_preset_baru = st.text_input("Simpan sebagai:", value=pilih_edit, key="nama_edit")
+                nilai_awal = kustom_presets[pilih_edit]
 
-        if st.button("💾 Simpan Preset"):
-            if nama_preset_baru.strip():
-                if pilih_edit != "-- Buat Baru --" and pilih_edit != nama_preset_baru.strip(): del kustom_presets[pilih_edit]
-                kustom_presets[nama_preset_baru.strip()] = kustom_input
-                with open(FILE_PRESET, "w") as f: json.dump(kustom_presets, f, indent=4)
-                st.session_state.preset_selector = nama_preset_baru.strip()
-                st.success("Preset berhasil disimpan!")
-                st.rerun()
-    with tab_hapus:
-        if kustom_presets:
-            pilih_hapus = st.selectbox("Pilih Preset untuk Dihapus:", list(kustom_presets.keys()))
-            if st.button("🗑️ Hapus Preset"):
-                del kustom_presets[pilih_hapus]
-                with open(FILE_PRESET, "w") as f: json.dump(kustom_presets, f, indent=4)
-                if st.session_state.preset_selector == pilih_hapus: st.session_state.preset_selector = "Matikan Preset (Manual)"
-                st.success("Preset dihapus!")
-                st.rerun()
-        else: st.info("Belum ada preset kustom.")
+            kustom_input = {}
+            for k, info in MASTER_FILTERS.items():
+                val_awal = nilai_awal.get(k, info['options'][0])
+                idx_awal = info['options'].index(val_awal) if val_awal in info['options'] else 0
+                kustom_input[k] = st.selectbox(f"P-{info['label']}", info['options'], index=idx_awal, key=f"edit_{k}")
+
+            if st.button("💾 Simpan Preset"):
+                if nama_preset_baru.strip():
+                    if pilih_edit != "-- Buat Baru --" and pilih_edit != nama_preset_baru.strip(): del kustom_presets[pilih_edit]
+                    kustom_presets[nama_preset_baru.strip()] = kustom_input
+                    with open(FILE_PRESET, "w") as f: json.dump(kustom_presets, f, indent=4)
+                    st.session_state.preset_selector = nama_preset_baru.strip()
+                    st.success("Preset berhasil disimpan!")
+                    st.rerun()
+        with tab_hapus:
+            if kustom_presets:
+                pilih_hapus = st.selectbox("Pilih Preset untuk Dihapus:", list(kustom_presets.keys()))
+                if st.button("🗑️ Hapus Preset"):
+                    del kustom_presets[pilih_hapus]
+                    with open(FILE_PRESET, "w") as f: json.dump(kustom_presets, f, indent=4)
+                    if st.session_state.preset_selector == pilih_hapus: st.session_state.preset_selector = "Matikan Preset (Manual)"
+                    st.success("Preset dihapus!")
+                    st.rerun()
+            else: st.info("Belum ada preset kustom.")
 
 st.markdown("""
 <div class="main-header">
