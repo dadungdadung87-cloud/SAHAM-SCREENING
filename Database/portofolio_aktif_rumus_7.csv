@@ -1,3 +1,1 @@
-Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL,Mode_Beli,Change_Beli
-2026-11-09 19:13,HRME,39.0,5225,20408066.250000004,41,38,MANUAL,30.0
-2026-11-09 19:13,BBSS,53.0,3844,20403759.800000004,56,51,MANUAL,20.454545454545457
+Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL
