@@ -1,3 +1,1 @@
-Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL,Mode_Beli,Change_Beli
-2026-11-09 19:13,ALII,715.0,298,21338960.5,751,694,MANUAL,5.925925925925927
-2026-11-09 19:13,SRTG,1735.0,122,21198750.5,1822,1683,MANUAL,3.892215568862276
+Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL

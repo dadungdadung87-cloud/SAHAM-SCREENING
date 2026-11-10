@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-11-09 15:55:00",
+    "stempel_data": "2026-11-10 15:15:01",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
-            "HRME",
-            "ALII",
-            "SRTG",
-            "SOTS",
-            "BAJA"
-        ],
-        "RUMUS 2": [
-            "SOTS",
-            "PTSP",
-            "IRSX",
-            "IBOS",
-            "CBRE"
-        ],
-        "RUMUS 3": [
-            "HRME",
-            "ALII",
-            "BAJA",
-            "SOTS",
-            "PBID"
-        ],
-        "RUMUS 4": [
-            "OLIV",
-            "BABY",
-            "PJAA",
-            "PGUN",
-            "WOWS"
-        ],
-        "RUMUS 5": [
-            "HRME",
-            "ALII",
-            "SRTG",
-            "SOTS",
-            "PBID"
-        ],
-        "RUMUS 6": [
-            "PBID",
-            "AKPI",
             "UNIQ",
             "PTSP",
-            "ANDI"
+            "HELI",
+            "TCID",
+            "FOLK"
+        ],
+        "RUMUS 2": [
+            "HELI",
+            "AKKU",
+            "RUNS",
+            "TCID",
+            "BBLD"
+        ],
+        "RUMUS 3": [
+            "UNIQ",
+            "PTSP",
+            "ALII",
+            "HELI",
+            "PTIS"
+        ],
+        "RUMUS 4": [
+            "SMKM",
+            "KRYA",
+            "BCAP",
+            "KAEF",
+            "MMLP"
+        ],
+        "RUMUS 5": [
+            "UNIQ",
+            "PTSP",
+            "ASII",
+            "FOLK",
+            "ARCI"
+        ],
+        "RUMUS 6": [
+            "UNIQ",
+            "PTSP",
+            "ASPR",
+            "LPIN",
+            "AXIO"
         ],
         "RUMUS 7": [
-            "HRME",
-            "SOTS",
-            "BAJA",
-            "AKPI",
-            "PTSP"
+            "UNIQ",
+            "PTSP",
+            "HELI",
+            "PTIS",
+            "KBLV"
         ],
         "RUMUS 8": [
-            "PBID",
-            "PGAS",
+            "UNIQ",
+            "PTSP",
+            "ASII",
             "ASPR",
-            "CBUT",
-            "ASBI"
+            "LPIN"
         ],
         "RUMUS 9": [
-            "HRME",
+            "UNIQ",
+            "PTSP",
             "ALII",
-            "SRTG",
-            "BAJA",
-            "SOTS"
+            "HELI",
+            "PTIS"
         ]
     }
 }
