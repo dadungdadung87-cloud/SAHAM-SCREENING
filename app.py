@@ -2435,7 +2435,10 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
                     import subprocess
                     import sys
                     try:
-                        proses_bot = subprocess.run([sys.executable, "bot_simulator.py", "--beli-only"], capture_output=True, text=True)
+                        perintah = (f'exec 200>/tmp/bot_simulator.lock; '
+                                    f'flock -w 120 200 || {{ echo "⏳ Bot sedang sibuk (siklus cron lain) — coba lagi sebentar."; exit 42; }}; '
+                                    f'exec "{sys.executable}" bot_simulator.py --beli-only')
+                        proses_bot = subprocess.run(["bash", "-c", perintah], capture_output=True, text=True)
                         if proses_bot.returncode != 0:
                             st.error("❌ Bot beli gagal dijalankan. Log error:")
                             st.code(proses_bot.stderr, language="bash")
@@ -2449,12 +2452,15 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
                         st.error(f"Sistem web gagal memanggil file bot: {e}")
         with col_jual:
             if st.button("💸 JUAL SORE Semua Posisi!", use_container_width=True,
-                         help="Menutup semua posisi yang belum tersentuh TP/SL. Tidak ada pembelian."):
+                         help="Menutup semua posisi yang belum tersentuh TP/SL (saham suspend ikut dijual @ harga penutupan terakhir). Tidak ada pembelian."):
                 with st.spinner("Bot mengeksekusi penjualan (TP/CL/square-off)..."):
                     import subprocess
                     import sys
                     try:
-                        proses_bot = subprocess.run([sys.executable, "bot_simulator.py", "--jual-only"], capture_output=True, text=True)
+                        perintah = (f'exec 200>/tmp/bot_simulator.lock; '
+                                    f'flock -w 120 200 || {{ echo "⏳ Bot sedang sibuk (siklus cron lain) — coba lagi sebentar."; exit 42; }}; '
+                                    f'exec "{sys.executable}" bot_simulator.py --jual-only')
+                        proses_bot = subprocess.run(["bash", "-c", perintah], capture_output=True, text=True)
                         if proses_bot.returncode != 0:
                             st.error("❌ Bot jual gagal dijalankan. Log error:")
                             st.code(proses_bot.stderr, language="bash")
@@ -2478,9 +2484,11 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
                     import subprocess
                     import sys
                     try:
+                        perintah_reset = (f'exec 200>/tmp/bot_simulator.lock; '
+                                          f'flock -w 120 200 || {{ echo "⏳ Proses lain sedang memakai data porto — coba lagi sebentar."; exit 42; }}; '
+                                          f'exec "{sys.executable}" reset_porto.py --yes')
                         hasil_reset = subprocess.run(
-                            [sys.executable, "reset_porto.py", "--yes"],
-                            capture_output=True, text=True, timeout=120
+                            ["bash", "-c", perintah_reset], capture_output=True, text=True, timeout=120
                         )
                         if hasil_reset.returncode != 0:
                             st.error("❌ Reset gagal.")

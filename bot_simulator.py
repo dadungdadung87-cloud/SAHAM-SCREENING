@@ -543,8 +543,7 @@ def jalankan_bot():
                     tgl_hari_ini = now.strftime('%Y-%m-%d')
                     df_sinyal = df_sinyal[df_sinyal['Stempel'] == tgl_hari_ini]
                     if df_sinyal.empty:
-                        print(f"⏭️ [RUMUS {i}] Tidak ada sinyal jadwal hari ini — dilewati.")
-                        continue
+                        print(f"⏭️ [RUMUS {i}] Tidak ada sinyal jadwal hari ini — pembelian dilewati (hasil jual FASE A tetap disimpan).")
                 # --- FASE B v5.1: alokasi beli dinamis (saldo / N sinyal valid) ---
                 # Pass 1: kumpulkan sinyal valid (belum dimiliki, ada di market, harga > 0)
                 sinyal_valid = []

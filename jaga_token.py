@@ -18,6 +18,7 @@ import sys
 import json
 import time
 import shutil
+import subprocess
 import argparse
 from datetime import datetime, timezone, timedelta
 
@@ -140,7 +141,8 @@ def utama():
     if args.auto_sync_harian and hidup and 8 <= now.hour < 11 and \
             not os.path.exists(SINKRON_HARIAN_FLAG.format(now.date())):
         try:
-            rc = ambil_main(["--test", "--quiet"])  # tulis hanya jika HAR lebih segar
+            rc = subprocess.run([sys.executable, os.path.join(BASE, "ambil_token.py"),
+                                 "--test", "--quiet"], capture_output=True, text=True).returncode
             os.system(f"touch {SINKRON_HARIAN_FLAG.format(now.date())}")
             tok, exp, sisa, hidup = status_token()
             sinkronkan(tok)
