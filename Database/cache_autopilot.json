@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-11-11 15:15:02",
+    "stempel_data": "2026-11-11 15:55:01",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
             "WMUU",
+            "IFII",
+            "POLA",
             "MYOR",
-            "TRUS",
-            "ICBP",
-            "AGAR"
+            "TRUS"
         ],
         "RUMUS 2": [
             "WMUU",
             "TRUS",
+            "KAEF",
             "AGAR",
-            "RUNS",
-            "PGLI"
+            "RUNS"
         ],
         "RUMUS 3": [
             "WMUU",
-            "TRUS",
-            "SKBM",
             "RAJA",
-            "BEER"
+            "POLA",
+            "BEER",
+            "TRUS"
         ],
         "RUMUS 4": [
+            "POLA",
+            "GOLD",
             "SCNP",
             "KSIX",
-            "MBAP",
-            "CBUT",
-            "OLIV"
+            "CBUT"
         ],
         "RUMUS 5": [
             "WMUU",
+            "IFII",
+            "POLA",
             "MYOR",
-            "TRUS",
-            "ICBP",
-            "AGAR"
+            "TRUS"
         ],
         "RUMUS 6": [
-            "",
-            "",
-            "",
-            "",
+            "POLA",
+            "AGII",
+            "ANDI",
+            "OBAT",
             ""
         ],
         "RUMUS 7": [
             "WMUU",
             "RAJA",
+            "ENRG",
             "TRUS",
-            "KJEN",
-            "AGAR"
+            "KAEF"
         ],
         "RUMUS 8": [
-            "MBAP",
+            "IFII",
+            "POLA",
+            "BTPN",
             "CBUT",
-            "",
-            "",
             ""
         ],
         "RUMUS 9": [
             "WMUU",
-            "MYOR",
-            "TRUS",
-            "SKBM",
-            "RAJA"
+            "RAJA",
+            "BEER",
+            "POLA",
+            "MYOR"
         ]
     }
 }
