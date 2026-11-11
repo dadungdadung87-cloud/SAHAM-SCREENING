@@ -1,29 +1,4 @@
 {
-  "2026-10-01": [
-    "AKKU",
-    "ASPI",
-    "BDMN",
-    "BEKS",
-    "BSWD",
-    "CCSI",
-    "CMNT",
-    "CSMI",
-    "DAAZ",
-    "DSSA",
-    "ENRG",
-    "IFII",
-    "IKBI",
-    "LPGI",
-    "PEVE",
-    "RSCH",
-    "SAPX",
-    "SMMT",
-    "SONA",
-    "SRSN",
-    "TEBE",
-    "TOWR",
-    "UVCR"
-  ],
   "2026-10-02": [
     "BLTZ",
     "BSWD",
@@ -646,5 +621,23 @@
     "SMKM",
     "TCID",
     "UNIQ"
+  ],
+  "2026-11-11": [
+    "AGAR",
+    "BEER",
+    "CBUT",
+    "ICBP",
+    "KJEN",
+    "KSIX",
+    "MBAP",
+    "MYOR",
+    "OLIV",
+    "PGLI",
+    "RAJA",
+    "RUNS",
+    "SCNP",
+    "SKBM",
+    "TRUS",
+    "WMUU"
   ]
 }

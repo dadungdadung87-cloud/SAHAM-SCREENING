@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-11-10 15:55:01",
+    "stempel_data": "2026-11-11 15:15:02",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
-            "UNIQ",
-            "MINA",
-            "RAJA",
-            "ALII",
-            "ASII"
+            "WMUU",
+            "MYOR",
+            "TRUS",
+            "ICBP",
+            "AGAR"
         ],
         "RUMUS 2": [
-            "RAJA",
-            "PSKT",
-            "BUVA",
-            "HELI",
-            "PACK"
+            "WMUU",
+            "TRUS",
+            "AGAR",
+            "RUNS",
+            "PGLI"
         ],
         "RUMUS 3": [
-            "UNIQ",
-            "ALII",
-            "MINA",
-            "PSKT",
-            "HELI"
+            "WMUU",
+            "TRUS",
+            "SKBM",
+            "RAJA",
+            "BEER"
         ],
         "RUMUS 4": [
-            "BEEF",
-            "SMKM",
-            "BBRM",
-            "TYRE",
-            "BCAP"
+            "SCNP",
+            "KSIX",
+            "MBAP",
+            "CBUT",
+            "OLIV"
         ],
         "RUMUS 5": [
-            "UNIQ",
-            "MINA",
-            "ALII",
-            "PTSP",
-            "RAJA"
+            "WMUU",
+            "MYOR",
+            "TRUS",
+            "ICBP",
+            "AGAR"
         ],
         "RUMUS 6": [
-            "UNIQ",
-            "PTSP",
-            "DEWI",
-            "ASPR",
-            "ARII"
+            "",
+            "",
+            "",
+            "",
+            ""
         ],
         "RUMUS 7": [
-            "UNIQ",
-            "MINA",
+            "WMUU",
             "RAJA",
-            "PTRO",
-            "BUVA"
+            "TRUS",
+            "KJEN",
+            "AGAR"
         ],
         "RUMUS 8": [
-            "UNIQ",
-            "PTSP",
-            "ASII",
-            "DEWI",
-            "ASPR"
+            "MBAP",
+            "CBUT",
+            "",
+            "",
+            ""
         ],
         "RUMUS 9": [
-            "UNIQ",
-            "ALII",
-            "MINA",
-            "PTSP",
-            "PSKT"
+            "WMUU",
+            "MYOR",
+            "TRUS",
+            "SKBM",
+            "RAJA"
         ]
     }
 }
