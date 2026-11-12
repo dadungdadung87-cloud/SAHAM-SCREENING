@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-11-11 15:55:01",
+    "stempel_data": "2026-11-12 15:15:02",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
-            "WMUU",
-            "IFII",
-            "POLA",
-            "MYOR",
-            "TRUS"
+            "",
+            "",
+            "",
+            "",
+            ""
         ],
         "RUMUS 2": [
-            "WMUU",
-            "TRUS",
-            "KAEF",
-            "AGAR",
-            "RUNS"
+            "",
+            "",
+            "",
+            "",
+            ""
         ],
         "RUMUS 3": [
-            "WMUU",
-            "RAJA",
-            "POLA",
-            "BEER",
-            "TRUS"
+            "",
+            "",
+            "",
+            "",
+            ""
         ],
         "RUMUS 4": [
-            "POLA",
-            "GOLD",
-            "SCNP",
-            "KSIX",
-            "CBUT"
+            "",
+            "",
+            "",
+            "",
+            ""
         ],
         "RUMUS 5": [
-            "WMUU",
-            "IFII",
-            "POLA",
-            "MYOR",
-            "TRUS"
+            "",
+            "",
+            "",
+            "",
+            ""
         ],
         "RUMUS 6": [
-            "POLA",
-            "AGII",
-            "ANDI",
-            "OBAT",
+            "",
+            "",
+            "",
+            "",
             ""
         ],
         "RUMUS 7": [
-            "WMUU",
-            "RAJA",
-            "ENRG",
-            "TRUS",
-            "KAEF"
+            "",
+            "",
+            "",
+            "",
+            ""
         ],
         "RUMUS 8": [
-            "IFII",
-            "POLA",
-            "BTPN",
-            "CBUT",
+            "",
+            "",
+            "",
+            "",
             ""
         ],
         "RUMUS 9": [
-            "WMUU",
-            "RAJA",
-            "BEER",
-            "POLA",
-            "MYOR"
+            "",
+            "",
+            "",
+            "",
+            ""
         ]
     }
 }
