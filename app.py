@@ -1159,7 +1159,7 @@ def manual_override(): st.session_state.preset_selector = "Matikan Preset (Manua
 
 SUMBER_DATA = "❓"
 
-@st.cache_data(ttl=300, show_spinner=False)
+@st.cache_data(ttl=120, show_spinner=False)
 def load_data_saham():
     global SUMBER_DATA
     df = None
@@ -2359,9 +2359,9 @@ if not df_hasil.empty:
 
                     # ========== BAGIAN 2: RADAR LIVE (SUMBER AI YANG SAMA) ==========
                     st.markdown("### 📡 Bagian 2 — Radar Live Top-5 (Sumber AI yang Sama)")
-                    st.caption("Menampilkan **hasil sidang AI yang sama persis** dengan Daftar Belanja (Bagian 1). Tidak ada AI kedua → hasil dijamin identik & hemat kuota. Refresh ±5 menit hanya memuat ulang hasil.")
+                    st.caption("Menampilkan **hasil sidang AI yang sama persis** dengan Daftar Belanja (Bagian 1). Tidak ada AI kedua → hasil dijamin identik & hemat kuota. Refresh ±2 menit hanya memuat ulang hasil.")
                     if AUTOREFRESH_OK:
-                        st_autorefresh(interval=5 * 60 * 1000, key="radar_live_autorefresh")
+                        st_autorefresh(interval=2 * 60 * 1000, key="radar_live_autorefresh")
                     _now = datetime.utcnow() + pd.Timedelta(hours=7)
                     _jam = _now.time()
                     live = (_now.weekday() < 5) and (pd.Timestamp("08:45").time() <= _jam <= pd.Timestamp("16:05").time())
