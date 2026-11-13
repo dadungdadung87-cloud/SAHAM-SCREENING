@@ -222,7 +222,8 @@ def jalankan_bot():
     # 🔑 DETEKSI MODE: manual / cron / jadwal / beli-only / jual-only / tp-sl-only / liquidate
     # ----------------------------------------------------
     mode = "jadwal" if "--jadwal" in sys.argv[1:] else ("manual" if "--manual" in sys.argv[1:] else "cron")
-    tp_sl_only = "--tp-sl-only" in sys.argv[1:]
+    tp_sl_only = "--tp-sl-only" in sys.argv[1:] or "--tp-sl-catchup" in sys.argv[1:]
+    tp_sl_catchup = "--tp-sl-catchup" in sys.argv[1:]
     if tp_sl_only:
         mode = "cron"
         beli_only = False
@@ -255,7 +256,7 @@ def jalankan_bot():
     jam_bursa_awal = datetime.strptime("08:45", "%H:%M").time()
     jam_bursa_akhir = datetime.strptime("16:05", "%H:%M").time()
     di_jam_bursa = (jam_bursa_awal <= jam_sekarang <= jam_bursa_akhir) and now.weekday() < 5
-    if mode == "cron" and not di_jam_bursa and not liquidate:
+    if mode == "cron" and not di_jam_bursa and not liquidate and not tp_sl_catchup:
         print("😴 Mode cron: di luar jam bursa. Penulis malam adalah tombol web — bot tidur.")
         return
 

@@ -1,33 +1,40 @@
-## Objective
-- Full audit of SAHAM-SCREENING project to find weaknesses, damage, and items needing fixes; then execute verified fixes, commit & push.
-
-## Key Findings (audit)
-- FIX (previous session) VERIFIED IN PRODUCTION: "JUAL SORE" suspend-stock fix already committed (88aa22be). Real history shows SMMA/GIAA (09-11) and GTBO/CBRE (10-11) sold with status `SUSPEND_SQUARE_OFF 🧊 (manual)` at last-close price; loss = -0.4% (fee only). All 9 portfolio arenas now EMPTY (0 rows). Sandbox /tmp/opencode/uji_suspend no longer needed (was lost from /tmp; not recreated).
-- BUG-1 (bot_simulator.py:547): `continue` inside "jadwal" mode skipped the porto/history write-back (lines 612-613) — any sells from FASE A were silently lost for formulas without today's signal.
-- BUG-2 (jaga_token.py:143): NameError `ambil_main` (function doesn't exist) inside try/except — `--auto-sync-harian` feature silently dead every morning.
-- BUG-3 (app.py buttons BELI/JUAL/RESET ~2438/2457/2481): no file lock → race condition with cron (jalankan_bot.sh uses flock /tmp/bot_simulator.lock); concurrent runs could corrupt/overwrite portfolio CSVs.
-- MINOR (not fixed, low priority): app.py:110,167 uses invalid model name "openrouter/free" (AI bandar/forensic features likely always error); app.py:218-223 lists nonexistent gemini-3.7/3.6-flash models (fallback loop still saves it); r2_client.py:56 upload_file lacks try/except in some callers.
-- SECURITY: clean. token_stockbit.txt / r2_config.json / telegram_config.json NOT git-tracked (verified via git ls-files); token file written with perm 0600 + atomic replace.
-
-## Fixes Applied (this session, commit 3f71947c)
-- bot_simulator.py: removed `continue` in jadwal-mode block (FASE A sell results now always saved).
-- jaga_token.py: replaced `ambil_main()` call with subprocess call to ambil_token.py --test --quiet (mirrors coba_extract_har() pattern).
-- app.py: all three buttons (BELI/JUAL/RESET) now wrapped in `flock -w 120 /tmp/bot_simulator.lock` (same lock as cron); exit 42 + friendly message if busy. Help text of JUAL SORE button updated to mention suspend stocks are included.
-
-## Verification
-- py_compile on all 3 edited files: OK.
-- flock smoke test: second process correctly BLOCKED with exit 42.
-- jaga_token.py --test: exodus HTTP 200, token alive, exp 11 Nov 06:16 WIB (~7.6h remaining at test time).
-
-## Git State
-- Commit 3f71947c "Fix: jualan FASE A hilang di mode jadwal, NameError auto-sync-harian, race condition tombol web (flock)" pushed to origin/main (8a2158e1..3f71947c).
-- compact_saham_screeningt.md intentionally NOT committed (local state file).
-
-## Next Steps
-1. Tomorrow morning (11 Nov): Stockbit token expires 06:16 WIB — ensure a fresh HAR export lands in ~/Downloads, or verify jaga_token cron auto-recovers; otherwise pipeline falls back to Yahoo.
-2. Optional low-priority cleanup: fix "openrouter/free" model name, stale Gemini model list, r2_client.py error handling.
-## Pemulihan Data 12 Nov (sesi token mati) — selesai 22:10
-- Arsip 2026-11-12 direkonstruksi dr Yahoo 5m: 78.709 baris, 832 ticker, snapshot 09:00-16:55 tiap 5 mnt (harga/vol kumulatif REAL; indikator = nilai final, Broksum ditandai paywall). Backup asli beku: Arsip_Reset/rekon_2026-11-12/.
-- Feed utama + fundamental (948 saham, R2 OK) + net_foreign + broker_scores + snapshot/evaluasi skor rumus: semua di-refresh dgn token baru. Producer patch: stop retry broksum saat HTTP 402 PAYWALL (update_data.py DATA-CENTER).
-- TP/SL catchup (flag baru --tp-sl-catchup di bot_simulator.py, melewati gate jam bursa utk pemanggilan eksplisit): 20 jualan = 8 TP / 12 SL, Telegram OK. Porto sisa 24 posisi.
-- WEB-SCREENING ikut tersinkron (f980caf1). Broksum per-snapshot hari ini: TIDAK recoverable (paywall 402).
+Objective
+- Pulihkan data hari ini (12 Nov 2026) untuk project SAHAM-SCREENING setelah token Stockbit mati seharian (HTTP 401) yang membuat data beku berisi data kemarin — isi ulang OHLCV harian, fundamental, net foreign, arsip intraday hari ini, lalu jalankan cek TP/SL portofolio seperti biasa (user siapkan token sehat mulai besok).
+Important Details
+- Root cause: token expired 12 Nov 06:15 WIB tidak ter-refresh sepanjang bursa → producer kena 401 ("Intraday selesai: 0 OK, 944 gagal") → fallback history_cache basi → arsip 2026-11-12 lama berisi 97 snapshot identik data 11 Nov (BBCA beku 5325/92.364.800).
+- Token baru sehat: exp 13 Nov 19:33 WIB; kanonik di SAHAM-SCREENING/token_stockbit.txt, disinkron jaga_token.py (cron */10 6-18) ke DATA-CENTER & WEB-SCREENING.
+- Stockbit exodus TIDAK punya bar intraday historis (varian period intraday → HTTP 400, endpoint intraday → 404); Yahoo 5m tersedia untuk sesi hari ini (kalibrasi: Yahoo = Stockbit, volume ×100).
+- Temuan baru malam ini: marketdetectors (broksum) → HTTP 402 {"error_type":"PAYWALL","message":"paywall"} — kemarin (11 Nov) broksum nyata terisi (B: ZP, AK, AZ | S: CC, YU, BK | (Acc), 19.563/78.493 baris); paywall tidak dipulihkan malam ini, skor broker hari ini = 0 (hari lama tetap terhitung).
+- Feed hasil_screener.csv = 52 kolom (Waktu Update, Ticker, Broksum, Kategori, Valuasi, PER (x), PBV (x), Harga (Rp), Change (%), Volume, …, Rekomendasi, Net Asing (Rp), Skor Broker).
+- Producer hanya mengarsip saat 9≤jam<17 ("Mode Malam") → arsip rekon manual tidak akan tertimpa producer.
+- jalankan_bot.sh menyalin feed/arsip/screener_YYYY-MM-DD.csv → Arsip_Data_Harian/ + upload R2 → arsip rekon wajib ada di feed/arsip SEBELUM consumer jalan (sudah).
+- TP/SL: bot_simulator.py --tp-sl-only; jual bila harga_sekarang >= Target_TP / <= Target_CL (bot_simulator.py:402-421); fallback harga dari arsip (harga_terakhir_dari_arsip).
+- Porto aktif: 44 posisi di 9 arena (Database/portofolio_aktif_rumus_1..9.csv), semua dibeli 2026-11-11 21:45 (WMUU, MYOR, POLA, TRUS, IFII, AGAR, GIAA, LMAX, RUNS, KAEF, GOLD…).
+- Konteks sesi lama: commit 3f71947c (BUG-1/2/3) & 88aa22be (suspend fix) sudah push; minor belum diperbaiki (app.py "openrouter/free", gemini-3.7/3.6 fiktif, r2_client.py:56 tanpa try/except).
+Work State
+Completed
+- Backup arsip beku → Arsip_Reset/rekon_2026-11-12/ (screener2026-11-12_BEKU_asli.csv, feed_arsip2026-11-12_BEKU_asli.csv, broker_scores_BEKU.json).
+- fetcher_exodus.py fundamental sukses: 948 saham × 12 metrik → Database/fundamental_exodus.csv + R2; disalin ke DATA-CENTER/feed/fundamental_exodus.csv.
+- Producer cycle 1 sukses (21:40): 944/944 OK, feed/hasil_screener.csv berisi bar hari ini asli (BBCA 5475 +2.82% vol 192.936.300; breadth 560 naik/147 turun); status.json stempel 2026-11-12 21:40:23, sumber_harga: STOCKBIT.
+- net_foreign.py sukses → feed/net_foreign.csv data hari ini (BBCA +246.98 M, BMRI +51.33 M).
+- Rekonstruksi arsip selesai via /tmp/opencode/rekon_arsip.py (fix: date_range(..., tz="Asia/Jakarta")): 78.709 baris, 832 ticker, snapshot/ticker median 96; BBCA 09:00=5325 vol 2.047.800 → 16:55=5475 vol 190.937.300; 54 MB; ditulis ke DATA-CENTER/feed/arsip/screener_2026-11-12.csv dan SAHAM-SCREENING/Arsip_Data_Harian/screener_2026-11-12.csv. Kolom indikator statis dari feed final; broksum tidak tersedia (paywall).
+- Verifikasi mekanisme TP/SL di bot_simulator.py selesai.
+Active
+- Tahap akhir pipeline BELUM dijalankan: refresh skor_broker.py → producer cycle 2 (merge fundamental+net foreign+skor broker ke feed) → skor_sistem.py snapshot+evaluasi (skor_rumus.json masih dari data beku 17:07) → consumer jalankan_bot.sh (sync feed + buat_state_intraday.py + R2 + bot_simulator.py --tp-sl-only + bangun_buku_besar + git push).
+- Pertimbangan patch 1-baris get_broksum_aman di DATA-CENTER/update_data.py: early-return saat HTTP 402 agar tidak spam ±800 request paywall tiap siklus.
+Blocked
+- Broksum (marketdetectors) paywall 402 — tidak bisa dipulihkan malam ini; kolom Broksum feed = "Error HTTP 402" (placeholder, tidak merusak parser skor).
+Next Move
+1. (Opsional) patch get_broksum_aman untuk 402; lalu cd /home/kaltaraid/Documents/DATA-CENTER && ./venv/bin/python skor_broker.py, producer ulang (bash jalankan_data_center.sh), lalu skor_sistem snapshot+evaluasi.
+2. Jalankan bash /home/kaltaraid/Documents/SAHAM-SCREENING/jalankan_bot.sh (sync feed, state_intraday, R2, --tp-sl-only, buku besar, git push); verifikasi posisi porto yang kena TP/CL di output/log dan pastikan commit/push sukses.
+Relevant Files
+- /home/kaltaraid/Documents/SAHAM-SCREENING/ — consumer utama (app.py, bot_simulator.py, jalankan_bot.sh, jaga_token.py, Database/portofolio_aktif_rumus_1..9.csv, Arsip_Data_Harian/).
+- /home/kaltaraid/Documents/DATA-CENTER/update_data.py — producer (Stockbit primary + yfinance fallback, history_cache parquet feed/history_cache/, arsip window 9-17).
+- /home/kaltaraid/Documents/DATA-CENTER/skor_broker.py — skor broker dari arsip (usecols Ticker/Harga (Rp)/Broksum; swing>10%; output feed/broker_scores.json).
+- /home/kaltaraid/Documents/DATA-CENTER/net_foreign.py — 60 saham watchlist → feed/net_foreign.csv.
+- /home/kaltaraid/Documents/DATA-CENTER/skor_sistem.py — snapshot+evaluasi skor rumus (perlu re-run).
+- /tmp/opencode/rekon_arsip.py (+ /tmp/opencode/rekon_arsip.log) — script rekonstruksi arsip Yahoo 5m.
+- /home/kaltaraid/Documents/DATA-CENTER/feed/{hasil_screener.csv,status.json,fundamental_exodus.csv,net_foreign.csv,broker_scores.json} — feed produksi.
+- /home/kaltaraid/Documents/SAHAM-SCREENING/Arsip_Reset/rekon_2026-11-12/ — backup arsip beku (jangan dihapus).
+- Log eksekusi: /tmp/opencode/producer_rekon.log, /tmp/opencode/fund_rekon.log.
+- venv: SAHAM-SCREENING/.venv (Python 3.14), DATA-CENTER/venv.
