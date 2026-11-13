@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-11-12 15:55:01",
+    "stempel_data": "2026-11-13 15:15:01",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
-            "",
-            "",
-            "",
-            "",
-            ""
+            "WMUU",
+            "ESIP",
+            "DKFT",
+            "URBN",
+            "GIAA"
         ],
         "RUMUS 2": [
-            "",
-            "",
-            "",
-            "",
-            ""
+            "WMUU",
+            "ESIP",
+            "GIAA",
+            "BEEF",
+            "TRIN"
         ],
         "RUMUS 3": [
-            "",
-            "",
-            "",
-            "",
-            ""
+            "URBN",
+            "WMUU",
+            "ESIP",
+            "DKFT",
+            "ESSA"
         ],
         "RUMUS 4": [
-            "",
-            "",
-            "",
-            "",
-            ""
+            "MEJA",
+            "RUNS",
+            "ARKO",
+            "HBAT",
+            "BSBK"
         ],
         "RUMUS 5": [
-            "",
-            "",
-            "",
-            "",
-            ""
+            "WMUU",
+            "ESIP",
+            "DKFT",
+            "GIAA",
+            "ESSA"
         ],
         "RUMUS 6": [
-            "",
-            "",
-            "",
-            "",
-            ""
+            "DKFT",
+            "GTBO",
+            "PKPK",
+            "ARII",
+            "ALDO"
         ],
         "RUMUS 7": [
-            "",
-            "",
-            "",
-            "",
-            ""
+            "WMUU",
+            "ESIP",
+            "ESSA",
+            "DKFT",
+            "TRIN"
         ],
         "RUMUS 8": [
-            "",
-            "",
-            "",
-            "",
-            ""
+            "WMUU",
+            "DKFT",
+            "BEEF",
+            "BUKA",
+            "GTBO"
         ],
         "RUMUS 9": [
-            "",
-            "",
-            "",
-            "",
-            ""
+            "WMUU",
+            "ESIP",
+            "DKFT",
+            "ESSA",
+            "BUKA"
         ]
     }
 }

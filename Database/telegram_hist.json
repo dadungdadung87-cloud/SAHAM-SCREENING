@@ -1,33 +1,4 @@
 {
-  "2026-10-05": [
-    "AKKU",
-    "AMFG",
-    "ASMI",
-    "ATAP",
-    "BAPA",
-    "BDKR",
-    "BEKS",
-    "BSWD",
-    "CSMI",
-    "FLMC",
-    "GOTO",
-    "IRRA",
-    "KDSI",
-    "KDTN",
-    "MBSS",
-    "MITI",
-    "MTMH",
-    "NAYZ",
-    "NEST",
-    "PGLI",
-    "PSGO",
-    "RATU",
-    "RGAS",
-    "ROCK",
-    "SMDR",
-    "SMIL",
-    "SMLE"
-  ],
   "2026-10-06": [
     "AHAP",
     "ASMI",
@@ -612,5 +583,25 @@
     "TRUS",
     "WMUU"
   ],
-  "2026-11-12": []
+  "2026-11-12": [],
+  "2026-11-13": [
+    "ALDO",
+    "ARII",
+    "ARKO",
+    "BEEF",
+    "BSBK",
+    "BUKA",
+    "DKFT",
+    "ESIP",
+    "ESSA",
+    "GIAA",
+    "GTBO",
+    "HBAT",
+    "MEJA",
+    "PKPK",
+    "RUNS",
+    "TRIN",
+    "URBN",
+    "WMUU"
+  ]
 }
