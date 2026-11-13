@@ -1,3 +1,1 @@
-Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL,Mode_Beli,Change_Beli
-2026-11-12 22:48,ASII,5450.0,39,21286882.5,5722,5286,MANUAL,3.8095238095238098
-2026-11-12 22:48,DEWI,246.0,872,21483376.8,258,239,MANUAL,1.6528925619834711
+Tanggal_Beli,Ticker,Harga_Beli,Lot,Total_Modal,Target_TP,Target_CL
