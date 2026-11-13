@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-11-13 15:15:01",
+    "stempel_data": "2026-11-13 15:55:01",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
             "WMUU",
             "ESIP",
             "DKFT",
-            "URBN",
-            "GIAA"
+            "GIAA",
+            "TARA"
         ],
         "RUMUS 2": [
             "WMUU",
             "ESIP",
-            "GIAA",
+            "ESSA",
             "BEEF",
-            "TRIN"
+            "SINI"
         ],
         "RUMUS 3": [
-            "URBN",
             "WMUU",
             "ESIP",
             "DKFT",
-            "ESSA"
+            "URBN",
+            "VOKS"
         ],
         "RUMUS 4": [
-            "MEJA",
-            "RUNS",
+            "BNBR",
             "ARKO",
-            "HBAT",
-            "BSBK"
+            "RUNS",
+            "AMAN",
+            "OKAS"
         ],
         "RUMUS 5": [
             "WMUU",
             "ESIP",
             "DKFT",
             "GIAA",
-            "ESSA"
+            "TARA"
         ],
         "RUMUS 6": [
             "DKFT",
+            "CLAY",
             "GTBO",
-            "PKPK",
-            "ARII",
-            "ALDO"
+            "INTP",
+            "PKPK"
         ],
         "RUMUS 7": [
             "WMUU",
             "ESIP",
-            "ESSA",
             "DKFT",
-            "TRIN"
+            "BEEF",
+            "KKGI"
         ],
         "RUMUS 8": [
             "WMUU",
             "DKFT",
             "BEEF",
-            "BUKA",
-            "GTBO"
+            "KKGI",
+            "SMRA"
         ],
         "RUMUS 9": [
             "WMUU",
             "ESIP",
             "DKFT",
-            "ESSA",
-            "BUKA"
+            "GIAA",
+            "TARA"
         ]
     }
 }
