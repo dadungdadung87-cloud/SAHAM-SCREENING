@@ -57,30 +57,27 @@ else
 fi
 
 JAM_SEKARANG=$(date +%H%M)
-FLAG_PAGI="/tmp/bsjp_pagi_$(date +%F)"
-FLAG_SORE="/tmp/bsjp_sore_$(date +%F)"
+FLAG_BELI="/tmp/bsjp_beli_$(date +%F)"
 
-if [ "$JAM_SEKARANG" -ge "1520" ] && [ "$JAM_SEKARANG" -le "1535" ]; then
-    if [ ! -f "$FLAG_PAGI" ]; then
-        echo "🧠 [15:20-15:35] Sidang jadwal (hanya bikin sinyal — TIDAK membeli)..."
+if [ "$JAM_SEKARANG" -ge "1550" ] && [ "$JAM_SEKARANG" -le "1559" ]; then
+    # ==========================================
+    # 🛒 SESI TUNGGAL 15:50 — daftar belanja (sidang AI) + BUY dalam satu waktu.
+    # Feed sudah segar (producer upload R2 tiap 2 menit) → mode_beli_aktif aman.
+    # Telegram hanya dikirim di sesi ini (satu-satunya notifikasi harian).
+    # ==========================================
+    if [ ! -f "$FLAG_BELI" ]; then
+        echo "🧠 [15:50] Sidang AI: bikin daftar belanja 9 rumus..."
         if ./.venv/bin/python sidang_jadwal.py; then
-            echo "📲 [15:36] Telegram pagi..."
+            echo "📲 [15:52] Telegram: daftar belanja hari ini..."
             ./.venv/bin/python kirim_telegram.py
-            touch "$FLAG_PAGI"
+            echo "🛒 [15:53] BUY: eksekusi sinyal ke 9 rumus..."
+            ./.venv/bin/python bot_simulator.py --jadwal
+            touch "$FLAG_BELI"
         else
-            echo "❌ Sidang jadwal gagal — dicoba lagi siklus berikutnya."
+            echo "❌ Sidang 15:50 gagal — dicoba lagi siklus berikutnya (sampai 15:59)."
         fi
     else
-        echo "⏭️ Sidang pagi sudah jalan hari ini, dilewati."
-    fi
-elif [ "$JAM_SEKARANG" -ge "1600" ] && [ "$JAM_SEKARANG" -le "1610" ]; then
-    if [ ! -f "$FLAG_SORE" ]; then
-        echo "🌆 [16:00-16:10] Sidang sore (referensi)..."
-        if ./.venv/bin/python sidang_sore.py && ./.venv/bin/python kirim_telegram_sore.py; then
-            touch "$FLAG_SORE"
-        else
-            echo "❌ Sidang/Telegram sore gagal — dicoba lagi siklus berikutnya."
-        fi
+        echo "⏭️ Sesi beli 15:50 sudah jalan hari ini, dilewati."
     fi
 else
     echo "🎯 Auto TP/SL: memeriksa posisi yang menyentuh Target_TP/Target_CL..."
