@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-11-13 15:55:01",
+    "stempel_data": "2026-11-16 15:48:01",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
-            "WMUU",
-            "ESIP",
-            "DKFT",
-            "GIAA",
-            "TARA"
+            "FOLK",
+            "COIN",
+            "VOKS",
+            "BBSS",
+            "MGNA"
         ],
         "RUMUS 2": [
-            "WMUU",
-            "ESIP",
-            "ESSA",
-            "BEEF",
-            "SINI"
+            "FOLK",
+            "TRIN",
+            "CHIP",
+            "PCAR",
+            "BHIT"
         ],
         "RUMUS 3": [
-            "WMUU",
-            "ESIP",
-            "DKFT",
-            "URBN",
-            "VOKS"
+            "FOLK",
+            "COIN",
+            "VOKS",
+            "BBSS",
+            "MGNA"
         ],
         "RUMUS 4": [
-            "BNBR",
-            "ARKO",
-            "RUNS",
-            "AMAN",
-            "OKAS"
+            "WIDI",
+            "OLIV",
+            "SHIP",
+            "ITMA",
+            "LOPI"
         ],
         "RUMUS 5": [
-            "WMUU",
-            "ESIP",
-            "DKFT",
-            "GIAA",
-            "TARA"
+            "FOLK",
+            "COIN",
+            "VOKS",
+            "BBSS",
+            "MGNA"
         ],
         "RUMUS 6": [
-            "DKFT",
-            "CLAY",
-            "GTBO",
-            "INTP",
-            "PKPK"
+            "ARII",
+            "PCAR",
+            "POLA",
+            "LPIN",
+            "SEMA"
         ],
         "RUMUS 7": [
-            "WMUU",
-            "ESIP",
-            "DKFT",
-            "BEEF",
-            "KKGI"
+            "FOLK",
+            "COIN",
+            "TRIN",
+            "MSIN",
+            "PCAR"
         ],
         "RUMUS 8": [
-            "WMUU",
-            "DKFT",
-            "BEEF",
-            "KKGI",
-            "SMRA"
+            "BUKA",
+            "VOKS",
+            "SMGR",
+            "ARII",
+            "POLA"
         ],
         "RUMUS 9": [
-            "WMUU",
-            "ESIP",
-            "DKFT",
-            "GIAA",
-            "TARA"
+            "FOLK",
+            "COIN",
+            "TRIN",
+            "BBSS",
+            "TRUE"
         ]
     }
 }
