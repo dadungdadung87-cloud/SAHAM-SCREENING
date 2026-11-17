@@ -1532,13 +1532,14 @@ def render_strategy_table(df_subset, file_name):
 # >>> PART 10 : TAB 1 - MARKET OVERVIEW <<<
 # =====================================================================
 if not df_hasil.empty:
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
         "📊 Market Overview", 
         "📌 Screener Utama", 
         "🤖 Asisten AI Spesial", 
         "💼 Portofolio Bot",
         "📚 Riwayat Transaksi",
-        "🕵️ Detektif Ledakan & Chat"
+        "🕵️ Detektif Ledakan & Chat",
+        "🎯 BSJP Tepat Sasaran v7"
     ])
     
     with tab1:
@@ -3211,3 +3212,181 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
                 st.markdown(jawab)
                 st.caption(f"⚡ via {mesin}")
             st.session_state["chat_detektif"].append({"role": "assistant", "content": jawab})
+
+# =====================================================================
+# >>> PART 15 : TAB 7 - SCREENER BSJP TEPAT SASARAN (FUNDAMENTAL KERAS) <<<
+# =====================================================================
+    with tab7:
+        import sys as _sys7
+        _sys7.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        try:
+            from services import screener_v7 as v7
+            V7_OK = True
+        except Exception as _e7:
+            V7_OK = False
+            st.error(f"Modul screener_v7 gagal dimuat: {_e7}")
+
+        if V7_OK:
+            st.markdown("## 🎯 Screener BSJP Tepat Sasaran v7")
+            st.caption(
+                f"Versi {v7.VERSI_V7} — lapisan penyaringan tambahan DI ATAS 9 rumus lama (tidak mengubah tab mana pun). "
+                "Skor komposit = 40% teknikal + 30% fundamental (PER/PBV/Piotroski/EPS/RS) + 20% likuiditas + 10% net asing. "
+                "🔒 Tab ini hanya MEMBACA — tidak pernah membeli/menjual/mengubah portofolio."
+            )
+
+            # --- Hitung sekali per sesi data ---
+            @st.cache_data(ttl=300, show_spinner=False)
+            def _hitung_v7(_stempel):
+                return v7.hitung_tab7(df_hasil)
+
+            _stempel = str(df_hasil["Terakhir Update"].iloc[0]) if (not df_hasil.empty and "Terakhir Update" in df_hasil.columns) else "kosong"
+            df_v7_semua = _hitung_v7(_stempel)
+
+            if df_v7_semua.empty:
+                st.info("Data kosong — tidak ada kandidat yang bisa dihitung.")
+            else:
+                # ---------- Panel filter ----------
+                with st.expander("🛠️ Panel Filter Tepat Sasaran", expanded=True):
+                    c1, c2, c3, c4 = st.columns(4)
+                    with c1:
+                        min_skor = st.slider("⭐ Skor Komposit Minimal", 0, 100, 60, 5, key="v7_min_skor")
+                    with c2:
+                        min_harga = st.number_input("⬇️ Harga Min (Rp)", 0, 1_000_000, 50, 50, key="v7_min_harga")
+                    with c3:
+                        max_harga = st.number_input("⬆️ Harga Maks (Rp)", 0, 10_000_000, 0, 500, key="v7_max_harga",
+                                                    help="0 = tanpa batas atas")
+                    with c4:
+                        pilihan_kat = st.multiselect("🏢 Kategori", sorted(df_v7_semua["Kategori"].dropna().unique()),
+                                                     key="v7_kategori")
+
+                    c5, c6, c7, c8 = st.columns(4)
+                    with c5:
+                        minta_likuid = st.checkbox("💧 Wajib Likuid (> 1 Miliar)", value=True, key="v7_likuid")
+                    with c6:
+                        tolak_gorengan = st.checkbox("🚫 Tolak Gorengan Sepi", value=True, key="v7_no_gorengan")
+                    with c7:
+                        per_maks = st.number_input("💰 PER Maksimal (x)", 0, 500, 30, 5, key="v7_per",
+                                                   help="0 = tanpa filter PER. Saham rugi (PER negatif) lolos hanya jika skor ≥ 70")
+                    with c8:
+                        pbv_maks = st.number_input("📚 PBV Maksimal (x)", 0, 100, 5, 1, key="v7_pbv",
+                                                   help="0 = tanpa filter PBV")
+
+                    c9, c10, c11, _sp = st.columns(4)
+                    with c9:
+                        min_pio = st.slider("🧮 Piotroski F-Score Min", 0, 9, 0, 1, key="v7_pio",
+                                            help="0 = tanpa filter. Skor 7-9 = fundamental kuat")
+                    with c10:
+                        hanya_beli = st.checkbox("🎯 Hanya Rekomendasi BELI", value=False, key="v7_beli")
+                    with c11:
+                        top_n = st.selectbox("Tampilkan Top", [10, 15, 20, 30, 50], index=1, key="v7_topn")
+
+                # --- Terapkan filter ---
+                df_v7_hasil = v7.filter_tepat_sasaran(
+                    df_v7_semua, min_skor=min_skor, min_harga=min_harga, max_harga=max_harga,
+                    minta_likuid=minta_likuid, tolak_gorengan=tolak_gorengan,
+                    per_maks=per_maks, pbv_maks=pbv_maks, min_piotroski=min_pio)
+                if hanya_beli:
+                    df_v7_hasil = df_v7_hasil[df_v7_hasil["Rekomendasi"].astype(str).str.contains("BELI", na=False)]
+
+                # ---------- Ringkasan ----------
+                st.markdown("---")
+                m1, m2, m3, m4 = st.columns(4)
+                m1.metric("🎯 Kandidat Lolos", f"{len(df_v7_hasil)}", delta=f"dari {len(df_v7_semua)} saham", delta_color="off")
+                if not df_v7_hasil.empty:
+                    m2.metric("⭐ Skor Tertinggi", f"{df_v7_hasil['Skor Komposit'].max():.1f}",
+                              delta=str(df_v7_hasil.iloc[0]["Ticker"]), delta_color="off")
+                    m3.metric("💰 Nilai Tx Tertinggi", format_singkat_rp(df_v7_hasil["Nilai Tx (Rp)"].max()))
+                    m4.metric("📊 Rata-rata Skor", f"{df_v7_hasil['Skor Komposit'].mean():.1f}")
+
+                # ---------- Tabel hasil ----------
+                st.markdown("### 🏆 Hasil Screening Tepat Sasaran")
+                if df_v7_hasil.empty:
+                    st.info("Tidak ada saham yang lolos semua filter. Longgarkan slider/kriteria di atas.")
+                else:
+                    df_tampil = df_v7_hasil.head(top_n).copy()
+                    kolom_tampil = [c for c in [
+                        "Ticker", "Harga (Rp)", "Change (%)", "Skor Komposit", "Skor Teknikal",
+                        "Skor Fundamental", "Skor Likuiditas", "Net Asing", "PER (x)", "PBV (x)",
+                        "Piotroski", "Kategori", "Valuasi", "Likuiditas", "Kelas Transaksi",
+                        "Rekomendasi", "Nilai Tx (Rp)"
+                    ] if c in df_tampil.columns]
+                    df_tampil = df_tampil[kolom_tampil]
+
+                    fmt_v7 = {}
+                    if "Harga (Rp)" in df_tampil: fmt_v7["Harga (Rp)"] = format_angka
+                    if "Change (%)" in df_tampil: fmt_v7["Change (%)"] = format_pct
+                    if "Nilai Tx (Rp)" in df_tampil: fmt_v7["Nilai Tx (Rp)"] = format_singkat_rp
+                    for c in ["Skor Komposit", "Skor Teknikal", "Skor Fundamental", "Skor Likuiditas", "Net Asing"]:
+                        if c in df_tampil: fmt_v7[c] = lambda v: f"{v:.1f}" if isinstance(v, (int, float)) and pd.notna(v) else "-"
+                    for c in ["PER (x)", "PBV (x)"]:
+                        if c in df_tampil: fmt_v7[c] = lambda v: f"{v:.2f}" if pd.notna(v) else "-"
+
+                    def warnai_skor(v):
+                        if isinstance(v, (int, float)) and pd.notna(v):
+                            if v >= 75: return "background-color:#14532d;color:#fff;font-weight:700"
+                            if v >= 60: return "background-color:#166534;color:#fff"
+                            if v >= 45: return "background-color:#713f12;color:#fff"
+                            return "background-color:#7f1d1d;color:#fff"
+                        return ""
+
+                    kolom_skor = [c for c in ["Skor Komposit", "Skor Teknikal", "Skor Fundamental", "Skor Likuiditas", "Net Asing"] if c in df_tampil.columns]
+                    sty = df_tampil.style.format(fmt_v7)
+                    if kolom_skor:
+                        sty = sty.map(warnai_skor, subset=kolom_skor)
+                    if "Change (%)" in df_tampil.columns:
+                        sty = sty.map(warna_tabel, subset=["Change (%)"])
+                    st.dataframe(sty, use_container_width=True, hide_index=True)
+
+                    # --- Salin daftar ticker ---
+                    c_dl1, c_dl2 = st.columns(2)
+                    with c_dl1:
+                        st.download_button(
+                            "📥 Download CSV",
+                            df_v7_hasil.to_csv(index=False).encode(),
+                            file_name=f"bsjp_v7_{datetime.now().strftime('%Y%m%d_%H%M')}.csv",
+                            mime="text/csv", key="v7_dl_csv")
+                    with c_dl2:
+                        daftar_t = df_tampil["Ticker"].tolist()
+                        st.code("\n".join(daftar_t), language="text")
+                        st.caption(f"Top {len(daftar_t)} ticker — salin manual untuk dipaste ke tab lain.")
+
+                # ---------- Perbandingan dengan 9 rumus lama ----------
+                st.markdown("---")
+                st.markdown("### 🔀 Perbandingan dengan 9 Rumus Lama (v6.1)")
+                st.caption("Ticker v7 yang JUGA muncul di salah satu 9 rumus lama = sinyal konfirmasi ganda (paling kuat).")
+                try:
+                    semua_rumus_lama = set()
+                    for i in range(1, 10):
+                        _dfr = df_hasil.copy()
+                        # replikasi cepat filter v6.1 via sidang_lib
+                        pass
+                    _sr = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sidang_lib.py")
+                    if os.path.exists(_sr):
+                        import importlib.util as _ilu
+                        _spec = _ilu.spec_from_file_location("sidang_lib_v7", _sr)
+                        _mod = _ilu.module_from_spec(_spec)
+                        _spec.loader.exec_module(_mod)
+                        _rumus = _mod.hitung_rumus(df_hasil)
+                        for i in range(1, 10):
+                            if not _rumus.get(i, pd.DataFrame()).empty:
+                                semua_rumus_lama.update(_rumus[i]["Ticker"].astype(str).str.upper())
+                    if semua_rumus_lama and not df_v7_hasil.empty:
+                        df_v7_hasil["_dobel"] = df_v7_hasil["Ticker"].isin(semua_rumus_lama)
+                        n_dobel = int(df_v7_hasil["_dobel"].sum())
+                        st.markdown(f"🔀 **{n_dobel} dari {len(df_v7_hasil)}** kandidat v7 juga lolos 9 rumus lama (konfirmasi ganda).")
+                        kolom_dobel = [c for c in ["Ticker", "Harga (Rp)", "Skor Komposit", "Rekomendasi", "_dobel"] if c in df_v7_hasil.columns]
+                        with st.expander(f"📋 Lihat {n_dobel} kandidat konfirmasi ganda", expanded=(0 < n_dobel <= 15)):
+                            st.dataframe(
+                                df_v7_hasil[df_v7_hasil["_dobel"]][kolom_dobel].style.format(
+                                    {"Harga (Rp)": format_angka, "Skor Komposit": lambda v: f"{v:.1f}"}),
+                                use_container_width=True, hide_index=True)
+                    else:
+                        st.info("Tidak ada kandidat v7 yang overlap dengan 9 rumus lama saat ini (v7 menangkap pola berbeda).")
+                except Exception as _e_dobel:
+                    st.caption(f"Perbandingan dilewati: {_e_dobel}")
+
+                # ---------- Distribusi skor ----------
+                st.markdown("---")
+                st.markdown("### 📊 Sebaran Skor Komposit (semua 825 saham)")
+                _hist = df_v7_semua["Skor Komposit"].clip(0, 100).round(0).astype(int).value_counts().sort_index()
+                st.bar_chart(_hist)
