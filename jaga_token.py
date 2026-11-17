@@ -125,6 +125,30 @@ def coba_extract_har(auto=False):
     return False
 
 
+def coba_ambil_cdp():
+    """Pulihkan token dari cookie browser via CDP (ambil_token_cdp.py).
+    Urutan: coba dulu apa adanya; jika gagal, reload stockbit.com lalu coba lagi.
+    Return True jika token kanonik sekarang hidup."""
+    import subprocess
+    skrip = os.path.join(BASE, "ambil_token_cdp.py")
+    for arg_ekstra in ([], ["--navigasi"]):  # percobaan 2: reload utk segar cookie
+        cmd = [sys.executable, skrip] + arg_ekstra
+        try:
+            r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            print((r.stdout or r.stderr or "").strip()[:300])
+            if r.returncode == 0:
+                tok, _, sisa, hidup = status_token()
+                if hidup:
+                    tulis_cache(tok)
+                    print(f"✅ Token baru via CDP browser: sisa {sisa:.1f} jam")
+                    return True
+        except subprocess.TimeoutExpired:
+            print("⚠️ ambil_token_cdp timeout")
+        except Exception as e:
+            print(f"⚠️ ambil_token_cdp gagal: {e}")
+    return False
+
+
 def utama():
     ap = argparse.ArgumentParser()
     ap.add_argument("--quiet", action="store_true")
@@ -167,23 +191,28 @@ def utama():
         if sisa < 3:  # hampir habis: ingatkan 1x
             alarm("peringatan_segera_habis",
                   f"⚠️ <b>Token Stockbit</b> sisa {sisa:.0f} jam lagi.\n"
-                  "Siapkan HAR baru dari DevTools stockbit.com sekarang.")
+                  "Selama laptop nyala + Thorium login stockbit.com, pemulihan "
+                  "OTOMATIS via browser. Tidak perlu apa-apa.")
     else:
-        print("❌ token MATI — mencoba pulihkan dari HAR ~/Downloads...")
-        if coba_extract_har():
+        print("❌ token MATI — coba pulihkan via CDP browser (cookie login Thorium)...")
+        pulih = coba_ambil_cdp()
+        if not pulih:
+            print("❌ CDP gagal — fallback scan HAR ~/Downloads...")
+            pulih = coba_extract_har()
+        if pulih:
             tok, exp, sisa2, _ = status_token()
             sinkronkan(tok)
-            alarm("pulih", f"✅ <b>Token Stockbit pulih</b> dari HAR baru "
+            alarm("pulih", f"✅ <b>Token Stockbit pulih otomatis</b> "
                            f"(sisa {sisa2:.0f} jam) — pipeline kembali normal.")
         else:
             alarm("mati",
                   f"🚨 <b>Token Stockbit MATI</b> ({now:%d %b %H:%M} WIB)\n"
-                  "Pipeline fallback ke Yahoo. Perbaikan:\n"
-                  "1. Buka stockbit.com + DevTools (F12) → tab Network\n"
-                  "2. Refresh halaman & login bila perlu\n"
-                  "3. Klik kanan network → <b>Save all as HAR with content</b>\n"
-                  "4. Simpan ke ~/Downloads → jaga_token.py siklus berikutnya "
-                  "akan ambil otomatis dalam 10 menit.")
+                  "Pemulihan otomatis gagal (browser mati/logout?). Pipeline "
+                  "fallback ke Yahoo. Perbaikan manual:\n"
+                  "1. Pastikan laptop menyala & Thorium jalan (./thorium-bot.sh)\n"
+                  "2. Buka stockbit.com di Thorium — login bila diminta\n"
+                  "3. jaga_token.py siklus berikutnya (≤10 menit) pulihkan otomatis\n"
+                  "   atau jalankan: ./.venv/bin/python ambil_token_cdp.py --navigasi")
 
 
 if __name__ == "__main__":
