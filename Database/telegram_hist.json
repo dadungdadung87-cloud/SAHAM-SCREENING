@@ -1,35 +1,4 @@
 {
-  "2026-10-07": [
-    "AKKU",
-    "AMFG",
-    "ASJT",
-    "ASMI",
-    "BDMN",
-    "BTEK",
-    "CSMI",
-    "FORU",
-    "IDEA",
-    "ISSP",
-    "ITIC",
-    "KDSI",
-    "KLBF",
-    "MEJA",
-    "MMIX",
-    "MPXL",
-    "MTMH",
-    "NAYZ",
-    "PCAR",
-    "PGLI",
-    "POLA",
-    "PRAY",
-    "REAL",
-    "RSCH",
-    "SMLE",
-    "SMSM",
-    "TRUE",
-    "VIVA",
-    "WIDI"
-  ],
   "2026-10-08": [
     "AIMS",
     "AMFG",
@@ -599,5 +568,21 @@
     "TRUE",
     "VOKS",
     "WIDI"
+  ],
+  "2026-11-17": [
+    "AREA",
+    "ARII",
+    "FOLK",
+    "KOCI",
+    "MGNA",
+    "MPXL",
+    "NSSS",
+    "POLA",
+    "PRIM",
+    "PSKT",
+    "SOFA",
+    "TRIN",
+    "TRUE",
+    "UNIQ"
   ]
 }

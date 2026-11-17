@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-11-16 15:48:01",
+    "stempel_data": "2026-11-17 15:48:01",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
+            "TRIN",
+            "MGNA",
             "FOLK",
-            "COIN",
-            "VOKS",
-            "BBSS",
-            "MGNA"
+            "TRUE",
+            "KOCI"
         ],
         "RUMUS 2": [
-            "FOLK",
             "TRIN",
-            "CHIP",
-            "PCAR",
-            "BHIT"
+            "FOLK",
+            "TRUE",
+            "MGNA",
+            "KOCI"
         ],
         "RUMUS 3": [
+            "TRIN",
+            "MGNA",
             "FOLK",
-            "COIN",
-            "VOKS",
-            "BBSS",
-            "MGNA"
+            "TRUE",
+            "KOCI"
         ],
         "RUMUS 4": [
-            "WIDI",
-            "OLIV",
-            "SHIP",
-            "ITMA",
-            "LOPI"
+            "AREA",
+            "NSSS",
+            "PSKT",
+            "PRIM",
+            "SOFA"
         ],
         "RUMUS 5": [
+            "TRIN",
             "FOLK",
-            "COIN",
-            "VOKS",
-            "BBSS",
+            "TRUE",
+            "KOCI",
             "MGNA"
         ],
         "RUMUS 6": [
-            "ARII",
-            "PCAR",
+            "UNIQ",
+            "MPXL",
             "POLA",
-            "LPIN",
-            "SEMA"
+            "ARII",
+            "PRIM"
         ],
         "RUMUS 7": [
-            "FOLK",
-            "COIN",
             "TRIN",
-            "MSIN",
-            "PCAR"
+            "FOLK",
+            "TRUE",
+            "KOCI",
+            "MGNA"
         ],
         "RUMUS 8": [
-            "BUKA",
-            "VOKS",
-            "SMGR",
-            "ARII",
-            "POLA"
+            "MGNA",
+            "MPXL",
+            "POLA",
+            "NSSS",
+            "ARII"
         ],
         "RUMUS 9": [
-            "FOLK",
-            "COIN",
             "TRIN",
-            "BBSS",
-            "TRUE"
+            "MGNA",
+            "FOLK",
+            "TRUE",
+            "KOCI"
         ]
     }
 }
