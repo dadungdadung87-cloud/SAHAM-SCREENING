@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-11-17 15:48:01",
+    "stempel_data": "2026-11-18 15:48:00",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
-            "TRIN",
-            "MGNA",
-            "FOLK",
-            "TRUE",
-            "KOCI"
+            "TRON",
+            "SOLA",
+            "MANG",
+            "CPRO",
+            "KOPI"
         ],
         "RUMUS 2": [
-            "TRIN",
-            "FOLK",
-            "TRUE",
-            "MGNA",
-            "KOCI"
+            "KOPI",
+            "NZIA",
+            "ALKA",
+            "BAPI",
+            "GULA"
         ],
         "RUMUS 3": [
-            "TRIN",
-            "MGNA",
-            "FOLK",
-            "TRUE",
-            "KOCI"
+            "TRON",
+            "SOLA",
+            "MANG",
+            "CPRO",
+            "KOPI"
         ],
         "RUMUS 4": [
-            "AREA",
-            "NSSS",
-            "PSKT",
-            "PRIM",
-            "SOFA"
+            "NAYZ",
+            "UNIQ",
+            "IDEA",
+            "PEHA",
+            "TBMS"
         ],
         "RUMUS 5": [
-            "TRIN",
-            "FOLK",
-            "TRUE",
-            "KOCI",
-            "MGNA"
+            "TRON",
+            "SOLA",
+            "MANG",
+            "CPRO",
+            "KOPI"
         ],
         "RUMUS 6": [
+            "ASGR",
             "UNIQ",
-            "MPXL",
-            "POLA",
-            "ARII",
-            "PRIM"
+            "IDEA",
+            "DGIK",
+            ""
         ],
         "RUMUS 7": [
-            "TRIN",
-            "FOLK",
-            "TRUE",
-            "KOCI",
-            "MGNA"
+            "TRON",
+            "SOLA",
+            "MANG",
+            "KOPI",
+            "ALKA"
         ],
         "RUMUS 8": [
-            "MGNA",
-            "MPXL",
-            "POLA",
-            "NSSS",
-            "ARII"
+            "TRON",
+            "MANG",
+            "MAPA",
+            "ASGR",
+            "UNIQ"
         ],
         "RUMUS 9": [
-            "TRIN",
-            "MGNA",
-            "FOLK",
-            "TRUE",
-            "KOCI"
+            "TRON",
+            "SOLA",
+            "MANG",
+            "CPRO",
+            "KOPI"
         ]
     }
 }
