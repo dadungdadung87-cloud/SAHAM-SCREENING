@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-11-18 15:48:00",
+    "stempel_data": "2026-11-19 15:48:01",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
-            "TRON",
-            "SOLA",
-            "MANG",
-            "CPRO",
-            "KOPI"
+            "TALF",
+            "HRME",
+            "NAYZ",
+            "PTSP",
+            "GOTO"
         ],
         "RUMUS 2": [
-            "KOPI",
-            "NZIA",
-            "ALKA",
-            "BAPI",
-            "GULA"
+            "TALF",
+            "HRME",
+            "PTSP",
+            "IFSH",
+            "BCAP"
         ],
         "RUMUS 3": [
-            "TRON",
-            "SOLA",
-            "MANG",
-            "CPRO",
-            "KOPI"
+            "TALF",
+            "OKAS",
+            "ESIP",
+            "HRME",
+            "JAST"
         ],
         "RUMUS 4": [
             "NAYZ",
-            "UNIQ",
-            "IDEA",
-            "PEHA",
-            "TBMS"
-        ],
-        "RUMUS 5": [
-            "TRON",
-            "SOLA",
-            "MANG",
-            "CPRO",
-            "KOPI"
-        ],
-        "RUMUS 6": [
-            "ASGR",
-            "UNIQ",
-            "IDEA",
-            "DGIK",
-            ""
-        ],
-        "RUMUS 7": [
-            "TRON",
-            "SOLA",
-            "MANG",
-            "KOPI",
-            "ALKA"
-        ],
-        "RUMUS 8": [
-            "TRON",
-            "MANG",
-            "MAPA",
-            "ASGR",
+            "OLIV",
+            "DILD",
+            "ASPR",
             "UNIQ"
         ],
+        "RUMUS 5": [
+            "GOTO",
+            "AMRT",
+            "NAYZ",
+            "PWON",
+            "PTSP"
+        ],
+        "RUMUS 6": [
+            "POLA",
+            "PWON",
+            "PTSP",
+            "ASPR",
+            "MPXL"
+        ],
+        "RUMUS 7": [
+            "TALF",
+            "HRME",
+            "OLIV",
+            "PTSP",
+            "WBSA"
+        ],
+        "RUMUS 8": [
+            "HRME",
+            "PWON",
+            "OLIV",
+            "MPXL",
+            "PSKT"
+        ],
         "RUMUS 9": [
-            "TRON",
-            "SOLA",
-            "MANG",
-            "CPRO",
-            "KOPI"
+            "ESIP",
+            "HRME",
+            "OKAS",
+            "ESTI",
+            "JAST"
         ]
     }
 }
