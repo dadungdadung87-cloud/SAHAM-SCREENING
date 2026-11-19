@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 # ==========================================
 # 🎫 AMBIL TOKEN VIA CDP — tanpa HAR manual!
-# Sumber: cookie "credentialStorage" di tab Stockbit yang sudah login
-# (Thorium port 9223). Token ini terbukti VALID untuk exodus.stockbit.com
-# (uji 2026-11-17: HTTP 200 via curl_cffi; requests polos kena 403 Cloudflare).
+# Metode 1 (utama): intersep respons endpoint auth/v1/session saat halaman
+#   Stockbit dimuat — selalu berisi access_token segar (terbukti 20 Nov:
+#   cookie credentialStorage kosong, tapi respons session tetap penuh).
+# Metode 2 (fallback): cookie credentialStorage (carakerja lama).
+# Uji validitas: exodus.stockbit.com via curl_cffi (requests polos kena 403).
 #
 # Alur otomatis: token kedaluwarsa → jaga_token.py panggil skrip ini →
-# skrip baca cookie browser (sesi login awet) → tulis ke kanonik → sinkron.
-# Tidak perlu user ekspor HAR lagi selama sesi login browser masih hidup.
+# skrip reload halaman → intersep token → tulis kanonik → sinkron.
 #
 # Pemakaian:
 #   ./.venv/bin/python ambil_token_cdp.py            # ambil + tulis jika lebih segar
-#   ./.venv/bin/python ambil_token_cdp.py --navigasi # reload stockbit.com dulu (refresh cookie)
+#   ./.venv/bin/python ambil_token_cdp.py --navigasi # buka halaman auth dulu (picu fetch token)
 #   ./.venv/bin/python ambil_token_cdp.py --status   # cek status token kanonik
 #   ./.venv/bin/python ambil_token_cdp.py --paksa    # timpa kanonik tanpa cek umur
 # Exit: 0 sukses | 2 gagal ambil | 3 token tidak lebih segar
@@ -34,6 +35,7 @@ PORT = 9223
 TIMEOUT = 20
 WIB = timezone(timedelta(hours=7))
 URL_EXODUS_TEST = "https://exodus.stockbit.com/screener/metric"
+URL_AUTH_PICU = "https://stockbit.com/#/portfolio"   # halaman yang memicu fetch auth
 HEADERS_EXODUS = {
     "accept": "application/json",
     "origin": "https://stockbit.com",
@@ -87,23 +89,78 @@ async def _eval_js(ws_url, ekspresi, id_msg=1):
     return ""
 
 
+async def _intersep_session(ws_url):
+    """Navigasikan tab ke halaman ber-auth, intersep respons auth/v1/session,
+    ambil data.access_token. Return (token, expired_at) atau (None, None)."""
+    async with websockets.connect(ws_url, max_size=50 * 1024 * 1024) as ws:
+        await ws.send(json.dumps({"id": 1, "method": "Network.enable"}))
+        await ws.send(json.dumps({"id": 2, "method": "Page.navigate",
+                                  "params": {"url": URL_AUTH_PICU}}))
+        akhir = time.time() + 45
+        while time.time() < akhir:
+            try:
+                msg = json.loads(await asyncio.wait_for(ws.recv(), timeout=3))
+            except asyncio.TimeoutError:
+                continue
+            except Exception:
+                break
+            if msg.get("method") == "Network.responseReceived":
+                url = msg["params"]["response"]["url"]
+                if "auth/v1/session" in url:
+                    rid = msg["params"]["requestId"]
+                    status = msg["params"]["response"]["status"]
+                    await ws.send(json.dumps({"id": 99, "method": "Network.getResponseBody",
+                                              "params": {"requestId": rid}}))
+            elif msg.get("id") == 99:
+                body = msg.get("result", {}).get("body", "")
+                if not body:
+                    return None, None
+                try:
+                    d = json.loads(body)
+                except Exception:
+                    return None, None
+                data = d.get("data") or {}
+                tok = data.get("access_token") or ""
+                return (tok if tok else None), data.get("expired_at")
+    return None, None
+
+
 async def _segarkan_cookie(ws_url):
-    """Reload halaman stockbit.com agar web app refresh token & cookie."""
+    """Reload halaman stockbit.com agar web app fetch token & set cookie."""
     async with websockets.connect(ws_url, max_size=10 * 1024 * 1024) as ws:
         await ws.send(json.dumps({"id": 2, "method": "Page.navigate",
                                   "params": {"url": "https://stockbit.com/"}}))
-        await asyncio.sleep(6)  # beri waktu app fetch token baru & set cookie
+        await asyncio.sleep(6)
 
 
-def ambil_dari_browser(navigasi_dulu=False):
-    """Ambil (token, exp_epoch, sumber) dari cookie credentialStorage browser.
-    Return (None, 0, alasan) bila gagal."""
+def ambil_via_intersep():
+    """Metode 1: intersep respons auth/v1/session. Return (tok, exp, sumber/alasan)."""
     ws_url = tab_stockbit()
     if not ws_url:
         return None, 0, "tab Stockbit tidak ditemukan di Thorium (port 9223)"
     try:
-        if navigasi_dulu:
+        tok, expired_at = asyncio.run(_intersep_session(ws_url))
+        if not tok:
+            # coba sekali lagi dgn reload eksplisit (kadang navigasi hash tidak memicu fetch)
             asyncio.run(_segarkan_cookie(ws_url))
+            ws_url2 = tab_stockbit()
+            tok, expired_at = asyncio.run(_intersep_session(ws_url2)) if ws_url2 else (None, None)
+        if not tok:
+            return None, 0, "respons auth/v1/session tidak tertangkap / tanpa token"
+        pl = payload_jwt(tok)
+        if not pl or not pl.get("exp"):
+            return None, 0, "token dari session bukan JWT valid"
+        return tok, int(pl["exp"]), f"intersep auth/v1/session (uid {pl.get('data', {}).get('uid')})"
+    except Exception as e:
+        return None, 0, f"error intersep: {e}"
+
+
+def ambil_via_cookie():
+    """Metode 2 (fallback): cookie credentialStorage. Return (tok, exp, sumber/alasan)."""
+    ws_url = tab_stockbit()
+    if not ws_url:
+        return None, 0, "tab Stockbit tidak ditemukan di Thorium (port 9223)"
+    try:
         raw = asyncio.run(_eval_js(
             ws_url,
             "(() => { const c = document.cookie.match(/credentialStorage=([^;]+)/);"
@@ -118,11 +175,18 @@ def ambil_dari_browser(navigasi_dulu=False):
         pl = payload_jwt(tok)
         if not pl or not pl.get("exp"):
             return None, 0, "token bukan JWT valid"
-        if "STOCKBIT" not in str(pl.get("iss", "")).upper():
-            return None, 0, f"iss bukan STOCKBIT ({pl.get('iss')})"
         return tok, int(pl["exp"]), f"cookie credentialStorage (uid {pl.get('data', {}).get('uid')})"
     except Exception as e:
-        return None, 0, f"error: {e}"
+        return None, 0, f"error cookie: {e}"
+
+
+def ambil_dari_browser(navigasi_dulu=False):
+    """Gabungan: intersep dulu, cookie jadi fallback. Return (tok, exp, sumber/alasan)."""
+    tok, exp, sumber = ambil_via_intersep()
+    if tok:
+        return tok, exp, sumber
+    print(f"ℹ️ intersep gagal ({sumber}) — coba cookie credentialStorage...")
+    return ambil_via_cookie()
 
 
 def uji_exodus(tok):
@@ -158,7 +222,7 @@ def simpan(tok):
 
 def utama():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--navigasi", action="store_true", help="reload stockbit.com dulu (segar cookie)")
+    ap.add_argument("--navigasi", action="store_true", help="buka halaman ber-auth dulu (picu fetch token)")
     ap.add_argument("--paksa", action="store_true", help="timpa kanonik tanpa cek umur")
     ap.add_argument("--tanpa-uji", action="store_true", help="lewati uji exodus (lebih cepat)")
     ap.add_argument("--status", action="store_true", help="hanya cek status")
