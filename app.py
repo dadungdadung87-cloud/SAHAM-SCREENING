@@ -1129,13 +1129,13 @@ MASTER_FILTERS = WEB_CONFIG["MASTER_FILTERS"]
 # =====================================================================
 def muat_preset():
     preset_bawaan = {
-        "🌙 BSJP (Beli Sore 15:50)": {k: "Semua" for k in MASTER_FILTERS},
+        "🌙 BSJP (Beli Sore 15:40)": {k: "Semua" for k in MASTER_FILTERS},
         "⚡ HAKA Sesi Pagi (Open=Low)": {k: "Semua" for k in MASTER_FILTERS},
         "🚀 Gorengan Aktif (High Risk)": {k: "Semua" for k in MASTER_FILTERS},
         "🎣 Pantulan Reversal Emas": {k: "Semua" for k in MASTER_FILTERS},
         "🔥 Bluechip Terakumulasi": {k: "Semua" for k in MASTER_FILTERS}
     }
-    preset_bawaan["🌙 BSJP (Beli Sore 15:50)"].update({"Tekanan Bandar": "Dominan Beli (Hajar Kanan)", "Karakter Gorengan": "Solid (Jarang Dibanting)", "Status Bandar": "Akumulasi Kuat", "MA Signal": "Uptrend", "Rekomendasi": "BELI"})
+    preset_bawaan["🌙 BSJP (Beli Sore 15:40)"].update({"Tekanan Bandar": "Dominan Beli (Hajar Kanan)", "Karakter Gorengan": "Solid (Jarang Dibanting)", "Status Bandar": "Akumulasi Kuat", "MA Signal": "Uptrend", "Rekomendasi": "BELI"})
     preset_bawaan["⚡ HAKA Sesi Pagi (Open=Low)"].update({"Status Open": "Open = Low (Bullish Kuat)", "Risk/Reward Ratio": "Sangat Menarik (> 1:3)"})
     preset_bawaan["🚀 Gorengan Aktif (High Risk)"].update({"Kategori": "Small Cap (Lapis 3)", "RVOL (Anomali Vol)": "Ledakan Ekstrem (> 300%)", "Posisi VWAP": "Di Atas VWAP (Kuat)"})
     preset_bawaan["🎣 Pantulan Reversal Emas"].update({"Sinyal Cuci Barang": "Jarum Bawah (Sinyal Pantulan Kuat)", "Kekuatan A/D": "Akumulasi Pro (Smart Money)"})
@@ -1377,7 +1377,7 @@ PRESET_UI_TAMPIL = False
 
 if PRESET_UI_TAMPIL:
     st.sidebar.title("⚙️ Preset Filter Cepat")
-    st.sidebar.info("Gunakan **'BSJP (Beli Sore 15:50)'** untuk mencari saham yang mantap dibeli sebelum penutupan bursa! (Auto SELL semua sisa posisi jam 15:00)")
+    st.sidebar.info("Gunakan **'BSJP (Beli Sore 15:40)'** untuk mencari saham yang mantap dibeli sebelum penutupan bursa! (Auto SELL semua sisa posisi jam 15:00)")
 
     opsi_preset = ["Matikan Preset (Manual)"] + list(daftar_preset_aktif.keys())
     idx_default = opsi_preset.index(st.session_state.preset_selector) if st.session_state.preset_selector in opsi_preset else 0
@@ -2427,7 +2427,7 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
         st.markdown("## 🤖 Monitor Bot Simulator")
         
         # >>> MODE CAMPURAN TERKONTROL: TP/SL otomatis, pembelian dan jual sore manual.
-        st.info("🎯 **Mode terkontrol:** posisi otomatis dijual jika menyentuh Target_TP/Target_CL, dan sisa posisi di-square-off otomatis jam **15:00**. Beli otomatis jam **15:50** (daftar belanja AI + Telegram). 🛒 BELI & 💸 JUAL tersedia untuk aksi manual di luar jadwal.")
+        st.info("🎯 **Mode terkontrol:** posisi otomatis dijual jika menyentuh Target_TP/Target_CL, dan sisa posisi di-square-off otomatis jam **15:00**. Beli otomatis jam **15:40** (daftar belanja AI + Telegram). 🛒 BELI & 💸 JUAL tersedia untuk aksi manual di luar jadwal.")
         col_beli, col_jual = st.columns(2)
         with col_beli:
             if st.button("🛒 EKSEKUSI BELI Semua Sinyal!", type="primary", use_container_width=True,
@@ -2736,7 +2736,7 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
             if not df_shadow_porto.empty:
                 st.dataframe(df_shadow_porto, use_container_width=True, hide_index=True)
             else:
-                st.info("📦 Belum ada posisi shadow. Beli virtual pertama terjadi jam 15:50 setelah sidang AI.")
+                st.info("📦 Belum ada posisi shadow. Beli virtual pertama terjadi jam 15:40 setelah sidang AI.")
         with sub_s2:
             if not df_shadow_hist.empty:
                 df_sh = df_shadow_hist.sort_values(by='Tanggal_Jual', ascending=False).reset_index(drop=True) if 'Tanggal_Jual' in df_shadow_hist.columns else df_shadow_hist

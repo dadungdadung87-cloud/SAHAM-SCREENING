@@ -294,7 +294,7 @@ def jalankan_shadow_top3(now, df_market, is_square_off_time, liquidate, boleh_be
         if history_baru:
             df_history = pd.concat([df_history, pd.DataFrame(history_baru)], ignore_index=True)
 
-        # BELI (virtual) dari sinyal_top3 saat mode jadwal 15:50
+        # BELI (virtual) dari sinyal_top3 saat mode jadwal 15:40
         file_sinyal3 = os.path.join(DIR_DB, f"sinyal_top3_rumus_{i}.csv")
         if boleh_beli and os.path.exists(file_sinyal3):
             try:
@@ -747,12 +747,12 @@ def jalankan_bot():
     print("✅ Inspeksi 9 Arena selesai.")
 
     # ----------------------------------------------------
-    # 🥇 SHADOW PORTO TOP 3: evaluasi virtual (jual + beli 15:50)
+    # 🥇 SHADOW PORTO TOP 3: evaluasi virtual (jual + beli 15:40)
     # Skip pada --beli-only (jual shadow tetap jalan di mode lain)
     # ----------------------------------------------------
     if beli_only is not True:
         try:
-            # Beli shadow hanya saat sesi beli (jadwal 15:50 / manual), selaras FASE B riil
+            # Beli shadow hanya saat sesi beli (jadwal 15:40 / manual), selaras FASE B riil
             boleh_beli_shadow = (mode in ("jadwal", "manual")) and not tp_sl_only and beli_only is not False and not liquidate and mode_beli_aktif
             jalankan_shadow_top3(now, df_market, is_square_off_time, liquidate, boleh_beli=boleh_beli_shadow)
         except Exception as e:
