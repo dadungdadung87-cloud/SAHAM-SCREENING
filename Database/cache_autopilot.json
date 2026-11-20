@@ -1,69 +1,69 @@
 {
-    "stempel_data": "2026-11-19 15:48:01",
+    "stempel_data": "2026-11-20 15:48:02",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
-            "TALF",
-            "HRME",
+            "NTBK",
+            "ICON",
+            "TGUK",
             "NAYZ",
-            "PTSP",
-            "GOTO"
+            "MANG"
         ],
         "RUMUS 2": [
-            "TALF",
-            "HRME",
-            "PTSP",
-            "IFSH",
-            "BCAP"
+            "NTBK",
+            "MBMA",
+            "ICON",
+            "TGUK",
+            "VOKS"
         ],
         "RUMUS 3": [
-            "TALF",
-            "OKAS",
-            "ESIP",
-            "HRME",
-            "JAST"
+            "NTBK",
+            "ICON",
+            "TGUK",
+            "NAYZ",
+            "MANG"
         ],
         "RUMUS 4": [
             "NAYZ",
-            "OLIV",
-            "DILD",
-            "ASPR",
-            "UNIQ"
+            "MANG",
+            "IDEA",
+            "PGJO",
+            "RDTX"
         ],
         "RUMUS 5": [
-            "GOTO",
-            "AMRT",
+            "NTBK",
+            "ICON",
+            "TGUK",
             "NAYZ",
-            "PWON",
-            "PTSP"
+            "MANG"
         ],
         "RUMUS 6": [
-            "POLA",
+            "IDEA",
+            "DGIK",
             "PWON",
-            "PTSP",
-            "ASPR",
-            "MPXL"
+            "MPXL",
+            "ASPR"
         ],
         "RUMUS 7": [
-            "TALF",
-            "HRME",
-            "OLIV",
-            "PTSP",
-            "WBSA"
+            "NTBK",
+            "ICON",
+            "TGUK",
+            "NAYZ",
+            "VOKS"
         ],
         "RUMUS 8": [
-            "HRME",
             "PWON",
-            "OLIV",
-            "MPXL",
-            "PSKT"
+            "MANG",
+            "IDEA",
+            "VOKS",
+            "DGIK"
         ],
         "RUMUS 9": [
-            "ESIP",
-            "HRME",
-            "OKAS",
-            "ESTI",
-            "JAST"
+            "NTBK",
+            "ICON",
+            "TGUK",
+            "NAYZ",
+            "MANG"
         ]
     }
 }

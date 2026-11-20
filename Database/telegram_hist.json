@@ -1,23 +1,4 @@
 {
-  "2026-10-10": [
-    "AKKU",
-    "BDMN",
-    "DKFT",
-    "DKHH",
-    "FLMC",
-    "GWSA",
-    "IKAI",
-    "INDS",
-    "JECX",
-    "NAYZ",
-    "PCAR",
-    "POLA",
-    "SEMA",
-    "SMIL",
-    "SOSS",
-    "STRK",
-    "TOWR"
-  ],
   "2026-10-12": [
     "ASPI",
     "BIKE",
@@ -569,5 +550,21 @@
     "TALF",
     "UNIQ",
     "WBSA"
+  ],
+  "2026-11-20": [
+    "ASPR",
+    "DGIK",
+    "ICON",
+    "IDEA",
+    "MANG",
+    "MBMA",
+    "MPXL",
+    "NAYZ",
+    "NTBK",
+    "PGJO",
+    "PWON",
+    "RDTX",
+    "TGUK",
+    "VOKS"
   ]
 }
