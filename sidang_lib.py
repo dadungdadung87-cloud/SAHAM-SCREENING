@@ -80,6 +80,57 @@ def _parse_top5(mentah, valid_set):
                 break
     return hasil[:5]
 
+def ai_hakim_top3(data_top5, api_key, daftar_model):
+    import google.generativeai as genai
+    genai.configure(api_key=api_key)
+    prompt = f"""
+    From the EXACTLY 5 Tickers below (already selected as Top 5), select EXACTLY 3 Tickers that are the MOST WORTHY to buy now, considering Score, Volume, momentum and risk.
+
+    DATA:
+    {data_top5}
+
+    CRITICAL: Output ONLY a raw JSON array with EXACTLY 3 objects, each with EXACTLY 1 key: "Ticker".
+    Only tickers from the data are allowed. DO NOT add explanations, markdown, or any other text. Keep the output as short as possible.
+    """
+    pesan = ""
+    for nama_model in daftar_model:
+        try:
+            model = genai.GenerativeModel(
+                nama_model,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.0, response_mime_type="application/json", max_output_tokens=512))
+            response = model.generate_content(prompt)
+            teks = response.text or ""
+            if not teks.strip():
+                pesan = "Respons kosong"; continue
+            return teks
+        except Exception as e:
+            pesan = str(e)
+            time.sleep(5 if any(k in str(e) for k in ["429", "503", "RESOURCE_EXHAUSTED"]) else 1)
+            continue
+    return f"Error_AI: {pesan}"
+
+def _parse_top3(mentah, valid_set):
+    hasil = []
+    for blok in re.findall(r'\[.*\]', mentah, re.DOTALL):
+        try:
+            calon = json.loads(blok.replace("'", '"'))
+            if isinstance(calon, list):
+                for item in calon:
+                    t = (item.get("Ticker", "") if isinstance(item, dict) else str(item)).strip().upper()
+                    if t in valid_set and t not in hasil:
+                        hasil.append(t)
+        except Exception:
+            continue
+    if len(hasil) < 3:
+        for m in re.finditer(r'\b([A-Z]{4})\b', mentah):
+            t = m.group(1)
+            if t in valid_set and t not in hasil:
+                hasil.append(t)
+            if len(hasil) >= 3:
+                break
+    return hasil[:3]
+
 def muat_momentum_30m(base_dir=None):
     """Set ticker yang HARGA NAIK dalam 30 menit terakhir AKTIF (arsip intraday hari ini).
     Basis: snapshot terakhir yang harga-nya benar-benar berubah (menghindari snapshot
@@ -356,11 +407,12 @@ def jalankan_sidang(daftar_rumus, df_data, api_key, log=print, mode_tulis=True):
     Kembalikan (keranjang, error atau None)."""
     import concurrent.futures
     keranjang = {f"RUMUS {i}": ["", "", "", "", ""] for i in range(1, 10)}
+    keranjang_top3 = {f"RUMUS {i}": [] for i in range(1, 10)}
     stempel_data = str(df_data["Terakhir Update"].iloc[0]) if (not df_data.empty and "Terakhir Update" in df_data.columns) else "tanpa_stempel"
     stempel_beli = _wb_now().strftime("%Y-%m-%d")
     daftar_model = radar_model_gemini_cepat(api_key)
     if not daftar_model:
-        return keranjang, "Tidak ada model Gemini online untuk key ini."
+        return keranjang, keranjang_top3, "Tidak ada model Gemini online untuk key ini."
 
     def sidang_satu(i):
         df_target = daftar_rumus[i]
@@ -401,19 +453,54 @@ def jalankan_sidang(daftar_rumus, df_data, api_key, log=print, mode_tulis=True):
                     r2_client.upload_arsip(fs, f"Database/sinyal_ai_rumus_{i}.csv")
                 except Exception:
                     pass
-        return i, [b["Ticker"] for b in baris], n
+        # Tahap 2: Top 3 dari Top 5 (shadow portfolio)
+        top3 = []
+        if len(baris) == 5:
+            data_top5 = {}
+            for t in [b["Ticker"] for b in baris]:
+                row = df_sorted[df_sorted['Ticker'] == t]
+                if row.empty:
+                    continue
+                data_top5[t] = {
+                    'Harga': row.iloc[0].get('Harga (Rp)', 0), 'Volume': row.iloc[0].get('Volume', 0),
+                    'Score': row.iloc[0].get('Score_Num', 0), 'Change_Pct': row.iloc[0].get('Change (%)', 0),
+                    'Tekanan_Bandar': row.iloc[0].get('Tekanan Bandar', 'Normal'), 'Broksum': row.iloc[0].get('Broksum', 'Normal')}
+            try:
+                if len(data_top5) == 5:
+                    mentah3 = ai_hakim_top3(data_top5, api_key, daftar_model)
+                    if "Error_AI" not in mentah3:
+                        top3 = _parse_top3(mentah3, set(data_top5.keys()))
+                    else:
+                        log(f"   RUMUS {i}: stage-2 AI gagal ({mentah3}), fallback 3 pertama Top 5")
+            except Exception as e:
+                log(f"   RUMUS {i}: stage-2 error {e}, fallback 3 pertama Top 5")
+        if len(top3) < 3:
+            top3 = [b["Ticker"] for b in baris][:3]
+        baris3 = [b for b in baris if b["Ticker"] in top3][:3]
+        if baris3 and mode_tulis:
+            fs3 = os.path.join(DIR_DB, f"sinyal_top3_rumus_{i}.csv")
+            pd.DataFrame(baris3).to_csv(fs3, index=False)
+            try:
+                import r2_client
+                r2_client.upload_arsip(fs3, f"Database/sinyal_top3_rumus_{i}.csv")
+            except Exception:
+                pass
+        return i, [b["Ticker"] for b in baris], n, top3
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as ex:
         futs = [ex.submit(sidang_satu, i) for i in range(1, 10)]
         for f in concurrent.futures.as_completed(futs):
-            i, jawara, n = f.result()
+            i, jawara, n, top3 = f.result()
             keranjang[f"RUMUS {i}"] = (jawara + ["", "", "", "", ""])[:5]
-            log(f"   RUMUS {i}: {n} kandidat -> {len(jawara)} jawara {jawara}")
+            keranjang_top3[f"RUMUS {i}"] = top3
+            log(f"   RUMUS {i}: {n} kandidat -> {len(jawara)} jawara {jawara} | TOP3 {top3}")
 
     try:
         with open(os.path.join(DIR_DB, "cache_autopilot.json"), "w") as f:
-            json.dump({"stempel_data": stempel_data, "versi": VERSI_SIDANG, "keranjang": keranjang}, f, indent=4)
+            json.dump({"stempel_data": stempel_data, "versi": VERSI_SIDANG, "keranjang": keranjang,
+                       "keranjang_top3": keranjang_top3}, f, indent=4)
         snap = {"stempel_data": stempel_data, "versi": VERSI_SIDANG, "keranjang": keranjang,
+                "keranjang_top3": keranjang_top3,
                 "waktu": _wb_now().strftime("%Y-%m-%d %H:%M:%S"), "mode": "sore" if not mode_tulis else "pagi"}
         nama_snap = "radar_snapshot_sore.json" if not mode_tulis else "radar_snapshot.json"
         ps = os.path.join(DIR_DB, nama_snap)
@@ -430,4 +517,4 @@ def jalankan_sidang(daftar_rumus, df_data, api_key, log=print, mode_tulis=True):
         log(f"❌ GAGAL tulis snapshot: {e}")
         import traceback
         log(traceback.format_exc())
-    return keranjang, None
+    return keranjang, keranjang_top3, None

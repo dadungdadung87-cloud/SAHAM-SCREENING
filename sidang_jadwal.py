@@ -20,7 +20,7 @@ def main():
     df = pd.read_csv(fs)
     daftar = sidang_lib.hitung_rumus(df)
     print(f"🧠 Sidang jadwal dimulai ({len(df)} saham)...")
-    keranjang, err = sidang_lib.jalankan_sidang(daftar, df, api_key)
+    keranjang, keranjang_top3, err = sidang_lib.jalankan_sidang(daftar, df, api_key)
     if err:
         print("❌", err); sys.exit(1)
     isi = {k: len([t for t in v if t]) for k, v in keranjang.items()}

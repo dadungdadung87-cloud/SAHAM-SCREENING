@@ -2682,6 +2682,68 @@ Berikan opini singkat (maks 150 kata) dalam Bahasa Indonesia: rumus mana yang pa
             else:
                 st.info(f"📭 Belum ada riwayat penjualan saham untuk {pilihan_arena}.")
 
+        # ============================================================
+        # 🥇 PORTO TOP 3 (SHADOW) — portofolio virtual, tanpa uang riil
+        # ============================================================
+        st.markdown("---")
+        st.markdown(f"### 🥇 PORTO TOP 3 SAHAM — {pilihan_arena} (SHADOW, virtual)")
+        st.caption("Re-filter AI: 3 terbaik dari Top 5. Simulasi murni dengan modal virtual Rp100 Juta — tanpa dana riil.")
+
+        f_shadow_porto = f"Database/shadow_top3_rumus_{nomor_rumus}.csv"
+        f_shadow_hist = f"Database/shadow_top3_history_rumus_{nomor_rumus}.csv"
+        try:
+            df_shadow_porto = pd.read_csv(f_shadow_porto) if os.path.exists(f_shadow_porto) else pd.DataFrame()
+            df_shadow_hist = pd.read_csv(f_shadow_hist) if os.path.exists(f_shadow_hist) else pd.DataFrame()
+        except Exception:
+            df_shadow_porto, df_shadow_hist = pd.DataFrame(), pd.DataFrame()
+
+        shadow_profit_rp = df_shadow_hist['Total_Return_Rp'].sum() if (not df_shadow_hist.empty and 'Total_Return_Rp' in df_shadow_hist.columns) else 0
+        shadow_modal_terpakai = df_shadow_porto['Total_Modal'].sum() if (not df_shadow_porto.empty and 'Total_Modal' in df_shadow_porto.columns) else 0
+        shadow_saldo = MODAL_AWAL + shadow_profit_rp - shadow_modal_terpakai
+        shadow_aset = shadow_saldo + shadow_modal_terpakai
+        shadow_trades = len(df_shadow_hist)
+        shadow_win = int((df_shadow_hist['Return_%'] > 0).sum()) if shadow_trades else 0
+
+        sc1, sc2, sc3, sc4 = st.columns(4)
+        with sc1:
+            st.metric(label="🥇 Aset Shadow (Kas + Saham)", value=f"Rp {shadow_aset:,.0f}".replace(",", "."))
+        with sc2:
+            st.metric(label="💵 Kas Virtual", value=f"Rp {shadow_saldo:,.0f}".replace(",", "."))
+        with sc3:
+            tanda_s = "+" if shadow_profit_rp >= 0 else "-"
+            st.metric(label="📈 Shadow Realized P/L",
+                      value=f"Rp {shadow_profit_rp:,.0f}".replace(",", "."),
+                      delta=f"{tanda_s} Rp {abs(shadow_profit_rp):,.0f}".replace(",", "."),
+                      delta_color="normal")
+        with sc4:
+            st.metric(label="🎯 Shadow Winrate", value=f"{(shadow_win / shadow_trades * 100) if shadow_trades else 0:.1f}%",
+                      delta=f"{shadow_trades} trade", delta_color="off")
+
+        # Perbandingan Top 5 (riil) vs Top 3 (shadow)
+        pl5_pct = total_profit_rp / MODAL_AWAL * 100
+        pl3_pct = shadow_profit_rp / MODAL_AWAL * 100
+        pemenang = "🥇 TOP 3 unggul" if pl3_pct > pl5_pct else ("💼 TOP 5 unggul" if pl5_pct > pl3_pct else "⚖️ Imbang")
+        b5, b3, bw = st.columns(3)
+        with b5:
+            st.metric(label="💼 Profit Top 5 (Riil)", value=f"{pl5_pct:+.2f}%", delta=f"Rp {total_profit_rp:,.0f}".replace(",", "."))
+        with b3:
+            st.metric(label="🥇 Profit Top 3 (Shadow)", value=f"{pl3_pct:+.2f}%", delta=f"Rp {shadow_profit_rp:,.0f}".replace(",", "."))
+        with bw:
+            st.metric(label="⚔️ Status A/B Test", value=pemenang, delta=f"selisih {abs(pl3_pct - pl5_pct):.2f}%", delta_color="off")
+
+        sub_s1, sub_s2 = st.tabs(["🟢 Posisi Shadow Aktif", "📚 Histori Shadow"])
+        with sub_s1:
+            if not df_shadow_porto.empty:
+                st.dataframe(df_shadow_porto, use_container_width=True, hide_index=True)
+            else:
+                st.info("📦 Belum ada posisi shadow. Beli virtual pertama terjadi jam 15:50 setelah sidang AI.")
+        with sub_s2:
+            if not df_shadow_hist.empty:
+                df_sh = df_shadow_hist.sort_values(by='Tanggal_Jual', ascending=False).reset_index(drop=True) if 'Tanggal_Jual' in df_shadow_hist.columns else df_shadow_hist
+                st.dataframe(df_sh, use_container_width=True, hide_index=True)
+            else:
+                st.info("📭 Belum ada histori shadow (muncul setelah posisi virtual terjual via TP/CL/square-off).")
+
 # =====================================================================
 # >>> PART 14 : TAB 5 - RIWAYAT TRANSAKSI (9 RUMUS) + TAB 6 - DETEKTIF LEDAKAN <<<
 # =====================================================================

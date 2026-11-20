@@ -80,10 +80,12 @@ def utama():
     tmp_s = os.path.join(DB, "radar_snapshot.json")
     unduh_r2("Database/radar_snapshot.json", tmp_s)
     keranjang, stempel = {}, None
+    keranjang_top3 = {}
     if os.path.exists(tmp_s):
         try:
             sn = json.load(open(tmp_s))
             keranjang, stempel = sn.get("keranjang") or {}, sn.get("stempel_data")
+            keranjang_top3 = sn.get("keranjang_top3") or {}
         except Exception: pass
 
     B = [f"📡 <b>RADAR BSJP</b> — {now.strftime('%d %b %Y, %H:%M')} WIB"]
@@ -117,6 +119,17 @@ def utama():
         B.append("")
     if kosong:
         B.append("⚠️ <b>RUMUS KOSONG:</b> " + ", ".join(f"R{i}" for i in kosong) + "\n")
+
+    # 4b) 🥇 Top 3 shadow per rumus (subset Top 5)
+    ada_top3 = any(keranjang_top3.get(f"RUMUS {i}") for i in range(1, 10))
+    if ada_top3:
+        B.append("🥇 <b>TOP 3 SAHAM (SHADOW)</b>")
+        for i in range(1, 10):
+            lst3 = [t for t in (keranjang_top3.get(f"RUMUS {i}") or []) if t]
+            if not lst3: continue
+            teks = ", ".join(f"<code>{t}</code>" for t in lst3)
+            B.append(f"• R{i}: {teks}")
+        B.append("")
 
     # 5) Consensus ≥3 rumus
     cnt = Counter(semua)

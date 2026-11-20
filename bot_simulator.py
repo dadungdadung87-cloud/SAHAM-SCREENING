@@ -210,6 +210,138 @@ def cek_saldo_tersedia(df_porto, df_history=None):
 # ==========================================
 # 🤖 MESIN EKSEKUSI UTAMA (MODE BSJP)
 # ==========================================
+# ==========================================
+# 🥇 SHADOW PORTO TOP 3 — portofolio virtual per rumus (tanpa uang riil)
+# ==========================================
+SHADOW_MODAL = 100000000.0  # Rp 100 Juta virtual per Rumus
+
+def inisialisasi_shadow(rumus_id):
+    file_porto = os.path.join(DIR_DB, f"shadow_top3_rumus_{rumus_id}.csv")
+    file_hist = os.path.join(DIR_DB, f"shadow_top3_history_rumus_{rumus_id}.csv")
+    if not os.path.exists(file_porto):
+        pd.DataFrame(columns=['Tanggal_Beli', 'Ticker', 'Harga_Beli', 'Lot', 'Total_Modal', 'Target_TP', 'Target_CL', 'Stempel']).to_csv(file_porto, index=False)
+    if not os.path.exists(file_hist):
+        pd.DataFrame(columns=['Tanggal_Beli', 'Tanggal_Jual', 'Ticker', 'Harga_Beli', 'Harga_Jual', 'Status', 'Total_Return_Rp', 'Return_%']).to_csv(file_hist, index=False)
+    return file_porto, file_hist
+
+def shadow_saldo(df_porto, df_history):
+    modal = SHADOW_MODAL
+    if df_history is not None and not df_history.empty and 'Total_Return_Rp' in df_history.columns:
+        modal += pd.to_numeric(df_history['Total_Return_Rp'], errors='coerce').fillna(0).sum()
+    if df_porto.empty:
+        return modal
+    return modal - pd.to_numeric(df_porto['Total_Modal'], errors='coerce').fillna(0).sum()
+
+def jalankan_shadow_top3(now, df_market, is_square_off_time, liquidate, boleh_beli=True, log=print):
+    """Evaluasi jual (TP/CL + square-off) lalu beli dari sinyal_top3_rumus_N.csv.
+    Uang virtual; mekanika identik bot riil (lot, fee)."""
+    tanggal_hari_ini = now.strftime('%Y-%m-%d')
+    for i in range(1, 10):
+        file_porto, file_hist = inisialisasi_shadow(i)
+        try:
+            df_porto = pd.read_csv(file_porto)
+            df_history = pd.read_csv(file_hist)
+        except Exception as e:
+            log(f"⚠️ [SHADOW R{i}] gagal baca file: {e}")
+            continue
+        porto_baru, history_baru = [], []
+
+        for _, posisi in df_porto.iterrows():
+            ticker = posisi['Ticker']
+            tgl_beli_saham = str(posisi['Tanggal_Beli']).split()[0]
+            try:
+                _h = df_market[df_market['Ticker'] == ticker]['Harga (Rp)'].values[0]
+                harga_sekarang = float(_h) if pd.notna(_h) and float(_h) > 0 else None
+            except Exception:
+                harga_sekarang = None
+
+            terjual, status_jual, harga_jual = False, "", 0.0
+            if harga_sekarang is None:
+                if is_square_off_time or liquidate:
+                    harga_jual, _ket = hitung_harga_jual_suspend(posisi, df_market)
+                    status_jual = "SHADOW_LIQUIDATE 🧨" if liquidate else "SHADOW_SUSPEND_OFF 🧊"
+                    terjual = harga_jual > 0
+                if not terjual:
+                    porto_baru.append(posisi)
+                    continue
+            else:
+                if is_square_off_time and tgl_beli_saham != tanggal_hari_ini:
+                    terjual, status_jual, harga_jual = True, "SHADOW_SQUARE_OFF 🧹", harga_sekarang
+                elif harga_sekarang >= posisi['Target_TP']:
+                    terjual, status_jual, harga_jual = True, "SHADOW_TP 🎯", harga_sekarang
+                elif harga_sekarang <= posisi['Target_CL']:
+                    terjual, status_jual, harga_jual = True, "SHADOW_CL ✂️", harga_sekarang
+
+            if terjual:
+                if not df_history.empty and ((df_history['Ticker'] == ticker) & (df_history['Tanggal_Beli'] == posisi['Tanggal_Beli'])).any():
+                    continue
+                modal = float(posisi['Total_Modal'])
+                kotor = harga_jual * posisi['Lot'] * 100
+                bersih = kotor - (kotor * FEE_JUAL)
+                profit_rp = bersih - modal
+                profit_pct = (profit_rp / modal) * 100 if modal > 0 else 0.0
+                history_baru.append({
+                    'Tanggal_Beli': posisi['Tanggal_Beli'], 'Tanggal_Jual': now.strftime("%Y-%m-%d %H:%M"),
+                    'Ticker': ticker, 'Harga_Beli': posisi['Harga_Beli'], 'Harga_Jual': harga_jual,
+                    'Status': status_jual, 'Total_Return_Rp': round(profit_rp, 2), 'Return_%': round(profit_pct, 2)})
+                log(f"🥇 [SHADOW R{i}] JUAL: {ticker} @ Rp {harga_jual:,.0f} | {status_jual} | {profit_pct:+.2f}%")
+            else:
+                porto_baru.append(posisi)
+
+        df_porto = pd.DataFrame(porto_baru)
+        if df_porto.empty:
+            df_porto = pd.DataFrame(columns=['Tanggal_Beli', 'Ticker', 'Harga_Beli', 'Lot', 'Total_Modal', 'Target_TP', 'Target_CL', 'Stempel'])
+        if history_baru:
+            df_history = pd.concat([df_history, pd.DataFrame(history_baru)], ignore_index=True)
+
+        # BELI (virtual) dari sinyal_top3 saat mode jadwal 15:50
+        file_sinyal3 = os.path.join(DIR_DB, f"sinyal_top3_rumus_{i}.csv")
+        if boleh_beli and os.path.exists(file_sinyal3):
+            try:
+                df_sinyal3 = pd.read_csv(file_sinyal3)
+                if 'Stempel' in df_sinyal3.columns:
+                    df_sinyal3 = df_sinyal3[df_sinyal3['Stempel'] == tanggal_hari_ini]
+                if df_sinyal3.empty:
+                    df_sinyal3 = None
+            except Exception:
+                df_sinyal3 = None
+            if df_sinyal3 is not None:
+                saldo = shadow_saldo(df_porto, df_history)
+                dimiliki = df_porto['Ticker'].tolist() if not df_porto.empty else []
+                sinyal_valid = []
+                for _, s in df_sinyal3.iterrows():
+                    t = str(s['Ticker']).strip()
+                    if t in dimiliki:
+                        continue
+                    try:
+                        hp = float(df_market[df_market['Ticker'] == t]['Harga (Rp)'].values[0])
+                    except Exception:
+                        continue
+                    if hp <= 0:
+                        continue
+                    sinyal_valid.append((t, hp, s))
+                N = len(sinyal_valid)
+                if N > 0:
+                    alokasi = saldo / N
+                    for t, hp, s in sinyal_valid:
+                        harga_1lot_fee = (hp * 100) * (1 + FEE_BELI)
+                        lot = min(int(alokasi // harga_1lot_fee), int(saldo // harga_1lot_fee))
+                        if lot < 1:
+                            continue
+                        modal_keluar = lot * harga_1lot_fee
+                        df_porto = pd.concat([df_porto, pd.DataFrame([{
+                            'Tanggal_Beli': now.strftime("%Y-%m-%d %H:%M"), 'Ticker': t, 'Harga_Beli': hp,
+                            'Lot': lot, 'Total_Modal': modal_keluar,
+                            'Target_TP': s['Target_TP'], 'Target_CL': s['Target_CL'], 'Stempel': tanggal_hari_ini}])], ignore_index=True)
+                        saldo -= modal_keluar
+                        log(f"🥇 [SHADOW R{i}] BELI: {t} @ Rp {hp:,.0f} | {lot} Lot (virtual)")
+                    os.remove(file_sinyal3)
+                    log(f"🔥 [SHADOW R{i}] Kertas top-3 dibakar.")
+
+        df_porto.to_csv(file_porto, index=False)
+        df_history.to_csv(file_hist, index=False)
+    log("🥇 Shadow Top 3 selesai dievaluasi.")
+
 def jalankan_bot():
     now = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=7)  # WIB (UTC+7): laptop & Cloud pakai jam yang sama
     tanggal_hari_ini = now.strftime('%Y-%m-%d')
@@ -613,6 +745,18 @@ def jalankan_bot():
         df_history.to_csv(file_hist, index=False)
 
     print("✅ Inspeksi 9 Arena selesai.")
+
+    # ----------------------------------------------------
+    # 🥇 SHADOW PORTO TOP 3: evaluasi virtual (jual + beli 15:50)
+    # Skip pada --beli-only (jual shadow tetap jalan di mode lain)
+    # ----------------------------------------------------
+    if beli_only is not True:
+        try:
+            # Beli shadow hanya saat sesi beli (jadwal 15:50 / manual), selaras FASE B riil
+            boleh_beli_shadow = (mode in ("jadwal", "manual")) and not tp_sl_only and beli_only is not False and not liquidate and mode_beli_aktif
+            jalankan_shadow_top3(now, df_market, is_square_off_time, liquidate, boleh_beli=boleh_beli_shadow)
+        except Exception as e:
+            print(f"⚠️ Shadow Top 3 gagal (bot riil tetap aman): {e}")
 
     # ----------------------------------------------------
     # 📲 NOTIFIKASI TELEGRAM — ringkasan jualan otomatis sesi ini
