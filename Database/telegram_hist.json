@@ -1,23 +1,4 @@
 {
-  "2026-10-12": [
-    "ASPI",
-    "BIKE",
-    "BTON",
-    "CMRY",
-    "DKHH",
-    "DRMA",
-    "DUTI",
-    "FMII",
-    "GLVA",
-    "GTBO",
-    "IFSH",
-    "LOPI",
-    "NAYZ",
-    "PCAR",
-    "STRK",
-    "TFCO",
-    "ZONE"
-  ],
   "2026-10-13": [
     "APLI",
     "BATR",
@@ -566,5 +547,27 @@
     "RDTX",
     "TGUK",
     "VOKS"
+  ],
+  "2026-11-23": [
+    "ABMM",
+    "ASII",
+    "ASPR",
+    "AYAM",
+    "BBCA",
+    "CUAN",
+    "DEWA",
+    "DIVA",
+    "FOLK",
+    "GULA",
+    "HRME",
+    "HRUM",
+    "IDEA",
+    "MANG",
+    "MCOL",
+    "NAYZ",
+    "TRIN",
+    "TRUE",
+    "VOKS",
+    "WGSH"
   ]
 }

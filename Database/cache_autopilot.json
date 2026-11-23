@@ -1,69 +1,116 @@
 {
-    "stempel_data": "2026-11-20 15:48:02",
+    "stempel_data": "2026-11-23 15:38:01",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
-            "NTBK",
-            "ICON",
-            "TGUK",
-            "NAYZ",
-            "MANG"
+            "TRUE",
+            "TRIN",
+            "DEWA",
+            "CUAN",
+            "BBCA"
         ],
         "RUMUS 2": [
-            "NTBK",
-            "MBMA",
-            "ICON",
-            "TGUK",
-            "VOKS"
+            "TRUE",
+            "ASPR",
+            "GULA",
+            "DEWA",
+            "CUAN"
         ],
         "RUMUS 3": [
-            "NTBK",
-            "ICON",
-            "TGUK",
-            "NAYZ",
-            "MANG"
+            "TRUE",
+            "TRIN",
+            "FOLK",
+            "ASPR",
+            "DIVA"
         ],
         "RUMUS 4": [
+            "MCOL",
             "NAYZ",
-            "MANG",
-            "IDEA",
-            "PGJO",
-            "RDTX"
+            "ABMM",
+            "WGSH",
+            "HRUM"
         ],
         "RUMUS 5": [
-            "NTBK",
-            "ICON",
-            "TGUK",
-            "NAYZ",
+            "TRIN",
+            "VOKS",
+            "FOLK",
+            "ASPR",
             "MANG"
         ],
         "RUMUS 6": [
+            "HRME",
+            "ASPR",
+            "MANG",
             "IDEA",
-            "DGIK",
-            "PWON",
-            "MPXL",
-            "ASPR"
+            "ASII"
         ],
         "RUMUS 7": [
-            "NTBK",
-            "ICON",
-            "TGUK",
+            "TRIN",
+            "TRUE",
+            "FOLK",
+            "VOKS",
+            "ASPR"
+        ],
+        "RUMUS 8": [
+            "ASPR",
+            "VOKS",
+            "MANG",
             "NAYZ",
+            "AYAM"
+        ],
+        "RUMUS 9": [
+            "TRUE",
+            "TRIN",
+            "FOLK",
+            "VOKS",
+            "DIVA"
+        ]
+    },
+    "keranjang_top3": {
+        "RUMUS 1": [
+            "TRIN",
+            "TRUE",
+            "CUAN"
+        ],
+        "RUMUS 2": [
+            "TRUE",
+            "ASPR",
+            "CUAN"
+        ],
+        "RUMUS 3": [
+            "TRIN",
+            "TRUE",
+            "FOLK"
+        ],
+        "RUMUS 4": [
+            "MCOL",
+            "NAYZ",
+            "ABMM"
+        ],
+        "RUMUS 5": [
+            "TRIN",
+            "VOKS",
+            "ASPR"
+        ],
+        "RUMUS 6": [
+            "ASPR",
+            "MANG",
+            "HRME"
+        ],
+        "RUMUS 7": [
+            "TRIN",
+            "TRUE",
             "VOKS"
         ],
         "RUMUS 8": [
-            "PWON",
-            "MANG",
-            "IDEA",
             "VOKS",
-            "DGIK"
+            "ASPR",
+            "MANG"
         ],
         "RUMUS 9": [
-            "NTBK",
-            "ICON",
-            "TGUK",
-            "NAYZ",
-            "MANG"
+            "TRIN",
+            "VOKS",
+            "TRUE"
         ]
     }
 }
