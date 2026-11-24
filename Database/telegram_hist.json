@@ -1,22 +1,4 @@
 {
-  "2026-10-13": [
-    "APLI",
-    "BATR",
-    "BIKE",
-    "BOLA",
-    "DKHH",
-    "HATM",
-    "NICK",
-    "NINE",
-    "PWON",
-    "RSCH",
-    "SBMA",
-    "SHID",
-    "SMGR",
-    "SMIL",
-    "TCPI",
-    "TFCO"
-  ],
   "2026-10-14": [
     "ALDO",
     "AMFG",
@@ -569,5 +551,24 @@
     "TRUE",
     "VOKS",
     "WGSH"
+  ],
+  "2026-11-24": [
+    "AREA",
+    "ASGR",
+    "BBSI",
+    "BNGA",
+    "CHIP",
+    "CRAB",
+    "IDEA",
+    "ISAT",
+    "MANG",
+    "MLBI",
+    "MPXL",
+    "MYOR",
+    "NAYZ",
+    "NZIA",
+    "OLIV",
+    "RELF",
+    "TRON"
   ]
 }

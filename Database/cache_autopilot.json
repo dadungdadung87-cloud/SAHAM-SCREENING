@@ -1,116 +1,116 @@
 {
-    "stempel_data": "2026-11-23 15:38:01",
+    "stempel_data": "2026-11-24 15:38:01",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
-            "TRUE",
-            "TRIN",
-            "DEWA",
-            "CUAN",
-            "BBCA"
+            "MPXL",
+            "MANG",
+            "OLIV",
+            "MLBI",
+            "CHIP"
         ],
         "RUMUS 2": [
-            "TRUE",
-            "ASPR",
-            "GULA",
-            "DEWA",
-            "CUAN"
+            "AREA",
+            "BNGA",
+            "CRAB",
+            "ISAT",
+            ""
         ],
         "RUMUS 3": [
-            "TRUE",
-            "TRIN",
-            "FOLK",
-            "ASPR",
-            "DIVA"
+            "TRON",
+            "NZIA",
+            "MPXL",
+            "MANG",
+            "NAYZ"
         ],
         "RUMUS 4": [
-            "MCOL",
-            "NAYZ",
-            "ABMM",
-            "WGSH",
-            "HRUM"
+            "MANG",
+            "MLBI",
+            "MYOR",
+            "BBSI",
+            "RELF"
         ],
         "RUMUS 5": [
-            "TRIN",
-            "VOKS",
-            "FOLK",
-            "ASPR",
-            "MANG"
+            "MPXL",
+            "MANG",
+            "ASGR",
+            "OLIV",
+            "MLBI"
         ],
         "RUMUS 6": [
-            "HRME",
-            "ASPR",
+            "MPXL",
             "MANG",
+            "ASGR",
             "IDEA",
-            "ASII"
+            "MYOR"
         ],
         "RUMUS 7": [
-            "TRIN",
-            "TRUE",
-            "FOLK",
-            "VOKS",
-            "ASPR"
+            "MPXL",
+            "NAYZ",
+            "IDEA",
+            "CHIP",
+            "AREA"
         ],
         "RUMUS 8": [
-            "ASPR",
-            "VOKS",
+            "TRON",
+            "MPXL",
             "MANG",
             "NAYZ",
-            "AYAM"
+            "ASGR"
         ],
         "RUMUS 9": [
-            "TRUE",
-            "TRIN",
-            "FOLK",
-            "VOKS",
-            "DIVA"
+            "TRON",
+            "NZIA",
+            "MPXL",
+            "MANG",
+            "NAYZ"
         ]
     },
     "keranjang_top3": {
         "RUMUS 1": [
-            "TRIN",
-            "TRUE",
-            "CUAN"
+            "MPXL",
+            "MANG",
+            "OLIV"
         ],
         "RUMUS 2": [
-            "TRUE",
-            "ASPR",
-            "CUAN"
+            "AREA",
+            "BNGA",
+            "CRAB"
         ],
         "RUMUS 3": [
-            "TRIN",
-            "TRUE",
-            "FOLK"
+            "MPXL",
+            "MANG",
+            "TRON"
         ],
         "RUMUS 4": [
-            "MCOL",
-            "NAYZ",
-            "ABMM"
+            "MANG",
+            "MLBI",
+            "MYOR"
         ],
         "RUMUS 5": [
-            "TRIN",
-            "VOKS",
-            "ASPR"
+            "MPXL",
+            "MANG",
+            "ASGR"
         ],
         "RUMUS 6": [
-            "ASPR",
+            "MPXL",
             "MANG",
-            "HRME"
+            "ASGR"
         ],
         "RUMUS 7": [
-            "TRIN",
-            "TRUE",
-            "VOKS"
+            "MPXL",
+            "IDEA",
+            "AREA"
         ],
         "RUMUS 8": [
-            "VOKS",
-            "ASPR",
-            "MANG"
+            "MPXL",
+            "MANG",
+            "ASGR"
         ],
         "RUMUS 9": [
-            "TRIN",
-            "VOKS",
-            "TRUE"
+            "MPXL",
+            "MANG",
+            "TRON"
         ]
     }
 }
