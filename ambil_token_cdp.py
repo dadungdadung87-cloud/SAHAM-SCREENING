@@ -34,7 +34,7 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 PORT = 9223
 TIMEOUT = 20
 WIB = timezone(timedelta(hours=7))
-URL_EXODUS_TEST = "https://exodus.stockbit.com/screener/metric"
+URL_EXODUS_TEST = "https://exodus.stockbit.com/company-price-feed/historical/summary/BUMI"  # bebas paywall (screener/metric kena 402)
 URL_AUTH_PICU = "https://stockbit.com/#/portfolio"   # halaman yang memicu fetch auth
 HEADERS_EXODUS = {
     "accept": "application/json",
