@@ -1,20 +1,4 @@
 {
-  "2026-10-14": [
-    "ALDO",
-    "AMFG",
-    "BIKE",
-    "DEWI",
-    "HERO",
-    "LPGI",
-    "MANG",
-    "MMIX",
-    "PORT",
-    "PRDA",
-    "PWON",
-    "STRK",
-    "TFCO",
-    "TRON"
-  ],
   "2026-10-15": [
     "ACES",
     "AKKU",
@@ -570,5 +554,25 @@
     "OLIV",
     "RELF",
     "TRON"
+  ],
+  "2026-11-25": [
+    "ARII",
+    "BESS",
+    "BHIT",
+    "BMBL",
+    "CITY",
+    "CMNP",
+    "DART",
+    "HAIS",
+    "MANG",
+    "MNCN",
+    "OLIV",
+    "POLA",
+    "PRIM",
+    "TEBE",
+    "UNVR",
+    "UVCR",
+    "VOKS",
+    "YUPI"
   ]
 }

@@ -1,116 +1,116 @@
 {
-    "stempel_data": "2026-11-24 15:38:01",
+    "stempel_data": "2026-11-25 15:38:01",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
-            "MPXL",
             "MANG",
-            "OLIV",
-            "MLBI",
-            "CHIP"
+            "DART",
+            "CITY",
+            "BMBL",
+            "UNVR"
         ],
         "RUMUS 2": [
-            "AREA",
-            "BNGA",
-            "CRAB",
-            "ISAT",
-            ""
+            "MANG",
+            "DART",
+            "CITY",
+            "BMBL",
+            "YUPI"
         ],
         "RUMUS 3": [
-            "TRON",
-            "NZIA",
-            "MPXL",
             "MANG",
-            "NAYZ"
+            "CITY",
+            "BMBL",
+            "BESS",
+            "YUPI"
         ],
         "RUMUS 4": [
-            "MANG",
-            "MLBI",
-            "MYOR",
-            "BBSI",
-            "RELF"
+            "OLIV",
+            "HAIS",
+            "BHIT",
+            "CMNP",
+            "TEBE"
         ],
         "RUMUS 5": [
-            "MPXL",
             "MANG",
-            "ASGR",
-            "OLIV",
-            "MLBI"
+            "UVCR",
+            "DART",
+            "MNCN",
+            "CITY"
         ],
         "RUMUS 6": [
-            "MPXL",
             "MANG",
-            "ASGR",
-            "IDEA",
-            "MYOR"
+            "POLA",
+            "PRIM",
+            "VOKS",
+            "ARII"
         ],
         "RUMUS 7": [
-            "MPXL",
-            "NAYZ",
-            "IDEA",
-            "CHIP",
-            "AREA"
+            "DART",
+            "BMBL",
+            "CITY",
+            "BESS",
+            "YUPI"
         ],
         "RUMUS 8": [
-            "TRON",
-            "MPXL",
             "MANG",
-            "NAYZ",
-            "ASGR"
+            "UNVR",
+            "POLA",
+            "YUPI",
+            "PRIM"
         ],
         "RUMUS 9": [
-            "TRON",
-            "NZIA",
-            "MPXL",
             "MANG",
-            "NAYZ"
+            "DART",
+            "CITY",
+            "BMBL",
+            "UNVR"
         ]
     },
     "keranjang_top3": {
         "RUMUS 1": [
-            "MPXL",
             "MANG",
-            "OLIV"
+            "CITY",
+            "DART"
         ],
         "RUMUS 2": [
-            "AREA",
-            "BNGA",
-            "CRAB"
+            "MANG",
+            "CITY",
+            "DART"
         ],
         "RUMUS 3": [
-            "MPXL",
             "MANG",
-            "TRON"
+            "CITY",
+            "YUPI"
         ],
         "RUMUS 4": [
-            "MANG",
-            "MLBI",
-            "MYOR"
+            "OLIV",
+            "HAIS",
+            "BHIT"
         ],
         "RUMUS 5": [
-            "MPXL",
             "MANG",
-            "ASGR"
+            "DART",
+            "CITY"
         ],
         "RUMUS 6": [
-            "MPXL",
             "MANG",
-            "ASGR"
+            "POLA",
+            "VOKS"
         ],
         "RUMUS 7": [
-            "MPXL",
-            "IDEA",
-            "AREA"
+            "CITY",
+            "DART",
+            "YUPI"
         ],
         "RUMUS 8": [
-            "MPXL",
             "MANG",
-            "ASGR"
+            "YUPI",
+            "UNVR"
         ],
         "RUMUS 9": [
-            "MPXL",
             "MANG",
-            "TRON"
+            "DART",
+            "CITY"
         ]
     }
 }
