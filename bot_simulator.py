@@ -319,6 +319,16 @@ def jalankan_shadow_top3(now, df_market, is_square_off_time, liquidate, boleh_be
                         continue
                     if hp <= 0:
                         continue
+                    # GATE BANTINGAN: tolak saham yang sudah naik ekstrem (anti beli di pucuk)
+                    try:
+                        chg_t = float(df_market[df_market['Ticker'] == t]['Change (%)'].values[0])
+                        batas_gate = 33.0 if hp <= 200 else 23.0
+                        if chg_t >= batas_gate:
+                            print(f"⛔ [SHADOW R{i}] GATE BANTINGAN: {t} +{chg_t:.1f}% "
+                                  f"(batas {batas_gate:.0f}%) — DITOLAK.")
+                            continue
+                    except Exception:
+                        pass
                     sinyal_valid.append((t, hp, s))
                 N = len(sinyal_valid)
                 if N > 0:
@@ -695,6 +705,15 @@ def jalankan_bot():
                         continue
                     try:
                         change_beli = float(df_market[df_market['Ticker'] == ticker]['Change (%)'].values[0])
+                        try:
+                            _hrg_gate = float(df_market[df_market['Ticker'] == ticker]['Harga (Rp)'].values[0])
+                        except Exception:
+                            _hrg_gate = harga_beli
+                        batas_gate = 33.0 if _hrg_gate <= 200 else 23.0
+                        if change_beli >= batas_gate:
+                            print(f"⛔ [RUMUS {i}] GATE BANTINGAN: {ticker} sudah naik {change_beli:+.1f}% "
+                                  f"(batas {batas_gate:.0f}% utk harga {_hrg_gate:.0f}) — DITOLAK (anti beli di pucuk).")
+                            continue
                     except Exception:
                         change_beli = 0.0
                     sinyal_valid.append((ticker, harga_beli, sinyal, change_beli))

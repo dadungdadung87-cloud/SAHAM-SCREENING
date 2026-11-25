@@ -18,7 +18,8 @@ KOLOM_HIST = ['Tanggal_Beli', 'Tanggal_Jual', 'Ticker', 'Harga_Beli', 'Harga_Jua
 
 dipindah = 0
 for i in range(1, 10):
-    for jenis in ["portofolio_aktif", "histori_transaksi", "sinyal_ai"]:
+    for jenis in ["portofolio_aktif", "histori_transaksi", "sinyal_ai",
+                  "shadow_top3", "shadow_top3_history", "sinyal_top3"]:
         src = os.path.join("Database", f"{jenis}_rumus_{i}.csv")
         if os.path.exists(src):
             shutil.move(src, os.path.join(folder, f"{jenis}_rumus_{i}.csv"))

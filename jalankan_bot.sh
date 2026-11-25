@@ -59,25 +59,26 @@ fi
 JAM_SEKARANG=$(date +%H%M)
 FLAG_BELI="/tmp/bsjp_beli_$(date +%F)"
 
-if [ "$JAM_SEKARANG" -ge "1540" ] && [ "$JAM_SEKARANG" -le "1549" ]; then
+if [ "$JAM_SEKARANG" -ge "1545" ] && [ "$JAM_SEKARANG" -le "1549" ]; then
     # ==========================================
-    # 🛒 SESI TUNGGAL 15:40 — daftar belanja (sidang AI) + BUY dalam satu waktu.
+    # 🛒 SESI TUNGGAL 15:45 — daftar belanja (sidang AI) + BUY dalam satu waktu.
+    # Gate anti-pucuk aktif (chg>=33% utk harga<=200 / >=23% utk harga>200 DITOLAK).
     # Feed sudah segar (producer upload R2 tiap 2 menit) → mode_beli_aktif aman.
     # Telegram hanya dikirim di sesi ini (satu-satunya notifikasi harian).
     # ==========================================
     if [ ! -f "$FLAG_BELI" ]; then
-        echo "🧠 [15:40] Sidang AI: bikin daftar belanja 9 rumus..."
+        echo "🧠 [15:45] Sidang AI + GATE: bikin daftar belanja 9 rumus..."
         if ./.venv/bin/python sidang_jadwal.py; then
-            echo "📲 [15:42] Telegram: daftar belanja hari ini..."
+            echo "📲 Telegram: daftar belanja hari ini..."
             ./.venv/bin/python kirim_telegram.py
-            echo "🛒 [15:43] BUY: eksekusi sinyal ke 9 rumus..."
+            echo "🛒 BUY: eksekusi sinyal ke 9 rumus (beli pakai data 15:48/15:49)..."
             ./.venv/bin/python bot_simulator.py --jadwal
             touch "$FLAG_BELI"
         else
-            echo "❌ Sidang 15:40 gagal — dicoba lagi siklus berikutnya (sampai 15:49)."
+            echo "❌ Sidang 15:45 gagal — dicoba lagi siklus berikutnya (sampai 15:49)."
         fi
     else
-        echo "⏭️ Sesi beli 15:40 sudah jalan hari ini, dilewati."
+        echo "⏭️ Sesi beli 15:45 sudah jalan hari ini, dilewati."
     fi
 else
     echo "🎯 Auto TP/SL: memeriksa posisi yang menyentuh Target_TP/Target_CL..."
