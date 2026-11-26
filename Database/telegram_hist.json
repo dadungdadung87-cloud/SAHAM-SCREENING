@@ -1,27 +1,4 @@
 {
-  "2026-10-15": [
-    "ACES",
-    "AKKU",
-    "ALDO",
-    "BELI",
-    "BIKE",
-    "BUKA",
-    "CMRY",
-    "DILD",
-    "DKHH",
-    "HATM",
-    "IDEA",
-    "MMIX",
-    "PCAR",
-    "PGJO",
-    "PRDA",
-    "PTSP",
-    "PWON",
-    "SBMA",
-    "SHIP",
-    "STRK",
-    "TFCO"
-  ],
   "2026-10-16": [
     "AKKU",
     "ALDO",
@@ -574,5 +551,26 @@
     "UVCR",
     "VOKS",
     "YUPI"
+  ],
+  "2026-11-26": [
+    "BBSI",
+    "BRPT",
+    "IDEA",
+    "INDO",
+    "IRSX",
+    "MANG",
+    "MHKI",
+    "MYOR",
+    "NASI",
+    "NSSS",
+    "OASA",
+    "OKAS",
+    "PURI",
+    "SAPX",
+    "SKRN",
+    "TBIG",
+    "TOBA",
+    "UNIQ",
+    "VOKS"
   ]
 }

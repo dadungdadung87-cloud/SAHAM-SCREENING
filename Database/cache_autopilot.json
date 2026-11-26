@@ -1,116 +1,116 @@
 {
-    "stempel_data": "2026-11-25 15:38:01",
+    "stempel_data": "2026-11-26 15:44:01",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
             "MANG",
-            "DART",
-            "CITY",
-            "BMBL",
-            "UNVR"
+            "SAPX",
+            "IRSX",
+            "OASA",
+            "MHKI"
         ],
         "RUMUS 2": [
-            "MANG",
-            "DART",
-            "CITY",
-            "BMBL",
-            "YUPI"
+            "SAPX",
+            "INDO",
+            "TOBA",
+            "SKRN",
+            "BRPT"
         ],
         "RUMUS 3": [
             "MANG",
-            "CITY",
-            "BMBL",
-            "BESS",
-            "YUPI"
+            "SAPX",
+            "IRSX",
+            "OASA",
+            "VOKS"
         ],
         "RUMUS 4": [
-            "OLIV",
-            "HAIS",
-            "BHIT",
-            "CMNP",
-            "TEBE"
+            "NSSS",
+            "OKAS",
+            "PURI",
+            "TBIG",
+            "BBSI"
         ],
         "RUMUS 5": [
+            "IRSX",
             "MANG",
-            "UVCR",
-            "DART",
-            "MNCN",
-            "CITY"
+            "OASA",
+            "TOBA",
+            "MHKI"
         ],
         "RUMUS 6": [
             "MANG",
-            "POLA",
-            "PRIM",
             "VOKS",
-            "ARII"
+            "UNIQ",
+            "IDEA",
+            "MYOR"
         ],
         "RUMUS 7": [
-            "DART",
-            "BMBL",
-            "CITY",
-            "BESS",
-            "YUPI"
+            "MANG",
+            "SAPX",
+            "IRSX",
+            "OASA",
+            "MHKI"
         ],
         "RUMUS 8": [
             "MANG",
-            "UNVR",
-            "POLA",
-            "YUPI",
-            "PRIM"
+            "VOKS",
+            "NASI",
+            "UNIQ",
+            "IDEA"
         ],
         "RUMUS 9": [
             "MANG",
-            "DART",
-            "CITY",
-            "BMBL",
-            "UNVR"
+            "IRSX",
+            "SAPX",
+            "OASA",
+            "MHKI"
         ]
     },
     "keranjang_top3": {
         "RUMUS 1": [
             "MANG",
-            "CITY",
-            "DART"
+            "SAPX",
+            "IRSX"
         ],
         "RUMUS 2": [
-            "MANG",
-            "CITY",
-            "DART"
+            "SAPX",
+            "INDO",
+            "TOBA"
         ],
         "RUMUS 3": [
             "MANG",
-            "CITY",
-            "YUPI"
+            "SAPX",
+            "IRSX"
         ],
         "RUMUS 4": [
-            "OLIV",
-            "HAIS",
-            "BHIT"
+            "NSSS",
+            "OKAS",
+            "BBSI"
         ],
         "RUMUS 5": [
             "MANG",
-            "DART",
-            "CITY"
+            "IRSX",
+            "OASA"
         ],
         "RUMUS 6": [
             "MANG",
-            "POLA",
-            "VOKS"
+            "VOKS",
+            "IDEA"
         ],
         "RUMUS 7": [
-            "CITY",
-            "DART",
-            "YUPI"
+            "MANG",
+            "SAPX",
+            "IRSX"
         ],
         "RUMUS 8": [
             "MANG",
-            "YUPI",
-            "UNVR"
+            "VOKS",
+            "UNIQ"
         ],
         "RUMUS 9": [
             "MANG",
-            "DART",
-            "CITY"
+            "SAPX",
+            "IRSX"
         ]
     }
 }
