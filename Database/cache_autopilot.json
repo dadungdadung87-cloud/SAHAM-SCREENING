@@ -1,116 +1,116 @@
 {
-    "stempel_data": "2026-11-26 15:44:01",
+    "stempel_data": "2026-11-27 15:44:01",
     "versi": "v6.1",
     "keranjang": {
         "RUMUS 1": [
-            "MANG",
-            "SAPX",
-            "IRSX",
-            "OASA",
-            "MHKI"
+            "BUMI",
+            "BRMS",
+            "DEWA",
+            "NETV",
+            "PSDN"
         ],
         "RUMUS 2": [
-            "SAPX",
-            "INDO",
-            "TOBA",
-            "SKRN",
-            "BRPT"
+            "NETV",
+            "PSDN",
+            "OLIV",
+            "SOSS",
+            "YULE"
         ],
         "RUMUS 3": [
-            "MANG",
-            "SAPX",
-            "IRSX",
-            "OASA",
-            "VOKS"
+            "NETV",
+            "PSDN",
+            "ALII",
+            "NASI",
+            "BMBL"
         ],
         "RUMUS 4": [
-            "NSSS",
-            "OKAS",
-            "PURI",
-            "TBIG",
-            "BBSI"
+            "NASI",
+            "SPRE",
+            "BCAP",
+            "LABA",
+            "HDFA"
         ],
         "RUMUS 5": [
-            "IRSX",
-            "MANG",
-            "OASA",
-            "TOBA",
-            "MHKI"
+            "BUMI",
+            "BRMS",
+            "DEWA",
+            "NETV",
+            "PSDN"
         ],
         "RUMUS 6": [
+            "ALII",
             "MANG",
-            "VOKS",
-            "UNIQ",
-            "IDEA",
-            "MYOR"
+            "KKGI",
+            "INTP",
+            "DKHH"
         ],
         "RUMUS 7": [
-            "MANG",
-            "SAPX",
-            "IRSX",
-            "OASA",
-            "MHKI"
+            "NETV",
+            "PSDN",
+            "BMBL",
+            "HDIT",
+            "BRMS"
         ],
         "RUMUS 8": [
-            "MANG",
-            "VOKS",
+            "PSDN",
             "NASI",
-            "UNIQ",
-            "IDEA"
+            "OLIV",
+            "SPRE",
+            "CEKA"
         ],
         "RUMUS 9": [
-            "MANG",
-            "IRSX",
-            "SAPX",
-            "OASA",
-            "MHKI"
+            "NETV",
+            "PSDN",
+            "BMBL",
+            "ALII",
+            "NASI"
         ]
     },
     "keranjang_top3": {
         "RUMUS 1": [
-            "MANG",
-            "SAPX",
-            "IRSX"
+            "NETV",
+            "PSDN",
+            "BRMS"
         ],
         "RUMUS 2": [
-            "SAPX",
-            "INDO",
-            "TOBA"
+            "NETV",
+            "PSDN",
+            "OLIV"
         ],
         "RUMUS 3": [
-            "MANG",
-            "SAPX",
-            "IRSX"
+            "BMBL",
+            "NETV",
+            "PSDN"
         ],
         "RUMUS 4": [
-            "NSSS",
-            "OKAS",
-            "BBSI"
+            "NASI",
+            "SPRE",
+            "LABA"
         ],
         "RUMUS 5": [
-            "MANG",
-            "IRSX",
-            "OASA"
+            "NETV",
+            "PSDN",
+            "BRMS"
         ],
         "RUMUS 6": [
             "MANG",
-            "VOKS",
-            "IDEA"
+            "ALII",
+            "INTP"
         ],
         "RUMUS 7": [
-            "MANG",
-            "SAPX",
-            "IRSX"
+            "BRMS",
+            "NETV",
+            "PSDN"
         ],
         "RUMUS 8": [
-            "MANG",
-            "VOKS",
-            "UNIQ"
+            "PSDN",
+            "NASI",
+            "OLIV"
         ],
         "RUMUS 9": [
-            "MANG",
-            "SAPX",
-            "IRSX"
+            "BMBL",
+            "NETV",
+            "PSDN"
         ]
     }
 }
